@@ -25,9 +25,55 @@
     "document_prep": "Preparación de Documentos",
     "credit_financing": "Crédito y Financiamiento"
   },
-  "Login": {
-    "title": "Iniciar sesión",
-    "googleCta": "Continuar con Google",
-    "error": "Acceso denegado. Este CRM está restringido a una sola cuenta."
+  "ClientStatus": {
+    "lead": "Prospecto",
+    "active": "Activo",
+    "in_progress": "En Progreso",
+    "completed": "Completado",
+    "follow_up": "Seguimiento"
+  },
+  "CaseStatus": {
+    "new": "Nuevo",
+    "in_progress": "En Progreso",
+    "waiting_on_client": "Esperando al Cliente",
+    "completed": "Completado",
+    "cancelled": "Cancelado"
+  },
+  "Clients": {
+    "title": "Clientes",
+    "newClient": "Nuevo Cliente",
+    "searchPlaceholder": "Buscar por nombre, correo o teléfono...",
+    "noResults": "Ningún cliente coincide con tu búsqueda.",
+    "empty": "Aún no hay clientes. Agrega tu primer cliente para comenzar.",
+    "columnName": "Nombre",
+    "columnContact": "Contacto",
+    "columnStatus": "Estado",
+    "columnServices": "Servicios de Interés",
+    "columnAdded": "Agregado",
+    "backToClients": "Volver a Clientes",
+    "editClient": "Editar Cliente",
+    "tabOverview": "Resumen",
+    "tabCases": "Casos",
+    "tabInvoices": "Facturas",
+    "tabAppointments": "Citas",
+    "noCases": "Aún no hay casos.",
+    "noInvoices": "Aún no hay facturas.",
+    "noAppointments": "Aún no hay citas.",
+    "referralSource": "Fuente de Referencia",
+    "preferredLanguage": "Idioma Preferido",
+    "notes": "Notas",
+    "form": {
+      "fullName": "Nombre Completo",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "preferredLanguage": "Idioma Preferido",
+      "status": "Estado",
+      "referralSource": "Fuente de Referencia",
+      "interestedServices": "Servicios de Interés",
+      "notes": "Notas",
+      "save": "Guardar Cliente",
+      "saving": "Guardando...",
+      "cancel": "Cancelar"
+    }
   }
 }

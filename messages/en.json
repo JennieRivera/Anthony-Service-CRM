@@ -25,9 +25,55 @@
     "document_prep": "Document Prep",
     "credit_financing": "Credit & Financing"
   },
-  "Login": {
-    "title": "Sign in",
-    "googleCta": "Continue with Google",
-    "error": "Access denied. This CRM is restricted to one account."
+  "ClientStatus": {
+    "lead": "Lead",
+    "active": "Active",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "follow_up": "Follow-up"
+  },
+  "CaseStatus": {
+    "new": "New",
+    "in_progress": "In Progress",
+    "waiting_on_client": "Waiting on Client",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "Clients": {
+    "title": "Clients",
+    "newClient": "New Client",
+    "searchPlaceholder": "Search by name, email, or phone...",
+    "noResults": "No clients match your search.",
+    "empty": "No clients yet. Add your first client to get started.",
+    "columnName": "Name",
+    "columnContact": "Contact",
+    "columnStatus": "Status",
+    "columnServices": "Interested Services",
+    "columnAdded": "Added",
+    "backToClients": "Back to Clients",
+    "editClient": "Edit Client",
+    "tabOverview": "Overview",
+    "tabCases": "Cases",
+    "tabInvoices": "Invoices",
+    "tabAppointments": "Appointments",
+    "noCases": "No cases yet.",
+    "noInvoices": "No invoices yet.",
+    "noAppointments": "No appointments yet.",
+    "referralSource": "Referral Source",
+    "preferredLanguage": "Preferred Language",
+    "notes": "Notes",
+    "form": {
+      "fullName": "Full Name",
+      "email": "Email",
+      "phone": "Phone",
+      "preferredLanguage": "Preferred Language",
+      "status": "Status",
+      "referralSource": "Referral Source",
+      "interestedServices": "Interested Services",
+      "notes": "Notes",
+      "save": "Save Client",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    }
   }
 }
