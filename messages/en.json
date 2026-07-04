@@ -19,9 +19,7 @@
   },
   "Login": {
     "title": "Sign in",
-    "email": "Email",
-    "password": "Password",
-    "submit": "Sign in",
-    "error": "Invalid email or password."
+    "googleCta": "Continue with Google",
+    "error": "Access denied. This CRM is restricted to one account."
   }
 }

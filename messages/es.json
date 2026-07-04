@@ -19,9 +19,7 @@
   },
   "Login": {
     "title": "Iniciar sesión",
-    "email": "Correo electrónico",
-    "password": "Contraseña",
-    "submit": "Iniciar sesión",
-    "error": "Correo o contraseña inválidos."
+    "googleCta": "Continuar con Google",
+    "error": "Acceso denegado. Este CRM está restringido a una sola cuenta."
   }
 }
