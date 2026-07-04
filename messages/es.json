@@ -25,6 +25,24 @@
     "activityInvoice": "Factura pagada",
     "activityDocument": "Documento subido"
   },
+  "Reports": {
+    "title": "Reportes y Análisis",
+    "from": "Desde",
+    "to": "Hasta",
+    "apply": "Aplicar",
+    "exportCsv": "Exportar CSV",
+    "exportPdf": "Exportar PDF",
+    "totalRevenue": "Ingresos Totales",
+    "newClients": "Nuevos Clientes",
+    "newCases": "Nuevos Casos",
+    "avgTurnaround": "Tiempo Promedio de Caso",
+    "days": "días",
+    "notAvailable": "N/D",
+    "revenueByService": "Ingresos por Tipo de Servicio",
+    "seasonality": "Volumen de Casos por Mes (Histórico)",
+    "columnService": "Servicio",
+    "columnRevenue": "Ingresos"
+  },
   "Nav": {
     "dashboard": "Panel",
     "clients": "Clientes",
@@ -32,6 +50,7 @@
     "documents": "Documentos",
     "appointments": "Citas",
     "invoices": "Facturas",
+    "reports": "Reportes",
     "signOut": "Cerrar sesión",
     "search": "Buscar...",
     "notifications": "Notificaciones",

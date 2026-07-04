@@ -25,6 +25,24 @@
     "activityInvoice": "Invoice paid",
     "activityDocument": "Document uploaded"
   },
+  "Reports": {
+    "title": "Reports & Analytics",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply",
+    "exportCsv": "Export CSV",
+    "exportPdf": "Export PDF",
+    "totalRevenue": "Total Revenue",
+    "newClients": "New Clients",
+    "newCases": "New Cases",
+    "avgTurnaround": "Avg. Case Turnaround",
+    "days": "days",
+    "notAvailable": "N/A",
+    "revenueByService": "Revenue by Service Type",
+    "seasonality": "Case Volume by Month (All Time)",
+    "columnService": "Service",
+    "columnRevenue": "Revenue"
+  },
   "Nav": {
     "dashboard": "Dashboard",
     "clients": "Clients",
@@ -32,6 +50,7 @@
     "documents": "Documents",
     "appointments": "Appointments",
     "invoices": "Invoices",
+    "reports": "Reports",
     "signOut": "Sign out",
     "search": "Search...",
     "notifications": "Notifications",

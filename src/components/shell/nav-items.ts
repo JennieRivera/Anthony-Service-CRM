@@ -6,6 +6,7 @@ import {
   FileText,
   CalendarDays,
   Receipt,
+  BarChart3,
 } from "lucide-react";
 
 export type NavItem = {
@@ -16,7 +17,8 @@ export type NavItem = {
     | "cases"
     | "documents"
     | "appointments"
-    | "invoices";
+    | "invoices"
+    | "reports";
   icon: LucideIcon;
 };
 
@@ -27,4 +29,5 @@ export const navItems: NavItem[] = [
   { href: "/appointments", labelKey: "appointments", icon: CalendarDays },
   { href: "/invoices", labelKey: "invoices", icon: Receipt },
   { href: "/documents", labelKey: "documents", icon: FileText },
+  { href: "/reports", labelKey: "reports", icon: BarChart3 },
 ];
