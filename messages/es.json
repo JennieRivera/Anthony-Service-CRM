@@ -10,6 +10,7 @@
     "clients": "Clientes",
     "cases": "Casos",
     "documents": "Documentos",
+    "appointments": "Citas",
     "signOut": "Cerrar sesión",
     "search": "Buscar...",
     "notifications": "Notificaciones",
@@ -149,5 +150,34 @@
     "uploading": "Subiendo...",
     "notConfigured": "El almacenamiento de archivos aún no está conectado. Agrega BLOB_READ_WRITE_TOKEN a .env.local (crea un almacén Blob en la pestaña Storage de tu proyecto de Vercel) para habilitar las subidas.",
     "uploadError": "Error al subir. Inténtalo de nuevo."
+  },
+  "AppointmentStatus": {
+    "scheduled": "Programada",
+    "completed": "Completada",
+    "cancelled": "Cancelada",
+    "no_show": "No Asistió"
+  },
+  "Appointments": {
+    "title": "Citas",
+    "newAppointment": "Nueva Cita",
+    "editAppointment": "Editar Cita",
+    "backToAppointments": "Volver a Citas",
+    "today": "Hoy",
+    "form": {
+      "client": "Cliente",
+      "selectClient": "Selecciona un cliente",
+      "case": "Caso",
+      "noCase": "Ninguno",
+      "title": "Título",
+      "serviceType": "Tipo de Servicio",
+      "startAt": "Inicio",
+      "endAt": "Fin",
+      "location": "Ubicación",
+      "status": "Estado",
+      "notes": "Notas",
+      "save": "Guardar Cita",
+      "saving": "Guardando...",
+      "cancel": "Cancelar"
+    }
   }
 }

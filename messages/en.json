@@ -10,6 +10,7 @@
     "clients": "Clients",
     "cases": "Cases",
     "documents": "Documents",
+    "appointments": "Appointments",
     "signOut": "Sign out",
     "search": "Search...",
     "notifications": "Notifications",
@@ -149,5 +150,34 @@
     "uploading": "Uploading...",
     "notConfigured": "File storage isn't connected yet. Add BLOB_READ_WRITE_TOKEN to .env.local (create a Blob store in your Vercel project's Storage tab) to enable uploads.",
     "uploadError": "Upload failed. Please try again."
+  },
+  "AppointmentStatus": {
+    "scheduled": "Scheduled",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "no_show": "No Show"
+  },
+  "Appointments": {
+    "title": "Appointments",
+    "newAppointment": "New Appointment",
+    "editAppointment": "Edit Appointment",
+    "backToAppointments": "Back to Appointments",
+    "today": "Today",
+    "form": {
+      "client": "Client",
+      "selectClient": "Select a client",
+      "case": "Case",
+      "noCase": "None",
+      "title": "Title",
+      "serviceType": "Service Type",
+      "startAt": "Start",
+      "endAt": "End",
+      "location": "Location",
+      "status": "Status",
+      "notes": "Notes",
+      "save": "Save Appointment",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    }
   }
 }

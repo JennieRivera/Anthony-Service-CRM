@@ -42,6 +42,7 @@ export function ClientProfileTabs({
   const t = useTranslations("Clients");
   const tCases = useTranslations("Cases");
   const tDocuments = useTranslations("Documents");
+  const tAppointments = useTranslations("Appointments");
   const tService = useTranslations("ServiceType");
 
   return (
@@ -120,6 +121,16 @@ export function ClientProfileTabs({
       </TabsContent>
 
       <TabsContent value="appointments" className="flex flex-col gap-2 pt-4">
+        <div className="flex justify-end">
+          <Button
+            size="sm"
+            variant="outline"
+            render={<Link href={`/appointments/new?clientId=${clientId}`} />}
+          >
+            <Plus className="h-4 w-4" />
+            {tAppointments("newAppointment")}
+          </Button>
+        </div>
         {appointments.length === 0 && (
           <p className="text-muted-foreground">{t("noAppointments")}</p>
         )}
