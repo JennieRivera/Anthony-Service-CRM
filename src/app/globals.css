@@ -1,26 +1,107 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-public-sans);
+  --font-heading: var(--font-playfair);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+ * Anthony Service CRM brand tokens — deep navy, warm cream, muted gold/brass.
+ * Single light theme only; no dark mode.
+ * Contrast checked: navy-on-cream ~16.4:1 (AAA), navy-on-gold ~6.2:1 (AA).
+ * Gold-on-cream is ~2.6:1 and fails AA — never use --accent as a text color
+ * on --background/--card; restrict it to fills, borders, chips, chart lines,
+ * and as a background with --accent-foreground (navy) text on top.
+ */
+:root {
+  --background: #faf8f3;
+  --foreground: #0f1a2b;
+  --card: #ffffff;
+  --card-foreground: #0f1a2b;
+  --popover: #ffffff;
+  --popover-foreground: #0f1a2b;
+  --primary: #0f1a2b;
+  --primary-foreground: #faf8f3;
+  --secondary: #f1ede4;
+  --secondary-foreground: #0f1a2b;
+  --muted: #f1ede4;
+  --muted-foreground: #5b6472;
+  --accent: #b8964a;
+  --accent-foreground: #0f1a2b;
+  --destructive: #a13b2c;
+  --border: #e4e0d6;
+  --input: #e4e0d6;
+  --ring: #b8964a;
+  --chart-1: #0f1a2b;
+  --chart-2: #b8964a;
+  --chart-3: #6b7a8f;
+  --chart-4: #8c6d46;
+  --chart-5: #3e5c76;
+  --radius: 0.625rem;
+  --sidebar: #0f1a2b;
+  --sidebar-foreground: #faf8f3;
+  --sidebar-primary: #b8964a;
+  --sidebar-primary-foreground: #0f1a2b;
+  --sidebar-accent: #1b2a40;
+  --sidebar-accent-foreground: #faf8f3;
+  --sidebar-border: #24344a;
+  --sidebar-ring: #b8964a;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+  }
 }
