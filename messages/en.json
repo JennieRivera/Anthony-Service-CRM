@@ -1,0 +1,27 @@
+{
+  "HomePage": {
+    "title": "Anthony Service CRM",
+    "subtitle": "Manage clients across notary, immigration, tax, and credit/financing services.",
+    "contactsCta": "View Contacts",
+    "dealsCta": "View Deals"
+  },
+  "Nav": {
+    "dashboard": "Dashboard",
+    "contacts": "Contacts",
+    "deals": "Deals",
+    "signOut": "Sign out"
+  },
+  "ServiceType": {
+    "notary": "Notary",
+    "immigration": "Immigration",
+    "tax": "Tax",
+    "credit_financing": "Credit & Financing"
+  },
+  "Login": {
+    "title": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "error": "Invalid email or password."
+  }
+}

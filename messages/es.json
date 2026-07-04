@@ -1,0 +1,27 @@
+{
+  "HomePage": {
+    "title": "Anthony Service CRM",
+    "subtitle": "Administra clientes de notaría, inmigración, impuestos y crédito/financiamiento.",
+    "contactsCta": "Ver Contactos",
+    "dealsCta": "Ver Casos"
+  },
+  "Nav": {
+    "dashboard": "Panel",
+    "contacts": "Contactos",
+    "deals": "Casos",
+    "signOut": "Cerrar sesión"
+  },
+  "ServiceType": {
+    "notary": "Notaría",
+    "immigration": "Inmigración",
+    "tax": "Impuestos",
+    "credit_financing": "Crédito y Financiamiento"
+  },
+  "Login": {
+    "title": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "submit": "Iniciar sesión",
+    "error": "Correo o contraseña inválidos."
+  }
+}
