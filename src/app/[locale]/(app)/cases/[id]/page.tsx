@@ -2,9 +2,12 @@ import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getCaseById } from "@/lib/queries/cases";
+import { isBlobConfigured } from "@/lib/blob/config";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { CaseStatusBadge } from "@/components/clients/StatusBadge";
+import { DocumentList } from "@/components/documents/DocumentList";
+import { DocumentUploader } from "@/components/documents/DocumentUploader";
 
 export default async function CaseDetailPage({
   params,
@@ -16,11 +19,12 @@ export default async function CaseDetailPage({
   const tService = await getTranslations("ServiceType");
   const tActType = await getTranslations("NotarialActType");
   const tIdMethod = await getTranslations("IdVerificationMethod");
+  const tDocuments = await getTranslations("Documents");
 
   const result = await getCaseById(id);
   if (!result) notFound();
 
-  const { case: c, client, notaryEntries, apostille } = result;
+  const { case: c, client, notaryEntries, apostille, documents } = result;
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -168,6 +172,20 @@ export default async function CaseDetailPage({
           </div>
         </div>
       )}
+
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+        <h2 className="font-heading text-lg text-foreground">
+          {tDocuments("title")}
+        </h2>
+        {isBlobConfigured() ? (
+          <DocumentUploader clientId={client.id} caseId={c.id} />
+        ) : (
+          <p className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            {tDocuments("notConfigured")}
+          </p>
+        )}
+        <DocumentList documents={documents} />
+      </div>
     </div>
   );
 }

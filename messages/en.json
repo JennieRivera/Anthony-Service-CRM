@@ -9,6 +9,7 @@
     "dashboard": "Dashboard",
     "clients": "Clients",
     "cases": "Cases",
+    "documents": "Documents",
     "signOut": "Sign out",
     "search": "Search...",
     "notifications": "Notifications",
@@ -126,5 +127,27 @@
     "personal_knowledge": "Personal Knowledge",
     "id_card": "ID Card",
     "credible_witness": "Credible Witness"
+  },
+  "DocumentStatus": {
+    "pending": "Pending",
+    "received": "Received",
+    "submitted": "Submitted",
+    "returned": "Returned"
+  },
+  "Documents": {
+    "title": "Documents",
+    "empty": "No documents yet.",
+    "columnFile": "File",
+    "columnClient": "Client",
+    "columnCase": "Case",
+    "columnType": "Type",
+    "columnStatus": "Status",
+    "columnUploaded": "Uploaded",
+    "uploadLabel": "Upload a document",
+    "documentTypePlaceholder": "Document type (optional)",
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "notConfigured": "File storage isn't connected yet. Add BLOB_READ_WRITE_TOKEN to .env.local (create a Blob store in your Vercel project's Storage tab) to enable uploads.",
+    "uploadError": "Upload failed. Please try again."
   }
 }

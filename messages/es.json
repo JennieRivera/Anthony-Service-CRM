@@ -9,6 +9,7 @@
     "dashboard": "Panel",
     "clients": "Clientes",
     "cases": "Casos",
+    "documents": "Documentos",
     "signOut": "Cerrar sesión",
     "search": "Buscar...",
     "notifications": "Notificaciones",
@@ -126,5 +127,27 @@
     "personal_knowledge": "Conocimiento Personal",
     "id_card": "Identificación",
     "credible_witness": "Testigo Confiable"
+  },
+  "DocumentStatus": {
+    "pending": "Pendiente",
+    "received": "Recibido",
+    "submitted": "Enviado",
+    "returned": "Devuelto"
+  },
+  "Documents": {
+    "title": "Documentos",
+    "empty": "Aún no hay documentos.",
+    "columnFile": "Archivo",
+    "columnClient": "Cliente",
+    "columnCase": "Caso",
+    "columnType": "Tipo",
+    "columnStatus": "Estado",
+    "columnUploaded": "Subido",
+    "uploadLabel": "Subir un documento",
+    "documentTypePlaceholder": "Tipo de documento (opcional)",
+    "upload": "Subir",
+    "uploading": "Subiendo...",
+    "notConfigured": "El almacenamiento de archivos aún no está conectado. Agrega BLOB_READ_WRITE_TOKEN a .env.local (crea un almacén Blob en la pestaña Storage de tu proyecto de Vercel) para habilitar las subidas.",
+    "uploadError": "Error al subir. Inténtalo de nuevo."
   }
 }

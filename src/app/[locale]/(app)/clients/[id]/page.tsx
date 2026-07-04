@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getClientById } from "@/lib/queries/clients";
+import { isBlobConfigured } from "@/lib/blob/config";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { ClientStatusBadge } from "@/components/clients/StatusBadge";
@@ -18,7 +19,7 @@ export default async function ClientProfilePage({
   const result = await getClientById(id);
   if (!result) notFound();
 
-  const { client, cases, invoices, appointments } = result;
+  const { client, cases, invoices, appointments, documents } = result;
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -74,6 +75,8 @@ export default async function ClientProfilePage({
         cases={cases}
         invoices={invoices}
         appointments={appointments}
+        documents={documents}
+        blobConfigured={isBlobConfigured()}
       />
     </div>
   );

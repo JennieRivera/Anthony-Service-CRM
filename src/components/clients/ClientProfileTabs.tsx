@@ -12,7 +12,9 @@ import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CaseStatusBadge } from "./StatusBadge";
-import type { Case, Invoice, Appointment } from "@/lib/db/schema";
+import { DocumentList } from "@/components/documents/DocumentList";
+import { DocumentUploader } from "@/components/documents/DocumentUploader";
+import type { Case, Invoice, Appointment, Document } from "@/lib/db/schema";
 
 function formatMoney(value: string | null) {
   if (!value) return "—";
@@ -27,14 +29,19 @@ export function ClientProfileTabs({
   cases,
   invoices,
   appointments,
+  documents,
+  blobConfigured,
 }: {
   clientId: string;
   cases: Case[];
   invoices: Invoice[];
   appointments: Appointment[];
+  documents: Document[];
+  blobConfigured: boolean;
 }) {
   const t = useTranslations("Clients");
   const tCases = useTranslations("Cases");
+  const tDocuments = useTranslations("Documents");
   const tService = useTranslations("ServiceType");
 
   return (
@@ -48,6 +55,9 @@ export function ClientProfileTabs({
         </TabsTrigger>
         <TabsTrigger value="appointments">
           {t("tabAppointments")} ({appointments.length})
+        </TabsTrigger>
+        <TabsTrigger value="documents">
+          {tDocuments("title")} ({documents.length})
         </TabsTrigger>
       </TabsList>
 
@@ -129,6 +139,17 @@ export function ClientProfileTabs({
             <Badge variant="outline">{appt.status}</Badge>
           </div>
         ))}
+      </TabsContent>
+
+      <TabsContent value="documents" className="flex flex-col gap-4 pt-4">
+        {blobConfigured ? (
+          <DocumentUploader clientId={clientId} />
+        ) : (
+          <p className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            {tDocuments("notConfigured")}
+          </p>
+        )}
+        <DocumentList documents={documents} />
       </TabsContent>
     </Tabs>
   );

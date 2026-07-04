@@ -5,6 +5,7 @@ import {
   clients,
   notaryLogEntries,
   apostilleDetails,
+  documents,
 } from "@/lib/db/schema";
 
 export async function listCasesWithClient() {
@@ -47,7 +48,7 @@ export async function getCaseById(id: string) {
 
   if (!row) return null;
 
-  const [notaryEntries, apostille] = await Promise.all([
+  const [notaryEntries, apostille, caseDocuments] = await Promise.all([
     db
       .select()
       .from(notaryLogEntries)
@@ -58,6 +59,11 @@ export async function getCaseById(id: string) {
       .from(apostilleDetails)
       .where(eq(apostilleDetails.caseId, id))
       .limit(1),
+    db
+      .select()
+      .from(documents)
+      .where(eq(documents.caseId, id))
+      .orderBy(desc(documents.createdAt)),
   ]);
 
   return {
@@ -65,5 +71,6 @@ export async function getCaseById(id: string) {
     client: row.client,
     notaryEntries,
     apostille: apostille[0] ?? null,
+    documents: caseDocuments,
   };
 }
