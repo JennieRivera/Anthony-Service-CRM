@@ -43,6 +43,7 @@ export function ClientProfileTabs({
   const tCases = useTranslations("Cases");
   const tDocuments = useTranslations("Documents");
   const tAppointments = useTranslations("Appointments");
+  const tInvoices = useTranslations("Invoices");
   const tService = useTranslations("ServiceType");
 
   return (
@@ -94,13 +95,24 @@ export function ClientProfileTabs({
       </TabsContent>
 
       <TabsContent value="invoices" className="flex flex-col gap-2 pt-4">
+        <div className="flex justify-end">
+          <Button
+            size="sm"
+            variant="outline"
+            render={<Link href={`/invoices/new?clientId=${clientId}`} />}
+          >
+            <Plus className="h-4 w-4" />
+            {tInvoices("newInvoice")}
+          </Button>
+        </div>
         {invoices.length === 0 && (
           <p className="text-muted-foreground">{t("noInvoices")}</p>
         )}
         {invoices.map((invoice) => (
-          <div
+          <Link
             key={invoice.id}
-            className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
+            href={`/invoices/${invoice.id}`}
+            className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted"
           >
             <div className="flex flex-col gap-1">
               <span className="font-medium text-foreground">
@@ -116,7 +128,7 @@ export function ClientProfileTabs({
               </span>
               <Badge variant="outline">{invoice.status}</Badge>
             </div>
-          </div>
+          </Link>
         ))}
       </TabsContent>
 

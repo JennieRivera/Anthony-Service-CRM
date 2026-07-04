@@ -5,11 +5,18 @@ import {
   Briefcase,
   FileText,
   CalendarDays,
+  Receipt,
 } from "lucide-react";
 
 export type NavItem = {
   href: string;
-  labelKey: "dashboard" | "clients" | "cases" | "documents" | "appointments";
+  labelKey:
+    | "dashboard"
+    | "clients"
+    | "cases"
+    | "documents"
+    | "appointments"
+    | "invoices";
   icon: LucideIcon;
 };
 
@@ -18,5 +25,6 @@ export const navItems: NavItem[] = [
   { href: "/clients", labelKey: "clients", icon: Users },
   { href: "/cases", labelKey: "cases", icon: Briefcase },
   { href: "/appointments", labelKey: "appointments", icon: CalendarDays },
+  { href: "/invoices", labelKey: "invoices", icon: Receipt },
   { href: "/documents", labelKey: "documents", icon: FileText },
 ];
