@@ -75,5 +75,56 @@
       "saving": "Guardando...",
       "cancel": "Cancelar"
     }
+  },
+  "Cases": {
+    "title": "Casos",
+    "newCase": "Nuevo Caso",
+    "editCase": "Editar Caso",
+    "backToCases": "Volver a Casos",
+    "viewKanban": "Tablero",
+    "viewList": "Lista",
+    "empty": "Aún no hay casos. Agrega tu primer caso para comenzar.",
+    "columnTitle": "Título",
+    "columnClient": "Cliente",
+    "columnService": "Servicio",
+    "columnDue": "Vencimiento",
+    "columnFee": "Tarifa",
+    "notaryJournal": "Entrada del Libro Notarial",
+    "apostilleDetails": "Detalles de Apostilla",
+    "form": {
+      "client": "Cliente",
+      "selectClient": "Selecciona un cliente",
+      "serviceType": "Tipo de Servicio",
+      "status": "Estado",
+      "title": "Título del Caso",
+      "dueDate": "Fecha de Vencimiento",
+      "fee": "Tarifa",
+      "notes": "Notas",
+      "documentType": "Tipo de Documento",
+      "notarialActType": "Tipo de Acto Notarial",
+      "idVerificationMethod": "Método de Verificación de Identidad",
+      "feeCharged": "Tarifa Cobrada",
+      "destinationCountry": "País de Destino",
+      "instrumentType": "Tipo de Instrumento",
+      "submissionDate": "Fecha de Envío",
+      "expectedReturnDate": "Fecha de Retorno Esperada",
+      "actualReturnDate": "Fecha de Retorno Real",
+      "save": "Guardar Caso",
+      "saving": "Guardando...",
+      "cancel": "Cancelar"
+    }
+  },
+  "NotarialActType": {
+    "jurat": "Jurat",
+    "acknowledgment": "Reconocimiento",
+    "oath_affirmation": "Juramento / Afirmación",
+    "signature_witnessing": "Testigo de Firma",
+    "copy_certification": "Certificación de Copia",
+    "other": "Otro"
+  },
+  "IdVerificationMethod": {
+    "personal_knowledge": "Conocimiento Personal",
+    "id_card": "Identificación",
+    "credible_witness": "Testigo Confiable"
   }
 }

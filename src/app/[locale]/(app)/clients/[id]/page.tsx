@@ -70,6 +70,7 @@ export default async function ClientProfilePage({
       </div>
 
       <ClientProfileTabs
+        clientId={client.id}
         cases={cases}
         invoices={invoices}
         appointments={appointments}

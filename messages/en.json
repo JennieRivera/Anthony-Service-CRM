@@ -75,5 +75,56 @@
       "saving": "Saving...",
       "cancel": "Cancel"
     }
+  },
+  "Cases": {
+    "title": "Cases",
+    "newCase": "New Case",
+    "editCase": "Edit Case",
+    "backToCases": "Back to Cases",
+    "viewKanban": "Board",
+    "viewList": "List",
+    "empty": "No cases yet. Add your first case to get started.",
+    "columnTitle": "Title",
+    "columnClient": "Client",
+    "columnService": "Service",
+    "columnDue": "Due",
+    "columnFee": "Fee",
+    "notaryJournal": "Notary Journal Entry",
+    "apostilleDetails": "Apostille Details",
+    "form": {
+      "client": "Client",
+      "selectClient": "Select a client",
+      "serviceType": "Service Type",
+      "status": "Status",
+      "title": "Case Title",
+      "dueDate": "Due Date",
+      "fee": "Fee",
+      "notes": "Notes",
+      "documentType": "Document Type",
+      "notarialActType": "Notarial Act Type",
+      "idVerificationMethod": "ID Verification Method",
+      "feeCharged": "Fee Charged",
+      "destinationCountry": "Destination Country",
+      "instrumentType": "Instrument Type",
+      "submissionDate": "Submission Date",
+      "expectedReturnDate": "Expected Return Date",
+      "actualReturnDate": "Actual Return Date",
+      "save": "Save Case",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    }
+  },
+  "NotarialActType": {
+    "jurat": "Jurat",
+    "acknowledgment": "Acknowledgment",
+    "oath_affirmation": "Oath / Affirmation",
+    "signature_witnessing": "Signature Witnessing",
+    "copy_certification": "Copy Certification",
+    "other": "Other"
+  },
+  "IdVerificationMethod": {
+    "personal_knowledge": "Personal Knowledge",
+    "id_card": "ID Card",
+    "credible_witness": "Credible Witness"
   }
 }

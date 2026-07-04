@@ -8,7 +8,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { CaseStatusBadge } from "./StatusBadge";
 import type { Case, Invoice, Appointment } from "@/lib/db/schema";
 
@@ -21,15 +23,18 @@ function formatMoney(value: string | null) {
 }
 
 export function ClientProfileTabs({
+  clientId,
   cases,
   invoices,
   appointments,
 }: {
+  clientId: string;
   cases: Case[];
   invoices: Invoice[];
   appointments: Appointment[];
 }) {
   const t = useTranslations("Clients");
+  const tCases = useTranslations("Cases");
   const tService = useTranslations("ServiceType");
 
   return (
@@ -47,6 +52,16 @@ export function ClientProfileTabs({
       </TabsList>
 
       <TabsContent value="cases" className="flex flex-col gap-2 pt-4">
+        <div className="flex justify-end">
+          <Button
+            size="sm"
+            variant="outline"
+            render={<Link href={`/cases/new?clientId=${clientId}`} />}
+          >
+            <Plus className="h-4 w-4" />
+            {tCases("newCase")}
+          </Button>
+        </div>
         {cases.length === 0 && (
           <p className="text-muted-foreground">{t("noCases")}</p>
         )}
