@@ -1,9 +1,29 @@
 {
-  "HomePage": {
-    "title": "Anthony Service CRM",
-    "subtitle": "Administra clientes de notaría, inmigración, impuestos y crédito/financiamiento.",
-    "clientsCta": "Ver Clientes",
-    "casesCta": "Ver Casos"
+  "Dashboard": {
+    "title": "Panel",
+    "activeClients": "Clientes Activos",
+    "revenueThisMonth": "Ingresos Este Mes",
+    "openCases": "Casos Abiertos",
+    "outstandingInvoices": "Facturas Pendientes",
+    "vsLastMonth": "vs. mes anterior",
+    "revenue": "Ingresos",
+    "weekly": "Semanal",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "serviceBreakdown": "Casos por Servicio",
+    "clientGrowth": "Nuevos Clientes",
+    "upcomingAppointments": "Próximas Citas",
+    "noUpcoming": "No hay próximas citas.",
+    "recentActivity": "Actividad Reciente",
+    "noActivity": "Sin actividad reciente.",
+    "actionNeeded": "Requiere Atención",
+    "noActionNeeded": "Nada requiere atención en este momento.",
+    "overdueInvoice": "Factura vencida",
+    "stalledCase": "Esperando al cliente",
+    "activityClient": "Nuevo cliente agregado",
+    "activityCase": "Caso actualizado",
+    "activityInvoice": "Factura pagada",
+    "activityDocument": "Documento subido"
   },
   "Nav": {
     "dashboard": "Panel",
