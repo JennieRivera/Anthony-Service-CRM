@@ -3,12 +3,12 @@ import { LayoutDashboard, Users, Briefcase } from "lucide-react";
 
 export type NavItem = {
   href: string;
-  labelKey: "dashboard" | "contacts" | "deals";
+  labelKey: "dashboard" | "clients" | "cases";
   icon: LucideIcon;
 };
 
 export const navItems: NavItem[] = [
   { href: "/", labelKey: "dashboard", icon: LayoutDashboard },
-  { href: "/contacts", labelKey: "contacts", icon: Users },
-  { href: "/deals", labelKey: "deals", icon: Briefcase },
+  { href: "/clients", labelKey: "clients", icon: Users },
+  { href: "/cases", labelKey: "cases", icon: Briefcase },
 ];

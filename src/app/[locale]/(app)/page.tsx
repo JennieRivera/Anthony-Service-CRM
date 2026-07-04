@@ -16,11 +16,11 @@ export default async function Home() {
         </p>
       </div>
       <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-        <Button size="lg" render={<Link href="/contacts" />}>
-          {t("contactsCta")}
+        <Button size="lg" render={<Link href="/clients" />}>
+          {t("clientsCta")}
         </Button>
-        <Button size="lg" variant="outline" render={<Link href="/deals" />}>
-          {t("dealsCta")}
+        <Button size="lg" variant="outline" render={<Link href="/cases" />}>
+          {t("casesCta")}
         </Button>
       </div>
     </div>

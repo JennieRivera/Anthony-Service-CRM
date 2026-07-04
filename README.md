@@ -13,9 +13,13 @@ Internal CRM for [Anthony Service, LLC](https://anthonyservice.com) (Kissimmee, 
 
 ## Data model
 
-- **Contacts** — clients, one record per person
-- **Deals** — a case/job for a contact, tagged with a `service_type` (`notary`, `immigration`, `tax`, `credit_financing`) and a status
-- **Documents** — files attached to a deal, stored in Vercel Blob
+- **Clients** — one record per person, with a status pipeline (lead → active → in progress → completed → follow-up)
+- **Cases** — a job for a client, tagged with a `service_type` (notary, mobile/online notary, immigration, tax prep, apostille, document prep, credit/financing) and its own status
+- **Appointments** — scheduled events tied to a client (and optionally a case)
+- **Invoices** / **Invoice line items** — billing tied to a client (and optionally a case)
+- **Notary log entries** — Florida notarial journal records (immutable client-name snapshot; never hard-deleted)
+- **Apostille details** — 1:1 extension of a case for apostille-specific tracking (destination country, submission/return dates)
+- **Documents** — files attached to a client (and optionally a case), stored in Vercel Blob
 - **Users** — reserved for future staff logins; not used for auth today (see below)
 
 See `src/lib/db/schema.ts` for the full schema.
