@@ -9,7 +9,11 @@
     "dashboard": "Dashboard",
     "contacts": "Contacts",
     "deals": "Deals",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "search": "Search...",
+    "notifications": "Notifications",
+    "openMenu": "Open menu",
+    "account": "Account"
   },
   "ServiceType": {
     "notary": "Notary",

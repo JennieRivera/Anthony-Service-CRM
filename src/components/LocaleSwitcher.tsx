@@ -13,12 +13,12 @@ export default function LocaleSwitcher() {
     <select
       value={locale}
       onChange={(e) => router.replace(pathname, { locale: e.target.value })}
-      className="rounded-md border border-black/[.08] bg-white px-2 py-1 text-sm dark:border-white/[.145] dark:bg-black dark:text-zinc-50"
+      className="h-9 rounded-md border border-input bg-card px-2 text-sm text-foreground"
       aria-label="Language"
     >
       {routing.locales.map((loc) => (
         <option key={loc} value={loc}>
-          {loc === "en" ? "English" : "Español"}
+          {loc === "en" ? "EN" : "ES"}
         </option>
       ))}
     </select>

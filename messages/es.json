@@ -9,7 +9,11 @@
     "dashboard": "Panel",
     "contacts": "Contactos",
     "deals": "Casos",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "search": "Buscar...",
+    "notifications": "Notificaciones",
+    "openMenu": "Abrir menú",
+    "account": "Cuenta"
   },
   "ServiceType": {
     "notary": "Notaría",
