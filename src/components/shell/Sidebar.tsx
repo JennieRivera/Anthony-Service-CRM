@@ -42,6 +42,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 isActive
@@ -61,6 +62,7 @@ export function Sidebar() {
         <button
           type="button"
           onClick={() => setCollapsed((v) => !v)}
+          aria-label={collapsed ? t("expandSidebar") : t("collapseSidebar")}
           className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm text-[var(--sidebar-foreground)]/70 transition-colors hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
         >
           {collapsed ? (

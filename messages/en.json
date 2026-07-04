@@ -74,7 +74,9 @@
     "search": "Search...",
     "notifications": "Notifications",
     "openMenu": "Open menu",
-    "account": "Account"
+    "account": "Account",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "ServiceType": {
     "notary": "Notary",

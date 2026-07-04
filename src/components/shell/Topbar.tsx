@@ -40,7 +40,12 @@ export async function Topbar() {
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <Button variant="ghost" size="icon" className="rounded-full" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                aria-label={t("account")}
+              />
             }
           >
             <Avatar className="h-8 w-8">

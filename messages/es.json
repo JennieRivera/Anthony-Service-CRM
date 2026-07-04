@@ -74,7 +74,9 @@
     "search": "Buscar...",
     "notifications": "Notificaciones",
     "openMenu": "Abrir menú",
-    "account": "Cuenta"
+    "account": "Cuenta",
+    "collapseSidebar": "Contraer barra lateral",
+    "expandSidebar": "Expandir barra lateral"
   },
   "ServiceType": {
     "notary": "Notaría",
