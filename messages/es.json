@@ -43,6 +43,24 @@
     "columnService": "Servicio",
     "columnRevenue": "Ingresos"
   },
+  "Settings": {
+    "title": "Configuración",
+    "businessProfile": "Perfil del Negocio",
+    "businessName": "Nombre del Negocio",
+    "address": "Dirección",
+    "phone": "Teléfono",
+    "languages": "Idiomas Atendidos",
+    "account": "Cuenta",
+    "signedInAs": "Sesión iniciada como",
+    "accessNote": "El acceso a este CRM está restringido a esta única cuenta.",
+    "notifications": "Preferencias de Notificación",
+    "notificationsComingSoon": "Las preferencias de notificación por correo/SMS estarán disponibles próximamente.",
+    "notifyNewAppointment": "Nueva cita reservada",
+    "notifyInvoicePaid": "Factura pagada",
+    "notifyOverdueInvoice": "Factura vencida",
+    "staffAccounts": "Cuentas de Personal",
+    "staffAccountsComingSoon": "Este CRM actualmente admite una sola cuenta de administrador. Los inicios de sesión de personal múltiple con permisos basados en roles (Admin / Personal) están planeados para una futura actualización."
+  },
   "Nav": {
     "dashboard": "Panel",
     "clients": "Clientes",
@@ -51,6 +69,7 @@
     "appointments": "Citas",
     "invoices": "Facturas",
     "reports": "Reportes",
+    "settings": "Configuración",
     "signOut": "Cerrar sesión",
     "search": "Buscar...",
     "notifications": "Notificaciones",

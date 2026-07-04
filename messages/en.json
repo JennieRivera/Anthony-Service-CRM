@@ -43,6 +43,24 @@
     "columnService": "Service",
     "columnRevenue": "Revenue"
   },
+  "Settings": {
+    "title": "Settings",
+    "businessProfile": "Business Profile",
+    "businessName": "Business Name",
+    "address": "Address",
+    "phone": "Phone",
+    "languages": "Languages Served",
+    "account": "Account",
+    "signedInAs": "Signed in as",
+    "accessNote": "Access to this CRM is restricted to this single account.",
+    "notifications": "Notification Preferences",
+    "notificationsComingSoon": "Email/SMS notification preferences are coming soon.",
+    "notifyNewAppointment": "New appointment booked",
+    "notifyInvoicePaid": "Invoice paid",
+    "notifyOverdueInvoice": "Invoice becomes overdue",
+    "staffAccounts": "Staff Accounts",
+    "staffAccountsComingSoon": "This CRM currently supports a single admin account. Multi-staff logins with role-based permissions (Admin / Staff) are planned for a future update."
+  },
   "Nav": {
     "dashboard": "Dashboard",
     "clients": "Clients",
@@ -51,6 +69,7 @@
     "appointments": "Appointments",
     "invoices": "Invoices",
     "reports": "Reports",
+    "settings": "Settings",
     "signOut": "Sign out",
     "search": "Search...",
     "notifications": "Notifications",

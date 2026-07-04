@@ -7,6 +7,7 @@ import {
   CalendarDays,
   Receipt,
   BarChart3,
+  Settings,
 } from "lucide-react";
 
 export type NavItem = {
@@ -18,7 +19,8 @@ export type NavItem = {
     | "documents"
     | "appointments"
     | "invoices"
-    | "reports";
+    | "reports"
+    | "settings";
   icon: LucideIcon;
 };
 
@@ -30,4 +32,5 @@ export const navItems: NavItem[] = [
   { href: "/invoices", labelKey: "invoices", icon: Receipt },
   { href: "/documents", labelKey: "documents", icon: FileText },
   { href: "/reports", labelKey: "reports", icon: BarChart3 },
+  { href: "/settings", labelKey: "settings", icon: Settings },
 ];
