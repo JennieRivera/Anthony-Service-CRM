@@ -102,7 +102,53 @@ const templates: Record<
           { en: "Full Legal Name", es: "Nombre Legal Completo" },
           { en: "A-Number (if any)", es: "Número A (si aplica)" },
           { en: "Country of Origin", es: "País de Origen" },
-          { en: "Form / Petition Requested", es: "Formulario / Petición Solicitada" },
+        ],
+      },
+      {
+        heading: {
+          en: "Immigration Forms Checklist (check what applies)",
+          es: "Lista de Formularios de Inmigración (marque lo que aplique)",
+        },
+        body: [
+          {
+            en: "☐ I-130 — Petition for Alien Relative",
+            es: "☐ I-130 — Petición de Familiar Extranjero",
+          },
+          {
+            en: "☐ I-140 — Immigrant Petition for Alien Worker",
+            es: "☐ I-140 — Petición de Inmigrante Basada en Empleo",
+          },
+          {
+            en: "☐ I-485 — Adjustment of Status (Green Card)",
+            es: "☐ I-485 — Ajuste de Estatus (Residencia)",
+          },
+          {
+            en: "☐ I-765 — Work Permit (Employment Authorization)",
+            es: "☐ I-765 — Permiso de Trabajo (Autorización de Empleo)",
+          },
+          {
+            en: "☐ I-131 — Travel Document (Advance Parole)",
+            es: "☐ I-131 — Permiso de Viaje (Advance Parole)",
+          },
+          {
+            en: "☐ I-90 — Green Card Renewal / Replacement",
+            es: "☐ I-90 — Renovación / Reemplazo de Residencia",
+          },
+          {
+            en: "☐ I-751 — Remove Conditions on Residence",
+            es: "☐ I-751 — Remover Condiciones de Residencia",
+          },
+          {
+            en: "☐ N-400 — Naturalization (Citizenship)",
+            es: "☐ N-400 — Naturalización (Ciudadanía)",
+          },
+          {
+            en: "☐ Nonimmigrant Visa Application (DS-160)",
+            es: "☐ Solicitud de Visa de No-Inmigrante (DS-160)",
+          },
+        ],
+        fields: [
+          { en: "Other Document(s)", es: "Otro(s) Documento(s)" },
         ],
       },
       {
