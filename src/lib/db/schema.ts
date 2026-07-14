@@ -11,14 +11,12 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const serviceTypeEnum = pgEnum("service_type", [
-  "notary",
-  "mobile_notary",
   "online_notary",
-  "immigration",
-  "tax_prep",
-  "apostille",
   "document_prep",
+  "tax_prep",
+  "company_registration",
   "credit_financing",
+  "leadership",
 ]);
 
 export const clientStatusEnum = pgEnum("client_status", [

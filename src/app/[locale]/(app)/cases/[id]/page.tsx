@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Pencil } from "lucide-react";
+import { Pencil, FileText } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getCaseById } from "@/lib/queries/cases";
 import { isBlobConfigured } from "@/lib/blob/config";
@@ -32,10 +32,19 @@ export default async function CaseDetailPage({
         <Link href="/cases" className="text-sm text-muted-foreground underline">
           &larr; {t("backToCases")}
         </Link>
-        <Button variant="outline" render={<Link href={`/cases/${id}/edit`} />}>
-          <Pencil className="h-4 w-4" />
-          {t("editCase")}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            render={<a href={`/api/cases/${id}/template/pdf`} />}
+          >
+            <FileText className="h-4 w-4" />
+            {t("generateTemplate")}
+          </Button>
+          <Button variant="outline" render={<Link href={`/cases/${id}/edit`} />}>
+            <Pencil className="h-4 w-4" />
+            {t("editCase")}
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">

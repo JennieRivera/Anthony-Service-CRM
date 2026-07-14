@@ -1,14 +1,12 @@
 import { z } from "zod";
 
 export const serviceTypeValues = [
-  "notary",
-  "mobile_notary",
   "online_notary",
-  "immigration",
-  "tax_prep",
-  "apostille",
   "document_prep",
+  "tax_prep",
+  "company_registration",
   "credit_financing",
+  "leadership",
 ] as const;
 
 export const clientStatusValues = [

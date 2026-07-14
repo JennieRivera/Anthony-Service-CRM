@@ -34,12 +34,12 @@ export const caseFormSchema = z.object({
   dueDate: optionalString,
   fee: optionalString,
   notes: optionalString,
-  // Notary journal (only relevant when serviceType is a notary variant)
+  // Notary journal (only relevant when serviceType is Online Notary)
   notaryDocumentType: optionalString,
   notarialActType: z.enum(notarialActTypeValues).optional(),
   idVerificationMethod: z.enum(idVerificationMethodValues).optional(),
   notaryFeeCharged: optionalString,
-  // Apostille details (only relevant when serviceType is "apostille")
+  // Apostille / authentication details (optional add-on for Document Prep cases)
   destinationCountry: optionalString,
   instrumentType: optionalString,
   submissionDate: optionalString,
@@ -49,4 +49,4 @@ export const caseFormSchema = z.object({
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
 
-export const notaryServiceTypes = ["notary", "mobile_notary", "online_notary"];
+export const notaryServiceTypes = ["online_notary"];

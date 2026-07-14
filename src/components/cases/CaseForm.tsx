@@ -57,7 +57,7 @@ export function CaseForm({
     resolver: zodResolver(caseFormSchema),
     defaultValues: {
       clientId: caseRecord?.clientId ?? defaultClientId ?? "",
-      serviceType: caseRecord?.serviceType ?? "notary",
+      serviceType: caseRecord?.serviceType ?? "online_notary",
       status: caseRecord?.status ?? "new",
       title: caseRecord?.title ?? "",
       dueDate: caseRecord?.dueDate ?? "",
@@ -77,7 +77,8 @@ export function CaseForm({
 
   const serviceType = watch("serviceType");
   const isNotary = notaryServiceTypes.includes(serviceType);
-  const isApostille = serviceType === "apostille";
+  // Apostille / authentication fields are an optional add-on for Document Prep cases.
+  const isApostille = serviceType === "document_prep";
 
   async function submit(values: CaseFormValues) {
     setSubmitting(true);

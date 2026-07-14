@@ -29,14 +29,12 @@ export type AppointmentEvent = {
 };
 
 const serviceColors: Record<string, string> = {
-  notary: "#0F1A2B",
-  mobile_notary: "#3E5C76",
-  online_notary: "#6B7A8F",
-  immigration: "#8C6D46",
-  tax_prep: "#B8964A",
-  apostille: "#7A5230",
+  online_notary: "#0F1A2B",
   document_prep: "#4A5A3A",
+  tax_prep: "#B8964A",
+  company_registration: "#3E5C76",
   credit_financing: "#6E4A6E",
+  leadership: "#7A5230",
 };
 
 export function AppointmentCalendar({

@@ -51,7 +51,7 @@ async function upsertServiceDetails(
     return;
   }
 
-  if (values.serviceType === "apostille") {
+  if (values.serviceType === "document_prep") {
     if (values.destinationCountry && values.instrumentType) {
       await db
         .insert(apostilleDetails)

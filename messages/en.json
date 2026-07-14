@@ -79,14 +79,12 @@
     "expandSidebar": "Expand sidebar"
   },
   "ServiceType": {
-    "notary": "Notary",
-    "mobile_notary": "Mobile Notary",
     "online_notary": "Online Notary",
-    "immigration": "Immigration",
-    "tax_prep": "Tax Prep",
-    "apostille": "Apostille",
-    "document_prep": "Document Prep",
-    "credit_financing": "Credit & Financing"
+    "document_prep": "Document Preparation",
+    "tax_prep": "Tax & Accounting",
+    "company_registration": "Company Registration",
+    "credit_financing": "Credit & Financing",
+    "leadership": "Leadership"
   },
   "ClientStatus": {
     "lead": "Lead",
@@ -143,6 +141,7 @@
     "title": "Cases",
     "newCase": "New Case",
     "editCase": "Edit Case",
+    "generateTemplate": "Generate Template",
     "backToCases": "Back to Cases",
     "viewKanban": "Board",
     "viewList": "List",

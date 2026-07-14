@@ -71,7 +71,7 @@ export function AppointmentForm({
       clientId: appointment?.clientId ?? defaultClientId ?? "",
       caseId: appointment?.caseId ?? "",
       title: appointment?.title ?? "",
-      serviceType: appointment?.serviceType ?? "notary",
+      serviceType: appointment?.serviceType ?? "online_notary",
       startAt: defaultStartValue,
       endAt: defaultEndValue,
       location: appointment?.location ?? "",
