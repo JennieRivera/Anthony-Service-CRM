@@ -69,6 +69,7 @@
     "appointments": "Citas",
     "invoices": "Facturas",
     "reports": "Reportes",
+    "companyRegistration": "Registro de Compañía",
     "settings": "Configuración",
     "signOut": "Cerrar sesión",
     "search": "Buscar...",
@@ -285,5 +286,10 @@
       "saving": "Guardando...",
       "cancel": "Cancelar"
     }
+  },
+  "CompanyRegistration": {
+    "title": "Registro de Compañía por Estado",
+    "instructions": "Haz clic en un estado para abrir su portal oficial de registro de negocios (Secretaría de Estado) en una pestaña nueva.",
+    "clickToOpen": "Clic para abrir el sitio oficial"
   }
 }

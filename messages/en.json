@@ -69,6 +69,7 @@
     "appointments": "Appointments",
     "invoices": "Invoices",
     "reports": "Reports",
+    "companyRegistration": "Company Registration",
     "settings": "Settings",
     "signOut": "Sign out",
     "search": "Search...",
@@ -285,5 +286,10 @@
       "saving": "Saving...",
       "cancel": "Cancel"
     }
+  },
+  "CompanyRegistration": {
+    "title": "Company Registration by State",
+    "instructions": "Click a state to open its official business registration portal (Secretary of State) in a new tab.",
+    "clickToOpen": "Click to open the official site"
   }
 }

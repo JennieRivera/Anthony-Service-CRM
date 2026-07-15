@@ -1,0 +1,62 @@
+// Official state business registration portals (Secretary of State / equivalent
+// business division) where a new LLC or corporation is filed. Compiled and
+// verified January 2026. States occasionally move their filing systems to a
+// new URL — if a link goes stale, update it here.
+export type StateBusinessLink = {
+  name: { en: string; es: string };
+  url: string;
+};
+
+export const stateBusinessLinks: Record<string, StateBusinessLink> = {
+  AL: { name: { en: "Alabama", es: "Alabama" }, url: "https://www.alabamainteractive.org/sos/welcome.action" },
+  AK: { name: { en: "Alaska", es: "Alaska" }, url: "https://www.commerce.alaska.gov/web/cbpl/" },
+  AZ: { name: { en: "Arizona", es: "Arizona" }, url: "https://www.azcc.gov/corporations" },
+  AR: { name: { en: "Arkansas", es: "Arkansas" }, url: "https://www.sos.arkansas.gov/business-commercial-services-bcs" },
+  CA: { name: { en: "California", es: "California" }, url: "https://www.sos.ca.gov/business-programs/business-entities/" },
+  CO: { name: { en: "Colorado", es: "Colorado" }, url: "https://www.sos.state.co.us/pubs/business/businessHome.html" },
+  CT: { name: { en: "Connecticut", es: "Connecticut" }, url: "https://portal.ct.gov/SOTS/Business-Services/BSD" },
+  DE: { name: { en: "Delaware", es: "Delaware" }, url: "https://corp.delaware.gov/" },
+  DC: { name: { en: "District of Columbia", es: "Distrito de Columbia" }, url: "https://dlcp.dc.gov/" },
+  FL: { name: { en: "Florida", es: "Florida" }, url: "https://dos.myflorida.com/sunbiz/" },
+  GA: { name: { en: "Georgia", es: "Georgia" }, url: "https://sos.ga.gov/index.php/corporations" },
+  HI: { name: { en: "Hawaii", es: "Hawái" }, url: "https://cca.hawaii.gov/breg/" },
+  ID: { name: { en: "Idaho", es: "Idaho" }, url: "https://sos.idaho.gov/business-services-resources/" },
+  IL: { name: { en: "Illinois", es: "Illinois" }, url: "https://www.ilsos.gov/departments/business_services/home.html" },
+  IN: { name: { en: "Indiana", es: "Indiana" }, url: "https://inbiz.in.gov/BOS/Home/Index" },
+  IA: { name: { en: "Iowa", es: "Iowa" }, url: "https://sos.iowa.gov/business/FormsAndFees.html" },
+  KS: { name: { en: "Kansas", es: "Kansas" }, url: "https://www.kansas.gov/businesscenter/" },
+  KY: { name: { en: "Kentucky", es: "Kentucky" }, url: "https://www.sos.ky.gov/bus/Pages/default.aspx" },
+  LA: { name: { en: "Louisiana", es: "Luisiana" }, url: "https://www.sos.la.gov/BusinessServices/Pages/default.aspx" },
+  ME: { name: { en: "Maine", es: "Maine" }, url: "https://www.maine.gov/sos/cec/" },
+  MD: { name: { en: "Maryland", es: "Maryland" }, url: "https://dat.maryland.gov/Pages/default.aspx" },
+  MA: { name: { en: "Massachusetts", es: "Massachusetts" }, url: "https://www.sec.state.ma.us/divisions/corporations/corporations.htm" },
+  MI: { name: { en: "Michigan", es: "Míchigan" }, url: "https://www.michigan.gov/en/lara/bureau-list/cscl" },
+  MN: { name: { en: "Minnesota", es: "Minnesota" }, url: "https://www.sos.state.mn.us/business-liens" },
+  MS: { name: { en: "Mississippi", es: "Misisipi" }, url: "https://www.sos.ms.gov/business-services-regulation" },
+  MO: { name: { en: "Missouri", es: "Misuri" }, url: "https://www.sos.mo.gov/business" },
+  MT: { name: { en: "Montana", es: "Montana" }, url: "https://sosmt.gov/business/" },
+  NE: { name: { en: "Nebraska", es: "Nebraska" }, url: "https://sos.nebraska.gov/business-services/business-services-division" },
+  NV: { name: { en: "Nevada", es: "Nevada" }, url: "https://www.nvsos.gov/sos/businesses" },
+  NH: { name: { en: "New Hampshire", es: "Nuevo Hampshire" }, url: "https://sos.nh.gov/corporation-ucc-securities/corporation/laws/corporation-division/" },
+  NJ: { name: { en: "New Jersey", es: "Nueva Jersey" }, url: "https://www.state.nj.us/treasury/index.shtml" },
+  NM: { name: { en: "New Mexico", es: "Nuevo México" }, url: "https://www.sos.state.nm.us/online-services/" },
+  NY: { name: { en: "New York", es: "Nueva York" }, url: "https://www.dos.ny.gov/corps/" },
+  NC: { name: { en: "North Carolina", es: "Carolina del Norte" }, url: "https://www.sosnc.gov/divisions/business_registration" },
+  ND: { name: { en: "North Dakota", es: "Dakota del Norte" }, url: "https://sos.nd.gov/business/business-services" },
+  OH: { name: { en: "Ohio", es: "Ohio" }, url: "https://bsportal.ohiosos.gov/" },
+  OK: { name: { en: "Oklahoma", es: "Oklahoma" }, url: "https://www.sos.ok.gov/business/default.aspx" },
+  OR: { name: { en: "Oregon", es: "Oregón" }, url: "https://sos.oregon.gov/business/Pages/default.aspx" },
+  PA: { name: { en: "Pennsylvania", es: "Pensilvania" }, url: "https://www.dos.pa.gov/BusinessCharities/Business/Pages/default.aspx" },
+  RI: { name: { en: "Rhode Island", es: "Rhode Island" }, url: "http://sos.ri.gov/divisions/business-portal" },
+  SC: { name: { en: "South Carolina", es: "Carolina del Sur" }, url: "https://sos.sc.gov/online-filings/business-entities" },
+  SD: { name: { en: "South Dakota", es: "Dakota del Sur" }, url: "https://sdsos.gov/business-services/default.aspx" },
+  TN: { name: { en: "Tennessee", es: "Tennessee" }, url: "https://sos.tn.gov/businesses" },
+  TX: { name: { en: "Texas", es: "Texas" }, url: "https://www.sos.state.tx.us/corp/index.shtml" },
+  UT: { name: { en: "Utah", es: "Utah" }, url: "https://corporations.utah.gov/" },
+  VT: { name: { en: "Vermont", es: "Vermont" }, url: "https://sos.vermont.gov/business-services/" },
+  VA: { name: { en: "Virginia", es: "Virginia" }, url: "https://cis.scc.virginia.gov/" },
+  WA: { name: { en: "Washington", es: "Washington" }, url: "https://www.sos.wa.gov/corps/" },
+  WV: { name: { en: "West Virginia", es: "Virginia Occidental" }, url: "https://sos.wv.gov/licensing/general-information/business-and-licensing-division-contact-information" },
+  WI: { name: { en: "Wisconsin", es: "Wisconsin" }, url: "https://dfi.wi.gov/Pages/Home.aspx" },
+  WY: { name: { en: "Wyoming", es: "Wyoming" }, url: "https://wyobiz.wyo.gov/Business/Default.aspx" },
+};
