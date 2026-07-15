@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { InvoiceStatusBadge } from "@/components/invoices/InvoiceStatusBadge";
 import { MarkAsPaidDialog } from "@/components/invoices/MarkAsPaidDialog";
+import { PaymentOptions } from "@/components/invoices/PaymentOptions";
 import { cancelInvoiceAction } from "../actions";
 
 export default async function InvoiceDetailPage({
@@ -138,6 +139,8 @@ export default async function InvoiceDetailPage({
           <span>${Number(invoice.total).toFixed(2)}</span>
         </div>
       </div>
+
+      <PaymentOptions invoice={invoice} />
     </div>
   );
 }
