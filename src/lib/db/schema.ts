@@ -71,6 +71,17 @@ export const idVerificationMethodEnum = pgEnum("id_verification_method", [
   "credible_witness",
 ]);
 
+export const conversationChannelEnum = pgEnum("conversation_channel", [
+  "email",
+  "call",
+  "whatsapp",
+]);
+
+export const conversationDirectionEnum = pgEnum("conversation_direction", [
+  "inbound",
+  "outbound",
+]);
+
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
@@ -220,6 +231,26 @@ export const apostilleDetails = pgTable("apostille_details", {
   notes: text("notes"),
 });
 
+export const conversationMessages = pgTable("conversation_messages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
+  clientId: uuid("client_id")
+    .notNull()
+    .references(() => clients.id, { onDelete: "cascade" }),
+  caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  channel: conversationChannelEnum("channel").notNull(),
+  direction: conversationDirectionEnum("direction").notNull(),
+  subject: text("subject"),
+  summary: text("summary").notNull(),
+  durationMinutes: integer("duration_minutes"),
+  counterpart: text("counterpart"),
+  externalId: text("external_id"),
+  loggedBy: uuid("logged_by").references(() => users.id),
+});
+
 export type User = typeof users.$inferSelect;
 export type Client = typeof clients.$inferSelect;
 export type Case = typeof cases.$inferSelect;
@@ -229,3 +260,4 @@ export type Invoice = typeof invoices.$inferSelect;
 export type InvoiceLineItem = typeof invoiceLineItems.$inferSelect;
 export type NotaryLogEntry = typeof notaryLogEntries.$inferSelect;
 export type ApostilleDetails = typeof apostilleDetails.$inferSelect;
+export type ConversationMessage = typeof conversationMessages.$inferSelect;

@@ -14,7 +14,15 @@ import { Button } from "@/components/ui/button";
 import { CaseStatusBadge } from "./StatusBadge";
 import { DocumentList } from "@/components/documents/DocumentList";
 import { DocumentUploader } from "@/components/documents/DocumentUploader";
-import type { Case, Invoice, Appointment, Document } from "@/lib/db/schema";
+import { ConversationTimeline } from "./ConversationTimeline";
+import { LogConversationDialog } from "./LogConversationDialog";
+import type {
+  Case,
+  Invoice,
+  Appointment,
+  Document,
+  ConversationMessage,
+} from "@/lib/db/schema";
 
 function formatMoney(value: string | null) {
   if (!value) return "—";
@@ -30,6 +38,7 @@ export function ClientProfileTabs({
   invoices,
   appointments,
   documents,
+  conversations,
   blobConfigured,
 }: {
   clientId: string;
@@ -37,6 +46,7 @@ export function ClientProfileTabs({
   invoices: Invoice[];
   appointments: Appointment[];
   documents: Document[];
+  conversations: ConversationMessage[];
   blobConfigured: boolean;
 }) {
   const t = useTranslations("Clients");
@@ -47,8 +57,11 @@ export function ClientProfileTabs({
   const tService = useTranslations("ServiceType");
 
   return (
-    <Tabs defaultValue="cases">
+    <Tabs defaultValue="conversations">
       <TabsList>
+        <TabsTrigger value="conversations">
+          {t("tabConversations")} ({conversations.length})
+        </TabsTrigger>
         <TabsTrigger value="cases">
           {t("tabCases")} ({cases.length})
         </TabsTrigger>
@@ -62,6 +75,16 @@ export function ClientProfileTabs({
           {tDocuments("title")} ({documents.length})
         </TabsTrigger>
       </TabsList>
+
+      <TabsContent
+        value="conversations"
+        className="flex flex-col gap-2 pt-4"
+      >
+        <div className="flex justify-end">
+          <LogConversationDialog clientId={clientId} />
+        </div>
+        <ConversationTimeline conversations={conversations} />
+      </TabsContent>
 
       <TabsContent value="cases" className="flex flex-col gap-2 pt-4">
         <div className="flex justify-end">

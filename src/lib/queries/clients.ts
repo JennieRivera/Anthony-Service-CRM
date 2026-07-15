@@ -1,6 +1,13 @@
 import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
-import { clients, cases, invoices, appointments, documents } from "@/lib/db/schema";
+import {
+  clients,
+  cases,
+  invoices,
+  appointments,
+  documents,
+  conversationMessages,
+} from "@/lib/db/schema";
 
 export async function listClients() {
   return getDb().select().from(clients).orderBy(desc(clients.createdAt));
@@ -17,29 +24,39 @@ export async function getClientById(id: string) {
 
   if (!client) return null;
 
-  const [clientCases, clientInvoices, clientAppointments, clientDocuments] =
-    await Promise.all([
-      db
-        .select()
-        .from(cases)
-        .where(eq(cases.clientId, id))
-        .orderBy(desc(cases.createdAt)),
-      db
-        .select()
-        .from(invoices)
-        .where(eq(invoices.clientId, id))
-        .orderBy(desc(invoices.createdAt)),
-      db
-        .select()
-        .from(appointments)
-        .where(eq(appointments.clientId, id))
-        .orderBy(desc(appointments.startAt)),
-      db
-        .select()
-        .from(documents)
-        .where(eq(documents.clientId, id))
-        .orderBy(desc(documents.createdAt)),
-    ]);
+  const [
+    clientCases,
+    clientInvoices,
+    clientAppointments,
+    clientDocuments,
+    clientConversations,
+  ] = await Promise.all([
+    db
+      .select()
+      .from(cases)
+      .where(eq(cases.clientId, id))
+      .orderBy(desc(cases.createdAt)),
+    db
+      .select()
+      .from(invoices)
+      .where(eq(invoices.clientId, id))
+      .orderBy(desc(invoices.createdAt)),
+    db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.clientId, id))
+      .orderBy(desc(appointments.startAt)),
+    db
+      .select()
+      .from(documents)
+      .where(eq(documents.clientId, id))
+      .orderBy(desc(documents.createdAt)),
+    db
+      .select()
+      .from(conversationMessages)
+      .where(eq(conversationMessages.clientId, id))
+      .orderBy(desc(conversationMessages.occurredAt)),
+  ]);
 
   return {
     client,
@@ -47,5 +64,6 @@ export async function getClientById(id: string) {
     invoices: clientInvoices,
     appointments: clientAppointments,
     documents: clientDocuments,
+    conversations: clientConversations,
   };
 }

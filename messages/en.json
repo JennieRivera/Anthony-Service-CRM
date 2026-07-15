@@ -115,6 +115,7 @@
     "backToClients": "Back to Clients",
     "editClient": "Edit Client",
     "tabOverview": "Overview",
+    "tabConversations": "Conversations",
     "tabCases": "Cases",
     "tabInvoices": "Invoices",
     "tabAppointments": "Appointments",
@@ -189,6 +190,36 @@
     "personal_knowledge": "Personal Knowledge",
     "id_card": "ID Card",
     "credible_witness": "Credible Witness"
+  },
+  "ConversationChannel": {
+    "email": "Email",
+    "call": "Call",
+    "whatsapp": "WhatsApp"
+  },
+  "ConversationDirection": {
+    "inbound": "Incoming",
+    "outbound": "Outgoing"
+  },
+  "Conversations": {
+    "title": "Conversations",
+    "empty": "No conversations logged yet.",
+    "whatsappNotConnected": "WhatsApp isn't connected yet — messages will appear here automatically once it's set up.",
+    "durationMinutesValue": "{minutes} min",
+    "form": {
+      "logEntry": "Log Entry",
+      "channel": "Channel",
+      "direction": "Direction",
+      "occurredAt": "Date & Time",
+      "subject": "Subject",
+      "subjectPlaceholder": "Email subject (optional)",
+      "summary": "Summary",
+      "summaryPlaceholder": "What was discussed...",
+      "durationMinutes": "Duration (minutes)",
+      "counterpart": "With (email or phone)",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    }
   },
   "DocumentStatus": {
     "pending": "Pending",

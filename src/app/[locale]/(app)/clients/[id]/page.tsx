@@ -19,7 +19,8 @@ export default async function ClientProfilePage({
   const result = await getClientById(id);
   if (!result) notFound();
 
-  const { client, cases, invoices, appointments, documents } = result;
+  const { client, cases, invoices, appointments, documents, conversations } =
+    result;
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -76,6 +77,7 @@ export default async function ClientProfilePage({
         invoices={invoices}
         appointments={appointments}
         documents={documents}
+        conversations={conversations}
         blobConfigured={isBlobConfigured()}
       />
     </div>

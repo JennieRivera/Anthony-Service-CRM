@@ -115,6 +115,7 @@
     "backToClients": "Volver a Clientes",
     "editClient": "Editar Cliente",
     "tabOverview": "Resumen",
+    "tabConversations": "Conversaciones",
     "tabCases": "Casos",
     "tabInvoices": "Facturas",
     "tabAppointments": "Citas",
@@ -189,6 +190,36 @@
     "personal_knowledge": "Conocimiento Personal",
     "id_card": "Identificación",
     "credible_witness": "Testigo Confiable"
+  },
+  "ConversationChannel": {
+    "email": "Correo",
+    "call": "Llamada",
+    "whatsapp": "WhatsApp"
+  },
+  "ConversationDirection": {
+    "inbound": "Entrante",
+    "outbound": "Saliente"
+  },
+  "Conversations": {
+    "title": "Conversaciones",
+    "empty": "Aún no hay conversaciones registradas.",
+    "whatsappNotConnected": "WhatsApp aún no está conectado — los mensajes aparecerán aquí automáticamente una vez configurado.",
+    "durationMinutesValue": "{minutes} min",
+    "form": {
+      "logEntry": "Registrar Entrada",
+      "channel": "Canal",
+      "direction": "Dirección",
+      "occurredAt": "Fecha y Hora",
+      "subject": "Asunto",
+      "subjectPlaceholder": "Asunto del correo (opcional)",
+      "summary": "Resumen",
+      "summaryPlaceholder": "De qué se habló...",
+      "durationMinutes": "Duración (minutos)",
+      "counterpart": "Con (correo o teléfono)",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "cancel": "Cancelar"
+    }
   },
   "DocumentStatus": {
     "pending": "Pendiente",
