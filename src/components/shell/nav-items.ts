@@ -13,6 +13,7 @@ import {
   BarChart3,
   Settings,
   Map,
+  MessagesSquare,
 } from "lucide-react";
 
 export type NavItem = {
@@ -28,6 +29,7 @@ export type NavItem = {
     | "payments"
     | "tasks"
     | "alliances"
+    | "communications"
     | "reports"
     | "companyRegistration"
     | "settings";
@@ -40,6 +42,7 @@ export const navItems: NavItem[] = [
   { href: "/cases", labelKey: "cases", icon: Briefcase },
   { href: "/tasks", labelKey: "tasks", icon: ListChecks },
   { href: "/appointments", labelKey: "appointments", icon: CalendarDays },
+  { href: "/communications", labelKey: "communications", icon: MessagesSquare },
   { href: "/invoices", labelKey: "invoices", icon: Receipt },
   { href: "/payments", labelKey: "payments", icon: Wallet },
   { href: "/referrals", labelKey: "referrals", icon: Handshake },

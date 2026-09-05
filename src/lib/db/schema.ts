@@ -94,11 +94,32 @@ export const conversationChannelEnum = pgEnum("conversation_channel", [
   "email",
   "call",
   "whatsapp",
+  // Phase 4, Session 1 — Communications module. Appended rather than
+  // reordered/renamed since ADD VALUE is the only additive path for a
+  // Postgres enum; UI display order is controlled separately in
+  // src/lib/validation/communication.ts.
+  "sms",
+  "facebook_messenger",
+  "instagram_dm",
+  "website_chat",
+  "highlevel",
+  "in_person",
+  "other",
 ]);
 
 export const conversationDirectionEnum = pgEnum("conversation_direction", [
   "inbound",
   "outbound",
+]);
+
+// Phase 4, Session 1 — Communications module record status.
+export const conversationStatusEnum = pgEnum("conversation_status", [
+  "new",
+  "read",
+  "replied",
+  "pending_follow_up",
+  "completed",
+  "archived",
 ]);
 
 export const referralStatusEnum = pgEnum("referral_status", [
@@ -791,6 +812,30 @@ export const conversationMessages = pgTable("conversation_messages", {
   counterpart: text("counterpart"),
   externalId: text("external_id"),
   loggedBy: uuid("logged_by").references(() => users.id),
+  // Phase 4, Session 1 — Communications module fields, additive on top of
+  // the Phase 1 conversation log. communicationSeq gives the record a
+  // friendly "COM-00001" ID the same way invoices/referrals get one.
+  communicationSeq: serial("communication_seq").notNull().unique(),
+  businessName: text("business_name"),
+  referralId: uuid("referral_id").references(() => referrals.id, {
+    onDelete: "set null",
+  }),
+  taskId: uuid("task_id").references(() => tasks.id, { onDelete: "set null" }),
+  // Reserved for the future staff/role system — same unpopulated-until-
+  // multi-user-login pattern as cases.assignedUserId; no picker UI yet.
+  assignedUserId: uuid("assigned_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  fullMessage: text("full_message"),
+  followUpRequired: boolean("follow_up_required").notNull().default(false),
+  followUpDate: date("follow_up_date"),
+  status: conversationStatusEnum("status").notNull().default("new"),
+  // Snapshot of the acting session's email, same reasoning as
+  // caseStatusHistory.changedByEmail — there's no populated users table yet.
+  createdByEmail: text("created_by_email"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 // Phase 2, Session 4 — discriminates plain internal referrals from

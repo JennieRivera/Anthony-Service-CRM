@@ -1,14 +1,38 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Mail, Phone, MessageCircle, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  MessageCircle,
+  MessageSquare,
+  MessageSquareText,
+  Camera,
+  Globe,
+  Zap,
+  MapPin,
+  MoreHorizontal,
+  ArrowDownLeft,
+  ArrowUpRight,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { ConversationMessage } from "@/lib/db/schema";
 
+// Phase 4, Session 1 — every conversation_channel enum value needs an entry
+// here or this Record indexing fails to type-check. lucide-react doesn't
+// ship trademarked brand logos (no Facebook/Instagram icon), so those two
+// use generic stand-ins instead.
 const channelIcons = {
   email: Mail,
   call: Phone,
   whatsapp: MessageCircle,
+  sms: MessageSquare,
+  facebook_messenger: MessageSquareText,
+  instagram_dm: Camera,
+  website_chat: Globe,
+  highlevel: Zap,
+  in_person: MapPin,
+  other: MoreHorizontal,
 } as const;
 
 export function ConversationTimeline({

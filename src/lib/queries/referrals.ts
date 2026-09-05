@@ -15,6 +15,13 @@ export async function listCasesForSelect() {
     .orderBy(desc(cases.createdAt));
 }
 
+export async function listReferralsForSelect() {
+  return getDb()
+    .select({ id: referrals.id, referralSeq: referrals.referralSeq })
+    .from(referrals)
+    .orderBy(desc(referrals.createdAt));
+}
+
 export async function listReferralsWithClient() {
   return getDb()
     .select({

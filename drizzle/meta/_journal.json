@@ -85,6 +85,13 @@
       "when": 1788583943313,
       "tag": "0011_hesitant_stellaris",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1788588395985,
+      "tag": "0012_goofy_rattler",
+      "breakpoints": true
     }
   ]
 }
