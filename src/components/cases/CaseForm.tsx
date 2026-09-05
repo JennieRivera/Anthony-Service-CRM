@@ -54,6 +54,11 @@ import {
   salesTaxServiceTypes,
   salesTaxCaseStatusValues,
   salesTaxFilingFrequencyValues,
+  irsServiceTypes,
+  irsCaseTypeValues,
+  irsEinStatusValues,
+  irsItinStatusValues,
+  irsApplicationStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
@@ -70,6 +75,7 @@ import type {
   AcademyEnrollmentDetails,
   MarketingProjectDetails,
   SalesTaxCaseDetails,
+  IrsCaseDetails,
 } from "@/lib/db/schema";
 
 export function CaseForm({
@@ -84,6 +90,7 @@ export function CaseForm({
   academyDetails,
   marketingDetails,
   salesTaxDetails,
+  irsDetails,
   clients,
   companies,
   defaultClientId,
@@ -100,6 +107,7 @@ export function CaseForm({
   academyDetails?: AcademyEnrollmentDetails | null;
   marketingDetails?: MarketingProjectDetails | null;
   salesTaxDetails?: SalesTaxCaseDetails | null;
+  irsDetails?: IrsCaseDetails | null;
   clients: { id: string; fullName: string }[];
   companies: { id: string; legalBusinessName: string }[];
   defaultClientId?: string;
@@ -134,6 +142,10 @@ export function CaseForm({
   const tMarketingCaseStatus = useTranslations("MarketingCaseStatus");
   const tSalesTaxCaseStatus = useTranslations("SalesTaxCaseStatus");
   const tSalesTaxFilingFrequency = useTranslations("SalesTaxFilingFrequency");
+  const tIrsCaseType = useTranslations("IrsCaseType");
+  const tIrsEinStatus = useTranslations("IrsEinStatus");
+  const tIrsItinStatus = useTranslations("IrsItinStatus");
+  const tIrsApplicationStatus = useTranslations("IrsApplicationStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -313,6 +325,18 @@ export function CaseForm({
       salesTaxPaymentDate: salesTaxDetails?.paymentDate ?? "",
       accountStatus: salesTaxDetails?.accountStatus ?? "",
       salesTaxCaseStatus: salesTaxDetails?.status ?? "not_started",
+      irsCaseType: irsDetails?.caseType ?? "ein_assistance",
+      taxpayerName: irsDetails?.taxpayerName ?? "",
+      responsibleParty: irsDetails?.responsibleParty ?? "",
+      irsState: irsDetails?.state ?? "",
+      submissionMethod: irsDetails?.submissionMethod ?? "",
+      irsSubmissionDate: irsDetails?.submissionDate ?? "",
+      irsReferenceNumber: irsDetails?.irsReferenceNumber ?? "",
+      irsEinStatus: irsDetails?.einStatus ?? "not_started",
+      irsItinStatus: irsDetails?.itinStatus ?? "not_started",
+      irsApplicationStatus: irsDetails?.applicationStatus ?? "not_started",
+      irsLetterReceived: irsDetails?.irsLetterReceived ?? false,
+      irsLetterDate: irsDetails?.irsLetterDate ?? "",
     },
   });
 
@@ -327,6 +351,8 @@ export function CaseForm({
   const isAcademy = academyServiceTypes.includes(serviceType);
   const isMarketing = marketingServiceTypes.includes(serviceType);
   const isSalesTax = salesTaxServiceTypes.includes(serviceType);
+  const isIrs = irsServiceTypes.includes(serviceType);
+  const irsCaseType = watch("irsCaseType");
   // Apostille / authentication fields are an optional add-on for Document Prep cases.
   const isApostille = serviceType === "document_prep";
 
@@ -411,7 +437,8 @@ export function CaseForm({
           !isFormation &&
           !isAcademy &&
           !isMarketing &&
-          !isSalesTax && (
+          !isSalesTax &&
+          !isIrs && (
           <div className="flex flex-col gap-1.5">
             <Label>{t("status")}</Label>
             <Controller
@@ -2366,6 +2393,195 @@ export function CaseForm({
           </div>
           <p className="text-xs text-muted-foreground">
             {t("salesTaxDisclaimer")}
+          </p>
+        </div>
+      )}
+
+      {isIrs && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("irsCaseDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("irsCaseType")}</Label>
+              <Controller
+                control={control}
+                name="irsCaseType"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {irsCaseTypeValues.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {tIrsCaseType(type)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("company")}</Label>
+              <Controller
+                control={control}
+                name="companyId"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{t("noCompany")}</SelectItem>
+                      {companies.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.legalBusinessName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            {irsCaseType === "ein_assistance" && (
+              <div className="flex flex-col gap-1.5">
+                <Label>{t("irsEinStatus")}</Label>
+                <Controller
+                  control={control}
+                  name="irsEinStatus"
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {irsEinStatusValues.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {tIrsEinStatus(status)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            )}
+
+            {irsCaseType === "itin_assistance" && (
+              <div className="flex flex-col gap-1.5">
+                <Label>{t("irsItinStatus")}</Label>
+                <Controller
+                  control={control}
+                  name="irsItinStatus"
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {irsItinStatusValues.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {tIrsItinStatus(status)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            )}
+
+            {irsCaseType !== "ein_assistance" && irsCaseType !== "itin_assistance" && (
+              <div className="flex flex-col gap-1.5">
+                <Label>{t("irsApplicationStatus")}</Label>
+                <Controller
+                  control={control}
+                  name="irsApplicationStatus"
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {irsApplicationStatusValues.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {tIrsApplicationStatus(status)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            )}
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="taxpayerName">{t("taxpayerName")}</Label>
+              <Input id="taxpayerName" {...register("taxpayerName")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="responsibleParty">{t("responsibleParty")}</Label>
+              <Input id="responsibleParty" {...register("responsibleParty")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="irsState">{t("irsState")}</Label>
+              <Input id="irsState" maxLength={2} placeholder="FL" {...register("irsState")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="submissionMethod">{t("submissionMethod")}</Label>
+              <Input
+                id="submissionMethod"
+                placeholder="Online, Fax, Mail..."
+                {...register("submissionMethod")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="irsSubmissionDate">{t("submissionDate")}</Label>
+              <Input
+                id="irsSubmissionDate"
+                type="date"
+                {...register("irsSubmissionDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="irsReferenceNumber">{t("irsReferenceNumber")}</Label>
+              <Input id="irsReferenceNumber" {...register("irsReferenceNumber")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="irsLetterDate">{t("irsLetterDate")}</Label>
+              <Input id="irsLetterDate" type="date" {...register("irsLetterDate")} />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="irsLetterReceived"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("irsLetterReceived")}</Label>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {t("irsDisclaimer")}
           </p>
         </div>
       )}

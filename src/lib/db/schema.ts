@@ -38,6 +38,8 @@ export const serviceTypeEnum = pgEnum("service_type", [
   "marketing",
   // Phase 5, Session 4 — Sales Tax Registration.
   "sales_tax",
+  // Phase 5, Session 5 — IRS / EIN / ITIN Administrative Services.
+  "irs_administrative",
 ]);
 
 export const clientStatusEnum = pgEnum("client_status", [
@@ -1478,6 +1480,102 @@ export const salesTaxStateInfo = pgTable("sales_tax_state_info", {
     .defaultNow(),
 });
 
+// Phase 5, Session 5 — IRS / EIN / ITIN Case Management. Links to the
+// Company Master Registry via companyId instead of duplicating business
+// name/entity type, same principle as salesTaxCaseDetails above. EIN/ITIN
+// status are only meaningful for their matching caseType; applicationStatus
+// covers the remaining case types (business account follow-up, IRS
+// correspondence, other). SECURITY: no full SSN/ITIN/passport columns —
+// irsReferenceNumber is an IRS-issued submission reference, not identity
+// data.
+export const irsCaseTypeEnum = pgEnum("irs_case_type", [
+  "ein_assistance",
+  "itin_assistance",
+  "business_account_follow_up",
+  "irs_correspondence",
+  "other",
+]);
+
+export const irsEinStatusEnum = pgEnum("irs_ein_status", [
+  "not_started",
+  "information_pending",
+  "ready",
+  "submitted",
+  "ein_received",
+  "closed",
+]);
+
+export const irsItinStatusEnum = pgEnum("irs_itin_status", [
+  "not_started",
+  "documents_pending",
+  "w7_preparation",
+  "certification_documentation_step",
+  "submitted",
+  "irs_processing",
+  "additional_information_requested",
+  "itin_received",
+  "closed",
+]);
+
+export const irsApplicationStatusEnum = pgEnum("irs_application_status", [
+  "not_started",
+  "in_progress",
+  "submitted",
+  "resolved",
+  "closed",
+]);
+
+export const irsCaseDetails = pgTable("irs_case_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  companyId: uuid("company_id").references(() => companies.id, {
+    onDelete: "set null",
+  }),
+  caseType: irsCaseTypeEnum("case_type").notNull().default("ein_assistance"),
+  taxpayerName: text("taxpayer_name"),
+  responsibleParty: text("responsible_party"),
+  state: text("state"),
+  submissionMethod: text("submission_method"),
+  submissionDate: date("submission_date"),
+  irsReferenceNumber: text("irs_reference_number"),
+  einStatus: irsEinStatusEnum("ein_status"),
+  itinStatus: irsItinStatusEnum("itin_status"),
+  applicationStatus: irsApplicationStatusEnum("application_status"),
+  irsLetterReceived: boolean("irs_letter_received").notNull().default(false),
+  irsLetterDate: date("irs_letter_date"),
+});
+
+// IRS Official Resource Center (spec section 4) — an admin-managed
+// directory of official IRS.gov links, not a live IRS integration.
+export const irsResourceCategoryEnum = pgEnum("irs_resource_category", [
+  "ein",
+  "itin",
+  "business_taxes",
+  "employment_taxes",
+  "estimated_taxes",
+  "irs_forms",
+  "irs_publications",
+  "irs_notices",
+  "irs_contact_resources",
+]);
+
+export const irsResources = pgTable("irs_resources", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  name: text("name").notNull(),
+  category: irsResourceCategoryEnum("category").notNull(),
+  url: text("url").notNull(),
+  description: text("description"),
+  lastVerifiedDate: date("last_verified_date"),
+  active: boolean("active").notNull().default(true),
+});
+
 export const conversationMessages = pgTable("conversation_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1749,6 +1847,8 @@ export type CompanyDocumentChecklistItem =
   typeof companyDocumentChecklistItems.$inferSelect;
 export type SalesTaxCaseDetails = typeof salesTaxCaseDetails.$inferSelect;
 export type SalesTaxStateInfo = typeof salesTaxStateInfo.$inferSelect;
+export type IrsCaseDetails = typeof irsCaseDetails.$inferSelect;
+export type IrsResource = typeof irsResources.$inferSelect;
 export type AuditLogEntry = typeof auditLog.$inferSelect;
 export type ProfessionalSystem = typeof professionalSystems.$inferSelect;
 export type WebsiteLink = typeof websiteLinks.$inferSelect;

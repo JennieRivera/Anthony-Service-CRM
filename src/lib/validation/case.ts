@@ -223,6 +223,41 @@ export const salesTaxFilingFrequencyValues = [
   "other",
 ] as const;
 
+// Phase 5, Session 5
+export const irsCaseTypeValues = [
+  "ein_assistance",
+  "itin_assistance",
+  "business_account_follow_up",
+  "irs_correspondence",
+  "other",
+] as const;
+export const irsEinStatusValues = [
+  "not_started",
+  "information_pending",
+  "ready",
+  "submitted",
+  "ein_received",
+  "closed",
+] as const;
+export const irsItinStatusValues = [
+  "not_started",
+  "documents_pending",
+  "w7_preparation",
+  "certification_documentation_step",
+  "submitted",
+  "irs_processing",
+  "additional_information_requested",
+  "itin_received",
+  "closed",
+] as const;
+export const irsApplicationStatusValues = [
+  "not_started",
+  "in_progress",
+  "submitted",
+  "resolved",
+  "closed",
+] as const;
+
 const optionalString = z.string().trim().optional().or(z.literal(""));
 
 export const caseFormSchema = z.object({
@@ -438,6 +473,22 @@ export const caseFormSchema = z.object({
     .enum(salesTaxCaseStatusValues)
     .optional()
     .or(z.literal("")),
+  // IRS / EIN / ITIN details (relevant when serviceType is IRS Administrative)
+  irsCaseType: z.enum(irsCaseTypeValues).optional().or(z.literal("")),
+  taxpayerName: optionalString,
+  responsibleParty: optionalString,
+  irsState: optionalString,
+  submissionMethod: optionalString,
+  irsSubmissionDate: optionalString,
+  irsReferenceNumber: optionalString,
+  irsEinStatus: z.enum(irsEinStatusValues).optional().or(z.literal("")),
+  irsItinStatus: z.enum(irsItinStatusValues).optional().or(z.literal("")),
+  irsApplicationStatus: z
+    .enum(irsApplicationStatusValues)
+    .optional()
+    .or(z.literal("")),
+  irsLetterReceived: z.boolean().optional(),
+  irsLetterDate: optionalString,
 });
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
@@ -452,3 +503,4 @@ export const formationServiceTypes = ["company_registration"];
 export const academyServiceTypes = ["academy"];
 export const marketingServiceTypes = ["marketing"];
 export const salesTaxServiceTypes = ["sales_tax"];
+export const irsServiceTypes = ["irs_administrative"];

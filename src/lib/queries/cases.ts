@@ -15,6 +15,7 @@ import {
   academyEnrollmentDetails,
   marketingProjectDetails,
   salesTaxCaseDetails,
+  irsCaseDetails,
   companies,
   documents,
   caseStatusHistory,
@@ -73,6 +74,7 @@ export async function getCaseById(id: string) {
     academyDetails,
     marketingDetails,
     salesTaxDetails,
+    irsDetails,
     caseDocuments,
     statusHistory,
   ] = await Promise.all([
@@ -138,6 +140,11 @@ export async function getCaseById(id: string) {
       .limit(1),
     db
       .select()
+      .from(irsCaseDetails)
+      .where(eq(irsCaseDetails.caseId, id))
+      .limit(1),
+    db
+      .select()
       .from(documents)
       .where(eq(documents.caseId, id))
       .orderBy(desc(documents.createdAt)),
@@ -159,6 +166,17 @@ export async function getCaseById(id: string) {
       )[0] ?? null
     : null;
 
+  const irsCompanyId = irsDetails[0]?.companyId;
+  const irsCompany = irsCompanyId
+    ? (
+        await db
+          .select({ id: companies.id, legalBusinessName: companies.legalBusinessName })
+          .from(companies)
+          .where(eq(companies.id, irsCompanyId))
+          .limit(1)
+      )[0] ?? null
+    : null;
+
   return {
     case: row.case,
     client: row.client,
@@ -175,6 +193,8 @@ export async function getCaseById(id: string) {
     marketingDetails: marketingDetails[0] ?? null,
     salesTaxDetails: salesTaxDetails[0] ?? null,
     salesTaxCompany,
+    irsDetails: irsDetails[0] ?? null,
+    irsCompany,
     documents: caseDocuments,
     statusHistory,
   };

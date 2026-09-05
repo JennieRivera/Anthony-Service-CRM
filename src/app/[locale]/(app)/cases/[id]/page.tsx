@@ -45,6 +45,10 @@ export default async function CaseDetailPage({
   const tMarketingCaseStatus = await getTranslations("MarketingCaseStatus");
   const tSalesTaxCaseStatus = await getTranslations("SalesTaxCaseStatus");
   const tSalesTaxFilingFrequency = await getTranslations("SalesTaxFilingFrequency");
+  const tIrsCaseType = await getTranslations("IrsCaseType");
+  const tIrsEinStatus = await getTranslations("IrsEinStatus");
+  const tIrsItinStatus = await getTranslations("IrsItinStatus");
+  const tIrsApplicationStatus = await getTranslations("IrsApplicationStatus");
 
   const result = await getCaseById(id);
   if (!result) notFound();
@@ -65,6 +69,8 @@ export default async function CaseDetailPage({
     marketingDetails,
     salesTaxDetails,
     salesTaxCompany,
+    irsDetails,
+    irsCompany,
     documents,
     statusHistory,
   } = result;
@@ -1200,6 +1206,91 @@ export default async function CaseDetailPage({
           </div>
           <p className="text-xs text-muted-foreground">
             {t("form.salesTaxDisclaimer")}
+          </p>
+        </div>
+      )}
+
+      {irsDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("irsCaseDetails")}
+            </h2>
+            <Badge variant="outline">{tIrsCaseType(irsDetails.caseType)}</Badge>
+            {irsDetails.caseType === "ein_assistance" && irsDetails.einStatus && (
+              <Badge variant="outline">{tIrsEinStatus(irsDetails.einStatus)}</Badge>
+            )}
+            {irsDetails.caseType === "itin_assistance" && irsDetails.itinStatus && (
+              <Badge variant="outline">{tIrsItinStatus(irsDetails.itinStatus)}</Badge>
+            )}
+            {irsDetails.caseType !== "ein_assistance" &&
+              irsDetails.caseType !== "itin_assistance" &&
+              irsDetails.applicationStatus && (
+                <Badge variant="outline">
+                  {tIrsApplicationStatus(irsDetails.applicationStatus)}
+                </Badge>
+              )}
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">{t("form.company")}</p>
+              <p className="text-foreground">
+                {irsCompany?.legalBusinessName ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.taxpayerName")}</p>
+              <p className="text-foreground">{irsDetails.taxpayerName ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.responsibleParty")}
+              </p>
+              <p className="text-foreground">
+                {irsDetails.responsibleParty ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.irsState")}</p>
+              <p className="text-foreground">{irsDetails.state ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.submissionMethod")}
+              </p>
+              <p className="text-foreground">
+                {irsDetails.submissionMethod ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.submissionDate")}</p>
+              <p className="text-foreground">
+                {irsDetails.submissionDate
+                  ? new Date(irsDetails.submissionDate).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.irsReferenceNumber")}
+              </p>
+              <p className="text-foreground">
+                {irsDetails.irsReferenceNumber ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.irsLetterReceived")}</p>
+              <p className="text-foreground">
+                {irsDetails.irsLetterReceived
+                  ? irsDetails.irsLetterDate
+                    ? new Date(irsDetails.irsLetterDate).toLocaleDateString()
+                    : "✓"
+                  : "—"}
+              </p>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {t("form.irsDisclaimer")}
           </p>
         </div>
       )}

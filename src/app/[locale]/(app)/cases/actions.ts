@@ -18,6 +18,7 @@ import {
   academyEnrollmentDetails,
   marketingProjectDetails,
   salesTaxCaseDetails,
+  irsCaseDetails,
   caseStatusEnum,
   caseStatusHistory,
   tasks,
@@ -35,6 +36,7 @@ import {
   academyServiceTypes,
   marketingServiceTypes,
   salesTaxServiceTypes,
+  irsServiceTypes,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { redirect } from "@/i18n/navigation";
@@ -263,6 +265,33 @@ function deriveEffectiveStatus(
     if (s === "past_due") return "waiting_on_client";
     if (s === "not_started" || s === "research_required") return "new";
     return "in_progress";
+  }
+
+  if (irsServiceTypes.includes(values.serviceType)) {
+    if (values.irsCaseType === "ein_assistance" && values.irsEinStatus) {
+      const s = values.irsEinStatus;
+      if (s === "closed" || s === "ein_received") return "completed";
+      if (s === "information_pending") return "waiting_on_client";
+      if (s === "not_started") return "new";
+      return "in_progress";
+    }
+    if (values.irsCaseType === "itin_assistance" && values.irsItinStatus) {
+      const s = values.irsItinStatus;
+      if (s === "closed" || s === "itin_received") return "completed";
+      if (
+        s === "documents_pending" ||
+        s === "additional_information_requested"
+      )
+        return "waiting_on_client";
+      if (s === "not_started") return "new";
+      return "in_progress";
+    }
+    if (values.irsApplicationStatus) {
+      const s = values.irsApplicationStatus;
+      if (s === "closed" || s === "resolved") return "completed";
+      if (s === "not_started") return "new";
+      return "in_progress";
+    }
   }
 
   return values.status;
@@ -648,6 +677,33 @@ async function upsertServiceDetails(
           set: detail,
         });
     }
+    return;
+  }
+
+  if (irsServiceTypes.includes(values.serviceType)) {
+    const detail = {
+      companyId: values.companyId || null,
+      caseType: values.irsCaseType || "ein_assistance",
+      taxpayerName: values.taxpayerName || null,
+      responsibleParty: values.responsibleParty || null,
+      state: values.irsState ? values.irsState.toUpperCase() : null,
+      submissionMethod: values.submissionMethod || null,
+      submissionDate: values.irsSubmissionDate || null,
+      irsReferenceNumber: values.irsReferenceNumber || null,
+      einStatus: values.irsEinStatus || null,
+      itinStatus: values.irsItinStatus || null,
+      applicationStatus: values.irsApplicationStatus || null,
+      irsLetterReceived: values.irsLetterReceived ?? false,
+      irsLetterDate: values.irsLetterDate || null,
+    };
+
+    await db
+      .insert(irsCaseDetails)
+      .values({ caseId, ...detail })
+      .onConflictDoUpdate({
+        target: irsCaseDetails.caseId,
+        set: detail,
+      });
     return;
   }
 }

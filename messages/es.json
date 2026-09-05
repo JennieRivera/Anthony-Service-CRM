@@ -114,7 +114,8 @@
     "account": "Cuenta",
     "collapseSidebar": "Contraer barra lateral",
     "expandSidebar": "Expandir barra lateral",
-    "salesTaxMap": "Mapa de Sales Tax"
+    "salesTaxMap": "Mapa de Sales Tax",
+    "irsResources": "Recursos IRS"
   },
   "ServiceType": {
     "online_notary": "Notaría en Línea",
@@ -128,7 +129,8 @@
     "immigration": "Servicios Administrativos de Inmigración",
     "academy": "Academia / Capacitación",
     "marketing": "Marketing / Marca / IA / Automatización",
-    "sales_tax": "Registro de Sales Tax"
+    "sales_tax": "Registro de Sales Tax",
+    "irs_administrative": "Administrativo IRS / EIN / ITIN"
   },
   "ClientStatus": {
     "lead": "Prospecto",
@@ -250,7 +252,7 @@
       "feeCharged": "Tarifa Cobrada",
       "destinationCountry": "País de Destino",
       "instrumentType": "Tipo de Instrumento",
-      "submissionDate": "Fecha de Envío",
+      "submissionDate": "Fecha de Presentación",
       "expectedReturnDate": "Fecha de Retorno Esperada",
       "actualReturnDate": "Fecha de Retorno Real",
       "modality": "Modalidad",
@@ -392,9 +394,22 @@
       "amountPaid": "Monto Pagado",
       "paymentDate": "Fecha de Pago",
       "accountStatus": "Estado de la Cuenta",
-      "salesTaxDisclaimer": "Los requisitos de sales tax estatal varían según la actividad comercial, el nexo, los productos, los servicios y la jurisdicción. Revise la guía oficial del estado antes de declarar."
+      "salesTaxDisclaimer": "Los requisitos de sales tax estatal varían según la actividad comercial, el nexo, los productos, los servicios y la jurisdicción. Revise la guía oficial del estado antes de declarar.",
+      "irsCaseType": "Tipo de Caso",
+      "taxpayerName": "Nombre del Contribuyente / Negocio",
+      "responsibleParty": "Parte Responsable",
+      "irsState": "Estado",
+      "submissionMethod": "Método de Presentación",
+      "irsReferenceNumber": "Número de Referencia del IRS",
+      "irsEinStatus": "Estado del EIN",
+      "irsItinStatus": "Estado del ITIN",
+      "irsApplicationStatus": "Estado de la Solicitud",
+      "irsLetterReceived": "Carta del IRS Recibida",
+      "irsLetterDate": "Fecha de la Carta del IRS",
+      "irsDisclaimer": "No ingrese el número completo de SSN, ITIN ni pasaporte aquí. Use solo los últimos 4 dígitos, o haga referencia a un documento seguro."
     },
-    "salesTaxCaseDetails": "Detalles de Registro de Sales Tax"
+    "salesTaxCaseDetails": "Detalles de Registro de Sales Tax",
+    "irsCaseDetails": "Detalles de Caso IRS / EIN / ITIN"
   },
   "NotarialActType": {
     "jurat": "Jurat",
@@ -1580,5 +1595,71 @@
     "save": "Guardar",
     "saving": "Guardando...",
     "activeCases": "{count, plural, one {# caso activo} other {# casos activos}} en este estado."
+  },
+  "IrsCaseType": {
+    "ein_assistance": "Asistencia con EIN",
+    "itin_assistance": "Asistencia Administrativa con ITIN",
+    "business_account_follow_up": "Seguimiento de Cuenta Comercial del IRS",
+    "irs_correspondence": "Correspondencia del IRS",
+    "other": "Otro Servicio Administrativo del IRS"
+  },
+  "IrsEinStatus": {
+    "not_started": "No Iniciado",
+    "information_pending": "Información Pendiente",
+    "ready": "Listo",
+    "submitted": "Enviado",
+    "ein_received": "EIN Recibido",
+    "closed": "Cerrado"
+  },
+  "IrsItinStatus": {
+    "not_started": "No Iniciado",
+    "documents_pending": "Documentos Pendientes",
+    "w7_preparation": "Preparación del W-7",
+    "certification_documentation_step": "Paso de Certificación/Documentación",
+    "submitted": "Enviado",
+    "irs_processing": "En Proceso en el IRS",
+    "additional_information_requested": "Información Adicional Solicitada",
+    "itin_received": "ITIN Recibido",
+    "closed": "Cerrado"
+  },
+  "IrsApplicationStatus": {
+    "not_started": "No Iniciado",
+    "in_progress": "En Progreso",
+    "submitted": "Enviado",
+    "resolved": "Resuelto",
+    "closed": "Cerrado"
+  },
+  "IrsResourceCategory": {
+    "ein": "EIN",
+    "itin": "ITIN",
+    "business_taxes": "Impuestos Comerciales",
+    "employment_taxes": "Impuestos Laborales",
+    "estimated_taxes": "Impuestos Estimados",
+    "irs_forms": "Formularios del IRS",
+    "irs_publications": "Publicaciones del IRS",
+    "irs_notices": "Avisos del IRS",
+    "irs_contact_resources": "Recursos de Contacto del IRS"
+  },
+  "IrsResources": {
+    "title": "Centro de Recursos del IRS",
+    "instructions": "Un directorio interno de referencia con enlaces oficiales de IRS.gov. Esto no es una conexión directa a ningún sistema del IRS.",
+    "disclaimer": "Anthony Multiservice, LLC no es un bufete de abogados ni una firma de contadores públicos. Esta página enlaza a recursos oficiales de IRS.gov únicamente para referencia interna y no es una integración directa con ningún sistema del IRS.",
+    "add": "Agregar Recurso",
+    "edit": "Editar Recurso",
+    "empty": "Aún no se han agregado recursos del IRS.",
+    "inactive": "Inactivo",
+    "disable": "Desactivar",
+    "enable": "Activar",
+    "lastVerifiedDate": "Última Verificación",
+    "form": {
+      "name": "Nombre del Recurso",
+      "category": "Categoría",
+      "url": "URL Oficial del IRS",
+      "description": "Descripción",
+      "lastVerifiedDate": "Fecha de Última Verificación",
+      "active": "Activo",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    }
   }
 }

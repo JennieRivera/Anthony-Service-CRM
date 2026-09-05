@@ -453,6 +453,30 @@ const templates: Record<
     ],
     includeNotaryBlock: false,
   },
+
+  irs_administrative: {
+    documentTitle: {
+      en: "IRS / EIN / ITIN Administrative Service Intake",
+      es: "Admisión — Servicio Administrativo IRS / EIN / ITIN",
+    },
+    intro: {
+      en: "This sheet organizes the information needed for EIN, ITIN, or other IRS administrative assistance. We are not attorneys or CPAs — we assist with administrative preparation and submission only.",
+      es: "Esta hoja organiza la información necesaria para asistencia administrativa de EIN, ITIN u otros trámites ante el IRS. No somos abogados ni contadores públicos — únicamente ayudamos con la preparación y presentación administrativa.",
+    },
+    sections: [
+      {
+        heading: { en: "Case Information", es: "Información del Caso" },
+        fields: [
+          { en: "Case Type (EIN / ITIN / Other)", es: "Tipo de Caso (EIN / ITIN / Otro)" },
+          { en: "Taxpayer / Business Name", es: "Nombre del Contribuyente / Negocio" },
+          { en: "Responsible Party", es: "Parte Responsable" },
+          { en: "State", es: "Estado" },
+          { en: "Submission Method", es: "Método de Presentación" },
+        ],
+      },
+    ],
+    includeNotaryBlock: false,
+  },
 };
 
 export function getServiceTemplate(

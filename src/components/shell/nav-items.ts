@@ -17,6 +17,7 @@ import {
   NotepadText,
   Building2,
   Landmark,
+  Library,
 } from "lucide-react";
 
 export type NavItem = {
@@ -38,6 +39,7 @@ export type NavItem = {
     | "reports"
     | "companyRegistration"
     | "salesTaxMap"
+    | "irsResources"
     | "settings";
   icon: LucideIcon;
 };
@@ -59,5 +61,6 @@ export const navItems: NavItem[] = [
   { href: "/reports", labelKey: "reports", icon: BarChart3 },
   { href: "/company-registration", labelKey: "companyRegistration", icon: Map },
   { href: "/sales-tax-map", labelKey: "salesTaxMap", icon: Landmark },
+  { href: "/irs-resources", labelKey: "irsResources", icon: Library },
   { href: "/settings", labelKey: "settings", icon: Settings },
 ];

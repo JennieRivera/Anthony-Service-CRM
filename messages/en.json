@@ -114,7 +114,8 @@
     "account": "Account",
     "collapseSidebar": "Collapse sidebar",
     "expandSidebar": "Expand sidebar",
-    "salesTaxMap": "Sales Tax Map"
+    "salesTaxMap": "Sales Tax Map",
+    "irsResources": "IRS Resources"
   },
   "ServiceType": {
     "online_notary": "Online Notary",
@@ -128,7 +129,8 @@
     "immigration": "Immigration Administrative Services",
     "academy": "Academy / Training",
     "marketing": "Marketing / Branding / AI / Automation",
-    "sales_tax": "Sales Tax Registration"
+    "sales_tax": "Sales Tax Registration",
+    "irs_administrative": "IRS / EIN / ITIN Administrative"
   },
   "ClientStatus": {
     "lead": "Lead",
@@ -392,9 +394,22 @@
       "amountPaid": "Amount Paid",
       "paymentDate": "Payment Date",
       "accountStatus": "Account Status",
-      "salesTaxDisclaimer": "State sales tax requirements vary by business activity, nexus, products, services and jurisdiction. Review official state guidance before filing."
+      "salesTaxDisclaimer": "State sales tax requirements vary by business activity, nexus, products, services and jurisdiction. Review official state guidance before filing.",
+      "irsCaseType": "Case Type",
+      "taxpayerName": "Taxpayer / Business Name",
+      "responsibleParty": "Responsible Party",
+      "irsState": "State",
+      "submissionMethod": "Submission Method",
+      "irsReferenceNumber": "IRS Reference Number",
+      "irsEinStatus": "EIN Status",
+      "irsItinStatus": "ITIN Status",
+      "irsApplicationStatus": "Application Status",
+      "irsLetterReceived": "IRS Letter Received",
+      "irsLetterDate": "IRS Letter Date",
+      "irsDisclaimer": "Do not enter full SSN, ITIN, or passport numbers here. Use the last 4 digits only, or reference a secure document instead."
     },
-    "salesTaxCaseDetails": "Sales Tax Registration Details"
+    "salesTaxCaseDetails": "Sales Tax Registration Details",
+    "irsCaseDetails": "IRS / EIN / ITIN Case Details"
   },
   "NotarialActType": {
     "jurat": "Jurat",
@@ -1580,5 +1595,71 @@
     "save": "Save",
     "saving": "Saving...",
     "activeCases": "{count, plural, one {# active case} other {# active cases}} in this state."
+  },
+  "IrsCaseType": {
+    "ein_assistance": "EIN Assistance",
+    "itin_assistance": "ITIN Administrative Assistance",
+    "business_account_follow_up": "IRS Business Account Follow-Up",
+    "irs_correspondence": "IRS Correspondence",
+    "other": "Other IRS Administrative Service"
+  },
+  "IrsEinStatus": {
+    "not_started": "Not Started",
+    "information_pending": "Information Pending",
+    "ready": "Ready",
+    "submitted": "Submitted",
+    "ein_received": "EIN Received",
+    "closed": "Closed"
+  },
+  "IrsItinStatus": {
+    "not_started": "Not Started",
+    "documents_pending": "Documents Pending",
+    "w7_preparation": "W-7 Preparation",
+    "certification_documentation_step": "Certification/Documentation Step",
+    "submitted": "Submitted",
+    "irs_processing": "IRS Processing",
+    "additional_information_requested": "Additional Information Requested",
+    "itin_received": "ITIN Received",
+    "closed": "Closed"
+  },
+  "IrsApplicationStatus": {
+    "not_started": "Not Started",
+    "in_progress": "In Progress",
+    "submitted": "Submitted",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "IrsResourceCategory": {
+    "ein": "EIN",
+    "itin": "ITIN",
+    "business_taxes": "Business Taxes",
+    "employment_taxes": "Employment Taxes",
+    "estimated_taxes": "Estimated Taxes",
+    "irs_forms": "IRS Forms",
+    "irs_publications": "IRS Publications",
+    "irs_notices": "IRS Notices",
+    "irs_contact_resources": "IRS Contact Resources"
+  },
+  "IrsResources": {
+    "title": "IRS Resource Center",
+    "instructions": "An internal reference directory of official IRS.gov links. This is not a direct connection to any IRS system.",
+    "disclaimer": "Anthony Multiservice, LLC is not a law firm or CPA firm. This page links to official IRS.gov resources for internal reference only and is not a direct integration with any IRS system.",
+    "add": "Add Resource",
+    "edit": "Edit Resource",
+    "empty": "No IRS resources added yet.",
+    "inactive": "Inactive",
+    "disable": "Disable",
+    "enable": "Enable",
+    "lastVerifiedDate": "Last Verified",
+    "form": {
+      "name": "Resource Name",
+      "category": "Category",
+      "url": "Official IRS URL",
+      "description": "Description",
+      "lastVerifiedDate": "Last Verified Date",
+      "active": "Active",
+      "save": "Save",
+      "saving": "Saving..."
+    }
   }
 }
