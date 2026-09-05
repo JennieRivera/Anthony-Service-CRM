@@ -70,6 +70,7 @@
     "invoices": "Invoices",
     "payments": "Payments",
     "referrals": "Referrals",
+    "tasks": "Tasks",
     "reports": "Reports",
     "companyRegistration": "Company Registration",
     "settings": "Settings",
@@ -157,6 +158,9 @@
     "columnFee": "Fee",
     "notaryJournal": "Notary Journal Entry",
     "apostilleDetails": "Apostille Details",
+    "trackingDetails": "Tracking Details",
+    "statusHistory": "Status History",
+    "closedDate": "Closed Date",
     "form": {
       "client": "Client",
       "selectClient": "Select a client",
@@ -166,6 +170,13 @@
       "dueDate": "Due Date",
       "fee": "Fee",
       "notes": "Notes",
+      "startDate": "Start Date",
+      "nextFollowUpDate": "Next Follow-Up Date",
+      "documentsRequested": "Documents Requested",
+      "documentsReceived": "Documents Received",
+      "paymentStatus": "Payment Status",
+      "referralSource": "Referral Source",
+      "nextAction": "Next Action",
       "documentType": "Document Type",
       "notarialActType": "Notarial Act Type",
       "idVerificationMethod": "ID Verification Method",
@@ -418,5 +429,21 @@
       "saving": "Saving...",
       "cancel": "Cancel"
     }
+  },
+  "TaskType": {
+    "follow_up": "Follow-up",
+    "payment_check": "Payment Check",
+    "document_reminder": "Document Reminder",
+    "closing": "Closing"
+  },
+  "Tasks": {
+    "title": "Tasks",
+    "empty": "No open tasks right now.",
+    "columnType": "Type",
+    "columnTitle": "Task",
+    "columnClient": "Client",
+    "columnCase": "Case",
+    "columnDueDate": "Due Date",
+    "markDone": "Mark Done"
   }
 }

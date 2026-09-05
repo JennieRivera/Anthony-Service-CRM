@@ -25,6 +25,7 @@ import {
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
+import { paymentStatusValues } from "@/lib/validation/payment";
 import type { Case } from "@/lib/db/schema";
 
 export function CaseForm({
@@ -43,6 +44,7 @@ export function CaseForm({
   const tService = useTranslations("ServiceType");
   const tActType = useTranslations("NotarialActType");
   const tIdMethod = useTranslations("IdVerificationMethod");
+  const tPaymentStatus = useTranslations("PaymentStatus");
   const tCases = useTranslations("Cases");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -63,6 +65,13 @@ export function CaseForm({
       dueDate: caseRecord?.dueDate ?? "",
       fee: caseRecord?.fee ?? "",
       notes: caseRecord?.notes ?? "",
+      startDate: caseRecord?.startDate ?? new Date().toISOString().slice(0, 10),
+      nextFollowUpDate: caseRecord?.nextFollowUpDate ?? "",
+      documentsRequested: caseRecord?.documentsRequested ?? "",
+      documentsReceived: caseRecord?.documentsReceived ?? "",
+      paymentStatus: caseRecord?.paymentStatus ?? "",
+      referralSource: caseRecord?.referralSource ?? "",
+      nextAction: caseRecord?.nextAction ?? "",
       notaryDocumentType: "",
       notarialActType: undefined,
       idVerificationMethod: undefined,
@@ -182,6 +191,85 @@ export function CaseForm({
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="fee">{t("fee")}</Label>
           <Input id="fee" type="number" step="0.01" {...register("fee")} />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+        <h3 className="font-heading text-base text-foreground">
+          {tCases("trackingDetails")}
+        </h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="startDate">{t("startDate")}</Label>
+            <Input id="startDate" type="date" {...register("startDate")} />
+            {errors.startDate && (
+              <p className="text-sm text-destructive">
+                {errors.startDate.message}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="nextFollowUpDate">{t("nextFollowUpDate")}</Label>
+            <Input
+              id="nextFollowUpDate"
+              type="date"
+              {...register("nextFollowUpDate")}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label>{t("paymentStatus")}</Label>
+            <Controller
+              control={control}
+              name="paymentStatus"
+              render={({ field }) => (
+                <Select
+                  value={field.value || "none"}
+                  onValueChange={(value) =>
+                    field.onChange(value === "none" ? "" : value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">—</SelectItem>
+                    {paymentStatusValues.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {tPaymentStatus(status)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="referralSource">{t("referralSource")}</Label>
+            <Input id="referralSource" {...register("referralSource")} />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="documentsRequested">
+              {t("documentsRequested")}
+            </Label>
+            <Input
+              id="documentsRequested"
+              {...register("documentsRequested")}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="documentsReceived">{t("documentsReceived")}</Label>
+            <Input id="documentsReceived" {...register("documentsReceived")} />
+          </div>
+
+          <div className="flex flex-col gap-1.5 sm:col-span-2">
+            <Label htmlFor="nextAction">{t("nextAction")}</Label>
+            <Input id="nextAction" {...register("nextAction")} />
+          </div>
         </div>
       </div>
 

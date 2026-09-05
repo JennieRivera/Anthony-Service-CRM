@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { serviceTypeValues } from "./client";
+import { paymentStatusValues } from "./payment";
 
 export const caseStatusValues = [
   "new",
@@ -34,6 +35,14 @@ export const caseFormSchema = z.object({
   dueDate: optionalString,
   fee: optionalString,
   notes: optionalString,
+  // Phase 2 foundation fields (Session 0)
+  startDate: z.string().min(1, "Start date is required"),
+  nextFollowUpDate: optionalString,
+  documentsRequested: optionalString,
+  documentsReceived: optionalString,
+  paymentStatus: z.enum(paymentStatusValues).optional().or(z.literal("")),
+  referralSource: optionalString,
+  nextAction: optionalString,
   // Notary journal (only relevant when serviceType is Online Notary)
   notaryDocumentType: optionalString,
   notarialActType: z.enum(notarialActTypeValues).optional(),

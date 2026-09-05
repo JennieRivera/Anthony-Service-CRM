@@ -8,6 +8,7 @@ import {
   Receipt,
   Handshake,
   Wallet,
+  ListChecks,
   BarChart3,
   Settings,
   Map,
@@ -24,6 +25,7 @@ export type NavItem = {
     | "invoices"
     | "referrals"
     | "payments"
+    | "tasks"
     | "reports"
     | "companyRegistration"
     | "settings";
@@ -34,6 +36,7 @@ export const navItems: NavItem[] = [
   { href: "/", labelKey: "dashboard", icon: LayoutDashboard },
   { href: "/clients", labelKey: "clients", icon: Users },
   { href: "/cases", labelKey: "cases", icon: Briefcase },
+  { href: "/tasks", labelKey: "tasks", icon: ListChecks },
   { href: "/appointments", labelKey: "appointments", icon: CalendarDays },
   { href: "/invoices", labelKey: "invoices", icon: Receipt },
   { href: "/payments", labelKey: "payments", icon: Wallet },

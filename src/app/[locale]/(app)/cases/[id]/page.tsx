@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { CaseStatusBadge } from "@/components/clients/StatusBadge";
 import { DocumentList } from "@/components/documents/DocumentList";
 import { DocumentUploader } from "@/components/documents/DocumentUploader";
+import { Badge } from "@/components/ui/badge";
 
 export default async function CaseDetailPage({
   params,
@@ -19,12 +20,14 @@ export default async function CaseDetailPage({
   const tService = await getTranslations("ServiceType");
   const tActType = await getTranslations("NotarialActType");
   const tIdMethod = await getTranslations("IdVerificationMethod");
+  const tPaymentStatus = await getTranslations("PaymentStatus");
   const tDocuments = await getTranslations("Documents");
 
   const result = await getCaseById(id);
   if (!result) notFound();
 
-  const { case: c, client, notaryEntries, apostille, documents } = result;
+  const { case: c, client, notaryEntries, apostille, documents, statusHistory } =
+    result;
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -85,6 +88,64 @@ export default async function CaseDetailPage({
             <p className="text-foreground">{c.notes}</p>
           </div>
         )}
+      </div>
+
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+        <h2 className="font-heading text-lg text-foreground">
+          {t("trackingDetails")}
+        </h2>
+        <div className="grid gap-3 text-sm sm:grid-cols-4">
+          <div>
+            <p className="text-muted-foreground">{t("form.startDate")}</p>
+            <p className="text-foreground">
+              {new Date(c.startDate).toLocaleDateString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">
+              {t("form.nextFollowUpDate")}
+            </p>
+            <p className="text-foreground">
+              {c.nextFollowUpDate
+                ? new Date(c.nextFollowUpDate).toLocaleDateString()
+                : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.paymentStatus")}</p>
+            <p className="text-foreground">
+              {c.paymentStatus ? tPaymentStatus(c.paymentStatus) : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.referralSource")}</p>
+            <p className="text-foreground">{c.referralSource ?? "—"}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">
+              {t("form.documentsRequested")}
+            </p>
+            <p className="text-foreground">{c.documentsRequested ?? "—"}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">
+              {t("form.documentsReceived")}
+            </p>
+            <p className="text-foreground">{c.documentsReceived ?? "—"}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.nextAction")}</p>
+            <p className="text-foreground">{c.nextAction ?? "—"}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("closedDate")}</p>
+            <p className="text-foreground">
+              {c.closedDate
+                ? new Date(c.closedDate).toLocaleDateString()
+                : "—"}
+            </p>
+          </div>
+        </div>
       </div>
 
       {notaryEntries.length > 0 && (
@@ -195,6 +256,36 @@ export default async function CaseDetailPage({
         )}
         <DocumentList documents={documents} />
       </div>
+
+      {statusHistory.length > 0 && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <h2 className="font-heading text-lg text-foreground">
+            {t("statusHistory")}
+          </h2>
+          <div className="flex flex-col gap-2">
+            {statusHistory.map((entry) => (
+              <div
+                key={entry.id}
+                className="flex flex-wrap items-center gap-2 border-t border-border pt-2 text-sm first:border-t-0 first:pt-0"
+              >
+                {entry.previousStatus && (
+                  <>
+                    <CaseStatusBadge status={entry.previousStatus} />
+                    <span className="text-muted-foreground">→</span>
+                  </>
+                )}
+                <CaseStatusBadge status={entry.newStatus} />
+                <span className="text-muted-foreground">
+                  {new Date(entry.changedAt).toLocaleString()}
+                </span>
+                {entry.changedByEmail && (
+                  <Badge variant="outline">{entry.changedByEmail}</Badge>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   notaryLogEntries,
   apostilleDetails,
   documents,
+  caseStatusHistory,
 } from "@/lib/db/schema";
 
 export async function listCasesWithClient() {
@@ -48,23 +49,29 @@ export async function getCaseById(id: string) {
 
   if (!row) return null;
 
-  const [notaryEntries, apostille, caseDocuments] = await Promise.all([
-    db
-      .select()
-      .from(notaryLogEntries)
-      .where(eq(notaryLogEntries.caseId, id))
-      .orderBy(desc(notaryLogEntries.entryDate)),
-    db
-      .select()
-      .from(apostilleDetails)
-      .where(eq(apostilleDetails.caseId, id))
-      .limit(1),
-    db
-      .select()
-      .from(documents)
-      .where(eq(documents.caseId, id))
-      .orderBy(desc(documents.createdAt)),
-  ]);
+  const [notaryEntries, apostille, caseDocuments, statusHistory] =
+    await Promise.all([
+      db
+        .select()
+        .from(notaryLogEntries)
+        .where(eq(notaryLogEntries.caseId, id))
+        .orderBy(desc(notaryLogEntries.entryDate)),
+      db
+        .select()
+        .from(apostilleDetails)
+        .where(eq(apostilleDetails.caseId, id))
+        .limit(1),
+      db
+        .select()
+        .from(documents)
+        .where(eq(documents.caseId, id))
+        .orderBy(desc(documents.createdAt)),
+      db
+        .select()
+        .from(caseStatusHistory)
+        .where(eq(caseStatusHistory.caseId, id))
+        .orderBy(desc(caseStatusHistory.changedAt)),
+    ]);
 
   return {
     case: row.case,
@@ -72,5 +79,6 @@ export async function getCaseById(id: string) {
     notaryEntries,
     apostille: apostille[0] ?? null,
     documents: caseDocuments,
+    statusHistory,
   };
 }

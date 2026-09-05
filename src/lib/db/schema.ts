@@ -148,6 +148,68 @@ export const cases = pgTable("cases", {
   dueDate: date("due_date"),
   fee: numeric("fee", { precision: 12, scale: 2 }),
   notes: text("notes"),
+  // Phase 2 foundation fields (Session 0) — reserved for the role/staff
+  // system landing in a later session, same "declared but not yet wired
+  // into any UI" pattern already used by documents.uploadedBy.
+  assignedUserId: uuid("assigned_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  startDate: date("start_date").notNull().defaultNow(),
+  nextFollowUpDate: date("next_follow_up_date"),
+  documentsRequested: text("documents_requested"),
+  documentsReceived: text("documents_received"),
+  paymentStatus: paymentStatusEnum("payment_status"),
+  referralSource: text("referral_source"),
+  nextAction: text("next_action"),
+  closedDate: date("closed_date"),
+});
+
+export const caseStatusHistory = pgTable("case_status_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  caseId: uuid("case_id")
+    .notNull()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  previousStatus: caseStatusEnum("previous_status"),
+  newStatus: caseStatusEnum("new_status").notNull(),
+  // Snapshot of the acting session's email — there's no populated staff/user
+  // table yet (single ADMIN_EMAIL auth), so this can't be a real FK today.
+  changedByEmail: text("changed_by_email"),
+  changedAt: timestamp("changed_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  note: text("note"),
+});
+
+export const taskTypeEnum = pgEnum("task_type", [
+  "follow_up",
+  "payment_check",
+  "document_reminder",
+  "closing",
+]);
+
+export const taskStatusEnum = pgEnum("task_status", [
+  "open",
+  "done",
+  "dismissed",
+]);
+
+export const tasks = pgTable("tasks", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  clientId: uuid("client_id")
+    .notNull()
+    .references(() => clients.id, { onDelete: "cascade" }),
+  caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  type: taskTypeEnum("type").notNull(),
+  title: text("title").notNull(),
+  dueDate: date("due_date"),
+  status: taskStatusEnum("status").notNull().default("open"),
+  assignedUserId: uuid("assigned_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
 });
 
 export const documents = pgTable("documents", {
@@ -340,3 +402,5 @@ export type ApostilleDetails = typeof apostilleDetails.$inferSelect;
 export type ConversationMessage = typeof conversationMessages.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
+export type CaseStatusHistory = typeof caseStatusHistory.$inferSelect;
+export type Task = typeof tasks.$inferSelect;

@@ -70,6 +70,7 @@
     "invoices": "Facturas",
     "payments": "Pagos",
     "referrals": "Referidos",
+    "tasks": "Tareas",
     "reports": "Reportes",
     "companyRegistration": "Registro de Compañía",
     "settings": "Configuración",
@@ -157,6 +158,9 @@
     "columnFee": "Tarifa",
     "notaryJournal": "Entrada del Libro Notarial",
     "apostilleDetails": "Detalles de Apostilla",
+    "trackingDetails": "Detalles de Seguimiento",
+    "statusHistory": "Historial de Estado",
+    "closedDate": "Fecha de Cierre",
     "form": {
       "client": "Cliente",
       "selectClient": "Selecciona un cliente",
@@ -166,6 +170,13 @@
       "dueDate": "Fecha de Vencimiento",
       "fee": "Tarifa",
       "notes": "Notas",
+      "startDate": "Fecha de Inicio",
+      "nextFollowUpDate": "Próxima Fecha de Seguimiento",
+      "documentsRequested": "Documentos Solicitados",
+      "documentsReceived": "Documentos Recibidos",
+      "paymentStatus": "Estado de Pago",
+      "referralSource": "Fuente de Referencia",
+      "nextAction": "Próxima Acción",
       "documentType": "Tipo de Documento",
       "notarialActType": "Tipo de Acto Notarial",
       "idVerificationMethod": "Método de Verificación de Identidad",
@@ -418,5 +429,21 @@
       "saving": "Guardando...",
       "cancel": "Cancelar"
     }
+  },
+  "TaskType": {
+    "follow_up": "Seguimiento",
+    "payment_check": "Verificación de Pago",
+    "document_reminder": "Recordatorio de Documentos",
+    "closing": "Cierre"
+  },
+  "Tasks": {
+    "title": "Tareas",
+    "empty": "No hay tareas pendientes por ahora.",
+    "columnType": "Tipo",
+    "columnTitle": "Tarea",
+    "columnClient": "Cliente",
+    "columnCase": "Caso",
+    "columnDueDate": "Fecha Límite",
+    "markDone": "Marcar como Hecha"
   }
 }
