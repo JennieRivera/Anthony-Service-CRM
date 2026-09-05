@@ -93,7 +93,8 @@
     "notary": "Notaría / RON / IPEN / Firma de Préstamos",
     "bookkeeping": "Contabilidad",
     "immigration": "Servicios Administrativos de Inmigración",
-    "academy": "Academia / Capacitación"
+    "academy": "Academia / Capacitación",
+    "marketing": "Marketing / Marca / IA / Automatización"
   },
   "ClientStatus": {
     "lead": "Prospecto",
@@ -123,15 +124,25 @@
     "backToClients": "Volver a Clientes",
     "editClient": "Editar Cliente",
     "tabOverview": "Resumen",
+    "tabTimeline": "Cronología",
     "tabConversations": "Conversaciones",
     "tabCases": "Casos",
     "tabInvoices": "Facturas",
+    "tabPayments": "Pagos",
+    "tabReferrals": "Referidos",
     "tabAppointments": "Citas",
+    "tabTasks": "Tareas",
     "noCases": "Aún no hay casos.",
     "noInvoices": "Aún no hay facturas.",
+    "noPayments": "Aún no hay pagos.",
+    "noReferrals": "Aún no hay referidos.",
     "noAppointments": "Aún no hay citas.",
+    "noTasks": "Aún no hay tareas.",
+    "noActivity": "Aún no hay actividad.",
+    "of": "de",
     "referralSource": "Fuente de Referencia",
     "preferredLanguage": "Idioma Preferido",
+    "outstandingBalance": "Balance Pendiente",
     "notes": "Notas",
     "form": {
       "fullName": "Nombre Completo",
@@ -173,6 +184,7 @@
     "consultingServiceDetails": "Detalles de Consultoría de Negocios",
     "businessFormationDetails": "Detalles de Formación de Empresa",
     "academyEnrollmentDetails": "Detalles de Inscripción en Academia",
+    "marketingProjectDetails": "Detalles del Proyecto de Marketing / Automatización",
     "trackingDetails": "Detalles de Seguimiento",
     "statusHistory": "Historial de Estado",
     "closedDate": "Fecha de Cierre",
@@ -311,6 +323,13 @@
       "communityAccess": "Acceso a la Comunidad",
       "highlevelSyncStatus": "Estado de Sincronización HighLevel",
       "academyCaseStatus": "Estado",
+      "projectType": "Tipo de Proyecto",
+      "businessGoal": "Meta del Negocio",
+      "currentSystems": "Sistemas Actuales",
+      "deliverables": "Entregables",
+      "integrationsRequired": "Integraciones Requeridas",
+      "aiAgentRequired": "Requiere Agente de IA",
+      "marketingCaseStatus": "Estado",
       "save": "Guardar Caso",
       "saving": "Guardando...",
       "cancel": "Cancelar"
@@ -824,5 +843,25 @@
       "saving": "Guardando...",
       "cancel": "Cancelar"
     }
+  },
+  "ProjectType": {
+    "marketing": "Marketing",
+    "branding": "Marca",
+    "crm": "CRM",
+    "automation": "Automatización",
+    "ai": "IA"
+  },
+  "MarketingCaseStatus": {
+    "discovery": "Descubrimiento",
+    "audit": "Auditoría",
+    "strategy": "Estrategia",
+    "proposal": "Propuesta",
+    "approved": "Aprobado",
+    "build": "Construcción",
+    "testing": "Pruebas",
+    "client_review": "Revisión del Cliente",
+    "live": "En Vivo",
+    "optimization": "Optimización",
+    "completed": "Completado"
   }
 }

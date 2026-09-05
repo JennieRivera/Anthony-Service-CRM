@@ -405,6 +405,30 @@ const templates: Record<
     ],
     includeNotaryBlock: false,
   },
+
+  marketing: {
+    documentTitle: {
+      en: "Marketing / Branding / AI / Automation Project Intake",
+      es: "Admisión de Proyecto — Marketing / Marca / IA / Automatización",
+    },
+    intro: {
+      en: "This intake sheet organizes the information needed to scope your marketing, branding, CRM, automation, or AI project.",
+      es: "Esta hoja de admisión organiza la información necesaria para definir el alcance de su proyecto de marketing, marca, CRM, automatización o IA.",
+    },
+    sections: [
+      {
+        heading: { en: "Project Information", es: "Información del Proyecto" },
+        fields: [
+          { en: "Project Type (Marketing / Branding / CRM / Automation / AI)", es: "Tipo de Proyecto (Marketing / Marca / CRM / Automatización / IA)" },
+          { en: "Business Goal", es: "Meta del Negocio" },
+          { en: "Current Systems", es: "Sistemas Actuales" },
+          { en: "Deliverables", es: "Entregables" },
+          { en: "Deadline", es: "Fecha Límite" },
+        ],
+      },
+    ],
+    includeNotaryBlock: false,
+  },
 };
 
 export function getServiceTemplate(

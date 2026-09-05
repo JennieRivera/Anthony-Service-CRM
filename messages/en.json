@@ -93,7 +93,8 @@
     "notary": "Notary / RON / IPEN / Loan Signing",
     "bookkeeping": "Bookkeeping / Accounting Support",
     "immigration": "Immigration Administrative Services",
-    "academy": "Academy / Training"
+    "academy": "Academy / Training",
+    "marketing": "Marketing / Branding / AI / Automation"
   },
   "ClientStatus": {
     "lead": "Lead",
@@ -123,15 +124,25 @@
     "backToClients": "Back to Clients",
     "editClient": "Edit Client",
     "tabOverview": "Overview",
+    "tabTimeline": "Timeline",
     "tabConversations": "Conversations",
     "tabCases": "Cases",
     "tabInvoices": "Invoices",
+    "tabPayments": "Payments",
+    "tabReferrals": "Referrals",
     "tabAppointments": "Appointments",
+    "tabTasks": "Tasks",
     "noCases": "No cases yet.",
     "noInvoices": "No invoices yet.",
+    "noPayments": "No payments yet.",
+    "noReferrals": "No referrals yet.",
     "noAppointments": "No appointments yet.",
+    "noTasks": "No tasks yet.",
+    "noActivity": "No activity yet.",
+    "of": "of",
     "referralSource": "Referral Source",
     "preferredLanguage": "Preferred Language",
+    "outstandingBalance": "Outstanding Balance",
     "notes": "Notes",
     "form": {
       "fullName": "Full Name",
@@ -173,6 +184,7 @@
     "consultingServiceDetails": "Business Consulting Details",
     "businessFormationDetails": "Business Formation Details",
     "academyEnrollmentDetails": "Academy Enrollment Details",
+    "marketingProjectDetails": "Marketing / Automation Project Details",
     "trackingDetails": "Tracking Details",
     "statusHistory": "Status History",
     "closedDate": "Closed Date",
@@ -311,6 +323,13 @@
       "communityAccess": "Community Access",
       "highlevelSyncStatus": "HighLevel Sync Status",
       "academyCaseStatus": "Status",
+      "projectType": "Project Type",
+      "businessGoal": "Business Goal",
+      "currentSystems": "Current Systems",
+      "deliverables": "Deliverables",
+      "integrationsRequired": "Integrations Required",
+      "aiAgentRequired": "AI Agent Required",
+      "marketingCaseStatus": "Status",
       "save": "Save Case",
       "saving": "Saving...",
       "cancel": "Cancel"
@@ -824,5 +843,25 @@
       "saving": "Saving...",
       "cancel": "Cancel"
     }
+  },
+  "ProjectType": {
+    "marketing": "Marketing",
+    "branding": "Branding",
+    "crm": "CRM",
+    "automation": "Automation",
+    "ai": "AI"
+  },
+  "MarketingCaseStatus": {
+    "discovery": "Discovery",
+    "audit": "Audit",
+    "strategy": "Strategy",
+    "proposal": "Proposal",
+    "approved": "Approved",
+    "build": "Build",
+    "testing": "Testing",
+    "client_review": "Client Review",
+    "live": "Live",
+    "optimization": "Optimization",
+    "completed": "Completed"
   }
 }

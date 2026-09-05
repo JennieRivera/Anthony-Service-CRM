@@ -181,6 +181,28 @@ export const highlevelSyncStatusValues = [
   "error",
 ] as const;
 
+// Phase 2, Session 6
+export const projectTypeValues = [
+  "marketing",
+  "branding",
+  "crm",
+  "automation",
+  "ai",
+] as const;
+export const marketingCaseStatusValues = [
+  "discovery",
+  "audit",
+  "strategy",
+  "proposal",
+  "approved",
+  "build",
+  "testing",
+  "client_review",
+  "live",
+  "optimization",
+  "completed",
+] as const;
+
 const optionalString = z.string().trim().optional().or(z.literal(""));
 
 export const caseFormSchema = z.object({
@@ -360,6 +382,18 @@ export const caseFormSchema = z.object({
     .enum(academyCaseStatusValues)
     .optional()
     .or(z.literal("")),
+  // Marketing/Branding/AI/Automation details (relevant when serviceType is Marketing)
+  projectType: z.enum(projectTypeValues).optional().or(z.literal("")),
+  businessGoal: optionalString,
+  currentSystems: optionalString,
+  deliverables: optionalString,
+  integrationsRequired: optionalString,
+  aiAgentRequired: z.boolean().optional(),
+  marketingCompletionPercentage: optionalString,
+  marketingCaseStatus: z
+    .enum(marketingCaseStatusValues)
+    .optional()
+    .or(z.literal("")),
 });
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
@@ -372,3 +406,4 @@ export const creditServiceTypes = ["credit_financing"];
 export const consultingServiceTypes = ["leadership"];
 export const formationServiceTypes = ["company_registration"];
 export const academyServiceTypes = ["academy"];
+export const marketingServiceTypes = ["marketing"];

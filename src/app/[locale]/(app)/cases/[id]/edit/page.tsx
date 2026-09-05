@@ -50,6 +50,7 @@ export default async function EditCasePage({
         consultingDetails={result.consultingDetails}
         formationDetails={result.formationDetails}
         academyDetails={result.academyDetails}
+        marketingDetails={result.marketingDetails}
         clients={clients}
         onSubmit={submit}
       />

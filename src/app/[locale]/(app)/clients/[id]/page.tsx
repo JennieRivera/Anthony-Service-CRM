@@ -19,8 +19,19 @@ export default async function ClientProfilePage({
   const result = await getClientById(id);
   if (!result) notFound();
 
-  const { client, cases, invoices, appointments, documents, conversations } =
-    result;
+  const {
+    client,
+    cases,
+    invoices,
+    appointments,
+    documents,
+    conversations,
+    referrals,
+    tasks,
+    payments,
+    outstandingBalance,
+    timeline,
+  } = result;
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -62,6 +73,20 @@ export default async function ClientProfilePage({
             <p className="text-muted-foreground">{t("referralSource")}</p>
             <p className="text-foreground">{client.referralSource ?? "—"}</p>
           </div>
+          <div>
+            <p className="text-muted-foreground">
+              {t("outstandingBalance")}
+            </p>
+            <p
+              className={
+                outstandingBalance > 0
+                  ? "font-medium text-destructive"
+                  : "text-foreground"
+              }
+            >
+              ${outstandingBalance.toFixed(2)}
+            </p>
+          </div>
         </div>
         {client.notes && (
           <div className="text-sm">
@@ -78,6 +103,10 @@ export default async function ClientProfilePage({
         appointments={appointments}
         documents={documents}
         conversations={conversations}
+        referrals={referrals}
+        tasks={tasks}
+        payments={payments}
+        timeline={timeline}
         blobConfigured={isBlobConfigured()}
       />
     </div>

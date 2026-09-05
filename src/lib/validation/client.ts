@@ -11,6 +11,7 @@ export const serviceTypeValues = [
   "bookkeeping",
   "immigration",
   "academy",
+  "marketing",
 ] as const;
 
 export const clientStatusValues = [

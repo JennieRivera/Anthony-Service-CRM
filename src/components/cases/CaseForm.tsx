@@ -48,6 +48,9 @@ import {
   academyServiceTypes,
   academyCaseStatusValues,
   highlevelSyncStatusValues,
+  marketingServiceTypes,
+  projectTypeValues,
+  marketingCaseStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
@@ -62,6 +65,7 @@ import type {
   ConsultingServiceDetails,
   BusinessFormationDetails,
   AcademyEnrollmentDetails,
+  MarketingProjectDetails,
 } from "@/lib/db/schema";
 
 export function CaseForm({
@@ -74,6 +78,7 @@ export function CaseForm({
   consultingDetails,
   formationDetails,
   academyDetails,
+  marketingDetails,
   clients,
   defaultClientId,
   onSubmit,
@@ -87,6 +92,7 @@ export function CaseForm({
   consultingDetails?: ConsultingServiceDetails | null;
   formationDetails?: BusinessFormationDetails | null;
   academyDetails?: AcademyEnrollmentDetails | null;
+  marketingDetails?: MarketingProjectDetails | null;
   clients: { id: string; fullName: string }[];
   defaultClientId?: string;
   onSubmit: (values: CaseFormValues) => Promise<void>;
@@ -116,6 +122,8 @@ export function CaseForm({
   const tFormationCaseStatus = useTranslations("FormationCaseStatus");
   const tAcademyCaseStatus = useTranslations("AcademyCaseStatus");
   const tHighlevelSyncStatus = useTranslations("HighlevelSyncStatus");
+  const tProjectType = useTranslations("ProjectType");
+  const tMarketingCaseStatus = useTranslations("MarketingCaseStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -269,6 +277,15 @@ export function CaseForm({
       communityAccess: academyDetails?.communityAccess ?? false,
       highlevelSyncStatus: academyDetails?.highlevelSyncStatus ?? "not_synced",
       academyCaseStatus: academyDetails?.status ?? "lead",
+      projectType: marketingDetails?.projectType ?? "",
+      businessGoal: marketingDetails?.businessGoal ?? "",
+      currentSystems: marketingDetails?.currentSystems ?? "",
+      deliverables: marketingDetails?.deliverables ?? "",
+      integrationsRequired: marketingDetails?.integrationsRequired ?? "",
+      aiAgentRequired: marketingDetails?.aiAgentRequired ?? false,
+      marketingCompletionPercentage:
+        marketingDetails?.completionPercentage?.toString() ?? "",
+      marketingCaseStatus: marketingDetails?.status ?? "discovery",
     },
   });
 
@@ -281,6 +298,7 @@ export function CaseForm({
   const isConsulting = consultingServiceTypes.includes(serviceType);
   const isFormation = formationServiceTypes.includes(serviceType);
   const isAcademy = academyServiceTypes.includes(serviceType);
+  const isMarketing = marketingServiceTypes.includes(serviceType);
   // Apostille / authentication fields are an optional add-on for Document Prep cases.
   const isApostille = serviceType === "document_prep";
 
@@ -363,7 +381,8 @@ export function CaseForm({
           !isCredit &&
           !isConsulting &&
           !isFormation &&
-          !isAcademy && (
+          !isAcademy &&
+          !isMarketing && (
           <div className="flex flex-col gap-1.5">
             <Label>{t("status")}</Label>
             <Controller
@@ -2002,6 +2021,124 @@ export function CaseForm({
                 )}
               />
               <Label>{t("communityAccess")}</Label>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isMarketing && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("marketingProjectDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("projectType")}</Label>
+              <Controller
+                control={control}
+                name="projectType"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projectTypeValues.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {tProjectType(type)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("marketingCaseStatus")}</Label>
+              <Controller
+                control={control}
+                name="marketingCaseStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {marketingCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tMarketingCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="marketingCompletionPercentage">
+                {t("completionPercentage")}
+              </Label>
+              <Input
+                id="marketingCompletionPercentage"
+                type="number"
+                min="0"
+                max="100"
+                {...register("marketingCompletionPercentage")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="integrationsRequired">
+                {t("integrationsRequired")}
+              </Label>
+              <Input
+                id="integrationsRequired"
+                placeholder="Zapier, Stripe, Mailchimp..."
+                {...register("integrationsRequired")}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="aiAgentRequired"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("aiAgentRequired")}</Label>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-1">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="businessGoal">{t("businessGoal")}</Label>
+              <Textarea
+                id="businessGoal"
+                rows={2}
+                {...register("businessGoal")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="currentSystems">{t("currentSystems")}</Label>
+              <Textarea
+                id="currentSystems"
+                rows={2}
+                {...register("currentSystems")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="deliverables">{t("deliverables")}</Label>
+              <Textarea
+                id="deliverables"
+                rows={2}
+                {...register("deliverables")}
+              />
             </div>
           </div>
         </div>

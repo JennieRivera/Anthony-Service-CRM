@@ -16,6 +16,7 @@ import {
   consultingServiceDetails,
   businessFormationDetails,
   academyEnrollmentDetails,
+  marketingProjectDetails,
   caseStatusEnum,
   caseStatusHistory,
   tasks,
@@ -31,6 +32,7 @@ import {
   consultingServiceTypes,
   formationServiceTypes,
   academyServiceTypes,
+  marketingServiceTypes,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { redirect } from "@/i18n/navigation";
@@ -237,6 +239,16 @@ function deriveEffectiveStatus(
     if (s === "completed" || s === "certified") return "completed";
     if (s === "inactive") return "cancelled";
     if (s === "lead") return "new";
+    return "in_progress";
+  }
+
+  if (
+    marketingServiceTypes.includes(values.serviceType) &&
+    values.marketingCaseStatus
+  ) {
+    const s = values.marketingCaseStatus;
+    if (s === "completed") return "completed";
+    if (s === "discovery") return "new";
     return "in_progress";
   }
 
@@ -562,6 +574,30 @@ async function upsertServiceDetails(
       .values({ caseId, ...detail })
       .onConflictDoUpdate({
         target: academyEnrollmentDetails.caseId,
+        set: detail,
+      });
+    return;
+  }
+
+  if (marketingServiceTypes.includes(values.serviceType)) {
+    const detail = {
+      projectType: values.projectType || null,
+      businessGoal: values.businessGoal || null,
+      currentSystems: values.currentSystems || null,
+      deliverables: values.deliverables || null,
+      integrationsRequired: values.integrationsRequired || null,
+      aiAgentRequired: values.aiAgentRequired ?? false,
+      completionPercentage: values.marketingCompletionPercentage
+        ? Number(values.marketingCompletionPercentage)
+        : null,
+      status: values.marketingCaseStatus || "discovery",
+    };
+
+    await db
+      .insert(marketingProjectDetails)
+      .values({ caseId, ...detail })
+      .onConflictDoUpdate({
+        target: marketingProjectDetails.caseId,
         set: detail,
       });
     return;

@@ -34,6 +34,8 @@ export const serviceTypeEnum = pgEnum("service_type", [
   // Community & Strategic Alliances (which isn't — see strategicAlliances
   // below, a standalone table with no client relationship).
   "academy",
+  // Phase 2, Session 6 — Marketing / Branding / AI / Automation.
+  "marketing",
 ]);
 
 export const clientStatusEnum = pgEnum("client_status", [
@@ -709,6 +711,46 @@ export const academyEnrollmentDetails = pgTable("academy_enrollment_details", {
   status: academyCaseStatusEnum("status").notNull().default("lead"),
 });
 
+// Phase 2, Session 6 — Marketing / Branding / AI / Automation category.
+// "Deadline" reuses cases.dueDate and "Responsible User" reuses the
+// already-reserved cases.assignedUserId (same not-yet-wired-into-UI
+// pattern as documents.uploadedBy) rather than adding duplicate fields.
+export const projectTypeEnum = pgEnum("project_type", [
+  "marketing",
+  "branding",
+  "crm",
+  "automation",
+  "ai",
+]);
+
+export const marketingCaseStatusEnum = pgEnum("marketing_case_status", [
+  "discovery",
+  "audit",
+  "strategy",
+  "proposal",
+  "approved",
+  "build",
+  "testing",
+  "client_review",
+  "live",
+  "optimization",
+  "completed",
+]);
+
+export const marketingProjectDetails = pgTable("marketing_project_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  projectType: projectTypeEnum("project_type"),
+  businessGoal: text("business_goal"),
+  currentSystems: text("current_systems"),
+  deliverables: text("deliverables"),
+  integrationsRequired: text("integrations_required"),
+  aiAgentRequired: boolean("ai_agent_required").notNull().default(false),
+  completionPercentage: integer("completion_percentage"),
+  status: marketingCaseStatusEnum("status").notNull().default("discovery"),
+});
+
 export const conversationMessages = pgTable("conversation_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -960,3 +1002,5 @@ export type AcademyEnrollmentDetails =
 export type StrategicAlliance = typeof strategicAlliances.$inferSelect;
 export type AllianceStatusHistory =
   typeof allianceStatusHistory.$inferSelect;
+export type MarketingProjectDetails =
+  typeof marketingProjectDetails.$inferSelect;

@@ -40,6 +40,8 @@ export default async function CaseDetailPage({
   const tFormationCaseStatus = await getTranslations("FormationCaseStatus");
   const tAcademyCaseStatus = await getTranslations("AcademyCaseStatus");
   const tHighlevelSyncStatus = await getTranslations("HighlevelSyncStatus");
+  const tProjectType = await getTranslations("ProjectType");
+  const tMarketingCaseStatus = await getTranslations("MarketingCaseStatus");
 
   const result = await getCaseById(id);
   if (!result) notFound();
@@ -57,6 +59,7 @@ export default async function CaseDetailPage({
     consultingDetails,
     formationDetails,
     academyDetails,
+    marketingDetails,
     documents,
     statusHistory,
   } = result;
@@ -1002,6 +1005,75 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {academyDetails.finalEvaluation}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {marketingDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("marketingProjectDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tMarketingCaseStatus(marketingDetails.status)}
+            </Badge>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">{t("form.projectType")}</p>
+              <p className="text-foreground">
+                {marketingDetails.projectType
+                  ? tProjectType(marketingDetails.projectType)
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.completionPercentage")}
+              </p>
+              <p className="text-foreground">
+                {marketingDetails.completionPercentage != null
+                  ? `${marketingDetails.completionPercentage}%`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.integrationsRequired")}
+              </p>
+              <p className="text-foreground">
+                {marketingDetails.integrationsRequired ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.aiAgentRequired")}
+              </p>
+              <p className="text-foreground">
+                {marketingDetails.aiAgentRequired ? "✓" : "—"}
+              </p>
+            </div>
+          </div>
+          {marketingDetails.businessGoal && (
+            <div className="text-sm">
+              <p className="text-muted-foreground">
+                {t("form.businessGoal")}
+              </p>
+              <p className="text-foreground">
+                {marketingDetails.businessGoal}
+              </p>
+            </div>
+          )}
+          {marketingDetails.deliverables && (
+            <div className="text-sm">
+              <p className="text-muted-foreground">
+                {t("form.deliverables")}
+              </p>
+              <p className="text-foreground">
+                {marketingDetails.deliverables}
               </p>
             </div>
           )}
