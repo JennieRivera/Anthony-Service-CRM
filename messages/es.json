@@ -88,7 +88,8 @@
     "tax_prep": "Taxes / Contabilidad",
     "company_registration": "Registro de Compañía",
     "credit_financing": "Crédito y Financiamiento",
-    "leadership": "Liderazgo"
+    "leadership": "Liderazgo",
+    "notary": "Notaría / RON / IPEN / Firma de Préstamos"
   },
   "ClientStatus": {
     "lead": "Prospecto",
@@ -158,6 +159,8 @@
     "columnFee": "Tarifa",
     "notaryJournal": "Entrada del Libro Notarial",
     "apostilleDetails": "Detalles de Apostilla",
+    "notaryServiceDetails": "Detalles del Servicio Notarial",
+    "taxServiceDetails": "Detalles del Servicio de Impuestos",
     "trackingDetails": "Detalles de Seguimiento",
     "statusHistory": "Historial de Estado",
     "closedDate": "Fecha de Cierre",
@@ -186,6 +189,43 @@
       "submissionDate": "Fecha de Envío",
       "expectedReturnDate": "Fecha de Retorno Esperada",
       "actualReturnDate": "Fecha de Retorno Real",
+      "modality": "Modalidad",
+      "selectModality": "Selecciona una modalidad",
+      "notaryCaseStatus": "Estado",
+      "idVerificationStatus": "Estado de Verificación de Identidad",
+      "appointmentDate": "Fecha de la Cita",
+      "appointmentTime": "Hora de la Cita",
+      "location": "Ubicación",
+      "numberOfSigners": "Número de Firmantes",
+      "numberOfDocuments": "Número de Documentos",
+      "numberOfNotarialActs": "Número de Actos Notariales",
+      "witnessRequired": "Requiere Testigo",
+      "witnessProvidedBy": "Testigo Provisto Por",
+      "loanSigningCompany": "Compañía de Firma de Préstamo",
+      "titleCompany": "Compañía de Título",
+      "signingService": "Servicio de Firma",
+      "scanbacksRequired": "Requiere Escaneo de Regreso",
+      "shippingRequired": "Requiere Envío",
+      "trackingNumber": "Número de Rastreo",
+      "notaryServiceFee": "Tarifa Notarial",
+      "travelFee": "Tarifa de Viaje",
+      "printingFee": "Tarifa de Impresión",
+      "totalFee": "Tarifa Total",
+      "taxYear": "Año Fiscal",
+      "filerType": "Individual / Negocio",
+      "jurisdiction": "Federal / Estatal",
+      "returnType": "Tipo de Declaración",
+      "filingStatus": "Estado Civil Fiscal",
+      "businessEntityType": "Tipo de Entidad de Negocio",
+      "taxCaseStatus": "Estado",
+      "intakeCompleted": "Admisión Completada",
+      "efileAuthorizationSigned": "Autorización de E-file Firmada",
+      "refundAmount": "Monto de Reembolso",
+      "balanceDueAmount": "Saldo Adeudado (al IRS/Estado)",
+      "taxAmountPaid": "Monto Pagado",
+      "balanceRemaining": "Balance Pendiente",
+      "internalNotes": "Notas Internas",
+      "noSensitiveDataWarning": "No ingreses aquí el SSN, ITIN, ni números completos de tarjeta o cuenta bancaria.",
       "save": "Guardar Caso",
       "saving": "Guardando...",
       "cancel": "Cancelar"
@@ -445,5 +485,58 @@
     "columnCase": "Caso",
     "columnDueDate": "Fecha Límite",
     "markDone": "Marcar como Hecha"
+  },
+  "NotaryModality": {
+    "in_person": "En Persona",
+    "mobile": "Móvil",
+    "ron": "RON (Notarización Remota en Línea)",
+    "ipen": "IPEN (Notarización Electrónica en Persona)"
+  },
+  "IdVerificationStatus": {
+    "pending": "Pendiente",
+    "verified": "Verificado",
+    "failed": "Fallido"
+  },
+  "NotaryCaseStatus": {
+    "new_request": "Nueva Solicitud",
+    "contacted": "Contactado",
+    "appointment_scheduled": "Cita Programada",
+    "waiting_for_documents": "Esperando Documentos",
+    "ready_for_signing": "Listo para Firmar",
+    "completed": "Completado",
+    "scanbacks_pending": "Escaneo de Regreso Pendiente",
+    "shipping_pending": "Envío Pendiente",
+    "closed": "Cerrado",
+    "cancelled": "Cancelado"
+  },
+  "TaxFilerType": {
+    "individual": "Individual",
+    "business": "Negocio"
+  },
+  "TaxJurisdiction": {
+    "federal": "Federal",
+    "state": "Estatal"
+  },
+  "TaxFilingStatus": {
+    "single": "Soltero(a)",
+    "married_filing_jointly": "Casado(a) Declarando en Conjunto",
+    "married_filing_separately": "Casado(a) Declarando por Separado",
+    "head_of_household": "Cabeza de Familia",
+    "qualifying_widow": "Viudo(a) Calificado(a)"
+  },
+  "TaxCaseStatus": {
+    "new_client": "Nuevo Cliente",
+    "intake_pending": "Admisión Pendiente",
+    "documents_pending": "Documentos Pendientes",
+    "ready_for_preparation": "Listo para Preparación",
+    "in_preparation": "En Preparación",
+    "internal_review": "Revisión Interna",
+    "client_review": "Revisión del Cliente",
+    "signature_pending": "Firma Pendiente",
+    "ready_to_efile": "Listo para E-file",
+    "filed": "Declarado",
+    "accepted": "Aceptado",
+    "rejected_correction_needed": "Rechazado / Corrección Necesaria",
+    "completed": "Completado"
   }
 }

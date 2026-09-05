@@ -7,6 +7,8 @@ import {
   integer,
   serial,
   date,
+  time,
+  boolean,
   pgEnum,
 } from "drizzle-orm/pg-core";
 
@@ -17,6 +19,10 @@ export const serviceTypeEnum = pgEnum("service_type", [
   "company_registration",
   "credit_financing",
   "leadership",
+  // Phase 2, Session 1 — broad Notary/RON/IPEN/Loan Signing category.
+  // `online_notary` is kept as-is for existing rows; new notary cases of
+  // any modality (in person, mobile, RON, IPEN) use this value instead.
+  "notary",
 ]);
 
 export const clientStatusEnum = pgEnum("client_status", [
@@ -315,6 +321,123 @@ export const apostilleDetails = pgTable("apostille_details", {
   notes: text("notes"),
 });
 
+// Phase 2, Session 1 — Notary / RON / IPEN / Loan Signing category.
+// This is the case-level appointment/intake tracker; the existing
+// notary_log_entries table remains the separate, immutable Florida
+// notarial-journal record for each individual notarial act performed.
+export const notaryModalityEnum = pgEnum("notary_modality", [
+  "in_person",
+  "mobile",
+  "ron",
+  "ipen",
+]);
+
+export const idVerificationStatusEnum = pgEnum("id_verification_status", [
+  "pending",
+  "verified",
+  "failed",
+]);
+
+export const notaryCaseStatusEnum = pgEnum("notary_case_status", [
+  "new_request",
+  "contacted",
+  "appointment_scheduled",
+  "waiting_for_documents",
+  "ready_for_signing",
+  "completed",
+  "scanbacks_pending",
+  "shipping_pending",
+  "closed",
+  "cancelled",
+]);
+
+export const notaryServiceDetails = pgTable("notary_service_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  modality: notaryModalityEnum("modality").notNull(),
+  appointmentDate: date("appointment_date"),
+  appointmentTime: time("appointment_time"),
+  location: text("location"),
+  numberOfSigners: integer("number_of_signers"),
+  numberOfDocuments: integer("number_of_documents"),
+  numberOfNotarialActs: integer("number_of_notarial_acts"),
+  idVerificationStatus: idVerificationStatusEnum("id_verification_status"),
+  witnessRequired: boolean("witness_required").notNull().default(false),
+  witnessProvidedBy: text("witness_provided_by"),
+  documentType: text("document_type"),
+  loanSigningCompany: text("loan_signing_company"),
+  titleCompany: text("title_company"),
+  signingService: text("signing_service"),
+  scanbacksRequired: boolean("scanbacks_required").notNull().default(false),
+  shippingRequired: boolean("shipping_required").notNull().default(false),
+  trackingNumber: text("tracking_number"),
+  notaryFee: numeric("notary_fee", { precision: 12, scale: 2 }),
+  travelFee: numeric("travel_fee", { precision: 12, scale: 2 }),
+  printingFee: numeric("printing_fee", { precision: 12, scale: 2 }),
+  status: notaryCaseStatusEnum("status").notNull().default("new_request"),
+});
+
+// Phase 2, Session 1 — Tax Services category.
+// One row = one return being prepared for one jurisdiction. A client who
+// needs both a federal and a state return gets two linked cases.
+export const taxFilerTypeEnum = pgEnum("tax_filer_type", [
+  "individual",
+  "business",
+]);
+
+export const taxJurisdictionEnum = pgEnum("tax_jurisdiction", [
+  "federal",
+  "state",
+]);
+
+export const taxFilingStatusEnum = pgEnum("tax_filing_status", [
+  "single",
+  "married_filing_jointly",
+  "married_filing_separately",
+  "head_of_household",
+  "qualifying_widow",
+]);
+
+export const taxCaseStatusEnum = pgEnum("tax_case_status", [
+  "new_client",
+  "intake_pending",
+  "documents_pending",
+  "ready_for_preparation",
+  "in_preparation",
+  "internal_review",
+  "client_review",
+  "signature_pending",
+  "ready_to_efile",
+  "filed",
+  "accepted",
+  "rejected_correction_needed",
+  "completed",
+]);
+
+export const taxServiceDetails = pgTable("tax_service_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  taxYear: integer("tax_year").notNull(),
+  filerType: taxFilerTypeEnum("filer_type").notNull(),
+  jurisdiction: taxJurisdictionEnum("jurisdiction").notNull().default("federal"),
+  returnType: text("return_type"),
+  filingStatus: taxFilingStatusEnum("filing_status"),
+  businessEntityType: text("business_entity_type"),
+  intakeCompleted: boolean("intake_completed").notNull().default(false),
+  efileAuthorizationSigned: boolean("efile_authorization_signed")
+    .notNull()
+    .default(false),
+  refundAmount: numeric("refund_amount", { precision: 12, scale: 2 }),
+  balanceDueAmount: numeric("balance_due_amount", { precision: 12, scale: 2 }),
+  amountPaid: numeric("amount_paid", { precision: 12, scale: 2 })
+    .notNull()
+    .default("0"),
+  internalNotes: text("internal_notes"),
+  status: taxCaseStatusEnum("status").notNull().default("new_client"),
+});
+
 export const conversationMessages = pgTable("conversation_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -404,3 +527,5 @@ export type Referral = typeof referrals.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type CaseStatusHistory = typeof caseStatusHistory.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
+export type NotaryServiceDetails = typeof notaryServiceDetails.$inferSelect;
+export type TaxServiceDetails = typeof taxServiceDetails.$inferSelect;

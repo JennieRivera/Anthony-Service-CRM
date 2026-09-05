@@ -22,12 +22,27 @@ export default async function CaseDetailPage({
   const tIdMethod = await getTranslations("IdVerificationMethod");
   const tPaymentStatus = await getTranslations("PaymentStatus");
   const tDocuments = await getTranslations("Documents");
+  const tNotaryModality = await getTranslations("NotaryModality");
+  const tIdVerificationStatus = await getTranslations("IdVerificationStatus");
+  const tNotaryCaseStatus = await getTranslations("NotaryCaseStatus");
+  const tTaxFilerType = await getTranslations("TaxFilerType");
+  const tTaxJurisdiction = await getTranslations("TaxJurisdiction");
+  const tTaxFilingStatus = await getTranslations("TaxFilingStatus");
+  const tTaxCaseStatus = await getTranslations("TaxCaseStatus");
 
   const result = await getCaseById(id);
   if (!result) notFound();
 
-  const { case: c, client, notaryEntries, apostille, documents, statusHistory } =
-    result;
+  const {
+    case: c,
+    client,
+    notaryEntries,
+    apostille,
+    notaryDetails,
+    taxDetails,
+    documents,
+    statusHistory,
+  } = result;
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -240,6 +255,208 @@ export default async function CaseDetailPage({
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {notaryDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("notaryServiceDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tNotaryCaseStatus(notaryDetails.status)}
+            </Badge>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">{t("form.modality")}</p>
+              <p className="text-foreground">
+                {tNotaryModality(notaryDetails.modality)}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.appointmentDate")}
+              </p>
+              <p className="text-foreground">
+                {notaryDetails.appointmentDate
+                  ? new Date(notaryDetails.appointmentDate).toLocaleDateString()
+                  : "—"}
+                {notaryDetails.appointmentTime
+                  ? ` ${notaryDetails.appointmentTime}`
+                  : ""}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.location")}</p>
+              <p className="text-foreground">
+                {notaryDetails.location ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.idVerificationStatus")}
+              </p>
+              <p className="text-foreground">
+                {notaryDetails.idVerificationStatus
+                  ? tIdVerificationStatus(notaryDetails.idVerificationStatus)
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.numberOfSigners")}
+              </p>
+              <p className="text-foreground">
+                {notaryDetails.numberOfSigners ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.numberOfDocuments")}
+              </p>
+              <p className="text-foreground">
+                {notaryDetails.numberOfDocuments ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.numberOfNotarialActs")}
+              </p>
+              <p className="text-foreground">
+                {notaryDetails.numberOfNotarialActs ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.loanSigningCompany")}
+              </p>
+              <p className="text-foreground">
+                {notaryDetails.loanSigningCompany ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.titleCompany")}</p>
+              <p className="text-foreground">
+                {notaryDetails.titleCompany ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.trackingNumber")}
+              </p>
+              <p className="text-foreground">
+                {notaryDetails.trackingNumber ?? "—"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {taxDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("taxServiceDetails")}
+            </h2>
+            <Badge variant="outline">{tTaxCaseStatus(taxDetails.status)}</Badge>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">{t("form.taxYear")}</p>
+              <p className="text-foreground">{taxDetails.taxYear}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.filerType")}</p>
+              <p className="text-foreground">
+                {tTaxFilerType(taxDetails.filerType)}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.jurisdiction")}</p>
+              <p className="text-foreground">
+                {tTaxJurisdiction(taxDetails.jurisdiction)}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.returnType")}</p>
+              <p className="text-foreground">{taxDetails.returnType ?? "—"}</p>
+            </div>
+            {taxDetails.filingStatus && (
+              <div>
+                <p className="text-muted-foreground">
+                  {t("form.filingStatus")}
+                </p>
+                <p className="text-foreground">
+                  {tTaxFilingStatus(taxDetails.filingStatus)}
+                </p>
+              </div>
+            )}
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.intakeCompleted")}
+              </p>
+              <p className="text-foreground">
+                {taxDetails.intakeCompleted ? "✓" : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.efileAuthorizationSigned")}
+              </p>
+              <p className="text-foreground">
+                {taxDetails.efileAuthorizationSigned ? "✓" : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.refundAmount")}
+              </p>
+              <p className="text-foreground">
+                {taxDetails.refundAmount
+                  ? `$${Number(taxDetails.refundAmount).toFixed(2)}`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.balanceDueAmount")}
+              </p>
+              <p className="text-foreground">
+                {taxDetails.balanceDueAmount
+                  ? `$${Number(taxDetails.balanceDueAmount).toFixed(2)}`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.taxAmountPaid")}
+              </p>
+              <p className="text-foreground">
+                ${Number(taxDetails.amountPaid).toFixed(2)}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.balanceRemaining")}
+              </p>
+              <p className="text-foreground">
+                $
+                {(
+                  Number(c.fee ?? 0) - Number(taxDetails.amountPaid)
+                ).toFixed(2)}
+              </p>
+            </div>
+          </div>
+          {taxDetails.internalNotes && (
+            <div className="text-sm">
+              <p className="text-muted-foreground">
+                {t("form.internalNotes")}
+              </p>
+              <p className="text-foreground">{taxDetails.internalNotes}</p>
+            </div>
+          )}
         </div>
       )}
 

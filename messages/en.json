@@ -88,7 +88,8 @@
     "tax_prep": "Tax & Accounting",
     "company_registration": "Company Registration",
     "credit_financing": "Credit & Financing",
-    "leadership": "Leadership"
+    "leadership": "Leadership",
+    "notary": "Notary / RON / IPEN / Loan Signing"
   },
   "ClientStatus": {
     "lead": "Lead",
@@ -158,6 +159,8 @@
     "columnFee": "Fee",
     "notaryJournal": "Notary Journal Entry",
     "apostilleDetails": "Apostille Details",
+    "notaryServiceDetails": "Notary Service Details",
+    "taxServiceDetails": "Tax Service Details",
     "trackingDetails": "Tracking Details",
     "statusHistory": "Status History",
     "closedDate": "Closed Date",
@@ -186,6 +189,43 @@
       "submissionDate": "Submission Date",
       "expectedReturnDate": "Expected Return Date",
       "actualReturnDate": "Actual Return Date",
+      "modality": "Modality",
+      "selectModality": "Select a modality",
+      "notaryCaseStatus": "Status",
+      "idVerificationStatus": "ID Verification Status",
+      "appointmentDate": "Appointment Date",
+      "appointmentTime": "Appointment Time",
+      "location": "Location",
+      "numberOfSigners": "Number of Signers",
+      "numberOfDocuments": "Number of Documents",
+      "numberOfNotarialActs": "Number of Notarial Acts",
+      "witnessRequired": "Witness Required",
+      "witnessProvidedBy": "Witness Provided By",
+      "loanSigningCompany": "Loan Signing Company",
+      "titleCompany": "Title Company",
+      "signingService": "Signing Service",
+      "scanbacksRequired": "Scanbacks Required",
+      "shippingRequired": "Shipping Required",
+      "trackingNumber": "Tracking Number",
+      "notaryServiceFee": "Notary Fee",
+      "travelFee": "Travel Fee",
+      "printingFee": "Printing Fee",
+      "totalFee": "Total Fee",
+      "taxYear": "Tax Year",
+      "filerType": "Individual / Business",
+      "jurisdiction": "Federal / State",
+      "returnType": "Return Type",
+      "filingStatus": "Filing Status",
+      "businessEntityType": "Business Entity Type",
+      "taxCaseStatus": "Status",
+      "intakeCompleted": "Intake Completed",
+      "efileAuthorizationSigned": "E-file Authorization Signed",
+      "refundAmount": "Refund Amount",
+      "balanceDueAmount": "Balance Due (to IRS/State)",
+      "taxAmountPaid": "Amount Paid",
+      "balanceRemaining": "Balance Remaining",
+      "internalNotes": "Internal Notes",
+      "noSensitiveDataWarning": "Do not enter SSN, ITIN, or full card/bank account numbers here.",
       "save": "Save Case",
       "saving": "Saving...",
       "cancel": "Cancel"
@@ -445,5 +485,58 @@
     "columnCase": "Case",
     "columnDueDate": "Due Date",
     "markDone": "Mark Done"
+  },
+  "NotaryModality": {
+    "in_person": "In Person",
+    "mobile": "Mobile",
+    "ron": "RON (Remote Online Notarization)",
+    "ipen": "IPEN (In-Person Electronic Notarization)"
+  },
+  "IdVerificationStatus": {
+    "pending": "Pending",
+    "verified": "Verified",
+    "failed": "Failed"
+  },
+  "NotaryCaseStatus": {
+    "new_request": "New Request",
+    "contacted": "Contacted",
+    "appointment_scheduled": "Appointment Scheduled",
+    "waiting_for_documents": "Waiting for Documents",
+    "ready_for_signing": "Ready for Signing",
+    "completed": "Completed",
+    "scanbacks_pending": "Scanbacks Pending",
+    "shipping_pending": "Shipping Pending",
+    "closed": "Closed",
+    "cancelled": "Cancelled"
+  },
+  "TaxFilerType": {
+    "individual": "Individual",
+    "business": "Business"
+  },
+  "TaxJurisdiction": {
+    "federal": "Federal",
+    "state": "State"
+  },
+  "TaxFilingStatus": {
+    "single": "Single",
+    "married_filing_jointly": "Married Filing Jointly",
+    "married_filing_separately": "Married Filing Separately",
+    "head_of_household": "Head of Household",
+    "qualifying_widow": "Qualifying Widow(er)"
+  },
+  "TaxCaseStatus": {
+    "new_client": "New Client",
+    "intake_pending": "Intake Pending",
+    "documents_pending": "Documents Pending",
+    "ready_for_preparation": "Ready for Preparation",
+    "in_preparation": "In Preparation",
+    "internal_review": "Internal Review",
+    "client_review": "Client Review",
+    "signature_pending": "Signature Pending",
+    "ready_to_efile": "Ready to E-file",
+    "filed": "Filed",
+    "accepted": "Accepted",
+    "rejected_correction_needed": "Rejected / Correction Needed",
+    "completed": "Completed"
   }
 }

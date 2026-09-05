@@ -7,6 +7,7 @@ export const serviceTypeValues = [
   "company_registration",
   "credit_financing",
   "leadership",
+  "notary",
 ] as const;
 
 export const clientStatusValues = [

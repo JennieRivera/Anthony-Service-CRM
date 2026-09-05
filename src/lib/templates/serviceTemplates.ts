@@ -74,6 +74,39 @@ const templates: Record<
     includeNotaryBlock: true,
   },
 
+  notary: {
+    documentTitle: {
+      en: "Notary Appointment Cover Sheet",
+      es: "Hoja de Cita Notarial",
+    },
+    intro: {
+      en: "Completed at the time of service for notarizations performed in person, mobile, via Remote Online Notarization (RON), or In-Person Electronic Notarization (IPEN), in accordance with Florida law.",
+      es: "Se completa al momento del servicio para notarizaciones realizadas en persona, a domicilio, mediante Notarización Remota en Línea (RON), o Notarización Electrónica en Persona (IPEN), conforme a la ley de la Florida.",
+    },
+    sections: [
+      {
+        heading: { en: "Appointment Information", es: "Información de la Cita" },
+        fields: [
+          { en: "Signer Full Name", es: "Nombre Completo del Firmante" },
+          { en: "Modality (In Person / Mobile / RON / IPEN)", es: "Modalidad (En Persona / Móvil / RON / IPEN)" },
+          { en: "Document(s) to be Notarized", es: "Documento(s) a Notariar" },
+          { en: "Appointment Date & Time", es: "Fecha y Hora de la Cita" },
+          { en: "Location", es: "Ubicación" },
+          { en: "Fee Charged", es: "Tarifa Cobrada" },
+        ],
+      },
+      {
+        heading: { en: "Loan Signing (if applicable)", es: "Firma de Préstamo (si aplica)" },
+        fields: [
+          { en: "Loan Signing Company", es: "Compañía de Firma de Préstamo" },
+          { en: "Title Company", es: "Compañía de Título" },
+          { en: "Signing Service", es: "Servicio de Firma" },
+        ],
+      },
+    ],
+    includeNotaryBlock: true,
+  },
+
   document_prep: {
     documentTitle: {
       en: "Document Preparation Service Intake",

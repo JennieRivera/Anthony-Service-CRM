@@ -40,7 +40,13 @@ export default async function EditCasePage({
         </Link>
       </div>
 
-      <CaseForm caseRecord={result.case} clients={clients} onSubmit={submit} />
+      <CaseForm
+        caseRecord={result.case}
+        notaryDetails={result.notaryDetails}
+        taxDetails={result.taxDetails}
+        clients={clients}
+        onSubmit={submit}
+      />
     </div>
   );
 }

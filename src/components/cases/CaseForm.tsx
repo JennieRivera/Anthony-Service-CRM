@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -22,19 +23,35 @@ import {
   notarialActTypeValues,
   idVerificationMethodValues,
   notaryServiceTypes,
+  taxServiceTypes,
+  notaryModalityValues,
+  idVerificationStatusValues,
+  notaryCaseStatusValues,
+  taxFilerTypeValues,
+  taxJurisdictionValues,
+  taxFilingStatusValues,
+  taxCaseStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
 import { paymentStatusValues } from "@/lib/validation/payment";
-import type { Case } from "@/lib/db/schema";
+import type {
+  Case,
+  NotaryServiceDetails,
+  TaxServiceDetails,
+} from "@/lib/db/schema";
 
 export function CaseForm({
   caseRecord,
+  notaryDetails,
+  taxDetails,
   clients,
   defaultClientId,
   onSubmit,
 }: {
   caseRecord?: Case;
+  notaryDetails?: NotaryServiceDetails | null;
+  taxDetails?: TaxServiceDetails | null;
   clients: { id: string; fullName: string }[];
   defaultClientId?: string;
   onSubmit: (values: CaseFormValues) => Promise<void>;
@@ -46,6 +63,13 @@ export function CaseForm({
   const tIdMethod = useTranslations("IdVerificationMethod");
   const tPaymentStatus = useTranslations("PaymentStatus");
   const tCases = useTranslations("Cases");
+  const tNotaryModality = useTranslations("NotaryModality");
+  const tIdVerificationStatus = useTranslations("IdVerificationStatus");
+  const tNotaryCaseStatus = useTranslations("NotaryCaseStatus");
+  const tTaxFilerType = useTranslations("TaxFilerType");
+  const tTaxJurisdiction = useTranslations("TaxJurisdiction");
+  const tTaxFilingStatus = useTranslations("TaxFilingStatus");
+  const tTaxCaseStatus = useTranslations("TaxCaseStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -81,11 +105,46 @@ export function CaseForm({
       submissionDate: "",
       expectedReturnDate: "",
       actualReturnDate: "",
+      notaryModality: notaryDetails?.modality ?? "",
+      appointmentDate: notaryDetails?.appointmentDate ?? "",
+      appointmentTime: notaryDetails?.appointmentTime ?? "",
+      location: notaryDetails?.location ?? "",
+      numberOfSigners: notaryDetails?.numberOfSigners?.toString() ?? "",
+      numberOfDocuments: notaryDetails?.numberOfDocuments?.toString() ?? "",
+      numberOfNotarialActs:
+        notaryDetails?.numberOfNotarialActs?.toString() ?? "",
+      idVerificationStatus: notaryDetails?.idVerificationStatus ?? "",
+      witnessRequired: notaryDetails?.witnessRequired ?? false,
+      witnessProvidedBy: notaryDetails?.witnessProvidedBy ?? "",
+      loanSigningCompany: notaryDetails?.loanSigningCompany ?? "",
+      titleCompany: notaryDetails?.titleCompany ?? "",
+      signingService: notaryDetails?.signingService ?? "",
+      scanbacksRequired: notaryDetails?.scanbacksRequired ?? false,
+      shippingRequired: notaryDetails?.shippingRequired ?? false,
+      trackingNumber: notaryDetails?.trackingNumber ?? "",
+      notaryServiceFee: notaryDetails?.notaryFee ?? "",
+      travelFee: notaryDetails?.travelFee ?? "",
+      printingFee: notaryDetails?.printingFee ?? "",
+      notaryCaseStatus: notaryDetails?.status ?? "new_request",
+      taxYear: taxDetails?.taxYear?.toString() ?? new Date().getFullYear().toString(),
+      filerType: taxDetails?.filerType ?? "",
+      jurisdiction: taxDetails?.jurisdiction ?? "federal",
+      returnType: taxDetails?.returnType ?? "",
+      filingStatus: taxDetails?.filingStatus ?? "",
+      businessEntityType: taxDetails?.businessEntityType ?? "",
+      intakeCompleted: taxDetails?.intakeCompleted ?? false,
+      efileAuthorizationSigned: taxDetails?.efileAuthorizationSigned ?? false,
+      refundAmount: taxDetails?.refundAmount ?? "",
+      balanceDueAmount: taxDetails?.balanceDueAmount ?? "",
+      taxAmountPaid: taxDetails?.amountPaid ?? "",
+      internalNotes: taxDetails?.internalNotes ?? "",
+      taxCaseStatus: taxDetails?.status ?? "new_client",
     },
   });
 
   const serviceType = watch("serviceType");
   const isNotary = notaryServiceTypes.includes(serviceType);
+  const isTax = taxServiceTypes.includes(serviceType);
   // Apostille / authentication fields are an optional add-on for Document Prep cases.
   const isApostille = serviceType === "document_prep";
 
@@ -161,37 +220,41 @@ export function CaseForm({
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label>{t("status")}</Label>
-          <Controller
-            control={control}
-            name="status"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {caseStatusValues.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {tStatus(status)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
+        {!isNotary && !isTax && (
+          <div className="flex flex-col gap-1.5">
+            <Label>{t("status")}</Label>
+            <Controller
+              control={control}
+              name="status"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {caseStatusValues.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {tStatus(status)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+        )}
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="dueDate">{t("dueDate")}</Label>
           <Input id="dueDate" type="date" {...register("dueDate")} />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="fee">{t("fee")}</Label>
-          <Input id="fee" type="number" step="0.01" {...register("fee")} />
-        </div>
+        {!isNotary && (
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="fee">{t("fee")}</Label>
+            <Input id="fee" type="number" step="0.01" {...register("fee")} />
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
@@ -393,6 +456,449 @@ export function CaseForm({
                 {...register("actualReturnDate")}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {isNotary && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("notaryServiceDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("modality")}</Label>
+              <Controller
+                control={control}
+                name="notaryModality"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("selectModality")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {notaryModalityValues.map((modality) => (
+                        <SelectItem key={modality} value={modality}>
+                          {tNotaryModality(modality)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("notaryCaseStatus")}</Label>
+              <Controller
+                control={control}
+                name="notaryCaseStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {notaryCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tNotaryCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("idVerificationStatus")}</Label>
+              <Controller
+                control={control}
+                name="idVerificationStatus"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(value) =>
+                      field.onChange(value === "none" ? "" : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">—</SelectItem>
+                      {idVerificationStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tIdVerificationStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="appointmentDate">{t("appointmentDate")}</Label>
+              <Input
+                id="appointmentDate"
+                type="date"
+                {...register("appointmentDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="appointmentTime">{t("appointmentTime")}</Label>
+              <Input
+                id="appointmentTime"
+                type="time"
+                {...register("appointmentTime")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="location">{t("location")}</Label>
+              <Input id="location" {...register("location")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="numberOfSigners">{t("numberOfSigners")}</Label>
+              <Input
+                id="numberOfSigners"
+                type="number"
+                {...register("numberOfSigners")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="numberOfDocuments">
+                {t("numberOfDocuments")}
+              </Label>
+              <Input
+                id="numberOfDocuments"
+                type="number"
+                {...register("numberOfDocuments")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="numberOfNotarialActs">
+                {t("numberOfNotarialActs")}
+              </Label>
+              <Input
+                id="numberOfNotarialActs"
+                type="number"
+                {...register("numberOfNotarialActs")}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="witnessRequired"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("witnessRequired")}</Label>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="witnessProvidedBy">
+                {t("witnessProvidedBy")}
+              </Label>
+              <Input
+                id="witnessProvidedBy"
+                {...register("witnessProvidedBy")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="loanSigningCompany">
+                {t("loanSigningCompany")}
+              </Label>
+              <Input
+                id="loanSigningCompany"
+                {...register("loanSigningCompany")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="titleCompany">{t("titleCompany")}</Label>
+              <Input id="titleCompany" {...register("titleCompany")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="signingService">{t("signingService")}</Label>
+              <Input id="signingService" {...register("signingService")} />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="scanbacksRequired"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("scanbacksRequired")}</Label>
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="shippingRequired"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("shippingRequired")}</Label>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="trackingNumber">{t("trackingNumber")}</Label>
+              <Input id="trackingNumber" {...register("trackingNumber")} />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="notaryServiceFee">{t("notaryServiceFee")}</Label>
+              <Input
+                id="notaryServiceFee"
+                type="number"
+                step="0.01"
+                {...register("notaryServiceFee")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="travelFee">{t("travelFee")}</Label>
+              <Input
+                id="travelFee"
+                type="number"
+                step="0.01"
+                {...register("travelFee")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="printingFee">{t("printingFee")}</Label>
+              <Input
+                id="printingFee"
+                type="number"
+                step="0.01"
+                {...register("printingFee")}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end text-lg font-medium text-foreground">
+            {t("totalFee")}: $
+            {(
+              (Number(watch("notaryServiceFee")) || 0) +
+              (Number(watch("travelFee")) || 0) +
+              (Number(watch("printingFee")) || 0)
+            ).toFixed(2)}
+          </div>
+        </div>
+      )}
+
+      {isTax && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("taxServiceDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="taxYear">{t("taxYear")}</Label>
+              <Input id="taxYear" type="number" {...register("taxYear")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("filerType")}</Label>
+              <Controller
+                control={control}
+                name="filerType"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {taxFilerTypeValues.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {tTaxFilerType(type)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("jurisdiction")}</Label>
+              <Controller
+                control={control}
+                name="jurisdiction"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {taxJurisdictionValues.map((j) => (
+                        <SelectItem key={j} value={j}>
+                          {tTaxJurisdiction(j)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="returnType">{t("returnType")}</Label>
+              <Input
+                id="returnType"
+                placeholder="1040, 1120, Schedule C..."
+                {...register("returnType")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("filingStatus")}</Label>
+              <Controller
+                control={control}
+                name="filingStatus"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(value) =>
+                      field.onChange(value === "none" ? "" : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">—</SelectItem>
+                      {taxFilingStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tTaxFilingStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="businessEntityType">
+                {t("businessEntityType")}
+              </Label>
+              <Input
+                id="businessEntityType"
+                {...register("businessEntityType")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("taxCaseStatus")}</Label>
+              <Controller
+                control={control}
+                name="taxCaseStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {taxCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tTaxCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="intakeCompleted"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("intakeCompleted")}</Label>
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="efileAuthorizationSigned"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("efileAuthorizationSigned")}</Label>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="refundAmount">{t("refundAmount")}</Label>
+              <Input
+                id="refundAmount"
+                type="number"
+                step="0.01"
+                {...register("refundAmount")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="balanceDueAmount">{t("balanceDueAmount")}</Label>
+              <Input
+                id="balanceDueAmount"
+                type="number"
+                step="0.01"
+                {...register("balanceDueAmount")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="taxAmountPaid">{t("taxAmountPaid")}</Label>
+              <Input
+                id="taxAmountPaid"
+                type="number"
+                step="0.01"
+                {...register("taxAmountPaid")}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="internalNotes">{t("internalNotes")}</Label>
+            <Textarea id="internalNotes" rows={3} {...register("internalNotes")} />
+            <p className="text-xs text-muted-foreground">
+              {t("noSensitiveDataWarning")}
+            </p>
           </div>
         </div>
       )}
