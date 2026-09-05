@@ -12,6 +12,7 @@ import {
   creditServiceDetails,
   consultingServiceDetails,
   businessFormationDetails,
+  academyEnrollmentDetails,
   documents,
   caseStatusHistory,
 } from "@/lib/db/schema";
@@ -66,6 +67,7 @@ export async function getCaseById(id: string) {
     creditDetails,
     consultingDetails,
     formationDetails,
+    academyDetails,
     caseDocuments,
     statusHistory,
   ] = await Promise.all([
@@ -116,6 +118,11 @@ export async function getCaseById(id: string) {
       .limit(1),
     db
       .select()
+      .from(academyEnrollmentDetails)
+      .where(eq(academyEnrollmentDetails.caseId, id))
+      .limit(1),
+    db
+      .select()
       .from(documents)
       .where(eq(documents.caseId, id))
       .orderBy(desc(documents.createdAt)),
@@ -138,6 +145,7 @@ export async function getCaseById(id: string) {
     creditDetails: creditDetails[0] ?? null,
     consultingDetails: consultingDetails[0] ?? null,
     formationDetails: formationDetails[0] ?? null,
+    academyDetails: academyDetails[0] ?? null,
     documents: caseDocuments,
     statusHistory,
   };

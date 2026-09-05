@@ -45,6 +45,9 @@ import {
   formationServiceTypes,
   formationTypeValues,
   formationCaseStatusValues,
+  academyServiceTypes,
+  academyCaseStatusValues,
+  highlevelSyncStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
@@ -58,6 +61,7 @@ import type {
   CreditServiceDetails,
   ConsultingServiceDetails,
   BusinessFormationDetails,
+  AcademyEnrollmentDetails,
 } from "@/lib/db/schema";
 
 export function CaseForm({
@@ -69,6 +73,7 @@ export function CaseForm({
   creditDetails,
   consultingDetails,
   formationDetails,
+  academyDetails,
   clients,
   defaultClientId,
   onSubmit,
@@ -81,6 +86,7 @@ export function CaseForm({
   creditDetails?: CreditServiceDetails | null;
   consultingDetails?: ConsultingServiceDetails | null;
   formationDetails?: BusinessFormationDetails | null;
+  academyDetails?: AcademyEnrollmentDetails | null;
   clients: { id: string; fullName: string }[];
   defaultClientId?: string;
   onSubmit: (values: CaseFormValues) => Promise<void>;
@@ -108,6 +114,8 @@ export function CaseForm({
   const tConsultingCaseStatus = useTranslations("ConsultingCaseStatus");
   const tFormationType = useTranslations("FormationType");
   const tFormationCaseStatus = useTranslations("FormationCaseStatus");
+  const tAcademyCaseStatus = useTranslations("AcademyCaseStatus");
+  const tHighlevelSyncStatus = useTranslations("HighlevelSyncStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -246,6 +254,21 @@ export function CaseForm({
       documentDeliveryStatus: formationDetails?.documentDeliveryStatus ?? "",
       governmentFee: formationDetails?.governmentFee ?? "",
       formationCaseStatus: formationDetails?.status ?? "new_inquiry",
+      program: academyDetails?.program ?? "",
+      course: academyDetails?.course ?? "",
+      enrollmentDate: academyDetails?.enrollmentDate ?? "",
+      modulesCompleted: academyDetails?.modulesCompleted?.toString() ?? "",
+      progressPercentage:
+        academyDetails?.progressPercentage?.toString() ?? "",
+      attendancePercentage:
+        academyDetails?.attendancePercentage?.toString() ?? "",
+      assignmentsCompleted:
+        academyDetails?.assignmentsCompleted?.toString() ?? "",
+      finalEvaluation: academyDetails?.finalEvaluation ?? "",
+      certificateDate: academyDetails?.certificateDate ?? "",
+      communityAccess: academyDetails?.communityAccess ?? false,
+      highlevelSyncStatus: academyDetails?.highlevelSyncStatus ?? "not_synced",
+      academyCaseStatus: academyDetails?.status ?? "lead",
     },
   });
 
@@ -257,6 +280,7 @@ export function CaseForm({
   const isCredit = creditServiceTypes.includes(serviceType);
   const isConsulting = consultingServiceTypes.includes(serviceType);
   const isFormation = formationServiceTypes.includes(serviceType);
+  const isAcademy = academyServiceTypes.includes(serviceType);
   // Apostille / authentication fields are an optional add-on for Document Prep cases.
   const isApostille = serviceType === "document_prep";
 
@@ -338,7 +362,8 @@ export function CaseForm({
           !isImmigration &&
           !isCredit &&
           !isConsulting &&
-          !isFormation && (
+          !isFormation &&
+          !isAcademy && (
           <div className="flex flex-col gap-1.5">
             <Label>{t("status")}</Label>
             <Controller
@@ -1836,6 +1861,147 @@ export function CaseForm({
                 )}
               />
               <Label>{t("einAssistance")}</Label>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isAcademy && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("academyEnrollmentDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="program">{t("program")}</Label>
+              <Input id="program" {...register("program")} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="course">{t("course")}</Label>
+              <Input id="course" {...register("course")} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("academyCaseStatus")}</Label>
+              <Controller
+                control={control}
+                name="academyCaseStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {academyCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tAcademyCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="enrollmentDate">{t("enrollmentDate")}</Label>
+              <Input
+                id="enrollmentDate"
+                type="date"
+                {...register("enrollmentDate")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="certificateDate">{t("certificateDate")}</Label>
+              <Input
+                id="certificateDate"
+                type="date"
+                {...register("certificateDate")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("highlevelSyncStatus")}</Label>
+              <Controller
+                control={control}
+                name="highlevelSyncStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {highlevelSyncStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tHighlevelSyncStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="modulesCompleted">
+                {t("modulesCompleted")}
+              </Label>
+              <Input
+                id="modulesCompleted"
+                type="number"
+                {...register("modulesCompleted")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="progressPercentage">
+                {t("progressPercentage")}
+              </Label>
+              <Input
+                id="progressPercentage"
+                type="number"
+                min="0"
+                max="100"
+                {...register("progressPercentage")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="attendancePercentage">
+                {t("attendancePercentage")}
+              </Label>
+              <Input
+                id="attendancePercentage"
+                type="number"
+                min="0"
+                max="100"
+                {...register("attendancePercentage")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="assignmentsCompleted">
+                {t("assignmentsCompleted")}
+              </Label>
+              <Input
+                id="assignmentsCompleted"
+                type="number"
+                {...register("assignmentsCompleted")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <Label htmlFor="finalEvaluation">{t("finalEvaluation")}</Label>
+              <Input id="finalEvaluation" {...register("finalEvaluation")} />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="communityAccess"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("communityAccess")}</Label>
             </div>
           </div>
         </div>

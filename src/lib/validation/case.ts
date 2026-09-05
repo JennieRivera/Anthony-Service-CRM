@@ -162,6 +162,25 @@ export const formationCaseStatusValues = [
   "completed",
 ] as const;
 
+// Phase 2, Session 5
+export const academyCaseStatusValues = [
+  "lead",
+  "registered",
+  "payment_pending",
+  "enrolled",
+  "active_student",
+  "in_progress",
+  "completed",
+  "certificate_pending",
+  "certified",
+  "inactive",
+] as const;
+export const highlevelSyncStatusValues = [
+  "not_synced",
+  "synced",
+  "error",
+] as const;
+
 const optionalString = z.string().trim().optional().or(z.literal(""));
 
 export const caseFormSchema = z.object({
@@ -322,6 +341,25 @@ export const caseFormSchema = z.object({
     .enum(formationCaseStatusValues)
     .optional()
     .or(z.literal("")),
+  // Academy enrollment details (relevant when serviceType is Academy)
+  program: optionalString,
+  course: optionalString,
+  enrollmentDate: optionalString,
+  modulesCompleted: optionalString,
+  progressPercentage: optionalString,
+  attendancePercentage: optionalString,
+  assignmentsCompleted: optionalString,
+  finalEvaluation: optionalString,
+  certificateDate: optionalString,
+  communityAccess: z.boolean().optional(),
+  highlevelSyncStatus: z
+    .enum(highlevelSyncStatusValues)
+    .optional()
+    .or(z.literal("")),
+  academyCaseStatus: z
+    .enum(academyCaseStatusValues)
+    .optional()
+    .or(z.literal("")),
 });
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
@@ -333,3 +371,4 @@ export const immigrationServiceTypes = ["immigration"];
 export const creditServiceTypes = ["credit_financing"];
 export const consultingServiceTypes = ["leadership"];
 export const formationServiceTypes = ["company_registration"];
+export const academyServiceTypes = ["academy"];

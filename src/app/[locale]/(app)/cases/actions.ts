@@ -15,6 +15,7 @@ import {
   creditServiceDetails,
   consultingServiceDetails,
   businessFormationDetails,
+  academyEnrollmentDetails,
   caseStatusEnum,
   caseStatusHistory,
   tasks,
@@ -29,6 +30,7 @@ import {
   creditServiceTypes,
   consultingServiceTypes,
   formationServiceTypes,
+  academyServiceTypes,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { redirect } from "@/i18n/navigation";
@@ -224,6 +226,17 @@ function deriveEffectiveStatus(
     const s = values.formationCaseStatus;
     if (s === "completed") return "completed";
     if (s === "new_inquiry") return "new";
+    return "in_progress";
+  }
+
+  if (
+    academyServiceTypes.includes(values.serviceType) &&
+    values.academyCaseStatus
+  ) {
+    const s = values.academyCaseStatus;
+    if (s === "completed" || s === "certified") return "completed";
+    if (s === "inactive") return "cancelled";
+    if (s === "lead") return "new";
     return "in_progress";
   }
 
@@ -515,6 +528,40 @@ async function upsertServiceDetails(
       .values({ caseId, ...detail })
       .onConflictDoUpdate({
         target: businessFormationDetails.caseId,
+        set: detail,
+      });
+    return;
+  }
+
+  if (academyServiceTypes.includes(values.serviceType)) {
+    const detail = {
+      program: values.program || null,
+      course: values.course || null,
+      enrollmentDate: values.enrollmentDate || null,
+      modulesCompleted: values.modulesCompleted
+        ? Number(values.modulesCompleted)
+        : null,
+      progressPercentage: values.progressPercentage
+        ? Number(values.progressPercentage)
+        : null,
+      attendancePercentage: values.attendancePercentage
+        ? Number(values.attendancePercentage)
+        : null,
+      assignmentsCompleted: values.assignmentsCompleted
+        ? Number(values.assignmentsCompleted)
+        : null,
+      finalEvaluation: values.finalEvaluation || null,
+      certificateDate: values.certificateDate || null,
+      communityAccess: values.communityAccess ?? false,
+      highlevelSyncStatus: values.highlevelSyncStatus || "not_synced",
+      status: values.academyCaseStatus || "lead",
+    };
+
+    await db
+      .insert(academyEnrollmentDetails)
+      .values({ caseId, ...detail })
+      .onConflictDoUpdate({
+        target: academyEnrollmentDetails.caseId,
         set: detail,
       });
     return;

@@ -38,6 +38,8 @@ export default async function CaseDetailPage({
   const tConsultingCaseStatus = await getTranslations("ConsultingCaseStatus");
   const tFormationType = await getTranslations("FormationType");
   const tFormationCaseStatus = await getTranslations("FormationCaseStatus");
+  const tAcademyCaseStatus = await getTranslations("AcademyCaseStatus");
+  const tHighlevelSyncStatus = await getTranslations("HighlevelSyncStatus");
 
   const result = await getCaseById(id);
   if (!result) notFound();
@@ -54,6 +56,7 @@ export default async function CaseDetailPage({
     creditDetails,
     consultingDetails,
     formationDetails,
+    academyDetails,
     documents,
     statusHistory,
   } = result;
@@ -893,6 +896,115 @@ export default async function CaseDetailPage({
               </p>
             </div>
           </div>
+        </div>
+      )}
+
+      {academyDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("academyEnrollmentDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tAcademyCaseStatus(academyDetails.status)}
+            </Badge>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">{t("form.program")}</p>
+              <p className="text-foreground">
+                {academyDetails.program ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.course")}</p>
+              <p className="text-foreground">
+                {academyDetails.course ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.enrollmentDate")}
+              </p>
+              <p className="text-foreground">
+                {academyDetails.enrollmentDate
+                  ? new Date(academyDetails.enrollmentDate).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.progressPercentage")}
+              </p>
+              <p className="text-foreground">
+                {academyDetails.progressPercentage != null
+                  ? `${academyDetails.progressPercentage}%`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.modulesCompleted")}
+              </p>
+              <p className="text-foreground">
+                {academyDetails.modulesCompleted ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.attendancePercentage")}
+              </p>
+              <p className="text-foreground">
+                {academyDetails.attendancePercentage != null
+                  ? `${academyDetails.attendancePercentage}%`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.assignmentsCompleted")}
+              </p>
+              <p className="text-foreground">
+                {academyDetails.assignmentsCompleted ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.certificateDate")}
+              </p>
+              <p className="text-foreground">
+                {academyDetails.certificateDate
+                  ? new Date(academyDetails.certificateDate).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.communityAccess")}
+              </p>
+              <p className="text-foreground">
+                {academyDetails.communityAccess ? "✓" : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.highlevelSyncStatus")}
+              </p>
+              <p className="text-foreground">
+                {tHighlevelSyncStatus(academyDetails.highlevelSyncStatus)}
+              </p>
+            </div>
+          </div>
+          {academyDetails.finalEvaluation && (
+            <div className="text-sm">
+              <p className="text-muted-foreground">
+                {t("form.finalEvaluation")}
+              </p>
+              <p className="text-foreground">
+                {academyDetails.finalEvaluation}
+              </p>
+            </div>
+          )}
         </div>
       )}
 

@@ -29,6 +29,11 @@ export const serviceTypeEnum = pgEnum("service_type", [
   // general document-prep work on 9 real cases) so existing rows aren't
   // reinterpreted; new immigration administrative cases use this instead.
   "immigration",
+  // Phase 2, Session 5 — Academy/Training. A student is a paying client,
+  // so this is a cases extension like every other category except
+  // Community & Strategic Alliances (which isn't — see strategicAlliances
+  // below, a standalone table with no client relationship).
+  "academy",
 ]);
 
 export const clientStatusEnum = pgEnum("client_status", [
@@ -659,6 +664,51 @@ export const businessFormationDetails = pgTable("business_formation_details", {
   status: formationCaseStatusEnum("status").notNull().default("new_inquiry"),
 });
 
+// Phase 2, Session 5 — Academy / Training category.
+// Reuses cases.startDate for "Start Date" (when the cohort/program begins)
+// and adds a separate enrollmentDate here, since a student can enroll
+// before the program actually starts.
+export const academyCaseStatusEnum = pgEnum("academy_case_status", [
+  "lead",
+  "registered",
+  "payment_pending",
+  "enrolled",
+  "active_student",
+  "in_progress",
+  "completed",
+  "certificate_pending",
+  "certified",
+  "inactive",
+]);
+
+// HighLevel sync is prepared here as a data field only — Session 7 is
+// where the actual integration gets activated, per the phase plan.
+export const highlevelSyncStatusEnum = pgEnum("highlevel_sync_status", [
+  "not_synced",
+  "synced",
+  "error",
+]);
+
+export const academyEnrollmentDetails = pgTable("academy_enrollment_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  program: text("program"),
+  course: text("course"),
+  enrollmentDate: date("enrollment_date"),
+  modulesCompleted: integer("modules_completed"),
+  progressPercentage: integer("progress_percentage"),
+  attendancePercentage: integer("attendance_percentage"),
+  assignmentsCompleted: integer("assignments_completed"),
+  finalEvaluation: text("final_evaluation"),
+  certificateDate: date("certificate_date"),
+  communityAccess: boolean("community_access").notNull().default(false),
+  highlevelSyncStatus: highlevelSyncStatusEnum("highlevel_sync_status")
+    .notNull()
+    .default("not_synced"),
+  status: academyCaseStatusEnum("status").notNull().default("lead"),
+});
+
 export const conversationMessages = pgTable("conversation_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -801,6 +851,83 @@ export const payments = pgTable("payments", {
   refundStatus: refundStatusEnum("refund_status").notNull().default("none"),
 });
 
+// Phase 2, Session 5 — Community & Strategic Alliances.
+// Deliberately NOT a cases extension: a church, chamber of commerce, CPA,
+// or attorney partner isn't a paying client, so this is its own
+// standalone table with no clientId relationship at all.
+export const organizationTypeEnum = pgEnum("organization_type", [
+  "church",
+  "chamber_of_commerce",
+  "cpa_accountant",
+  "attorney",
+  "insurance",
+  "realtor",
+  "consultant",
+  "financial_partner",
+  "technology_partner",
+  "community_organization",
+  "professional_association",
+  "other",
+]);
+
+export const allianceStatusEnum = pgEnum("alliance_status", [
+  "prospect",
+  "contacted",
+  "meeting_scheduled",
+  "under_discussion",
+  "agreement_review",
+  "active_partner",
+  "paused",
+  "inactive",
+]);
+
+export const strategicAlliances = pgTable("strategic_alliances", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  organizationName: text("organization_name").notNull(),
+  contactPerson: text("contact_person"),
+  organizationType: organizationTypeEnum("organization_type"),
+  phone: text("phone"),
+  email: text("email"),
+  website: text("website"),
+  state: text("state"),
+  country: text("country"),
+  relationshipOwner: text("relationship_owner"),
+  dateIntroduced: date("date_introduced"),
+  servicesConnected: text("services_connected"),
+  referralAgreement: boolean("referral_agreement").notNull().default(false),
+  commissionAgreement: boolean("commission_agreement")
+    .notNull()
+    .default(false),
+  marketingPermission: boolean("marketing_permission")
+    .notNull()
+    .default(false),
+  logoPermission: boolean("logo_permission").notNull().default(false),
+  lastContact: date("last_contact"),
+  nextFollowUp: date("next_follow_up"),
+  status: allianceStatusEnum("status").notNull().default("prospect"),
+  notes: text("notes"),
+});
+
+export const allianceStatusHistory = pgTable("alliance_status_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  allianceId: uuid("alliance_id")
+    .notNull()
+    .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+  previousStatus: allianceStatusEnum("previous_status"),
+  newStatus: allianceStatusEnum("new_status").notNull(),
+  changedByEmail: text("changed_by_email"),
+  changedAt: timestamp("changed_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  note: text("note"),
+});
+
 export type User = typeof users.$inferSelect;
 export type Client = typeof clients.$inferSelect;
 export type Case = typeof cases.$inferSelect;
@@ -828,3 +955,8 @@ export type BusinessFormationDetails =
   typeof businessFormationDetails.$inferSelect;
 export type ReferralStatusHistory = typeof referralStatusHistory.$inferSelect;
 export type RriReferralDetails = typeof rriReferralDetails.$inferSelect;
+export type AcademyEnrollmentDetails =
+  typeof academyEnrollmentDetails.$inferSelect;
+export type StrategicAlliance = typeof strategicAlliances.$inferSelect;
+export type AllianceStatusHistory =
+  typeof allianceStatusHistory.$inferSelect;

@@ -10,6 +10,7 @@ export const serviceTypeValues = [
   "notary",
   "bookkeeping",
   "immigration",
+  "academy",
 ] as const;
 
 export const clientStatusValues = [

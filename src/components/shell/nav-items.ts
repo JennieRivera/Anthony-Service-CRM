@@ -9,6 +9,7 @@ import {
   Handshake,
   Wallet,
   ListChecks,
+  Network,
   BarChart3,
   Settings,
   Map,
@@ -26,6 +27,7 @@ export type NavItem = {
     | "referrals"
     | "payments"
     | "tasks"
+    | "alliances"
     | "reports"
     | "companyRegistration"
     | "settings";
@@ -41,6 +43,7 @@ export const navItems: NavItem[] = [
   { href: "/invoices", labelKey: "invoices", icon: Receipt },
   { href: "/payments", labelKey: "payments", icon: Wallet },
   { href: "/referrals", labelKey: "referrals", icon: Handshake },
+  { href: "/alliances", labelKey: "alliances", icon: Network },
   { href: "/documents", labelKey: "documents", icon: FileText },
   { href: "/reports", labelKey: "reports", icon: BarChart3 },
   { href: "/company-registration", labelKey: "companyRegistration", icon: Map },

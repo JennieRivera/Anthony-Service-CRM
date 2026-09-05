@@ -381,6 +381,30 @@ const templates: Record<
     ],
     includeNotaryBlock: false,
   },
+
+  academy: {
+    documentTitle: {
+      en: "Academy / Training Enrollment Sheet",
+      es: "Hoja de Inscripción — Academia / Capacitación",
+    },
+    intro: {
+      en: "This sheet records the information needed to enroll you in the selected program or course.",
+      es: "Esta hoja registra la información necesaria para inscribirlo(a) en el programa o curso seleccionado.",
+    },
+    sections: [
+      {
+        heading: { en: "Enrollment Information", es: "Información de Inscripción" },
+        fields: [
+          { en: "Student Full Name", es: "Nombre Completo del Estudiante" },
+          { en: "Program", es: "Programa" },
+          { en: "Course", es: "Curso" },
+          { en: "Enrollment Date", es: "Fecha de Inscripción" },
+          { en: "Payment Status", es: "Estado de Pago" },
+        ],
+      },
+    ],
+    includeNotaryBlock: false,
+  },
 };
 
 export function getServiceTemplate(
