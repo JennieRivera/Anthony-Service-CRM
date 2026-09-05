@@ -150,7 +150,7 @@ export function ClientProfileTabs({
         <div className="flex justify-end">
           <LogConversationDialog clientId={clientId} />
         </div>
-        <ConversationTimeline conversations={conversations} />
+        <ConversationTimeline conversations={conversations} cases={cases} />
       </TabsContent>
 
       <TabsContent value="cases" className="flex flex-col gap-2 pt-4">
