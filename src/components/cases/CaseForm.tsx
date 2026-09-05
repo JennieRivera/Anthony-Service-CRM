@@ -42,6 +42,9 @@ import {
   creditAccountTypeValues,
   creditCaseStatusValues,
   consultingCaseStatusValues,
+  formationServiceTypes,
+  formationTypeValues,
+  formationCaseStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
@@ -54,6 +57,7 @@ import type {
   ImmigrationServiceDetails,
   CreditServiceDetails,
   ConsultingServiceDetails,
+  BusinessFormationDetails,
 } from "@/lib/db/schema";
 
 export function CaseForm({
@@ -64,6 +68,7 @@ export function CaseForm({
   immigrationDetails,
   creditDetails,
   consultingDetails,
+  formationDetails,
   clients,
   defaultClientId,
   onSubmit,
@@ -75,6 +80,7 @@ export function CaseForm({
   immigrationDetails?: ImmigrationServiceDetails | null;
   creditDetails?: CreditServiceDetails | null;
   consultingDetails?: ConsultingServiceDetails | null;
+  formationDetails?: BusinessFormationDetails | null;
   clients: { id: string; fullName: string }[];
   defaultClientId?: string;
   onSubmit: (values: CaseFormValues) => Promise<void>;
@@ -100,6 +106,8 @@ export function CaseForm({
   const tCreditAccountType = useTranslations("CreditAccountType");
   const tCreditCaseStatus = useTranslations("CreditCaseStatus");
   const tConsultingCaseStatus = useTranslations("ConsultingCaseStatus");
+  const tFormationType = useTranslations("FormationType");
+  const tFormationCaseStatus = useTranslations("FormationCaseStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -226,6 +234,18 @@ export function CaseForm({
       completionPercentage:
         consultingDetails?.completionPercentage?.toString() ?? "",
       consultingCaseStatus: consultingDetails?.status ?? "lead",
+      formationType: formationDetails?.formationType ?? "",
+      stateOfFormation: formationDetails?.stateOfFormation ?? "",
+      formationBusinessName: formationDetails?.businessName ?? "",
+      nameAvailabilityChecked:
+        formationDetails?.nameAvailabilityChecked ?? false,
+      registeredAgent: formationDetails?.registeredAgent ?? "",
+      einAssistance: formationDetails?.einAssistance ?? false,
+      stateFilingDate: formationDetails?.stateFilingDate ?? "",
+      stateApprovalDate: formationDetails?.stateApprovalDate ?? "",
+      documentDeliveryStatus: formationDetails?.documentDeliveryStatus ?? "",
+      governmentFee: formationDetails?.governmentFee ?? "",
+      formationCaseStatus: formationDetails?.status ?? "new_inquiry",
     },
   });
 
@@ -236,6 +256,7 @@ export function CaseForm({
   const isImmigration = immigrationServiceTypes.includes(serviceType);
   const isCredit = creditServiceTypes.includes(serviceType);
   const isConsulting = consultingServiceTypes.includes(serviceType);
+  const isFormation = formationServiceTypes.includes(serviceType);
   // Apostille / authentication fields are an optional add-on for Document Prep cases.
   const isApostille = serviceType === "document_prep";
 
@@ -316,7 +337,8 @@ export function CaseForm({
           !isBookkeeping &&
           !isImmigration &&
           !isCredit &&
-          !isConsulting && (
+          !isConsulting &&
+          !isFormation && (
           <div className="flex flex-col gap-1.5">
             <Label>{t("status")}</Label>
             <Controller
@@ -1650,6 +1672,170 @@ export function CaseForm({
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="actionPlan">{t("actionPlan")}</Label>
               <Textarea id="actionPlan" rows={2} {...register("actionPlan")} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isFormation && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("businessFormationDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("formationType")}</Label>
+              <Controller
+                control={control}
+                name="formationType"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {formationTypeValues.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {tFormationType(type)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="stateOfFormation">
+                {t("stateOfFormation")}
+              </Label>
+              <Input
+                id="stateOfFormation"
+                {...register("stateOfFormation")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="formationBusinessName">
+                {t("formationBusinessName")}
+              </Label>
+              <Input
+                id="formationBusinessName"
+                {...register("formationBusinessName")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("formationCaseStatus")}</Label>
+              <Controller
+                control={control}
+                name="formationCaseStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {formationCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tFormationCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="registeredAgent">{t("registeredAgent")}</Label>
+              <Input id="registeredAgent" {...register("registeredAgent")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("documentDeliveryStatus")}</Label>
+              <Controller
+                control={control}
+                name="documentDeliveryStatus"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(value) =>
+                      field.onChange(value === "none" ? "" : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">—</SelectItem>
+                      {deliverableStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tDeliverableStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="stateFilingDate">{t("stateFilingDate")}</Label>
+              <Input
+                id="stateFilingDate"
+                type="date"
+                {...register("stateFilingDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="stateApprovalDate">
+                {t("stateApprovalDate")}
+              </Label>
+              <Input
+                id="stateApprovalDate"
+                type="date"
+                {...register("stateApprovalDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="governmentFee">{t("governmentFee")}</Label>
+              <Input
+                id="governmentFee"
+                type="number"
+                step="0.01"
+                {...register("governmentFee")}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="nameAvailabilityChecked"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("nameAvailabilityChecked")}</Label>
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="einAssistance"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("einAssistance")}</Label>
             </div>
           </div>
         </div>

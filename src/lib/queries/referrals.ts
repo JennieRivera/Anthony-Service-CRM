@@ -1,6 +1,12 @@
 import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
-import { referrals, clients, cases } from "@/lib/db/schema";
+import {
+  referrals,
+  clients,
+  cases,
+  rriReferralDetails,
+  referralStatusHistory,
+} from "@/lib/db/schema";
 
 export async function listCasesForSelect() {
   return getDb()
@@ -15,6 +21,7 @@ export async function listReferralsWithClient() {
       id: referrals.id,
       referralSeq: referrals.referralSeq,
       referralDate: referrals.referralDate,
+      category: referrals.category,
       status: referrals.status,
       commissionDue: referrals.commissionDue,
       commissionPaidDate: referrals.commissionPaidDate,
@@ -43,9 +50,24 @@ export async function getReferralById(id: string) {
 
   if (!row) return null;
 
+  const [rriDetails, statusHistory] = await Promise.all([
+    db
+      .select()
+      .from(rriReferralDetails)
+      .where(eq(rriReferralDetails.referralId, id))
+      .limit(1),
+    db
+      .select()
+      .from(referralStatusHistory)
+      .where(eq(referralStatusHistory.referralId, id))
+      .orderBy(desc(referralStatusHistory.changedAt)),
+  ]);
+
   return {
     referral: row.referral,
     client: row.client,
     caseTitle: row.caseTitle,
+    rriDetails: rriDetails[0] ?? null,
+    statusHistory,
   };
 }

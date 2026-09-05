@@ -614,6 +614,51 @@ export const consultingServiceDetails = pgTable("consulting_service_details", {
   status: consultingCaseStatusEnum("status").notNull().default("lead"),
 });
 
+// Phase 2, Session 4 — Business Formation category.
+// Reuses the existing `company_registration` service_type (0 existing
+// rows, exact semantic match).
+export const formationTypeEnum = pgEnum("formation_type", [
+  "llc",
+  "corporation",
+  "nonprofit",
+  "other",
+]);
+
+export const formationCaseStatusEnum = pgEnum("formation_case_status", [
+  "new_inquiry",
+  "intake",
+  "name_review",
+  "documents_pending",
+  "ready_to_file",
+  "filed",
+  "state_pending",
+  "approved",
+  "ein_stage",
+  "documents_delivered",
+  "completed",
+]);
+
+export const businessFormationDetails = pgTable("business_formation_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  formationType: formationTypeEnum("formation_type"),
+  stateOfFormation: text("state_of_formation"),
+  businessName: text("business_name"),
+  nameAvailabilityChecked: boolean("name_availability_checked")
+    .notNull()
+    .default(false),
+  registeredAgent: text("registered_agent"),
+  einAssistance: boolean("ein_assistance").notNull().default(false),
+  stateFilingDate: date("state_filing_date"),
+  stateApprovalDate: date("state_approval_date"),
+  // Reuses the same not_started/in_progress/ready/delivered tracker
+  // introduced in Session 2 for bookkeeping reports and translations.
+  documentDeliveryStatus: deliverableStatusEnum("document_delivery_status"),
+  governmentFee: numeric("government_fee", { precision: 12, scale: 2 }),
+  status: formationCaseStatusEnum("status").notNull().default("new_inquiry"),
+});
+
 export const conversationMessages = pgTable("conversation_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -634,13 +679,25 @@ export const conversationMessages = pgTable("conversation_messages", {
   loggedBy: uuid("logged_by").references(() => users.id),
 });
 
+// Phase 2, Session 4 — discriminates plain internal referrals from
+// Commercial Finance/RRI referrals, the same way cases.serviceType picks
+// which extension table applies. Existing rows default to "general".
+export const referralCategoryEnum = pgEnum("referral_category", [
+  "general",
+  "commercial_finance",
+]);
+
 export const referrals = pgTable("referrals", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   referralSeq: serial("referral_seq").notNull().unique(),
   referralDate: date("referral_date").notNull().defaultNow(),
+  category: referralCategoryEnum("category").notNull().default("general"),
   clientId: uuid("client_id")
     .notNull()
     .references(() => clients.id, { onDelete: "restrict" }),
@@ -661,10 +718,65 @@ export const referrals = pgTable("referrals", {
     scale: 2,
   }),
   commissionDue: numeric("commission_due", { precision: 12, scale: 2 }),
+  commissionDueDate: date("commission_due_date"),
   commissionPaidDate: date("commission_paid_date"),
   paymentMethod: text("payment_method"),
   paymentConfirmation: text("payment_confirmation"),
   notes: text("notes"),
+});
+
+export const referralStatusHistory = pgTable("referral_status_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  referralId: uuid("referral_id")
+    .notNull()
+    .references(() => referrals.id, { onDelete: "cascade" }),
+  previousStatus: referralStatusEnum("previous_status"),
+  newStatus: referralStatusEnum("new_status").notNull(),
+  changedByEmail: text("changed_by_email"),
+  changedAt: timestamp("changed_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  note: text("note"),
+});
+
+// Commercial Finance / RRI Referrals category — a 1:1 extension of a
+// referral row rather than a cases row, since this tracks a business we
+// refer OUT to the RRI lending partner (the opposite direction from a
+// normal incoming referral), not a service Anthony Multiservice performs.
+export const rriStatusEnum = pgEnum("rri_status", [
+  "new_referral",
+  "consent_pending",
+  "submitted_to_rri",
+  "rri_reviewing",
+  "documents_pending",
+  "qualified",
+  "declined",
+  "approved",
+  "closing",
+  "funded",
+  "commission_due",
+  "commission_paid",
+  "closed",
+]);
+
+export const rriReferralDetails = pgTable("rri_referral_details", {
+  referralId: uuid("referral_id")
+    .primaryKey()
+    .references(() => referrals.id, { onDelete: "cascade" }),
+  businessName: text("business_name"),
+  businessEntity: text("business_entity"),
+  industry: text("industry"),
+  yearsInBusiness: integer("years_in_business"),
+  fundingPurpose: text("funding_purpose"),
+  amountRequested: numeric("amount_requested", { precision: 12, scale: 2 }),
+  monthlyRevenueRange: text("monthly_revenue_range"),
+  financingType: text("financing_type"),
+  documentsRequested: text("documents_requested"),
+  documentsReceived: text("documents_received"),
+  consentToShareInformation: boolean("consent_to_share_information")
+    .notNull()
+    .default(false),
+  status: rriStatusEnum("status").notNull().default("new_referral"),
 });
 
 export const payments = pgTable("payments", {
@@ -712,3 +824,7 @@ export type ImmigrationServiceDetails =
 export type CreditServiceDetails = typeof creditServiceDetails.$inferSelect;
 export type ConsultingServiceDetails =
   typeof consultingServiceDetails.$inferSelect;
+export type BusinessFormationDetails =
+  typeof businessFormationDetails.$inferSelect;
+export type ReferralStatusHistory = typeof referralStatusHistory.$inferSelect;
+export type RriReferralDetails = typeof rriReferralDetails.$inferSelect;

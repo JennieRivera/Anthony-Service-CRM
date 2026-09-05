@@ -14,6 +14,7 @@ import {
   immigrationServiceDetails,
   creditServiceDetails,
   consultingServiceDetails,
+  businessFormationDetails,
   caseStatusEnum,
   caseStatusHistory,
   tasks,
@@ -27,6 +28,7 @@ import {
   immigrationServiceTypes,
   creditServiceTypes,
   consultingServiceTypes,
+  formationServiceTypes,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { redirect } from "@/i18n/navigation";
@@ -212,6 +214,16 @@ function deriveEffectiveStatus(
     const s = values.consultingCaseStatus;
     if (s === "completed") return "completed";
     if (s === "lead") return "new";
+    return "in_progress";
+  }
+
+  if (
+    formationServiceTypes.includes(values.serviceType) &&
+    values.formationCaseStatus
+  ) {
+    const s = values.formationCaseStatus;
+    if (s === "completed") return "completed";
+    if (s === "new_inquiry") return "new";
     return "in_progress";
   }
 
@@ -476,6 +488,33 @@ async function upsertServiceDetails(
       .values({ caseId, ...detail })
       .onConflictDoUpdate({
         target: consultingServiceDetails.caseId,
+        set: detail,
+      });
+    return;
+  }
+
+  if (formationServiceTypes.includes(values.serviceType)) {
+    const detail = {
+      formationType: values.formationType || null,
+      stateOfFormation: values.stateOfFormation || null,
+      businessName: values.formationBusinessName || null,
+      nameAvailabilityChecked: values.nameAvailabilityChecked ?? false,
+      registeredAgent: values.registeredAgent || null,
+      einAssistance: values.einAssistance ?? false,
+      stateFilingDate: values.stateFilingDate || null,
+      stateApprovalDate: values.stateApprovalDate || null,
+      documentDeliveryStatus: values.documentDeliveryStatus || null,
+      governmentFee: values.governmentFee
+        ? Number(values.governmentFee).toFixed(2)
+        : null,
+      status: values.formationCaseStatus || "new_inquiry",
+    };
+
+    await db
+      .insert(businessFormationDetails)
+      .values({ caseId, ...detail })
+      .onConflictDoUpdate({
+        target: businessFormationDetails.caseId,
         set: detail,
       });
     return;

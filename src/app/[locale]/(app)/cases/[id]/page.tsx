@@ -36,6 +36,8 @@ export default async function CaseDetailPage({
   const tCreditAccountType = await getTranslations("CreditAccountType");
   const tCreditCaseStatus = await getTranslations("CreditCaseStatus");
   const tConsultingCaseStatus = await getTranslations("ConsultingCaseStatus");
+  const tFormationType = await getTranslations("FormationType");
+  const tFormationCaseStatus = await getTranslations("FormationCaseStatus");
 
   const result = await getCaseById(id);
   if (!result) notFound();
@@ -51,6 +53,7 @@ export default async function CaseDetailPage({
     immigrationDetails,
     creditDetails,
     consultingDetails,
+    formationDetails,
     documents,
     statusHistory,
   } = result;
@@ -799,6 +802,97 @@ export default async function CaseDetailPage({
               <p className="text-foreground">{consultingDetails.actionPlan}</p>
             </div>
           )}
+        </div>
+      )}
+
+      {formationDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("businessFormationDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tFormationCaseStatus(formationDetails.status)}
+            </Badge>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.formationBusinessName")}
+              </p>
+              <p className="text-foreground">
+                {formationDetails.businessName ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.formationType")}
+              </p>
+              <p className="text-foreground">
+                {formationDetails.formationType
+                  ? tFormationType(formationDetails.formationType)
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.stateOfFormation")}
+              </p>
+              <p className="text-foreground">
+                {formationDetails.stateOfFormation ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.registeredAgent")}
+              </p>
+              <p className="text-foreground">
+                {formationDetails.registeredAgent ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.stateFilingDate")}
+              </p>
+              <p className="text-foreground">
+                {formationDetails.stateFilingDate
+                  ? new Date(formationDetails.stateFilingDate).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.stateApprovalDate")}
+              </p>
+              <p className="text-foreground">
+                {formationDetails.stateApprovalDate
+                  ? new Date(
+                      formationDetails.stateApprovalDate,
+                    ).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.documentDeliveryStatus")}
+              </p>
+              <p className="text-foreground">
+                {formationDetails.documentDeliveryStatus
+                  ? tDeliverableStatus(formationDetails.documentDeliveryStatus)
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.governmentFee")}
+              </p>
+              <p className="text-foreground">
+                {formationDetails.governmentFee
+                  ? `$${Number(formationDetails.governmentFee).toFixed(2)}`
+                  : "—"}
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

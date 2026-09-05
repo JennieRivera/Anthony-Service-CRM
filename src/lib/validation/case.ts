@@ -141,6 +141,27 @@ export const consultingCaseStatusValues = [
   "completed",
 ] as const;
 
+// Phase 2, Session 4
+export const formationTypeValues = [
+  "llc",
+  "corporation",
+  "nonprofit",
+  "other",
+] as const;
+export const formationCaseStatusValues = [
+  "new_inquiry",
+  "intake",
+  "name_review",
+  "documents_pending",
+  "ready_to_file",
+  "filed",
+  "state_pending",
+  "approved",
+  "ein_stage",
+  "documents_delivered",
+  "completed",
+] as const;
+
 const optionalString = z.string().trim().optional().or(z.literal(""));
 
 export const caseFormSchema = z.object({
@@ -283,6 +304,24 @@ export const caseFormSchema = z.object({
     .enum(consultingCaseStatusValues)
     .optional()
     .or(z.literal("")),
+  // Business formation details (relevant when serviceType is Company Registration)
+  formationType: z.enum(formationTypeValues).optional().or(z.literal("")),
+  stateOfFormation: optionalString,
+  formationBusinessName: optionalString,
+  nameAvailabilityChecked: z.boolean().optional(),
+  registeredAgent: optionalString,
+  einAssistance: z.boolean().optional(),
+  stateFilingDate: optionalString,
+  stateApprovalDate: optionalString,
+  documentDeliveryStatus: z
+    .enum(deliverableStatusValues)
+    .optional()
+    .or(z.literal("")),
+  governmentFee: optionalString,
+  formationCaseStatus: z
+    .enum(formationCaseStatusValues)
+    .optional()
+    .or(z.literal("")),
 });
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
@@ -293,3 +332,4 @@ export const bookkeepingServiceTypes = ["bookkeeping"];
 export const immigrationServiceTypes = ["immigration"];
 export const creditServiceTypes = ["credit_financing"];
 export const consultingServiceTypes = ["leadership"];
+export const formationServiceTypes = ["company_registration"];

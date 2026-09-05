@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -19,18 +20,22 @@ import {
 import {
   referralFormSchema,
   referralStatusValues,
+  referralCategoryValues,
+  rriStatusValues,
   type ReferralFormValues,
 } from "@/lib/validation/referral";
-import type { Referral } from "@/lib/db/schema";
+import type { Referral, RriReferralDetails } from "@/lib/db/schema";
 
 export function ReferralForm({
   referral,
+  rriDetails,
   clients,
   cases,
   defaultClientId,
   onSubmit,
 }: {
   referral?: Referral;
+  rriDetails?: RriReferralDetails | null;
   clients: { id: string; fullName: string }[];
   cases: { id: string; title: string }[];
   defaultClientId?: string;
@@ -39,6 +44,8 @@ export function ReferralForm({
   const t = useTranslations("Referrals.form");
   const tReferrals = useTranslations("Referrals");
   const tStatus = useTranslations("ReferralStatus");
+  const tCategory = useTranslations("ReferralCategory");
+  const tRriStatus = useTranslations("RriStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -55,6 +62,7 @@ export function ReferralForm({
       caseId: referral?.caseId ?? "",
       referralDate:
         referral?.referralDate ?? new Date().toISOString().slice(0, 10),
+      category: referral?.category ?? "general",
       originatingBusiness: referral?.originatingBusiness ?? "",
       referredBy: referral?.referredBy ?? "",
       receivingParty: referral?.receivingParty ?? "",
@@ -63,12 +71,28 @@ export function ReferralForm({
       grossRevenue: referral?.grossRevenue ?? "",
       allowedDeductions: referral?.allowedDeductions ?? "",
       commissionPercentage: referral?.commissionPercentage ?? "",
+      commissionDueDate: referral?.commissionDueDate ?? "",
       commissionPaidDate: referral?.commissionPaidDate ?? "",
       paymentMethod: referral?.paymentMethod ?? "",
       paymentConfirmation: referral?.paymentConfirmation ?? "",
       notes: referral?.notes ?? "",
+      rriBusinessName: rriDetails?.businessName ?? "",
+      businessEntity: rriDetails?.businessEntity ?? "",
+      industry: rriDetails?.industry ?? "",
+      yearsInBusiness: rriDetails?.yearsInBusiness?.toString() ?? "",
+      fundingPurpose: rriDetails?.fundingPurpose ?? "",
+      amountRequested: rriDetails?.amountRequested ?? "",
+      monthlyRevenueRange: rriDetails?.monthlyRevenueRange ?? "",
+      financingType: rriDetails?.financingType ?? "",
+      rriDocumentsRequested: rriDetails?.documentsRequested ?? "",
+      rriDocumentsReceived: rriDetails?.documentsReceived ?? "",
+      consentToShareInformation: rriDetails?.consentToShareInformation ?? false,
+      rriStatus: rriDetails?.status ?? "new_referral",
     },
   });
+
+  const category = watch("category");
+  const isCommercialFinance = category === "commercial_finance";
 
   const grossRevenue = Number(watch("grossRevenue")) || 0;
   const allowedDeductions = Number(watch("allowedDeductions")) || 0;
@@ -157,19 +181,19 @@ export function ReferralForm({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label>{t("status")}</Label>
+          <Label>{t("category")}</Label>
           <Controller
             control={control}
-            name="status"
+            name="category"
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {referralStatusValues.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {tStatus(status)}
+                  {referralCategoryValues.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {tCategory(cat)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -177,6 +201,30 @@ export function ReferralForm({
             )}
           />
         </div>
+
+        {!isCommercialFinance && (
+          <div className="flex flex-col gap-1.5">
+            <Label>{t("status")}</Label>
+            <Controller
+              control={control}
+              name="status"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {referralStatusValues.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {tStatus(status)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+        )}
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="originatingBusiness">
@@ -271,6 +319,15 @@ export function ReferralForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
+          <Label htmlFor="commissionDueDate">{t("commissionDueDate")}</Label>
+          <Input
+            id="commissionDueDate"
+            type="date"
+            {...register("commissionDueDate")}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
           <Label htmlFor="commissionPaidDate">
             {t("commissionPaidDate")}
           </Label>
@@ -296,6 +353,122 @@ export function ReferralForm({
           />
         </div>
       </div>
+
+      {isCommercialFinance && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tReferrals("rriDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="rriBusinessName">{t("rriBusinessName")}</Label>
+              <Input id="rriBusinessName" {...register("rriBusinessName")} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="businessEntity">{t("businessEntity")}</Label>
+              <Input id="businessEntity" {...register("businessEntity")} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="industry">{t("industry")}</Label>
+              <Input id="industry" {...register("industry")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="yearsInBusiness">{t("yearsInBusiness")}</Label>
+              <Input
+                id="yearsInBusiness"
+                type="number"
+                {...register("yearsInBusiness")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="amountRequested">{t("amountRequested")}</Label>
+              <Input
+                id="amountRequested"
+                type="number"
+                step="0.01"
+                {...register("amountRequested")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="monthlyRevenueRange">
+                {t("monthlyRevenueRange")}
+              </Label>
+              <Input
+                id="monthlyRevenueRange"
+                placeholder="$10k-50k"
+                {...register("monthlyRevenueRange")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="financingType">{t("financingType")}</Label>
+              <Input
+                id="financingType"
+                placeholder="Term Loan, Line of Credit..."
+                {...register("financingType")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="fundingPurpose">{t("fundingPurpose")}</Label>
+              <Input id="fundingPurpose" {...register("fundingPurpose")} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("rriStatus")}</Label>
+              <Controller
+                control={control}
+                name="rriStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {rriStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tRriStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="rriDocumentsRequested">
+                {t("rriDocumentsRequested")}
+              </Label>
+              <Input
+                id="rriDocumentsRequested"
+                {...register("rriDocumentsRequested")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="rriDocumentsReceived">
+                {t("rriDocumentsReceived")}
+              </Label>
+              <Input
+                id="rriDocumentsReceived"
+                {...register("rriDocumentsReceived")}
+              />
+            </div>
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="consentToShareInformation"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("consentToShareInformation")}</Label>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="notes">{t("notes")}</Label>

@@ -1,12 +1,9 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { getDb } from "@/lib/db";
-import { referrals } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
 import { Link } from "@/i18n/navigation";
 import { ReferralForm } from "@/components/referrals/ReferralForm";
 import { listClientsForSelect } from "@/lib/queries/cases";
-import { listCasesForSelect } from "@/lib/queries/referrals";
+import { listCasesForSelect, getReferralById } from "@/lib/queries/referrals";
 import { updateReferralAction } from "../../actions";
 import type { ReferralFormValues } from "@/lib/validation/referral";
 
@@ -18,13 +15,8 @@ export default async function EditReferralPage({
   const { id } = await params;
   const t = await getTranslations("Referrals");
 
-  const [referral] = await getDb()
-    .select()
-    .from(referrals)
-    .where(eq(referrals.id, id))
-    .limit(1);
-
-  if (!referral) notFound();
+  const result = await getReferralById(id);
+  if (!result) notFound();
 
   const [clients, cases] = await Promise.all([
     listClientsForSelect(),
@@ -46,12 +38,13 @@ export default async function EditReferralPage({
           href={`/referrals/${id}`}
           className="text-sm text-muted-foreground underline"
         >
-          &larr; REF-{String(referral.referralSeq).padStart(5, "0")}
+          &larr; REF-{String(result.referral.referralSeq).padStart(5, "0")}
         </Link>
       </div>
 
       <ReferralForm
-        referral={referral}
+        referral={result.referral}
+        rriDetails={result.rriDetails}
         clients={clients}
         cases={cases}
         onSubmit={submit}
