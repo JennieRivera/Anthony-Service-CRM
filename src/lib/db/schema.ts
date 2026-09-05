@@ -198,6 +198,179 @@ export const users = pgTable("users", {
     .defaultNow(),
 });
 
+// Phase 5, Session 1 — Company Master Registry. This is the first single
+// source of truth for "a business" in this CRM. Before this, business
+// identity (name/entity type/industry/revenue range) was captured
+// separately and redundantly in bookkeeping_service_details,
+// business_formation_details, and rri_referral_details — each tied to one
+// case/referral, with no link between them even when they described the
+// same business. Those tables are untouched (existing rows/behavior don't
+// change); going forward, Company 360 (a later session) treats `companies`
+// as authoritative and those as historical case-level snapshots.
+//
+// Deliberately NOT included here, despite being named as company fields in
+// the Phase 5 plan:
+//   - Owner(s), Authorized Representative(s), Ownership Percentage — these
+//     are per-owner facts (a company has *multiple* owners, each with
+//     their own %), so they live on company_owners below, not as a single
+//     company-level value.
+//   - Tax Service Status, Bookkeeping Status, Consulting Status, CRM
+//     Status, Marketing Status, Academy Status, RRI Referral Status —
+//     storing these as separate manually-typed columns here would recreate
+//     the exact duplication problem this table exists to fix. A later
+//     session (Company 360) computes them live from the client's actual
+//     linked cases/referrals instead.
+export const companyEntityTypeEnum = pgEnum("company_entity_type", [
+  "llc",
+  "corporation",
+  "s_corporation",
+  "partnership",
+  "sole_proprietor",
+  "nonprofit",
+  "other",
+]);
+
+// Deliberately narrower than the future IRS/EIN case-management module's
+// own status enum (a later session) — this is just a registry-level
+// summary, not a case tracker.
+export const companyEinStatusEnum = pgEnum("company_ein_status", [
+  "not_started",
+  "applied",
+  "received",
+]);
+
+export const companyAccountingMethodEnum = pgEnum("company_accounting_method", [
+  "cash",
+  "accrual",
+]);
+
+export const companies = pgTable("companies", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  legalBusinessName: text("legal_business_name").notNull(),
+  dbaName: text("dba_name"),
+  entityType: companyEntityTypeEnum("entity_type"),
+  stateOfFormation: text("state_of_formation"),
+  formationDate: date("formation_date"),
+  stateDocumentNumber: text("state_document_number"),
+  einStatus: companyEinStatusEnum("ein_status").notNull().default("not_started"),
+  // Only the last 4 digits are ever stored — never the full EIN.
+  einLast4: text("ein_last4"),
+  registeredAgent: text("registered_agent"),
+  registeredAgentAddress: text("registered_agent_address"),
+  principalBusinessAddress: text("principal_business_address"),
+  mailingAddress: text("mailing_address"),
+  phone: text("phone"),
+  email: text("email"),
+  website: text("website"),
+  industry: text("industry"),
+  naicsCode: text("naics_code"),
+  businessDescription: text("business_description"),
+  yearsInBusiness: integer("years_in_business"),
+  numberOfEmployees: integer("number_of_employees"),
+  annualRevenueRange: text("annual_revenue_range"),
+  monthlyRevenueRange: text("monthly_revenue_range"),
+  fiscalYearEnd: text("fiscal_year_end"),
+  accountingMethod: companyAccountingMethodEnum("accounting_method"),
+  bookkeepingSoftware: text("bookkeeping_software"),
+  payrollProvider: text("payroll_provider"),
+  salesTaxRequired: boolean("sales_tax_required").notNull().default(false),
+  salesTaxStates: text("sales_tax_states").array(),
+  licensesRequired: text("licenses_required"),
+  insuranceStatus: text("insurance_status"),
+  // Relationship/institution name only — never account numbers or
+  // credentials.
+  bankingRelationship: text("banking_relationship"),
+  businessCreditStatus: text("business_credit_status"),
+  fundingNeeds: text("funding_needs"),
+  notes: text("notes"),
+});
+
+// Phase 5, Session 1 — one row per owner; a company can have several.
+// clientId is optional: an owner who is already a client links to that
+// record instead of duplicating their contact info, but name/phone/email
+// stay on this row too since not every owner is necessarily a client yet.
+export const companyOwners = pgTable("company_owners", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  companyId: uuid("company_id")
+    .notNull()
+    .references(() => companies.id, { onDelete: "cascade" }),
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  name: text("name").notNull(),
+  role: text("role"),
+  ownershipPercentage: numeric("ownership_percentage", {
+    precision: 5,
+    scale: 2,
+  }),
+  phone: text("phone"),
+  email: text("email"),
+  preferredLanguage: text("preferred_language", { enum: ["en", "es"] }),
+  authorizedSigner: boolean("authorized_signer").notNull().default(false),
+  startDate: date("start_date"),
+  endDate: date("end_date"),
+  notes: text("notes"),
+});
+
+export const companyContacts = pgTable("company_contacts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  companyId: uuid("company_id")
+    .notNull()
+    .references(() => companies.id, { onDelete: "cascade" }),
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  name: text("name").notNull(),
+  role: text("role"),
+  phone: text("phone"),
+  email: text("email"),
+  notes: text("notes"),
+});
+
+// Distinct from Owners/Contacts — someone with legal authority to act for
+// the company (e.g. sign filings) who isn't necessarily an owner.
+export const companyAuthorizedRepresentatives = pgTable(
+  "company_authorized_representatives",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id, { onDelete: "cascade" }),
+    clientId: uuid("client_id").references(() => clients.id, {
+      onDelete: "set null",
+    }),
+    name: text("name").notNull(),
+    role: text("role"),
+    phone: text("phone"),
+    email: text("email"),
+    notes: text("notes"),
+  },
+);
+
 export const clients = pgTable("clients", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -213,6 +386,12 @@ export const clients = pgTable("clients", {
   referralSource: text("referral_source"),
   interestedServices: serviceTypeEnum("interested_services").array(),
   notes: text("notes"),
+  // Phase 5, Session 1 — optional link to the Company Master Registry. A
+  // client can represent/be associated with a company; not every client
+  // has one (individual walk-in notary clients, for example, never will).
+  companyId: uuid("company_id").references(() => companies.id, {
+    onDelete: "set null",
+  }),
 });
 
 // Phase 4, Session 3 — one optional row per client, the same 1:1-extension
@@ -1443,6 +1622,11 @@ export type WebsiteChatSession = typeof websiteChatSessions.$inferSelect;
 export type ClientHighlevelSync = typeof clientHighlevelSync.$inferSelect;
 export type IntegrationSettingsRow = typeof integrationSettings.$inferSelect;
 export type MessageTemplate = typeof messageTemplates.$inferSelect;
+export type Company = typeof companies.$inferSelect;
+export type CompanyOwner = typeof companyOwners.$inferSelect;
+export type CompanyContact = typeof companyContacts.$inferSelect;
+export type CompanyAuthorizedRepresentative =
+  typeof companyAuthorizedRepresentatives.$inferSelect;
 export type AuditLogEntry = typeof auditLog.$inferSelect;
 export type ProfessionalSystem = typeof professionalSystems.$inferSelect;
 export type WebsiteLink = typeof websiteLinks.$inferSelect;

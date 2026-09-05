@@ -134,6 +134,13 @@
       "when": 1788623980806,
       "tag": "0018_ambitious_cerise",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1788630412028,
+      "tag": "0019_flawless_shocker",
+      "breakpoints": true
     }
   ]
 }

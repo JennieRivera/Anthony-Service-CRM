@@ -20,6 +20,7 @@ function normalize(values: ClientFormValues) {
       ? values.interestedServices
       : null,
     notes: values.notes || null,
+    companyId: values.companyId || null,
   };
 }
 

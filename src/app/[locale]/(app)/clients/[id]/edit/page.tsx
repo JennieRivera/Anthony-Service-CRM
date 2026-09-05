@@ -5,6 +5,7 @@ import { clients } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { Link } from "@/i18n/navigation";
 import { ClientForm } from "@/components/clients/ClientForm";
+import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { updateClientAction } from "../../actions";
 import type { ClientFormValues } from "@/lib/validation/client";
 
@@ -16,11 +17,10 @@ export default async function EditClientPage({
   const { id } = await params;
   const t = await getTranslations("Clients");
 
-  const [client] = await getDb()
-    .select()
-    .from(clients)
-    .where(eq(clients.id, id))
-    .limit(1);
+  const [[client], companies] = await Promise.all([
+    getDb().select().from(clients).where(eq(clients.id, id)).limit(1),
+    listCompaniesForSelect(),
+  ]);
 
   if (!client) notFound();
 
@@ -43,7 +43,7 @@ export default async function EditClientPage({
         </Link>
       </div>
 
-      <ClientForm client={client} onSubmit={submit} />
+      <ClientForm client={client} companies={companies} onSubmit={submit} />
     </div>
   );
 }

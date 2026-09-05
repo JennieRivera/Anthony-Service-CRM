@@ -15,6 +15,7 @@ import {
   Map,
   MessagesSquare,
   NotepadText,
+  Building2,
 } from "lucide-react";
 
 export type NavItem = {
@@ -22,6 +23,7 @@ export type NavItem = {
   labelKey:
     | "dashboard"
     | "clients"
+    | "companies"
     | "cases"
     | "documents"
     | "appointments"
@@ -41,6 +43,7 @@ export type NavItem = {
 export const navItems: NavItem[] = [
   { href: "/", labelKey: "dashboard", icon: LayoutDashboard },
   { href: "/clients", labelKey: "clients", icon: Users },
+  { href: "/companies", labelKey: "companies", icon: Building2 },
   { href: "/cases", labelKey: "cases", icon: Briefcase },
   { href: "/tasks", labelKey: "tasks", icon: ListChecks },
   { href: "/appointments", labelKey: "appointments", icon: CalendarDays },

@@ -1,10 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ClientForm } from "@/components/clients/ClientForm";
+import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { createClientAction } from "../actions";
 
 export default async function NewClientPage() {
   const t = await getTranslations("Clients");
+  const companies = await listCompaniesForSelect();
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -17,7 +19,7 @@ export default async function NewClientPage() {
         </Link>
       </div>
 
-      <ClientForm onSubmit={createClientAction} />
+      <ClientForm companies={companies} onSubmit={createClientAction} />
     </div>
   );
 }

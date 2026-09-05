@@ -27,9 +27,11 @@ import type { Client } from "@/lib/db/schema";
 
 export function ClientForm({
   client,
+  companies,
   onSubmit,
 }: {
   client?: Client;
+  companies: { id: string; legalBusinessName: string }[];
   onSubmit: (values: ClientFormValues) => Promise<void>;
 }) {
   const t = useTranslations("Clients.form");
@@ -54,6 +56,7 @@ export function ClientForm({
       referralSource: client?.referralSource ?? "",
       interestedServices: client?.interestedServices ?? [],
       notes: client?.notes ?? "",
+      companyId: client?.companyId ?? "",
     },
   });
 
@@ -139,6 +142,32 @@ export function ClientForm({
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="referralSource">{t("referralSource")}</Label>
           <Input id="referralSource" {...register("referralSource")} />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("company")}</Label>
+          <Controller
+            control={control}
+            name="companyId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noCompany")}</SelectItem>
+                  {companies.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.legalBusinessName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
       </div>
 

@@ -36,6 +36,7 @@ export const clientFormSchema = z.object({
   referralSource: z.string().trim().optional().or(z.literal("")),
   interestedServices: z.array(z.enum(serviceTypeValues)),
   notes: z.string().trim().optional().or(z.literal("")),
+  companyId: z.string().trim().optional().or(z.literal("")),
 });
 
 export type ClientFormValues = z.infer<typeof clientFormSchema>;
