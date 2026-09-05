@@ -169,6 +169,13 @@
       "when": 1788644943396,
       "tag": "0023_opposite_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1788646418415,
+      "tag": "0024_opposite_khan",
+      "breakpoints": true
     }
   ]
 }

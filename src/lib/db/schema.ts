@@ -1640,6 +1640,121 @@ export const immigrationForms = pgTable("immigration_forms", {
   active: boolean("active").notNull().default(true),
 });
 
+// Phase 5, Session 7 — Associations & Chambers Directory (spec section 9).
+// Deliberately a standalone table rather than extending Strategic
+// Alliances (Phase 2): that module tracks referral/commission partners
+// (CPAs, attorneys, insurance, realtors) with referral-agreement fields
+// that don't apply here, while this one tracks membership-organization
+// relationships (dues, membership status, Latino-focus) with its own
+// status pipeline. Confirmed with the user rather than assumed.
+export const associationOrganizationTypeEnum = pgEnum(
+  "association_organization_type",
+  [
+    "latino_chamber",
+    "chamber_of_commerce",
+    "business_association",
+    "professional_association",
+    "community_organization",
+    "faith_based_organization",
+    "other",
+  ],
+);
+
+export const associationRelationshipStatusEnum = pgEnum(
+  "association_relationship_status",
+  [
+    "research",
+    "prospect",
+    "contacted",
+    "meeting_scheduled",
+    "member",
+    "strategic_partner",
+    "inactive",
+  ],
+);
+
+export const associationsChambers = pgTable("associations_chambers", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  organizationName: text("organization_name").notNull(),
+  organizationType: associationOrganizationTypeEnum("organization_type")
+    .notNull()
+    .default("other"),
+  state: text("state"),
+  city: text("city"),
+  country: text("country"),
+  website: text("website"),
+  phone: text("phone"),
+  email: text("email"),
+  contactPerson: text("contact_person"),
+  industryFocus: text("industry_focus"),
+  latinoFocus: boolean("latino_focus").notNull().default(false),
+  membershipStatus: text("membership_status"),
+  membershipCost: text("membership_cost"),
+  amsRelationshipStatus: associationRelationshipStatusEnum(
+    "ams_relationship_status",
+  )
+    .notNull()
+    .default("research"),
+  dateContacted: date("date_contacted"),
+  lastContact: date("last_contact"),
+  nextFollowUp: date("next_follow_up"),
+  partnershipOpportunity: text("partnership_opportunity"),
+  notes: text("notes"),
+});
+
+// Phase 5, Session 7 — Latino Business Opportunity Map (spec sections 7-8).
+// Population/business-presence/industry/source fields are admin-maintained
+// from public data (Census, SBA, etc.) since AMS has no internal source for
+// them. Associations/Chambers/Strategic-Partner counts are computed live
+// from associationsChambers and strategicAlliances (grouped by state)
+// instead of duplicated here. AMS Clients/Leads/Revenue stay admin-entered
+// placeholders until Map + Company Integration (Phase 5, Session 8) wires
+// them to real client/case data by state.
+export const latinoOpportunityScoreEnum = pgEnum("latino_opportunity_score", [
+  "very_high",
+  "high",
+  "medium",
+  "emerging",
+  "insufficient_data",
+]);
+
+export const latinoBusinessOpportunityData = pgTable(
+  "latino_business_opportunity_data",
+  {
+    state: text("state").primaryKey(),
+    estimatedLatinoPopulation: integer("estimated_latino_population"),
+    estimatedLatinoBusinessPresence: integer(
+      "estimated_latino_business_presence",
+    ),
+    topIndustries: text("top_industries"),
+    amsClientsCount: integer("ams_clients_count"),
+    amsLeadsCount: integer("ams_leads_count"),
+    revenueFromState: numeric("revenue_from_state", {
+      precision: 12,
+      scale: 2,
+    }),
+    opportunityScore: latinoOpportunityScoreEnum("opportunity_score")
+      .notNull()
+      .default("insufficient_data"),
+    potentialServices: text("potential_services"),
+    expansionNotes: text("expansion_notes"),
+    notes: text("notes"),
+    sourceName: text("source_name"),
+    sourceUrl: text("source_url"),
+    sourceYear: integer("source_year"),
+    sourceLastUpdated: date("source_last_updated"),
+    sourceDataType: text("source_data_type"),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+);
 
 export const conversationMessages = pgTable("conversation_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -1915,6 +2030,9 @@ export type SalesTaxStateInfo = typeof salesTaxStateInfo.$inferSelect;
 export type IrsCaseDetails = typeof irsCaseDetails.$inferSelect;
 export type IrsResource = typeof irsResources.$inferSelect;
 export type ImmigrationForm = typeof immigrationForms.$inferSelect;
+export type AssociationChamber = typeof associationsChambers.$inferSelect;
+export type LatinoBusinessOpportunityData =
+  typeof latinoBusinessOpportunityData.$inferSelect;
 export type AuditLogEntry = typeof auditLog.$inferSelect;
 export type ProfessionalSystem = typeof professionalSystems.$inferSelect;
 export type WebsiteLink = typeof websiteLinks.$inferSelect;
