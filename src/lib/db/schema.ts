@@ -122,6 +122,31 @@ export const conversationStatusEnum = pgEnum("conversation_status", [
   "archived",
 ]);
 
+// Phase 4, Session 3 — per-client channel readiness/consent, ahead of any
+// live WhatsApp/Email/SMS integration.
+export const whatsappContactStatusEnum = pgEnum("whatsapp_contact_status", [
+  "not_connected",
+  "connected",
+  "consent_pending",
+  "active",
+  "opted_out",
+]);
+
+export const emailContactStatusEnum = pgEnum("email_contact_status", [
+  "active",
+  "unsubscribed",
+  "bounced",
+  "invalid",
+  "consent_pending",
+]);
+
+export const smsContactStatusEnum = pgEnum("sms_contact_status", [
+  "active",
+  "opted_out",
+  "invalid",
+  "consent_pending",
+]);
+
 export const referralStatusEnum = pgEnum("referral_status", [
   "submitted",
   "in_progress",
@@ -189,6 +214,71 @@ export const clients = pgTable("clients", {
   interestedServices: serviceTypeEnum("interested_services").array(),
   notes: text("notes"),
 });
+
+// Phase 4, Session 3 — one optional row per client, the same 1:1-extension
+// pattern as the Phase 2 case-detail tables, but keyed on clientId since
+// channel readiness/consent belongs to the client, not any one case.
+// clients.email/clients.phone are reused as-is for Email Address/Mobile
+// Number rather than duplicated here; whatsappNumber gets its own field
+// since a client's WhatsApp number is often a different number.
+export const clientCommunicationPreferences = pgTable(
+  "client_communication_preferences",
+  {
+    clientId: uuid("client_id")
+      .primaryKey()
+      .references(() => clients.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    preferredChannel: conversationChannelEnum("preferred_channel"),
+    emailConsent: boolean("email_consent").notNull().default(false),
+    smsConsent: boolean("sms_consent").notNull().default(false),
+    whatsappConsent: boolean("whatsapp_consent").notNull().default(false),
+    marketingConsent: boolean("marketing_consent").notNull().default(false),
+    partnerReferralConsent: boolean("partner_referral_consent")
+      .notNull()
+      .default(false),
+    consentDate: date("consent_date"),
+    consentSource: text("consent_source"),
+    optOutDate: date("opt_out_date"),
+    // WhatsApp
+    whatsappNumber: text("whatsapp_number"),
+    whatsappContactStatus: whatsappContactStatusEnum("whatsapp_contact_status")
+      .notNull()
+      .default("not_connected"),
+    // Auto-updated by createCommunicationAction/updateCommunicationAction
+    // whenever a communication is logged on this channel — not hand-edited.
+    lastWhatsappMessageAt: timestamp("last_whatsapp_message_at", {
+      withTimezone: true,
+    }),
+    nextWhatsappFollowUpDate: date("next_whatsapp_follow_up_date"),
+    whatsappTemplateUsed: text("whatsapp_template_used"),
+    // Email
+    emailStatus: emailContactStatusEnum("email_status")
+      .notNull()
+      .default("consent_pending"),
+    lastEmailSentAt: timestamp("last_email_sent_at", { withTimezone: true }),
+    lastEmailReceivedAt: timestamp("last_email_received_at", {
+      withTimezone: true,
+    }),
+    lastEmailSubject: text("last_email_subject"),
+    emailTemplateUsed: text("email_template_used"),
+    nextEmailFollowUpDate: date("next_email_follow_up_date"),
+    // SMS
+    smsStatus: smsContactStatusEnum("sms_status")
+      .notNull()
+      .default("consent_pending"),
+    lastSmsSentAt: timestamp("last_sms_sent_at", { withTimezone: true }),
+    lastSmsReceivedAt: timestamp("last_sms_received_at", {
+      withTimezone: true,
+    }),
+    smsTemplateUsed: text("sms_template_used"),
+    nextSmsFollowUpDate: date("next_sms_follow_up_date"),
+  },
+);
 
 export const cases = pgTable("cases", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -1047,6 +1137,8 @@ export type InvoiceLineItem = typeof invoiceLineItems.$inferSelect;
 export type NotaryLogEntry = typeof notaryLogEntries.$inferSelect;
 export type ApostilleDetails = typeof apostilleDetails.$inferSelect;
 export type ConversationMessage = typeof conversationMessages.$inferSelect;
+export type ClientCommunicationPreferences =
+  typeof clientCommunicationPreferences.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type CaseStatusHistory = typeof caseStatusHistory.$inferSelect;

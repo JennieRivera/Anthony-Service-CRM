@@ -10,6 +10,7 @@ import {
   payments,
   referrals,
   tasks,
+  clientCommunicationPreferences,
 } from "@/lib/db/schema";
 
 export type TimelineEntry = {
@@ -50,6 +51,7 @@ export async function getClientById(id: string) {
     clientConversations,
     clientReferrals,
     clientTasks,
+    communicationPreferences,
   ] = await Promise.all([
     db
       .select()
@@ -86,6 +88,12 @@ export async function getClientById(id: string) {
       .from(tasks)
       .where(eq(tasks.clientId, id))
       .orderBy(desc(tasks.createdAt)),
+    db
+      .select()
+      .from(clientCommunicationPreferences)
+      .where(eq(clientCommunicationPreferences.clientId, id))
+      .limit(1)
+      .then((rows) => rows[0] ?? null),
   ]);
 
   // Payments don't carry clientId directly — they hang off an invoice —
@@ -183,5 +191,6 @@ export async function getClientById(id: string) {
     payments: clientPayments,
     outstandingBalance,
     timeline,
+    communicationPreferences,
   };
 }

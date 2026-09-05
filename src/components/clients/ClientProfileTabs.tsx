@@ -16,6 +16,7 @@ import { DocumentList } from "@/components/documents/DocumentList";
 import { DocumentUploader } from "@/components/documents/DocumentUploader";
 import { ConversationTimeline } from "./ConversationTimeline";
 import { LogConversationDialog } from "./LogConversationDialog";
+import { CommunicationPreferencesPanel } from "./CommunicationPreferencesPanel";
 import { ReferralStatusBadge } from "@/components/referrals/ReferralStatusBadge";
 import { PaymentStatusBadge } from "@/components/payments/PaymentStatusBadge";
 import type {
@@ -27,6 +28,7 @@ import type {
   Referral,
   Task,
   Payment,
+  ClientCommunicationPreferences,
 } from "@/lib/db/schema";
 import type { TimelineEntry } from "@/lib/queries/clients";
 
@@ -61,6 +63,7 @@ export function ClientProfileTabs({
   payments,
   timeline,
   blobConfigured,
+  communicationPreferences,
 }: {
   clientId: string;
   cases: Case[];
@@ -73,6 +76,7 @@ export function ClientProfileTabs({
   payments: Payment[];
   timeline: TimelineEntry[];
   blobConfigured: boolean;
+  communicationPreferences: ClientCommunicationPreferences | null;
 }) {
   const t = useTranslations("Clients");
   const tCases = useTranslations("Cases");
@@ -110,6 +114,9 @@ export function ClientProfileTabs({
         </TabsTrigger>
         <TabsTrigger value="documents">
           {tDocuments("title")} ({documents.length})
+        </TabsTrigger>
+        <TabsTrigger value="preferences">
+          {t("tabPreferences")}
         </TabsTrigger>
       </TabsList>
 
@@ -347,6 +354,13 @@ export function ClientProfileTabs({
           </p>
         )}
         <DocumentList documents={documents} />
+      </TabsContent>
+
+      <TabsContent value="preferences" className="flex flex-col gap-4 pt-4">
+        <CommunicationPreferencesPanel
+          clientId={clientId}
+          preferences={communicationPreferences}
+        />
       </TabsContent>
     </Tabs>
   );

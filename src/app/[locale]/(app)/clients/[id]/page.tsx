@@ -31,6 +31,7 @@ export default async function ClientProfilePage({
     payments,
     outstandingBalance,
     timeline,
+    communicationPreferences,
   } = result;
 
   return (
@@ -108,6 +109,7 @@ export default async function ClientProfilePage({
         payments={payments}
         timeline={timeline}
         blobConfigured={isBlobConfigured()}
+        communicationPreferences={communicationPreferences}
       />
     </div>
   );
