@@ -14,6 +14,8 @@ import {
   businessFormationDetails,
   academyEnrollmentDetails,
   marketingProjectDetails,
+  salesTaxCaseDetails,
+  companies,
   documents,
   caseStatusHistory,
 } from "@/lib/db/schema";
@@ -70,6 +72,7 @@ export async function getCaseById(id: string) {
     formationDetails,
     academyDetails,
     marketingDetails,
+    salesTaxDetails,
     caseDocuments,
     statusHistory,
   ] = await Promise.all([
@@ -130,6 +133,11 @@ export async function getCaseById(id: string) {
       .limit(1),
     db
       .select()
+      .from(salesTaxCaseDetails)
+      .where(eq(salesTaxCaseDetails.caseId, id))
+      .limit(1),
+    db
+      .select()
       .from(documents)
       .where(eq(documents.caseId, id))
       .orderBy(desc(documents.createdAt)),
@@ -139,6 +147,17 @@ export async function getCaseById(id: string) {
       .where(eq(caseStatusHistory.caseId, id))
       .orderBy(desc(caseStatusHistory.changedAt)),
   ]);
+
+  const salesTaxCompanyId = salesTaxDetails[0]?.companyId;
+  const salesTaxCompany = salesTaxCompanyId
+    ? (
+        await db
+          .select({ id: companies.id, legalBusinessName: companies.legalBusinessName })
+          .from(companies)
+          .where(eq(companies.id, salesTaxCompanyId))
+          .limit(1)
+      )[0] ?? null
+    : null;
 
   return {
     case: row.case,
@@ -154,6 +173,8 @@ export async function getCaseById(id: string) {
     formationDetails: formationDetails[0] ?? null,
     academyDetails: academyDetails[0] ?? null,
     marketingDetails: marketingDetails[0] ?? null,
+    salesTaxDetails: salesTaxDetails[0] ?? null,
+    salesTaxCompany,
     documents: caseDocuments,
     statusHistory,
   };

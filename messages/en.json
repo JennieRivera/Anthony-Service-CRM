@@ -113,7 +113,8 @@
     "openMenu": "Open menu",
     "account": "Account",
     "collapseSidebar": "Collapse sidebar",
-    "expandSidebar": "Expand sidebar"
+    "expandSidebar": "Expand sidebar",
+    "salesTaxMap": "Sales Tax Map"
   },
   "ServiceType": {
     "online_notary": "Online Notary",
@@ -126,7 +127,8 @@
     "bookkeeping": "Bookkeeping / Accounting Support",
     "immigration": "Immigration Administrative Services",
     "academy": "Academy / Training",
-    "marketing": "Marketing / Branding / AI / Automation"
+    "marketing": "Marketing / Branding / AI / Automation",
+    "sales_tax": "Sales Tax Registration"
   },
   "ClientStatus": {
     "lead": "Lead",
@@ -370,8 +372,29 @@
       "marketingCaseStatus": "Status",
       "save": "Save Case",
       "saving": "Saving...",
-      "cancel": "Cancel"
-    }
+      "cancel": "Cancel",
+      "company": "Company",
+      "noCompany": "Not linked to a company",
+      "notSet": "Not Set",
+      "salesTaxState": "State",
+      "salesTaxCaseStatus": "Sales Tax Status",
+      "stateTaxAgency": "State Tax Agency",
+      "agencyWebsite": "Agency Website",
+      "registrationPortalUrl": "Registration Portal URL",
+      "salesTaxAccountNumber": "Sales Tax Account Number",
+      "registrationDate": "Registration Date",
+      "effectiveDate": "Effective Date",
+      "filingFrequency": "Filing Frequency",
+      "nextFilingDueDate": "Next Filing Due Date",
+      "lastFiledPeriod": "Last Filed Period",
+      "lastFilingDate": "Last Filing Date",
+      "amountDue": "Amount Due",
+      "amountPaid": "Amount Paid",
+      "paymentDate": "Payment Date",
+      "accountStatus": "Account Status",
+      "salesTaxDisclaimer": "State sales tax requirements vary by business activity, nexus, products, services and jurisdiction. Review official state guidance before filing."
+    },
+    "salesTaxCaseDetails": "Sales Tax Registration Details"
   },
   "NotarialActType": {
     "jurat": "Jurat",
@@ -1516,5 +1539,46 @@
     "verified": "Verified",
     "expired": "Expired",
     "renewal_due": "Renewal Due"
+  },
+  "SalesTaxCaseStatus": {
+    "not_started": "Not Started",
+    "research_required": "Research Required",
+    "registration_pending": "Registration Pending",
+    "submitted": "Submitted",
+    "approved": "Approved",
+    "account_active": "Account Active",
+    "filing_due": "Filing Due",
+    "filed": "Filed",
+    "past_due": "Past Due",
+    "closed": "Closed"
+  },
+  "SalesTaxFilingFrequency": {
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "annual": "Annual",
+    "other": "Other"
+  },
+  "SalesTaxMap": {
+    "title": "Interactive Sales Tax Map",
+    "instructions": "Click a state to view or update its sales tax agency links and notes.",
+    "legend": {
+      "green": "Active client cases",
+      "blue": "Info available, no active cases",
+      "gold": "Registration or filing pending",
+      "red": "Past due filing or issue",
+      "gray": "No records yet"
+    },
+    "disclaimer": "State sales tax requirements vary by business activity, nexus, products, services and jurisdiction. Review official state guidance before filing.",
+    "editTitle": "{state} — Sales Tax Reference Info",
+    "stateTaxAgency": "State Tax Agency",
+    "officialWebsite": "Official Website",
+    "registrationLink": "Sales Tax Registration Link",
+    "filingPortalLink": "Sales Tax Filing Portal",
+    "businessRegistrationLink": "Business Registration Link",
+    "lastVerifiedDate": "Last Verified Date",
+    "notes": "Notes",
+    "save": "Save",
+    "saving": "Saving...",
+    "activeCases": "{count, plural, one {# active case} other {# active cases}} in this state."
   }
 }

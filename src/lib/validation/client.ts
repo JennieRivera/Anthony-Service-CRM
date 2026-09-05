@@ -12,6 +12,7 @@ export const serviceTypeValues = [
   "immigration",
   "academy",
   "marketing",
+  "sales_tax",
 ] as const;
 
 export const clientStatusValues = [

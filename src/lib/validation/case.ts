@@ -203,6 +203,26 @@ export const marketingCaseStatusValues = [
   "completed",
 ] as const;
 
+// Phase 5, Session 4
+export const salesTaxCaseStatusValues = [
+  "not_started",
+  "research_required",
+  "registration_pending",
+  "submitted",
+  "approved",
+  "account_active",
+  "filing_due",
+  "filed",
+  "past_due",
+  "closed",
+] as const;
+export const salesTaxFilingFrequencyValues = [
+  "monthly",
+  "quarterly",
+  "annual",
+  "other",
+] as const;
+
 const optionalString = z.string().trim().optional().or(z.literal(""));
 
 export const caseFormSchema = z.object({
@@ -394,6 +414,30 @@ export const caseFormSchema = z.object({
     .enum(marketingCaseStatusValues)
     .optional()
     .or(z.literal("")),
+  // Sales tax registration details (relevant when serviceType is Sales Tax)
+  companyId: optionalString,
+  salesTaxState: optionalString,
+  stateTaxAgency: optionalString,
+  agencyWebsite: optionalString,
+  registrationPortalUrl: optionalString,
+  salesTaxAccountNumber: optionalString,
+  registrationDate: optionalString,
+  effectiveDate: optionalString,
+  filingFrequency: z
+    .enum(salesTaxFilingFrequencyValues)
+    .optional()
+    .or(z.literal("")),
+  nextFilingDueDate: optionalString,
+  lastFiledPeriod: optionalString,
+  lastFilingDate: optionalString,
+  amountDue: optionalString,
+  salesTaxAmountPaid: optionalString,
+  salesTaxPaymentDate: optionalString,
+  accountStatus: optionalString,
+  salesTaxCaseStatus: z
+    .enum(salesTaxCaseStatusValues)
+    .optional()
+    .or(z.literal("")),
 });
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
@@ -407,3 +451,4 @@ export const consultingServiceTypes = ["leadership"];
 export const formationServiceTypes = ["company_registration"];
 export const academyServiceTypes = ["academy"];
 export const marketingServiceTypes = ["marketing"];
+export const salesTaxServiceTypes = ["sales_tax"];

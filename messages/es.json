@@ -113,7 +113,8 @@
     "openMenu": "Abrir menú",
     "account": "Cuenta",
     "collapseSidebar": "Contraer barra lateral",
-    "expandSidebar": "Expandir barra lateral"
+    "expandSidebar": "Expandir barra lateral",
+    "salesTaxMap": "Mapa de Sales Tax"
   },
   "ServiceType": {
     "online_notary": "Notaría en Línea",
@@ -126,7 +127,8 @@
     "bookkeeping": "Contabilidad",
     "immigration": "Servicios Administrativos de Inmigración",
     "academy": "Academia / Capacitación",
-    "marketing": "Marketing / Marca / IA / Automatización"
+    "marketing": "Marketing / Marca / IA / Automatización",
+    "sales_tax": "Registro de Sales Tax"
   },
   "ClientStatus": {
     "lead": "Prospecto",
@@ -370,8 +372,29 @@
       "marketingCaseStatus": "Estado",
       "save": "Guardar Caso",
       "saving": "Guardando...",
-      "cancel": "Cancelar"
-    }
+      "cancel": "Cancelar",
+      "company": "Compañía",
+      "noCompany": "No vinculado a una compañía",
+      "notSet": "No Establecido",
+      "salesTaxState": "Estado",
+      "salesTaxCaseStatus": "Estado de Sales Tax",
+      "stateTaxAgency": "Agencia Tributaria Estatal",
+      "agencyWebsite": "Sitio Web de la Agencia",
+      "registrationPortalUrl": "URL del Portal de Registro",
+      "salesTaxAccountNumber": "Número de Cuenta de Sales Tax",
+      "registrationDate": "Fecha de Registro",
+      "effectiveDate": "Fecha de Vigencia",
+      "filingFrequency": "Frecuencia de Declaración",
+      "nextFilingDueDate": "Próxima Fecha de Declaración",
+      "lastFiledPeriod": "Último Período Declarado",
+      "lastFilingDate": "Fecha de Última Declaración",
+      "amountDue": "Monto Adeudado",
+      "amountPaid": "Monto Pagado",
+      "paymentDate": "Fecha de Pago",
+      "accountStatus": "Estado de la Cuenta",
+      "salesTaxDisclaimer": "Los requisitos de sales tax estatal varían según la actividad comercial, el nexo, los productos, los servicios y la jurisdicción. Revise la guía oficial del estado antes de declarar."
+    },
+    "salesTaxCaseDetails": "Detalles de Registro de Sales Tax"
   },
   "NotarialActType": {
     "jurat": "Jurat",
@@ -1516,5 +1539,46 @@
     "verified": "Verificado",
     "expired": "Vencido",
     "renewal_due": "Renovación Pendiente"
+  },
+  "SalesTaxCaseStatus": {
+    "not_started": "No Iniciado",
+    "research_required": "Requiere Investigación",
+    "registration_pending": "Registro Pendiente",
+    "submitted": "Enviado",
+    "approved": "Aprobado",
+    "account_active": "Cuenta Activa",
+    "filing_due": "Declaración Pendiente",
+    "filed": "Presentado",
+    "past_due": "Vencido",
+    "closed": "Cerrado"
+  },
+  "SalesTaxFilingFrequency": {
+    "monthly": "Mensual",
+    "quarterly": "Trimestral",
+    "annual": "Anual",
+    "other": "Otro"
+  },
+  "SalesTaxMap": {
+    "title": "Mapa Interactivo de Sales Tax",
+    "instructions": "Haga clic en un estado para ver o actualizar los enlaces y notas de su agencia de sales tax.",
+    "legend": {
+      "green": "Casos activos de clientes",
+      "blue": "Información disponible, sin casos activos",
+      "gold": "Registro o declaración pendiente",
+      "red": "Declaración vencida o problema",
+      "gray": "Sin registros aún"
+    },
+    "disclaimer": "Los requisitos de sales tax estatal varían según la actividad comercial, el nexo, los productos, los servicios y la jurisdicción. Revise la guía oficial del estado antes de declarar.",
+    "editTitle": "{state} — Información de Referencia de Sales Tax",
+    "stateTaxAgency": "Agencia Tributaria Estatal",
+    "officialWebsite": "Sitio Web Oficial",
+    "registrationLink": "Enlace de Registro de Sales Tax",
+    "filingPortalLink": "Portal de Declaración de Sales Tax",
+    "businessRegistrationLink": "Enlace de Registro de Negocio",
+    "lastVerifiedDate": "Fecha de Última Verificación",
+    "notes": "Notas",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "activeCases": "{count, plural, one {# caso activo} other {# casos activos}} en este estado."
   }
 }

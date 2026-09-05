@@ -43,6 +43,8 @@ export default async function CaseDetailPage({
   const tHighlevelSyncStatus = await getTranslations("HighlevelSyncStatus");
   const tProjectType = await getTranslations("ProjectType");
   const tMarketingCaseStatus = await getTranslations("MarketingCaseStatus");
+  const tSalesTaxCaseStatus = await getTranslations("SalesTaxCaseStatus");
+  const tSalesTaxFilingFrequency = await getTranslations("SalesTaxFilingFrequency");
 
   const result = await getCaseById(id);
   if (!result) notFound();
@@ -61,6 +63,8 @@ export default async function CaseDetailPage({
     formationDetails,
     academyDetails,
     marketingDetails,
+    salesTaxDetails,
+    salesTaxCompany,
     documents,
     statusHistory,
   } = result;
@@ -1086,6 +1090,117 @@ export default async function CaseDetailPage({
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {salesTaxDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("salesTaxCaseDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tSalesTaxCaseStatus(salesTaxDetails.status)}
+            </Badge>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">{t("form.company")}</p>
+              <p className="text-foreground">
+                {salesTaxCompany?.legalBusinessName ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.salesTaxState")}</p>
+              <p className="text-foreground">{salesTaxDetails.state}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.stateTaxAgency")}</p>
+              <p className="text-foreground">
+                {salesTaxDetails.stateTaxAgency ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.salesTaxAccountNumber")}
+              </p>
+              <p className="text-foreground">
+                {salesTaxDetails.salesTaxAccountNumber ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.registrationDate")}</p>
+              <p className="text-foreground">
+                {salesTaxDetails.registrationDate
+                  ? new Date(salesTaxDetails.registrationDate).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.filingFrequency")}</p>
+              <p className="text-foreground">
+                {salesTaxDetails.filingFrequency
+                  ? tSalesTaxFilingFrequency(salesTaxDetails.filingFrequency)
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.nextFilingDueDate")}
+              </p>
+              <p className="text-foreground">
+                {salesTaxDetails.nextFilingDueDate
+                  ? new Date(salesTaxDetails.nextFilingDueDate).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.lastFiledPeriod")}</p>
+              <p className="text-foreground">
+                {salesTaxDetails.lastFiledPeriod ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.amountDue")}</p>
+              <p className="text-foreground">
+                {salesTaxDetails.amountDue
+                  ? `$${Number(salesTaxDetails.amountDue).toFixed(2)}`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.amountPaid")}</p>
+              <p className="text-foreground">
+                {salesTaxDetails.amountPaid
+                  ? `$${Number(salesTaxDetails.amountPaid).toFixed(2)}`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.accountStatus")}</p>
+              <p className="text-foreground">
+                {salesTaxDetails.accountStatus ?? "—"}
+              </p>
+            </div>
+            {salesTaxDetails.registrationPortalUrl && (
+              <div>
+                <p className="text-muted-foreground">
+                  {t("form.registrationPortalUrl")}
+                </p>
+                <a
+                  href={salesTaxDetails.registrationPortalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-foreground underline"
+                >
+                  {t("form.registrationPortalUrl")}
+                </a>
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {t("form.salesTaxDisclaimer")}
+          </p>
         </div>
       )}
 

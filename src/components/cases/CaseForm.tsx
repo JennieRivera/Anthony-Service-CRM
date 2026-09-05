@@ -51,6 +51,9 @@ import {
   marketingServiceTypes,
   projectTypeValues,
   marketingCaseStatusValues,
+  salesTaxServiceTypes,
+  salesTaxCaseStatusValues,
+  salesTaxFilingFrequencyValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
@@ -66,6 +69,7 @@ import type {
   BusinessFormationDetails,
   AcademyEnrollmentDetails,
   MarketingProjectDetails,
+  SalesTaxCaseDetails,
 } from "@/lib/db/schema";
 
 export function CaseForm({
@@ -79,7 +83,9 @@ export function CaseForm({
   formationDetails,
   academyDetails,
   marketingDetails,
+  salesTaxDetails,
   clients,
+  companies,
   defaultClientId,
   onSubmit,
 }: {
@@ -93,7 +99,9 @@ export function CaseForm({
   formationDetails?: BusinessFormationDetails | null;
   academyDetails?: AcademyEnrollmentDetails | null;
   marketingDetails?: MarketingProjectDetails | null;
+  salesTaxDetails?: SalesTaxCaseDetails | null;
   clients: { id: string; fullName: string }[];
+  companies: { id: string; legalBusinessName: string }[];
   defaultClientId?: string;
   onSubmit: (values: CaseFormValues) => Promise<void>;
 }) {
@@ -124,6 +132,8 @@ export function CaseForm({
   const tHighlevelSyncStatus = useTranslations("HighlevelSyncStatus");
   const tProjectType = useTranslations("ProjectType");
   const tMarketingCaseStatus = useTranslations("MarketingCaseStatus");
+  const tSalesTaxCaseStatus = useTranslations("SalesTaxCaseStatus");
+  const tSalesTaxFilingFrequency = useTranslations("SalesTaxFilingFrequency");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -286,6 +296,23 @@ export function CaseForm({
       marketingCompletionPercentage:
         marketingDetails?.completionPercentage?.toString() ?? "",
       marketingCaseStatus: marketingDetails?.status ?? "discovery",
+      companyId: salesTaxDetails?.companyId ?? "",
+      salesTaxState: salesTaxDetails?.state ?? "",
+      stateTaxAgency: salesTaxDetails?.stateTaxAgency ?? "",
+      agencyWebsite: salesTaxDetails?.agencyWebsite ?? "",
+      registrationPortalUrl: salesTaxDetails?.registrationPortalUrl ?? "",
+      salesTaxAccountNumber: salesTaxDetails?.salesTaxAccountNumber ?? "",
+      registrationDate: salesTaxDetails?.registrationDate ?? "",
+      effectiveDate: salesTaxDetails?.effectiveDate ?? "",
+      filingFrequency: salesTaxDetails?.filingFrequency ?? "",
+      nextFilingDueDate: salesTaxDetails?.nextFilingDueDate ?? "",
+      lastFiledPeriod: salesTaxDetails?.lastFiledPeriod ?? "",
+      lastFilingDate: salesTaxDetails?.lastFilingDate ?? "",
+      amountDue: salesTaxDetails?.amountDue ?? "",
+      salesTaxAmountPaid: salesTaxDetails?.amountPaid ?? "",
+      salesTaxPaymentDate: salesTaxDetails?.paymentDate ?? "",
+      accountStatus: salesTaxDetails?.accountStatus ?? "",
+      salesTaxCaseStatus: salesTaxDetails?.status ?? "not_started",
     },
   });
 
@@ -299,6 +326,7 @@ export function CaseForm({
   const isFormation = formationServiceTypes.includes(serviceType);
   const isAcademy = academyServiceTypes.includes(serviceType);
   const isMarketing = marketingServiceTypes.includes(serviceType);
+  const isSalesTax = salesTaxServiceTypes.includes(serviceType);
   // Apostille / authentication fields are an optional add-on for Document Prep cases.
   const isApostille = serviceType === "document_prep";
 
@@ -382,7 +410,8 @@ export function CaseForm({
           !isConsulting &&
           !isFormation &&
           !isAcademy &&
-          !isMarketing && (
+          !isMarketing &&
+          !isSalesTax && (
           <div className="flex flex-col gap-1.5">
             <Label>{t("status")}</Label>
             <Controller
@@ -2141,6 +2170,203 @@ export function CaseForm({
               />
             </div>
           </div>
+        </div>
+      )}
+
+      {isSalesTax && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("salesTaxCaseDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("company")}</Label>
+              <Controller
+                control={control}
+                name="companyId"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{t("noCompany")}</SelectItem>
+                      {companies.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.legalBusinessName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="salesTaxState">{t("salesTaxState")}</Label>
+              <Input
+                id="salesTaxState"
+                maxLength={2}
+                placeholder="FL"
+                {...register("salesTaxState")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("salesTaxCaseStatus")}</Label>
+              <Controller
+                control={control}
+                name="salesTaxCaseStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {salesTaxCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tSalesTaxCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="stateTaxAgency">{t("stateTaxAgency")}</Label>
+              <Input id="stateTaxAgency" {...register("stateTaxAgency")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="agencyWebsite">{t("agencyWebsite")}</Label>
+              <Input
+                id="agencyWebsite"
+                placeholder="https://"
+                {...register("agencyWebsite")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="registrationPortalUrl">
+                {t("registrationPortalUrl")}
+              </Label>
+              <Input
+                id="registrationPortalUrl"
+                placeholder="https://"
+                {...register("registrationPortalUrl")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="salesTaxAccountNumber">
+                {t("salesTaxAccountNumber")}
+              </Label>
+              <Input
+                id="salesTaxAccountNumber"
+                {...register("salesTaxAccountNumber")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="registrationDate">{t("registrationDate")}</Label>
+              <Input
+                id="registrationDate"
+                type="date"
+                {...register("registrationDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="effectiveDate">{t("effectiveDate")}</Label>
+              <Input id="effectiveDate" type="date" {...register("effectiveDate")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("filingFrequency")}</Label>
+              <Controller
+                control={control}
+                name="filingFrequency"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{t("notSet")}</SelectItem>
+                      {salesTaxFilingFrequencyValues.map((freq) => (
+                        <SelectItem key={freq} value={freq}>
+                          {tSalesTaxFilingFrequency(freq)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="nextFilingDueDate">{t("nextFilingDueDate")}</Label>
+              <Input
+                id="nextFilingDueDate"
+                type="date"
+                {...register("nextFilingDueDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="lastFiledPeriod">{t("lastFiledPeriod")}</Label>
+              <Input
+                id="lastFiledPeriod"
+                placeholder="Q3 2026"
+                {...register("lastFiledPeriod")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="lastFilingDate">{t("lastFilingDate")}</Label>
+              <Input id="lastFilingDate" type="date" {...register("lastFilingDate")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="amountDue">{t("amountDue")}</Label>
+              <Input id="amountDue" type="number" step="0.01" {...register("amountDue")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="salesTaxAmountPaid">{t("amountPaid")}</Label>
+              <Input
+                id="salesTaxAmountPaid"
+                type="number"
+                step="0.01"
+                {...register("salesTaxAmountPaid")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="salesTaxPaymentDate">{t("paymentDate")}</Label>
+              <Input
+                id="salesTaxPaymentDate"
+                type="date"
+                {...register("salesTaxPaymentDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="accountStatus">{t("accountStatus")}</Label>
+              <Input id="accountStatus" {...register("accountStatus")} />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {t("salesTaxDisclaimer")}
+          </p>
         </div>
       )}
 

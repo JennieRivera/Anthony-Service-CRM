@@ -429,6 +429,30 @@ const templates: Record<
     ],
     includeNotaryBlock: false,
   },
+
+  sales_tax: {
+    documentTitle: {
+      en: "Sales Tax Registration Intake",
+      es: "Admisión — Registro de Sales Tax",
+    },
+    intro: {
+      en: "This sheet organizes the information needed to research and track your state sales tax registration. State sales tax requirements vary by business activity, nexus, products, services and jurisdiction — review official state guidance before filing.",
+      es: "Esta hoja organiza la información necesaria para investigar y dar seguimiento a su registro de sales tax estatal. Los requisitos de sales tax estatal varían según la actividad comercial, el nexo, los productos, los servicios y la jurisdicción — revise la guía oficial del estado antes de declarar.",
+    },
+    sections: [
+      {
+        heading: { en: "Registration Information", es: "Información de Registro" },
+        fields: [
+          { en: "Business Legal Name", es: "Nombre Legal del Negocio" },
+          { en: "State", es: "Estado" },
+          { en: "State Tax Agency", es: "Agencia Tributaria Estatal" },
+          { en: "Filing Frequency", es: "Frecuencia de Declaración" },
+          { en: "Next Filing Due Date", es: "Próxima Fecha de Declaración" },
+        ],
+      },
+    ],
+    includeNotaryBlock: false,
+  },
 };
 
 export function getServiceTemplate(

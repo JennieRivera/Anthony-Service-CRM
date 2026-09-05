@@ -17,6 +17,7 @@ import {
   businessFormationDetails,
   academyEnrollmentDetails,
   marketingProjectDetails,
+  salesTaxCaseDetails,
   caseStatusEnum,
   caseStatusHistory,
   tasks,
@@ -33,6 +34,7 @@ import {
   formationServiceTypes,
   academyServiceTypes,
   marketingServiceTypes,
+  salesTaxServiceTypes,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { redirect } from "@/i18n/navigation";
@@ -249,6 +251,17 @@ function deriveEffectiveStatus(
     const s = values.marketingCaseStatus;
     if (s === "completed") return "completed";
     if (s === "discovery") return "new";
+    return "in_progress";
+  }
+
+  if (
+    salesTaxServiceTypes.includes(values.serviceType) &&
+    values.salesTaxCaseStatus
+  ) {
+    const s = values.salesTaxCaseStatus;
+    if (s === "closed") return "completed";
+    if (s === "past_due") return "waiting_on_client";
+    if (s === "not_started" || s === "research_required") return "new";
     return "in_progress";
   }
 
@@ -600,6 +613,41 @@ async function upsertServiceDetails(
         target: marketingProjectDetails.caseId,
         set: detail,
       });
+    return;
+  }
+
+  if (salesTaxServiceTypes.includes(values.serviceType)) {
+    if (values.salesTaxState) {
+      const detail = {
+        companyId: values.companyId || null,
+        state: values.salesTaxState.toUpperCase(),
+        stateTaxAgency: values.stateTaxAgency || null,
+        agencyWebsite: values.agencyWebsite || null,
+        registrationPortalUrl: values.registrationPortalUrl || null,
+        salesTaxAccountNumber: values.salesTaxAccountNumber || null,
+        registrationDate: values.registrationDate || null,
+        effectiveDate: values.effectiveDate || null,
+        filingFrequency: values.filingFrequency || null,
+        nextFilingDueDate: values.nextFilingDueDate || null,
+        lastFiledPeriod: values.lastFiledPeriod || null,
+        lastFilingDate: values.lastFilingDate || null,
+        amountDue: values.amountDue ? Number(values.amountDue).toFixed(2) : null,
+        amountPaid: values.salesTaxAmountPaid
+          ? Number(values.salesTaxAmountPaid).toFixed(2)
+          : null,
+        paymentDate: values.salesTaxPaymentDate || null,
+        accountStatus: values.accountStatus || null,
+        status: values.salesTaxCaseStatus || "not_started",
+      };
+
+      await db
+        .insert(salesTaxCaseDetails)
+        .values({ caseId, ...detail })
+        .onConflictDoUpdate({
+          target: salesTaxCaseDetails.caseId,
+          set: detail,
+        });
+    }
     return;
   }
 }

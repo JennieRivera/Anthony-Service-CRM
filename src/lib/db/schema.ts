@@ -36,6 +36,8 @@ export const serviceTypeEnum = pgEnum("service_type", [
   "academy",
   // Phase 2, Session 6 — Marketing / Branding / AI / Automation.
   "marketing",
+  // Phase 5, Session 4 — Sales Tax Registration.
+  "sales_tax",
 ]);
 
 export const clientStatusEnum = pgEnum("client_status", [
@@ -1408,6 +1410,74 @@ export const marketingProjectDetails = pgTable("marketing_project_details", {
   status: marketingCaseStatusEnum("status").notNull().default("discovery"),
 });
 
+// Phase 5, Session 4 — Sales Tax Registration category. Links to the
+// Company Master Registry (Phase 5, Session 1) via companyId instead of
+// duplicating business name/entity type columns the way older extension
+// tables above (bookkeeping, formation) do — those predate `companies`.
+export const salesTaxCaseStatusEnum = pgEnum("sales_tax_case_status", [
+  "not_started",
+  "research_required",
+  "registration_pending",
+  "submitted",
+  "approved",
+  "account_active",
+  "filing_due",
+  "filed",
+  "past_due",
+  "closed",
+]);
+
+export const salesTaxFilingFrequencyEnum = pgEnum("sales_tax_filing_frequency", [
+  "monthly",
+  "quarterly",
+  "annual",
+  "other",
+]);
+
+export const salesTaxCaseDetails = pgTable("sales_tax_case_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  companyId: uuid("company_id").references(() => companies.id, {
+    onDelete: "set null",
+  }),
+  state: text("state").notNull(),
+  stateTaxAgency: text("state_tax_agency"),
+  agencyWebsite: text("agency_website"),
+  registrationPortalUrl: text("registration_portal_url"),
+  salesTaxAccountNumber: text("sales_tax_account_number"),
+  status: salesTaxCaseStatusEnum("status").notNull().default("not_started"),
+  registrationDate: date("registration_date"),
+  effectiveDate: date("effective_date"),
+  filingFrequency: salesTaxFilingFrequencyEnum("filing_frequency"),
+  nextFilingDueDate: date("next_filing_due_date"),
+  lastFiledPeriod: text("last_filed_period"),
+  lastFilingDate: date("last_filing_date"),
+  amountDue: numeric("amount_due", { precision: 12, scale: 2 }),
+  amountPaid: numeric("amount_paid", { precision: 12, scale: 2 }),
+  paymentDate: date("payment_date"),
+  accountStatus: text("account_status"),
+});
+
+// Reference data backing the Interactive Sales Tax Map (spec section 2).
+// Deliberately starts empty rather than seeded with guessed government
+// URLs — an admin fills each state in via the map UI, and a state with no
+// row yet simply renders Gray ("no records yet"), which is one of the
+// map's defined states, not an error condition.
+export const salesTaxStateInfo = pgTable("sales_tax_state_info", {
+  state: text("state").primaryKey(),
+  stateTaxAgency: text("state_tax_agency"),
+  officialWebsite: text("official_website"),
+  registrationLink: text("registration_link"),
+  filingPortalLink: text("filing_portal_link"),
+  businessRegistrationLink: text("business_registration_link"),
+  notes: text("notes"),
+  lastVerifiedDate: date("last_verified_date"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const conversationMessages = pgTable("conversation_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1677,6 +1747,8 @@ export type CompanyAuthorizedRepresentative =
   typeof companyAuthorizedRepresentatives.$inferSelect;
 export type CompanyDocumentChecklistItem =
   typeof companyDocumentChecklistItems.$inferSelect;
+export type SalesTaxCaseDetails = typeof salesTaxCaseDetails.$inferSelect;
+export type SalesTaxStateInfo = typeof salesTaxStateInfo.$inferSelect;
 export type AuditLogEntry = typeof auditLog.$inferSelect;
 export type ProfessionalSystem = typeof professionalSystems.$inferSelect;
 export type WebsiteLink = typeof websiteLinks.$inferSelect;
