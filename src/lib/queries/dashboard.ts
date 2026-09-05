@@ -1,5 +1,13 @@
 import { getDb } from "@/lib/db";
-import { clients, cases, invoices, documents } from "@/lib/db/schema";
+import {
+  clients,
+  cases,
+  invoices,
+  documents,
+  referrals,
+  conversationMessages,
+  strategicAlliances,
+} from "@/lib/db/schema";
 import { listUpcomingAppointments } from "./appointments";
 import { listOpenTasks } from "./tasks";
 
@@ -18,15 +26,27 @@ function weekKey(d: Date) {
 export async function getDashboardData() {
   const db = getDb();
 
-  const [allClients, allCases, allInvoices, allDocuments, upcoming, openTasks] =
-    await Promise.all([
-      db.select().from(clients),
-      db.select().from(cases),
-      db.select().from(invoices),
-      db.select().from(documents),
-      listUpcomingAppointments(5),
-      listOpenTasks(),
-    ]);
+  const [
+    allClients,
+    allCases,
+    allInvoices,
+    allDocuments,
+    upcoming,
+    openTasks,
+    allReferrals,
+    allCommunications,
+    allAlliances,
+  ] = await Promise.all([
+    db.select().from(clients),
+    db.select().from(cases),
+    db.select().from(invoices),
+    db.select().from(documents),
+    listUpcomingAppointments(5),
+    listOpenTasks(),
+    db.select().from(referrals),
+    db.select().from(conversationMessages),
+    db.select().from(strategicAlliances),
+  ]);
 
   const now = new Date();
   const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -208,6 +228,33 @@ export async function getDashboardData() {
     .filter((task) => task.type === "follow_up" || task.type === "inactivity_alert")
     .slice(0, 8);
 
+  // Phase 4, Session 8 — lightweight summaries for the new Referrals,
+  // Communications, Academy, and Community dashboard sections (spec #17).
+  // Full dashboards for each already exist at their own pages; these are
+  // just enough to justify a section header in the right spot, with a
+  // "view all" link to the real thing.
+  const openReferrals = allReferrals.filter((r) =>
+    ["submitted", "in_progress"].includes(r.status),
+  );
+  const commissionDueTotal = allReferrals
+    .filter((r) => !r.commissionPaidDate)
+    .reduce((sum, r) => sum + Number(r.commissionDue ?? 0), 0);
+
+  const pendingFollowUpComms = allCommunications.filter(
+    (c) => c.status === "pending_follow_up",
+  ).length;
+  const newComms = allCommunications.filter((c) => c.status === "new").length;
+
+  const activeAcademyCases = allCases.filter(
+    (c) =>
+      c.serviceType === "academy" &&
+      !["completed", "cancelled"].includes(c.status),
+  ).length;
+
+  const activeAlliances = allAlliances.filter(
+    (a) => a.status === "active_partner",
+  ).length;
+
   return {
     kpis: {
       activeClients,
@@ -228,5 +275,19 @@ export async function getDashboardData() {
       stalledCases,
     },
     followUpTasks,
+    referralsSummary: {
+      openCount: openReferrals.length,
+      commissionDueTotal,
+    },
+    communicationsSummary: {
+      pendingFollowUp: pendingFollowUpComms,
+      unread: newComms,
+    },
+    academySummary: {
+      activeCount: activeAcademyCases,
+    },
+    communitySummary: {
+      activeAlliances,
+    },
   };
 }

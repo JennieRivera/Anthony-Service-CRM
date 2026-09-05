@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Plug, ShieldCheck } from "lucide-react";
+import { Plug, ShieldCheck, LayoutGrid, Globe } from "lucide-react";
 
 export default async function SettingsPage() {
   const t = await getTranslations("Settings");
@@ -109,6 +109,30 @@ export default async function SettingsPage() {
             >
               <Plug className="h-4 w-4" />
               {t("manageIntegrations")}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("professionalSystemsCard")}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <p className="text-sm text-muted-foreground">
+            {t("professionalSystemsCardDescription")}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              render={<Link href="/settings/professional-systems" />}
+            >
+              <LayoutGrid className="h-4 w-4" />
+              {t("manageProfessionalSystems")}
+            </Button>
+            <Button variant="outline" render={<Link href="/settings/websites" />}>
+              <Globe className="h-4 w-4" />
+              {t("manageWebsites")}
             </Button>
           </div>
         </CardContent>

@@ -509,6 +509,74 @@ export const auditLog = pgTable("audit_log", {
   summary: text("summary").notNull(),
 });
 
+// Phase 4, Session 8 — "My Professional Systems" (spec #14/#15). category
+// and icon are free text (not enums) since Admin can add new cards with
+// categories not anticipated here. url is nullable — the business's own
+// account URL for Tax/Bookkeeping/Consulting Software and HighLevel/
+// Academy isn't specified anywhere in the plan, so those seed rows start
+// blank for Admin to fill in rather than guessing one.
+export const professionalSystemConnectionStatusEnum = pgEnum(
+  "professional_system_connection_status",
+  ["link_only", "api_available", "webhook_available", "connected", "not_connected", "error"],
+);
+
+export const professionalSystemIntegrationTypeEnum = pgEnum(
+  "professional_system_integration_type",
+  ["external_link", "api", "webhook", "oauth", "manual", "unknown"],
+);
+
+export const professionalSystems = pgTable("professional_systems", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  name: text("name").notNull().unique(),
+  category: text("category").notNull(),
+  url: text("url"),
+  icon: text("icon"),
+  description: text("description"),
+  connectionStatus: professionalSystemConnectionStatusEnum("connection_status")
+    .notNull()
+    .default("not_connected"),
+  integrationType: professionalSystemIntegrationTypeEnum("integration_type")
+    .notNull()
+    .default("unknown"),
+  lastSyncAt: timestamp("last_sync_at", { withTimezone: true }),
+  notes: text("notes"),
+  active: boolean("active").notNull().default(true),
+  openInNewTab: boolean("open_in_new_tab").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
+// Phase 4, Session 8 — "My Websites" (spec #16). status is a manually-set
+// field (Admin marks it), not a live uptime check — building a real
+// health-check crawler is out of scope for "prepare the dashboard".
+export const websiteLinkStatusEnum = pgEnum("website_link_status", [
+  "active",
+  "inactive",
+  "unknown",
+]);
+
+export const websiteLinks = pgTable("website_links", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  name: text("name").notNull().unique(),
+  url: text("url").notNull(),
+  status: websiteLinkStatusEnum("status").notNull().default("unknown"),
+  lastCheckedAt: timestamp("last_checked_at", { withTimezone: true }),
+  notes: text("notes"),
+  active: boolean("active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
 export const cases = pgTable("cases", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1376,6 +1444,8 @@ export type ClientHighlevelSync = typeof clientHighlevelSync.$inferSelect;
 export type IntegrationSettingsRow = typeof integrationSettings.$inferSelect;
 export type MessageTemplate = typeof messageTemplates.$inferSelect;
 export type AuditLogEntry = typeof auditLog.$inferSelect;
+export type ProfessionalSystem = typeof professionalSystems.$inferSelect;
+export type WebsiteLink = typeof websiteLinks.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type CaseStatusHistory = typeof caseStatusHistory.$inferSelect;
