@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { integrationSettings } from "@/lib/db/schema";
 import { getIntegrationDefinition } from "@/lib/integrations";
+import { logAuditEvent } from "@/lib/audit";
 
 async function ensureRow(integrationKey: string) {
   await getDb()
@@ -60,6 +61,13 @@ export async function testIntegrationConnectionAction(integrationKey: string) {
       .where(eq(integrationSettings.integrationKey, integrationKey));
   }
 
+  await logAuditEvent({
+    action: "integration.tested",
+    entityType: "integration_settings",
+    entityId: integrationKey,
+    summary: `Tested connection for ${integrationKey} (configured: ${configured ?? "n/a"})`,
+  });
+
   revalidatePath("/settings/integrations");
 }
 
@@ -75,6 +83,13 @@ export async function disconnectIntegrationAction(integrationKey: string) {
     })
     .where(eq(integrationSettings.integrationKey, integrationKey));
 
+  await logAuditEvent({
+    action: "integration.disconnected",
+    entityType: "integration_settings",
+    entityId: integrationKey,
+    summary: `Disconnected ${integrationKey}`,
+  });
+
   revalidatePath("/settings/integrations");
 }
 
@@ -87,6 +102,13 @@ export async function updateIntegrationNotesAction(
     .update(integrationSettings)
     .set({ notes: notes || null, updatedAt: new Date() })
     .where(eq(integrationSettings.integrationKey, integrationKey));
+
+  await logAuditEvent({
+    action: "integration.notes_updated",
+    entityType: "integration_settings",
+    entityId: integrationKey,
+    summary: `Updated notes for ${integrationKey}`,
+  });
 
   revalidatePath("/settings/integrations");
 }

@@ -7,6 +7,7 @@ import {
   highlevelSyncFormSchema,
   type HighlevelSyncFormValues,
 } from "@/lib/validation/highlevel";
+import { logAuditEvent } from "@/lib/audit";
 
 export async function upsertClientHighlevelSyncAction(
   clientId: string,
@@ -32,6 +33,13 @@ export async function upsertClientHighlevelSyncAction(
       target: clientHighlevelSync.clientId,
       set: detail,
     });
+
+  await logAuditEvent({
+    action: "integration.updated",
+    entityType: "client_highlevel_sync",
+    entityId: clientId,
+    summary: `HighLevel sync updated for client (status: ${detail.syncStatus})`,
+  });
 
   revalidatePath(`/clients/${clientId}`);
 }

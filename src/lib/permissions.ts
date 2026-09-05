@@ -58,3 +58,43 @@ export function canAccessArea(role: Role, area: AccessArea): boolean {
   const allowed = ROLE_PERMISSIONS[role];
   return allowed === "*" || allowed.includes(area);
 }
+
+// Phase 4, Session 7 — "Communication Security" role rules (spec #13),
+// layered on the same unenforced design as the rest of this file (still no
+// multi-staff login, so nothing here runs against a real request yet).
+//
+//   Admin              — full access                         → "*" above
+//   Manager            — all business communications          → "*" above
+//   Staff (tax/bookkeeping/notary/consulting)
+//                      — only their service area's cases,
+//                        and only ones assigned to them once
+//                        assignedUserId is populated (today every
+//                        communication is effectively unassigned,
+//                        so the finer "assigned to them" clause is
+//                        aspirational until multi-user login ships)
+//   Referral Manager   — referral-linked communications only   → ["referrals"]
+//   Academy Staff      — academy-linked communications only    → ["academy"]
+//   Community Manager  — community/alliance communications     → ["alliances"]
+//
+// A communication with no case/referral link at all (e.g. a general
+// inbound inquiry) has no area and is treated as admin/manager-only below,
+// consistent with how the 4 role-less service categories are handled.
+export function getCommunicationAccessArea(communication: {
+  caseServiceType?: AccessArea | null;
+  referralId?: string | null;
+}): AccessArea | null {
+  if (communication.caseServiceType) return communication.caseServiceType;
+  if (communication.referralId) return "referrals";
+  return null;
+}
+
+export function canAccessCommunication(
+  role: Role,
+  communication: { caseServiceType?: AccessArea | null; referralId?: string | null },
+): boolean {
+  const allowed = ROLE_PERMISSIONS[role];
+  if (allowed === "*") return true;
+
+  const area = getCommunicationAccessArea(communication);
+  return area !== null && allowed.includes(area);
+}

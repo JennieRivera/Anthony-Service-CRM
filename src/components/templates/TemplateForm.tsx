@@ -23,6 +23,7 @@ import {
   type MessageTemplateFormValues,
 } from "@/lib/validation/messageTemplate";
 import { communicationChannelValues } from "@/lib/validation/communication";
+import { containsLikelySsnOrItin } from "@/lib/sensitiveDataCheck";
 import type { MessageTemplate } from "@/lib/db/schema";
 
 export function TemplateForm({
@@ -58,6 +59,8 @@ export function TemplateForm({
   });
 
   const channel = watch("channel");
+  const messageBodyValue = watch("messageBody");
+  const showSensitiveDataWarning = containsLikelySsnOrItin(messageBodyValue ?? "");
 
   async function submit(values: MessageTemplateFormValues) {
     setSubmitting(true);
@@ -159,6 +162,11 @@ export function TemplateForm({
         {errors.messageBody && (
           <p className="text-sm text-destructive">
             {errors.messageBody.message}
+          </p>
+        )}
+        {showSensitiveDataWarning && (
+          <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+            {t("sensitiveDataWarning")}
           </p>
         )}
       </div>

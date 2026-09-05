@@ -492,6 +492,23 @@ export const messageTemplates = pgTable("message_templates", {
   createdByEmail: text("created_by_email"),
 });
 
+// Phase 4, Session 7 — communication security audit trail (spec #13):
+// message creation, template changes, consent changes, channel status
+// changes, and integration changes all write one row here via
+// src/lib/audit.ts's logAuditEvent(). Append-only, no update/delete UI,
+// same non-tamperable spirit as case_status_history.
+export const auditLog = pgTable("audit_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  actorEmail: text("actor_email"),
+  action: text("action").notNull(),
+  entityType: text("entity_type").notNull(),
+  entityId: text("entity_id"),
+  summary: text("summary").notNull(),
+});
+
 export const cases = pgTable("cases", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1358,6 +1375,7 @@ export type WebsiteChatSession = typeof websiteChatSessions.$inferSelect;
 export type ClientHighlevelSync = typeof clientHighlevelSync.$inferSelect;
 export type IntegrationSettingsRow = typeof integrationSettings.$inferSelect;
 export type MessageTemplate = typeof messageTemplates.$inferSelect;
+export type AuditLogEntry = typeof auditLog.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type CaseStatusHistory = typeof caseStatusHistory.$inferSelect;

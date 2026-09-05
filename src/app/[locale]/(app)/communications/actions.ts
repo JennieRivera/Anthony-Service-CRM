@@ -15,6 +15,7 @@ import {
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
+import { logAuditEvent } from "@/lib/audit";
 
 function normalize(values: CommunicationFormValues) {
   return {
@@ -129,6 +130,12 @@ export async function createCommunicationAction(
     .returning({ id: conversationMessages.id });
 
   await ensureFollowUpTask(created.id, null, normalized);
+  await logAuditEvent({
+    action: "communication.created",
+    entityType: "communication",
+    entityId: created.id,
+    summary: `Logged ${values.channel}/${values.direction} communication for client ${values.clientId}`,
+  });
 
   revalidatePath("/communications");
   revalidatePath(`/clients/${values.clientId}`);
@@ -157,6 +164,12 @@ export async function updateCommunicationAction(
     .where(eq(conversationMessages.id, id));
 
   await ensureFollowUpTask(id, existing?.taskId ?? null, normalized);
+  await logAuditEvent({
+    action: "communication.updated",
+    entityType: "communication",
+    entityId: id,
+    summary: `Updated communication (status: ${values.status})`,
+  });
 
   revalidatePath("/communications");
   revalidatePath(`/communications/${id}`);

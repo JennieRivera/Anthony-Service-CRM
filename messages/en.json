@@ -64,7 +64,10 @@
     "staffAccountsComingSoon": "This CRM currently supports a single admin account. Multi-staff logins with role-based permissions (Admin / Staff) are planned for a future update.",
     "integrations": "Integrations",
     "integrationsDescription": "See the connection status of every external system prepared for this CRM, and test or disconnect them. No API keys are ever shown here — secrets live only in server environment variables.",
-    "manageIntegrations": "Manage Integrations"
+    "manageIntegrations": "Manage Integrations",
+    "security": "Security",
+    "securityDescription": "Review the audit trail of message creation, template changes, consent changes, channel status changes, and integration changes.",
+    "viewAuditLog": "View Audit Log"
   },
   "Nav": {
     "dashboard": "Dashboard",
@@ -561,6 +564,16 @@
     "highlevel_to_crm": "HighLevel to CRM",
     "two_way": "Two-Way"
   },
+  "AuditLog": {
+    "title": "Audit Log",
+    "description": "An append-only record of message creation, template changes, consent changes, channel status changes, and integration changes across the CRM.",
+    "backToSettings": "Back to Settings",
+    "empty": "No audit events yet.",
+    "columnDate": "Date",
+    "columnActor": "Actor",
+    "columnAction": "Action",
+    "columnSummary": "Summary"
+  },
   "Integrations": {
     "title": "Integrations",
     "description": "Every integration named in the Phase 4 plan, prepared but not yet activated. Test Connection checks only whether the server has the relevant environment variable set — it never reads or displays the value.",
@@ -593,7 +606,9 @@
     "notesPlaceholder": "Internal notes about this integration...",
     "notesSaved": "Saved.",
     "testConnection": "Test Connection",
-    "disconnect": "Disconnect"
+    "disconnect": "Disconnect",
+    "warningError": "This integration reported an error on its last check. Review before relying on it.",
+    "warningMissingAccount": "This integration is marked connected/ready but no Connected Account is recorded — document who or what authorized it."
   },
   "HighLevelSync": {
     "title": "HighLevel Sync",
@@ -667,6 +682,7 @@
       "subject": "Subject",
       "messageBody": "Message Body",
       "active": "Active",
+      "sensitiveDataWarning": "This looks like it may contain a Social Security or ITIN number. Templates are reused across clients — please remove it before saving.",
       "save": "Save Template",
       "saving": "Saving...",
       "cancel": "Cancel"
@@ -717,6 +733,7 @@
       "fullMessagePlaceholder": "Full message text or internal note (optional)",
       "followUpRequired": "Follow-Up Required",
       "followUpDate": "Follow-Up Date",
+      "sensitiveDataWarning": "This looks like it may contain a Social Security or ITIN number. Communication records are not the place for that — please remove it before saving.",
       "save": "Save Communication",
       "saving": "Saving...",
       "cancel": "Cancel"

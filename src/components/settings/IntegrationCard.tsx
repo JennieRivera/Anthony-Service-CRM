@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +25,23 @@ const statusClasses: Record<string, string> = {
 
 type Integration = Awaited<ReturnType<typeof listIntegrationSettings>>[number];
 
+// Phase 4, Session 7 — "security warnings if an integration is configured
+// without recommended protections" (spec #19). The recommended protection
+// checked here is accountability: a live/ready connection with no
+// Connected Account recorded means nobody has documented who or what
+// authorized it, which is a real audit-trail gap even before any API key
+// exists. An error status is always worth flagging too.
+function getSecurityWarning(integration: Integration): string | null {
+  if (integration.status === "error") return "error";
+  if (
+    ["connected", "ready", "syncing"].includes(integration.status) &&
+    !integration.connectedAccount
+  ) {
+    return "missingAccount";
+  }
+  return null;
+}
+
 export function IntegrationCard({ integration }: { integration: Integration }) {
   const t = useTranslations("Integrations");
   const tStatus = useTranslations("IntegrationSyncStatus");
@@ -31,6 +49,7 @@ export function IntegrationCard({ integration }: { integration: Integration }) {
   const [notes, setNotes] = useState(integration.notes ?? "");
   const [isPending, startTransition] = useTransition();
   const [savedNotes, setSavedNotes] = useState(false);
+  const warning = getSecurityWarning(integration);
 
   function testConnection() {
     startTransition(async () => {
@@ -62,6 +81,15 @@ export function IntegrationCard({ integration }: { integration: Integration }) {
           {tStatus(integration.status)}
         </Badge>
       </div>
+
+      {warning && (
+        <div className="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>
+            {warning === "error" ? t("warningError") : t("warningMissingAccount")}
+          </span>
+        </div>
+      )}
 
       <div className="grid gap-2 text-sm sm:grid-cols-2">
         <div>

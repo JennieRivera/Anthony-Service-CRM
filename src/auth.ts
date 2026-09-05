@@ -4,7 +4,12 @@ import Google from "next-auth/providers/google";
 const allowedEmail = process.env.ADMIN_EMAIL?.toLowerCase();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt" },
+  // Phase 4, Session 7 — "session timeout readiness" (spec #19). Explicit
+  // 12-hour idle-independent expiry instead of Auth.js's 30-day default,
+  // given this CRM handles immigration/tax/financial records. Sessions
+  // still refresh on activity within that window (Auth.js's default
+  // behavior), so an actively-working admin isn't logged out mid-task.
+  session: { strategy: "jwt", maxAge: 12 * 60 * 60 },
   pages: { signIn: "/login" },
   providers: [Google],
   callbacks: {

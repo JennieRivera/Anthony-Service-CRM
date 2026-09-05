@@ -64,7 +64,10 @@
     "staffAccountsComingSoon": "Este CRM actualmente admite una sola cuenta de administrador. Los inicios de sesión de personal múltiple con permisos basados en roles (Admin / Personal) están planeados para una futura actualización.",
     "integrations": "Integraciones",
     "integrationsDescription": "Consulta el estado de conexión de cada sistema externo preparado para este CRM, y pruébalos o desconéctalos. Las llaves de API nunca se muestran aquí — los secretos viven solo en variables de entorno del servidor.",
-    "manageIntegrations": "Administrar Integraciones"
+    "manageIntegrations": "Administrar Integraciones",
+    "security": "Seguridad",
+    "securityDescription": "Revisa el rastro de auditoría de creación de mensajes, cambios de plantillas, cambios de consentimiento, cambios de estado de canal y cambios de integraciones.",
+    "viewAuditLog": "Ver Log de Auditoría"
   },
   "Nav": {
     "dashboard": "Panel",
@@ -561,6 +564,16 @@
     "highlevel_to_crm": "HighLevel a CRM",
     "two_way": "Bidireccional"
   },
+  "AuditLog": {
+    "title": "Log de Auditoría",
+    "description": "Un registro de solo-adición de creación de mensajes, cambios de plantillas, cambios de consentimiento, cambios de estado de canal y cambios de integraciones en todo el CRM.",
+    "backToSettings": "Volver a Configuración",
+    "empty": "Aún no hay eventos de auditoría.",
+    "columnDate": "Fecha",
+    "columnActor": "Actor",
+    "columnAction": "Acción",
+    "columnSummary": "Resumen"
+  },
   "Integrations": {
     "title": "Integraciones",
     "description": "Cada integración nombrada en el plan de Fase 4, preparada pero aún no activada. Probar Conexión solo verifica si el servidor tiene configurada la variable de entorno correspondiente — nunca lee ni muestra su valor.",
@@ -593,7 +606,9 @@
     "notesPlaceholder": "Notas internas sobre esta integración...",
     "notesSaved": "Guardado.",
     "testConnection": "Probar Conexión",
-    "disconnect": "Desconectar"
+    "disconnect": "Desconectar",
+    "warningError": "Esta integración reportó un error en su última verificación. Revísala antes de confiar en ella.",
+    "warningMissingAccount": "Esta integración está marcada como conectada/lista pero no tiene una Cuenta Conectada registrada — documenta quién o qué la autorizó."
   },
   "HighLevelSync": {
     "title": "Sincronización HighLevel",
@@ -667,6 +682,7 @@
       "subject": "Asunto",
       "messageBody": "Cuerpo del Mensaje",
       "active": "Activa",
+      "sensitiveDataWarning": "Esto parece contener un número de Seguro Social o ITIN. Las plantillas se reutilizan entre clientes — elimínalo antes de guardar.",
       "save": "Guardar Plantilla",
       "saving": "Guardando...",
       "cancel": "Cancelar"
@@ -717,6 +733,7 @@
       "fullMessagePlaceholder": "Texto completo del mensaje o nota interna (opcional)",
       "followUpRequired": "Requiere Seguimiento",
       "followUpDate": "Fecha de Seguimiento",
+      "sensitiveDataWarning": "Esto parece contener un número de Seguro Social o ITIN. Los registros de comunicación no son el lugar para eso — elimínalo antes de guardar.",
       "save": "Guardar Comunicación",
       "saving": "Guardando...",
       "cancel": "Cancelar"

@@ -24,6 +24,7 @@ import {
   communicationStatusValues,
   type CommunicationFormValues,
 } from "@/lib/validation/communication";
+import { containsLikelySsnOrItin } from "@/lib/sensitiveDataCheck";
 import type { ConversationMessage, MessageTemplate } from "@/lib/db/schema";
 
 function nowForInput() {
@@ -98,6 +99,11 @@ export function CommunicationForm({
 
   const channel = watch("channel");
   const followUpRequired = watch("followUpRequired");
+  const summaryValue = watch("summary");
+  const fullMessageValue = watch("fullMessage");
+  const showSensitiveDataWarning =
+    containsLikelySsnOrItin(summaryValue ?? "") ||
+    containsLikelySsnOrItin(fullMessageValue ?? "");
 
   async function submit(values: CommunicationFormValues) {
     setSubmitting(true);
@@ -368,6 +374,12 @@ export function CommunicationForm({
           </div>
         )}
       </div>
+
+      {showSensitiveDataWarning && (
+        <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          {t("sensitiveDataWarning")}
+        </p>
+      )}
 
       {error && (
         <p className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
