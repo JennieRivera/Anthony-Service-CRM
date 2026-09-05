@@ -280,6 +280,107 @@ export const clientCommunicationPreferences = pgTable(
   },
 );
 
+// Phase 4, Session 4 — Facebook Messenger and Instagram share the same
+// Meta-platform lifecycle ("prepare for future Meta / HighLevel connection"
+// in the spec for both), so one enum covers both rather than two identical
+// ones.
+export const metaChannelStatusEnum = pgEnum("meta_channel_status", [
+  "not_connected",
+  "connected",
+  "consent_pending",
+  "active",
+  "opted_out",
+]);
+
+export const websiteSourceEnum = pgEnum("website_source", [
+  "anthonyservice_com",
+  "anthonyfinancial360_com",
+  "anthonymultiservice_net",
+  "anthonymultiserviceacademy_ai",
+  "other",
+]);
+
+// Phase 4, Session 4 — a thread, not a message: clientId/caseId are
+// nullable because a Facebook/Instagram conversation often arrives before
+// anyone has matched it to a client record. Individual message content
+// still belongs in conversation_messages (channel: facebook_messenger) via
+// the Communications module — this table tracks the thread's own state.
+export const facebookMessengerThreads = pgTable("facebook_messenger_threads", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  facebookProfile: text("facebook_profile"),
+  status: metaChannelStatusEnum("status").notNull().default("not_connected"),
+  lastMessageAt: timestamp("last_message_at", { withTimezone: true }),
+  // Reserved for the future staff/role system — same unpopulated pattern as
+  // cases.assignedUserId; no picker UI yet.
+  assignedUserId: uuid("assigned_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  followUpDate: date("follow_up_date"),
+});
+
+export const instagramDmThreads = pgTable("instagram_dm_threads", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  instagramUsername: text("instagram_username"),
+  status: metaChannelStatusEnum("status").notNull().default("not_connected"),
+  lastMessageAt: timestamp("last_message_at", { withTimezone: true }),
+  assignedUserId: uuid("assigned_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  followUpDate: date("follow_up_date"),
+});
+
+// Phase 4, Session 4 — a website chat visitor is frequently not a client
+// yet at all (anonymous site visitor), so this is a plain event log with
+// an optional clientId rather than a client-keyed extension table.
+export const websiteChatSessions = pgTable("website_chat_sessions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  websiteSource: websiteSourceEnum("website_source").notNull(),
+  visitorName: text("visitor_name"),
+  visitorEmail: text("visitor_email"),
+  visitorPhone: text("visitor_phone"),
+  language: text("language", { enum: ["en", "es"] }),
+  serviceInterest: serviceTypeEnum("service_interest"),
+  message: text("message").notNull(),
+  // Reuses conversation_status rather than a redundant parallel enum with
+  // identical New/Read/Replied/Pending Follow-Up/Completed/Archived values.
+  conversationStatus: conversationStatusEnum("conversation_status")
+    .notNull()
+    .default("new"),
+  assignedUserId: uuid("assigned_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  followUpDate: date("follow_up_date"),
+});
+
 export const cases = pgTable("cases", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1139,6 +1240,10 @@ export type ApostilleDetails = typeof apostilleDetails.$inferSelect;
 export type ConversationMessage = typeof conversationMessages.$inferSelect;
 export type ClientCommunicationPreferences =
   typeof clientCommunicationPreferences.$inferSelect;
+export type FacebookMessengerThread =
+  typeof facebookMessengerThreads.$inferSelect;
+export type InstagramDmThread = typeof instagramDmThreads.$inferSelect;
+export type WebsiteChatSession = typeof websiteChatSessions.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type CaseStatusHistory = typeof caseStatusHistory.$inferSelect;

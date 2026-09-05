@@ -459,6 +459,77 @@
     "saving": "Saving...",
     "saved": "Saved."
   },
+  "MetaChannelStatus": {
+    "not_connected": "Not Connected",
+    "connected": "Connected",
+    "consent_pending": "Consent Pending",
+    "active": "Active",
+    "opted_out": "Opted Out"
+  },
+  "WebsiteSource": {
+    "anthonyservice_com": "anthonyservice.com",
+    "anthonyfinancial360_com": "anthonyfinancial360.com",
+    "anthonymultiservice_net": "anthonymultiservice.net",
+    "anthonymultiserviceacademy_ai": "anthonymultiserviceacademy.ai",
+    "other": "Other"
+  },
+  "SocialChannels": {
+    "tabLog": "Log",
+    "tabFacebook": "Facebook Messenger",
+    "tabInstagram": "Instagram",
+    "tabWebsiteChat": "Website Chat",
+    "facebook": {
+      "add": "Add Facebook Thread",
+      "description": "Track Facebook Messenger conversations ahead of a future Meta/HighLevel connection. No tokens are active — nothing here sends or receives real Messenger messages yet.",
+      "empty": "No Facebook Messenger threads yet.",
+      "profile": "Facebook Profile / Page",
+      "profilePlaceholder": "Profile name or page URL",
+      "client": "Related Client",
+      "noClient": "Not linked yet",
+      "service": "Related Service",
+      "noService": "None",
+      "status": "Messenger Status",
+      "followUpDate": "Follow-Up Date",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "instagram": {
+      "add": "Add Instagram Thread",
+      "description": "Track Instagram Direct Message conversations ahead of a future Meta/HighLevel connection. No tokens are active — nothing here sends or receives real DMs yet.",
+      "empty": "No Instagram DM threads yet.",
+      "username": "Instagram Username",
+      "usernamePlaceholder": "@username",
+      "client": "Related Client",
+      "noClient": "Not linked yet",
+      "service": "Related Service",
+      "noService": "None",
+      "status": "Instagram Status",
+      "followUpDate": "Follow-Up Date",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "websiteChat": {
+      "add": "Add Website Chat Entry",
+      "description": "Prepared source for a future chatbot/live-chat integration on your websites. No public frontend is built yet — entries are logged manually for now.",
+      "empty": "No website chat entries yet.",
+      "source": "Website Source",
+      "client": "Related Client",
+      "noClient": "Not linked yet",
+      "visitor": "Visitor",
+      "visitorName": "Visitor Name",
+      "visitorEmail": "Visitor Email",
+      "visitorPhone": "Visitor Phone",
+      "language": "Language",
+      "unknown": "Unknown",
+      "serviceInterest": "Service Interest",
+      "noServiceInterest": "None",
+      "message": "Message",
+      "status": "Conversation Status",
+      "followUpDate": "Follow-Up Date",
+      "save": "Save",
+      "saving": "Saving..."
+    }
+  },
   "Communications": {
     "title": "Communications",
     "newCommunication": "New Communication",

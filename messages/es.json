@@ -459,6 +459,77 @@
     "saving": "Guardando...",
     "saved": "Guardado."
   },
+  "MetaChannelStatus": {
+    "not_connected": "No Conectado",
+    "connected": "Conectado",
+    "consent_pending": "Consentimiento Pendiente",
+    "active": "Activo",
+    "opted_out": "Dado de Baja"
+  },
+  "WebsiteSource": {
+    "anthonyservice_com": "anthonyservice.com",
+    "anthonyfinancial360_com": "anthonyfinancial360.com",
+    "anthonymultiservice_net": "anthonymultiservice.net",
+    "anthonymultiserviceacademy_ai": "anthonymultiserviceacademy.ai",
+    "other": "Otro"
+  },
+  "SocialChannels": {
+    "tabLog": "Registro",
+    "tabFacebook": "Facebook Messenger",
+    "tabInstagram": "Instagram",
+    "tabWebsiteChat": "Chat del Sitio Web",
+    "facebook": {
+      "add": "Agregar Conversación de Facebook",
+      "description": "Da seguimiento a conversaciones de Facebook Messenger antes de una futura conexión con Meta/HighLevel. No hay tokens activos — nada aquí envía o recibe mensajes reales de Messenger todavía.",
+      "empty": "Aún no hay conversaciones de Facebook Messenger.",
+      "profile": "Perfil / Página de Facebook",
+      "profilePlaceholder": "Nombre del perfil o URL de la página",
+      "client": "Cliente Relacionado",
+      "noClient": "Aún no vinculado",
+      "service": "Servicio Relacionado",
+      "noService": "Ninguno",
+      "status": "Estado de Messenger",
+      "followUpDate": "Fecha de Seguimiento",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    },
+    "instagram": {
+      "add": "Agregar Conversación de Instagram",
+      "description": "Da seguimiento a mensajes directos de Instagram antes de una futura conexión con Meta/HighLevel. No hay tokens activos — nada aquí envía o recibe DMs reales todavía.",
+      "empty": "Aún no hay conversaciones de Instagram.",
+      "username": "Usuario de Instagram",
+      "usernamePlaceholder": "@usuario",
+      "client": "Cliente Relacionado",
+      "noClient": "Aún no vinculado",
+      "service": "Servicio Relacionado",
+      "noService": "Ninguno",
+      "status": "Estado de Instagram",
+      "followUpDate": "Fecha de Seguimiento",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    },
+    "websiteChat": {
+      "add": "Agregar Entrada de Chat",
+      "description": "Fuente preparada para una futura integración de chatbot/chat en vivo en tus sitios web. Aún no se ha construido el frontend público — las entradas se registran manualmente por ahora.",
+      "empty": "Aún no hay entradas de chat del sitio web.",
+      "source": "Sitio Web de Origen",
+      "client": "Cliente Relacionado",
+      "noClient": "Aún no vinculado",
+      "visitor": "Visitante",
+      "visitorName": "Nombre del Visitante",
+      "visitorEmail": "Correo del Visitante",
+      "visitorPhone": "Teléfono del Visitante",
+      "language": "Idioma",
+      "unknown": "Desconocido",
+      "serviceInterest": "Servicio de Interés",
+      "noServiceInterest": "Ninguno",
+      "message": "Mensaje",
+      "status": "Estado de la Conversación",
+      "followUpDate": "Fecha de Seguimiento",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    }
+  },
   "Communications": {
     "title": "Comunicaciones",
     "newCommunication": "Nueva Comunicación",
