@@ -1,4 +1,6 @@
-// Phase 2, Session 7 — RBAC design reference.
+// Phase 2, Session 7 — RBAC design reference. Extended in Phase 5,
+// Session 8 to add the Immigration Staff role and cover every module
+// added across Phase 5 (spec section 17).
 //
 // This map is NOT enforced anywhere yet. Sign-in is still restricted to
 // the single ADMIN_EMAIL (src/auth.ts) by explicit decision when this was
@@ -6,10 +8,13 @@
 // would need to ship first. `users.role` exists in the schema (reserved,
 // unpopulated) for when that happens.
 //
-// Categories with no dedicated role in the 9-role list (Credit Services,
-// Business Formation, Marketing/Automation, Immigration, and the legacy
-// Document Prep/apostille category) are restricted to admin/manager only,
-// per an explicit decision — not silently guessed.
+// Categories with no dedicated role (Credit Services, Business Formation,
+// Marketing/Automation, and the legacy Document Prep/apostille category)
+// are restricted to admin/manager only, per an explicit decision — not
+// silently guessed. Company Master Registry access is granted per spec
+// section 17's own wording ("Bookkeeping Staff: ... company financial
+// profile", "Consulting Staff: business and company strategy") rather
+// than opened to every role.
 
 export const roleValues = [
   "admin",
@@ -21,12 +26,15 @@ export const roleValues = [
   "academy_staff",
   "referral_manager",
   "community_manager",
+  "immigration_staff",
 ] as const;
 
 export type Role = (typeof roleValues)[number];
 
-// Matches cases.serviceType values, plus the two standalone modules
-// (referrals, alliances) that aren't cases at all.
+// Matches cases.serviceType values, plus the standalone modules
+// (referrals, alliances, companies, associations) and reference
+// directories (irs_resources, immigration_forms) that aren't cases at
+// all.
 export type AccessArea =
   | "notary"
   | "online_notary"
@@ -40,18 +48,33 @@ export type AccessArea =
   | "marketing"
   | "document_prep"
   | "referrals"
-  | "alliances";
+  | "alliances"
+  // Phase 5 additions (Sessions 1-8)
+  | "companies"
+  | "sales_tax"
+  | "irs_administrative"
+  | "irs_resources"
+  | "immigration_forms"
+  | "associations";
 
 export const ROLE_PERMISSIONS: Record<Role, AccessArea[] | "*"> = {
   admin: "*",
   manager: "*",
-  tax_staff: ["tax_prep"],
-  bookkeeping_staff: ["bookkeeping"],
+  // "Tax Staff: tax, EIN, sales tax" (spec section 17)
+  tax_staff: ["tax_prep", "sales_tax", "irs_administrative", "irs_resources"],
+  // "Bookkeeping Staff: bookkeeping and company financial profile"
+  bookkeeping_staff: ["bookkeeping", "companies"],
   notary_staff: ["notary", "online_notary"],
-  consulting_staff: ["leadership"],
+  // "Consulting Staff: business and company strategy"
+  consulting_staff: ["leadership", "companies"],
   academy_staff: ["academy"],
   referral_manager: ["referrals"],
-  community_manager: ["alliances"],
+  // "Community Manager: associations and chambers"
+  community_manager: ["alliances", "associations"],
+  // "Immigration Staff: immigration administrative cases only" — cases,
+  // the Immigration Forms Library, and per-case document folders (which
+  // live on the immigration case's own documents, so no separate area).
+  immigration_staff: ["immigration", "immigration_forms"],
 };
 
 export function canAccessArea(role: Role, area: AccessArea): boolean {

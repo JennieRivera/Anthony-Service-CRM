@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AssociationStatusBadge } from "@/components/associations/AssociationStatusBadge";
+import { AssociationActiveToggle } from "@/components/associations/AssociationActiveToggle";
 
 export default async function AssociationDetailPage({
   params,
@@ -28,10 +29,13 @@ export default async function AssociationDetailPage({
         >
           &larr; {t("backToAssociations")}
         </Link>
-        <Button render={<Link href={`/associations/${id}/edit`} />}>
-          <Pencil className="h-4 w-4" />
-          {t("editOrganization")}
-        </Button>
+        <div className="flex gap-2">
+          <AssociationActiveToggle id={id} active={org.active} />
+          <Button render={<Link href={`/associations/${id}/edit`} />}>
+            <Pencil className="h-4 w-4" />
+            {t("editOrganization")}
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
@@ -42,6 +46,11 @@ export default async function AssociationDetailPage({
             </h1>
             {org.latinoFocus && (
               <Badge variant="outline">{t("latinoFocusBadge")}</Badge>
+            )}
+            {!org.active && (
+              <Badge variant="outline" className="text-muted-foreground">
+                {t("inactiveBadge")}
+              </Badge>
             )}
           </div>
           <AssociationStatusBadge status={org.amsRelationshipStatus} />
@@ -114,6 +123,18 @@ export default async function AssociationDetailPage({
                 ? new Date(org.nextFollowUp).toLocaleDateString()
                 : "—"}
             </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.lastVerifiedDate")}</p>
+            <p className="text-foreground">
+              {org.lastVerifiedDate
+                ? new Date(org.lastVerifiedDate).toLocaleDateString()
+                : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.verifiedBy")}</p>
+            <p className="text-foreground">{org.verifiedBy ?? "—"}</p>
           </div>
         </div>
         {org.partnershipOpportunity && (

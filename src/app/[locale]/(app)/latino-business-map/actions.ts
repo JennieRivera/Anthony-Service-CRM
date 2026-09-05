@@ -38,6 +38,7 @@ export async function upsertLatinoBusinessDataAction(
     sourceYear: values.sourceYear ? Number(values.sourceYear) : null,
     sourceLastUpdated: values.sourceLastUpdated || null,
     sourceDataType: values.sourceDataType || null,
+    verifiedBy: values.verifiedBy || null,
     updatedAt: new Date(),
   };
 

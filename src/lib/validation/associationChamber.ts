@@ -42,6 +42,9 @@ export const associationChamberFormSchema = z.object({
   nextFollowUp: optionalString,
   partnershipOpportunity: optionalString,
   notes: optionalString,
+  lastVerifiedDate: optionalString,
+  verifiedBy: optionalString,
+  active: z.boolean().optional(),
 });
 export type AssociationChamberFormValues = z.infer<
   typeof associationChamberFormSchema

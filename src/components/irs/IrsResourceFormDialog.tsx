@@ -54,6 +54,7 @@ export function IrsResourceFormDialog({
         url: resource?.url ?? "",
         description: resource?.description ?? "",
         lastVerifiedDate: resource?.lastVerifiedDate ?? "",
+        verifiedBy: resource?.verifiedBy ?? "",
         active: resource?.active ?? true,
       },
     });
@@ -76,7 +77,7 @@ export function IrsResourceFormDialog({
         {resource ? <Pencil className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
         {resource ? tLabels("edit") : tLabels("add")}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{resource ? tLabels("edit") : tLabels("add")}</DialogTitle>
         </DialogHeader>
@@ -114,6 +115,10 @@ export function IrsResourceFormDialog({
                 type="date"
                 {...register("lastVerifiedDate")}
               />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="verifiedBy">{t("verifiedBy")}</Label>
+              <Input id="verifiedBy" {...register("verifiedBy")} />
             </div>
             <div className="flex flex-col gap-1.5 sm:col-span-2">
               <Label htmlFor="url">{t("url")}</Label>

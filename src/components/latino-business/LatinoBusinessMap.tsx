@@ -135,6 +135,7 @@ export function LatinoBusinessMap({
       sourceYear: "",
       sourceLastUpdated: "",
       sourceDataType: "",
+      verifiedBy: "",
     },
   });
 
@@ -169,6 +170,7 @@ export function LatinoBusinessMap({
             sourceYear: stateData?.info?.sourceYear?.toString() ?? "",
             sourceLastUpdated: stateData?.info?.sourceLastUpdated ?? "",
             sourceDataType: stateData?.info?.sourceDataType ?? "",
+            verifiedBy: stateData?.info?.verifiedBy ?? "",
           });
         },
         tooltip: (
@@ -414,9 +416,13 @@ export function LatinoBusinessMap({
                   <Label htmlFor="sourceLastUpdated">{t("sourceLastUpdated")}</Label>
                   <Input id="sourceLastUpdated" type="date" {...register("sourceLastUpdated")} />
                 </div>
-                <div className="flex flex-col gap-1.5 sm:col-span-2">
+                <div className="flex flex-col gap-1.5">
                   <Label htmlFor="sourceDataType">{t("sourceDataType")}</Label>
                   <Input id="sourceDataType" {...register("sourceDataType")} />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="latinoMapVerifiedBy">{t("verifiedBy")}</Label>
+                  <Input id="latinoMapVerifiedBy" {...register("verifiedBy")} />
                 </div>
               </div>
             </div>

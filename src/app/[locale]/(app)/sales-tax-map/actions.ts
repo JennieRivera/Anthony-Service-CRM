@@ -22,6 +22,7 @@ export async function upsertSalesTaxStateInfoAction(
     businessRegistrationLink: values.businessRegistrationLink || null,
     notes: values.notes || null,
     lastVerifiedDate: values.lastVerifiedDate || null,
+    verifiedBy: values.verifiedBy || null,
     updatedAt: new Date(),
   };
 

@@ -189,6 +189,10 @@ export const userRoleEnum = pgEnum("user_role", [
   "academy_staff",
   "referral_manager",
   "community_manager",
+  // Phase 5, Session 8 — Immigration Staff (spec section 17): scoped to
+  // immigration administrative cases only, including the Immigration
+  // Forms Library and the per-case document folders (Session 6).
+  "immigration_staff",
 ]);
 
 export const users = pgTable("users", {
@@ -1498,6 +1502,8 @@ export const salesTaxStateInfo = pgTable("sales_tax_state_info", {
   businessRegistrationLink: text("business_registration_link"),
   notes: text("notes"),
   lastVerifiedDate: date("last_verified_date"),
+  // Phase 5, Session 8 — Data Freshness (spec section 18).
+  verifiedBy: text("verified_by"),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -1596,6 +1602,7 @@ export const irsResources = pgTable("irs_resources", {
   url: text("url").notNull(),
   description: text("description"),
   lastVerifiedDate: date("last_verified_date"),
+  verifiedBy: text("verified_by"),
   active: boolean("active").notNull().default(true),
 });
 
@@ -1637,6 +1644,7 @@ export const immigrationForms = pgTable("immigration_forms", {
   checklist: text("checklist"),
   internalNotes: text("internal_notes"),
   lastVerifiedDate: date("last_verified_date"),
+  verifiedBy: text("verified_by"),
   active: boolean("active").notNull().default(true),
 });
 
@@ -1706,6 +1714,12 @@ export const associationsChambers = pgTable("associations_chambers", {
   nextFollowUp: date("next_follow_up"),
   partnershipOpportunity: text("partnership_opportunity"),
   notes: text("notes"),
+  // Phase 5, Session 8 — Data Freshness (spec section 18). Added
+  // retroactively to this Session 7 table since the spec explicitly
+  // includes "associations" in the freshness-tracking list.
+  lastVerifiedDate: date("last_verified_date"),
+  verifiedBy: text("verified_by"),
+  active: boolean("active").notNull().default(true),
 });
 
 // Phase 5, Session 7 — Latino Business Opportunity Map (spec sections 7-8).
@@ -1750,6 +1764,10 @@ export const latinoBusinessOpportunityData = pgTable(
     sourceYear: integer("source_year"),
     sourceLastUpdated: date("source_last_updated"),
     sourceDataType: text("source_data_type"),
+    // Phase 5, Session 8 — Data Freshness (spec section 18).
+    // sourceLastUpdated above already serves as this row's "Last Verified
+    // Date".
+    verifiedBy: text("verified_by"),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

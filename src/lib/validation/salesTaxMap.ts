@@ -10,6 +10,7 @@ export const salesTaxStateInfoFormSchema = z.object({
   businessRegistrationLink: optionalString,
   notes: optionalString,
   lastVerifiedDate: optionalString,
+  verifiedBy: optionalString,
 });
 export type SalesTaxStateInfoFormValues = z.infer<
   typeof salesTaxStateInfoFormSchema

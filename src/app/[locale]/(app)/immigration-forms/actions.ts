@@ -24,6 +24,7 @@ function normalize(values: ImmigrationFormFormValues) {
     checklist: values.checklist || null,
     internalNotes: values.internalNotes || null,
     lastVerifiedDate: values.lastVerifiedDate || null,
+    verifiedBy: values.verifiedBy || null,
     active: values.active ?? true,
     updatedAt: new Date(),
   };

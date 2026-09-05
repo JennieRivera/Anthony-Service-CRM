@@ -33,6 +33,9 @@ function normalize(values: AssociationChamberFormValues) {
     nextFollowUp: values.nextFollowUp || null,
     partnershipOpportunity: values.partnershipOpportunity || null,
     notes: values.notes || null,
+    lastVerifiedDate: values.lastVerifiedDate || null,
+    verifiedBy: values.verifiedBy || null,
+    active: values.active ?? true,
     updatedAt: new Date(),
   };
 }
@@ -80,4 +83,24 @@ export async function updateAssociationChamberAction(
   revalidatePath(`/associations/${id}`);
   const locale = await getLocale();
   redirect({ href: `/associations/${id}`, locale });
+}
+
+export async function toggleAssociationChamberActiveAction(
+  id: string,
+  active: boolean,
+) {
+  await getDb()
+    .update(associationsChambers)
+    .set({ active, updatedAt: new Date() })
+    .where(eq(associationsChambers.id, id));
+
+  await logAuditEvent({
+    action: "association_chamber.updated",
+    entityType: "association_chamber",
+    entityId: id,
+    summary: `Association/chamber ${active ? "activated" : "deactivated"}`,
+  });
+
+  revalidatePath("/associations");
+  revalidatePath(`/associations/${id}`);
 }

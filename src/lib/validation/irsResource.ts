@@ -20,6 +20,7 @@ export const irsResourceFormSchema = z.object({
   url: z.string().trim().min(1, "URL is required"),
   description: optionalString,
   lastVerifiedDate: optionalString,
+  verifiedBy: optionalString,
   active: z.boolean().optional(),
 });
 export type IrsResourceFormValues = z.infer<typeof irsResourceFormSchema>;

@@ -42,7 +42,24 @@
     "activityClient": "Nuevo cliente agregado",
     "activityCase": "Caso actualizado",
     "activityInvoice": "Factura pagada",
-    "activityDocument": "Documento subido"
+    "activityDocument": "Documento subido",
+    "sectionBusinessExpansion": "Expansión de Negocios",
+    "sectionDataFreshness": "Alertas de Actualización de Datos",
+    "companiesRegistered": "Compañías Registradas",
+    "companiesByState": "Estados con Compañías",
+    "salesTaxCases": "Casos de Sales Tax",
+    "salesTaxDue": "Sales Tax Pendiente",
+    "einCases": "Casos de EIN",
+    "itinCases": "Casos de ITIN",
+    "immigrationCases": "Casos Admin. de Inmigración",
+    "latinoBusinessOpportunities": "Oportunidades de Negocios Latinos",
+    "activeAssociations": "Asociaciones Activas",
+    "strategicChambers": "Cámaras Estratégicas",
+    "expansionStates": "Estados de Expansión",
+    "companyComplianceAlerts": "Alertas de Cumplimiento de Compañías",
+    "dataFreshnessSummary": "{count, plural, one {# registro de referencia no ha} other {# registros de referencia no han}} sido verificados en los últimos 180 días.",
+    "dataFreshnessMore": "+ {count} más",
+    "neverVerified": "Nunca verificado"
   },
   "Reports": {
     "title": "Reportes y Análisis",
@@ -1157,7 +1174,22 @@
   "CompanyRegistration": {
     "title": "Registro de Compañía por Estado",
     "instructions": "Haz clic en un estado para abrir su portal oficial de registro de negocios (Secretaría de Estado) en una pestaña nueva.",
-    "clickToOpen": "Clic para abrir el sitio oficial"
+    "clickToOpen": "Clic para abrir el sitio oficial",
+    "businessSummary": "Resumen de Negocios",
+    "loadingSummary": "Cargando...",
+    "companiesByState": "Compañías",
+    "clientsByState": "Clientes",
+    "revenueByState": "Ingresos (Pagados)",
+    "salesTaxClients": "Clientes de Sales Tax",
+    "rriReferrals": "Referidos RRI",
+    "associationsAndChambers": "Asociaciones / Cámaras",
+    "serviceDemand": "Principales Servicios",
+    "latinoBusinessOpportunity": "Oportunidad de Negocios Latinos",
+    "viewSalesTaxMap": "Ver Mapa de Sales Tax",
+    "viewLatinoBusinessMap": "Ver Mapa de Negocios Latinos",
+    "viewAssociations": "Ver Asociaciones",
+    "viewCompanies": "Ver Compañías",
+    "openRegistrationLink": "Abrir Sitio de Registro Estatal →"
   },
   "ReferralStatus": {
     "submitted": "Enviado",
@@ -1600,7 +1632,8 @@
     "notes": "Notas",
     "save": "Guardar",
     "saving": "Guardando...",
-    "activeCases": "{count, plural, one {# caso activo} other {# casos activos}} en este estado."
+    "activeCases": "{count, plural, one {# caso activo} other {# casos activos}} en este estado.",
+    "verifiedBy": "Verificado Por"
   },
   "IrsCaseType": {
     "ein_assistance": "Asistencia con EIN",
@@ -1665,7 +1698,8 @@
       "lastVerifiedDate": "Fecha de Última Verificación",
       "active": "Activo",
       "save": "Guardar",
-      "saving": "Guardando..."
+      "saving": "Guardando...",
+      "verifiedBy": "Verificado Por"
     }
   },
   "ImmigrationDocumentFolder": {
@@ -1720,7 +1754,8 @@
       "lastVerifiedDate": "Fecha de Última Verificación",
       "active": "Activo",
       "save": "Guardar",
-      "saving": "Guardando..."
+      "saving": "Guardando...",
+      "verifiedBy": "Verificado Por"
     }
   },
   "AssociationOrganizationType": {
@@ -1775,8 +1810,14 @@
       "notes": "Notas",
       "save": "Guardar",
       "saving": "Guardando...",
-      "cancel": "Cancelar"
-    }
+      "cancel": "Cancelar",
+      "lastVerifiedDate": "Fecha de Última Verificación",
+      "verifiedBy": "Verificado Por",
+      "active": "Activo"
+    },
+    "inactiveBadge": "Inactivo",
+    "activate": "Activar",
+    "deactivate": "Desactivar"
   },
   "LatinoOpportunityScore": {
     "very_high": "Muy Alto",
@@ -1817,6 +1858,7 @@
     "sourceLastUpdated": "Última Actualización",
     "sourceDataType": "Tipo de Dato",
     "save": "Guardar",
-    "saving": "Guardando..."
+    "saving": "Guardando...",
+    "verifiedBy": "Verificado Por"
   }
 }

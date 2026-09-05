@@ -26,6 +26,7 @@ export const latinoBusinessDataFormSchema = z.object({
   sourceYear: optionalString,
   sourceLastUpdated: optionalString,
   sourceDataType: optionalString,
+  verifiedBy: optionalString,
 });
 export type LatinoBusinessDataFormValues = z.infer<
   typeof latinoBusinessDataFormSchema

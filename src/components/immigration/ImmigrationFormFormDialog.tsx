@@ -61,6 +61,7 @@ export function ImmigrationFormFormDialog({
         checklist: form?.checklist ?? "",
         internalNotes: form?.internalNotes ?? "",
         lastVerifiedDate: form?.lastVerifiedDate ?? "",
+        verifiedBy: form?.verifiedBy ?? "",
         active: form?.active ?? true,
       },
     });
@@ -83,7 +84,7 @@ export function ImmigrationFormFormDialog({
         {form ? <Pencil className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
         {form ? tLabels("edit") : tLabels("add")}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{form ? tLabels("edit") : tLabels("add")}</DialogTitle>
         </DialogHeader>
@@ -145,6 +146,10 @@ export function ImmigrationFormFormDialog({
                 type="date"
                 {...register("lastVerifiedDate")}
               />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="verifiedBy">{t("verifiedBy")}</Label>
+              <Input id="verifiedBy" {...register("verifiedBy")} />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="filingFeeReference">{t("filingFeeReference")}</Label>

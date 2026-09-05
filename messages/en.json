@@ -42,7 +42,24 @@
     "activityClient": "New client added",
     "activityCase": "Case updated",
     "activityInvoice": "Invoice paid",
-    "activityDocument": "Document uploaded"
+    "activityDocument": "Document uploaded",
+    "sectionBusinessExpansion": "Business Expansion",
+    "sectionDataFreshness": "Data Freshness Alerts",
+    "companiesRegistered": "Companies Registered",
+    "companiesByState": "States with Companies",
+    "salesTaxCases": "Sales Tax Cases",
+    "salesTaxDue": "Sales Tax Due",
+    "einCases": "EIN Cases",
+    "itinCases": "ITIN Cases",
+    "immigrationCases": "Immigration Admin. Cases",
+    "latinoBusinessOpportunities": "Latino Business Opportunities",
+    "activeAssociations": "Active Associations",
+    "strategicChambers": "Strategic Chambers",
+    "expansionStates": "Expansion States",
+    "companyComplianceAlerts": "Company Compliance Alerts",
+    "dataFreshnessSummary": "{count, plural, one {# reference record hasn't} other {# reference records haven't}} been verified in the last 180 days.",
+    "dataFreshnessMore": "+ {count} more",
+    "neverVerified": "Never verified"
   },
   "Reports": {
     "title": "Reports & Analytics",
@@ -1157,7 +1174,22 @@
   "CompanyRegistration": {
     "title": "Company Registration by State",
     "instructions": "Click a state to open its official business registration portal (Secretary of State) in a new tab.",
-    "clickToOpen": "Click to open the official site"
+    "clickToOpen": "Click to open the official site",
+    "businessSummary": "Business Summary",
+    "loadingSummary": "Loading...",
+    "companiesByState": "Companies",
+    "clientsByState": "Clients",
+    "revenueByState": "Revenue (Paid)",
+    "salesTaxClients": "Sales Tax Clients",
+    "rriReferrals": "RRI Referrals",
+    "associationsAndChambers": "Associations / Chambers",
+    "serviceDemand": "Top Services",
+    "latinoBusinessOpportunity": "Latino Business Opportunity",
+    "viewSalesTaxMap": "View Sales Tax Map",
+    "viewLatinoBusinessMap": "View Latino Business Map",
+    "viewAssociations": "View Associations",
+    "viewCompanies": "View Companies",
+    "openRegistrationLink": "Open State Registration Site →"
   },
   "ReferralStatus": {
     "submitted": "Submitted",
@@ -1600,7 +1632,8 @@
     "notes": "Notes",
     "save": "Save",
     "saving": "Saving...",
-    "activeCases": "{count, plural, one {# active case} other {# active cases}} in this state."
+    "activeCases": "{count, plural, one {# active case} other {# active cases}} in this state.",
+    "verifiedBy": "Verified By"
   },
   "IrsCaseType": {
     "ein_assistance": "EIN Assistance",
@@ -1665,7 +1698,8 @@
       "lastVerifiedDate": "Last Verified Date",
       "active": "Active",
       "save": "Save",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "verifiedBy": "Verified By"
     }
   },
   "ImmigrationDocumentFolder": {
@@ -1720,7 +1754,8 @@
       "lastVerifiedDate": "Last Verified Date",
       "active": "Active",
       "save": "Save",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "verifiedBy": "Verified By"
     }
   },
   "AssociationOrganizationType": {
@@ -1775,8 +1810,14 @@
       "notes": "Notes",
       "save": "Save",
       "saving": "Saving...",
-      "cancel": "Cancel"
-    }
+      "cancel": "Cancel",
+      "lastVerifiedDate": "Last Verified Date",
+      "verifiedBy": "Verified By",
+      "active": "Active"
+    },
+    "inactiveBadge": "Inactive",
+    "activate": "Activate",
+    "deactivate": "Deactivate"
   },
   "LatinoOpportunityScore": {
     "very_high": "Very High",
@@ -1817,6 +1858,7 @@
     "sourceLastUpdated": "Last Updated",
     "sourceDataType": "Data Type",
     "save": "Save",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "verifiedBy": "Verified By"
   }
 }

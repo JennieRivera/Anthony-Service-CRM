@@ -47,6 +47,11 @@ export async function AssociationTable({
                     {t("latinoFocusBadge")}
                   </Badge>
                 )}
+                {!org.active && (
+                  <Badge variant="outline" className="ml-2 text-muted-foreground">
+                    {t("inactiveBadge")}
+                  </Badge>
+                )}
               </TableCell>
               <TableCell className="text-muted-foreground">
                 {tOrgType(org.organizationType)}

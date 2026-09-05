@@ -30,6 +30,7 @@ export const immigrationFormFormSchema = z.object({
   checklist: optionalString,
   internalNotes: optionalString,
   lastVerifiedDate: optionalString,
+  verifiedBy: optionalString,
   active: z.boolean().optional(),
 });
 export type ImmigrationFormFormValues = z.infer<typeof immigrationFormFormSchema>;

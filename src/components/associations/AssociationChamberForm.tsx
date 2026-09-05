@@ -65,6 +65,9 @@ export function AssociationChamberForm({
       nextFollowUp: organization?.nextFollowUp ?? "",
       partnershipOpportunity: organization?.partnershipOpportunity ?? "",
       notes: organization?.notes ?? "",
+      lastVerifiedDate: organization?.lastVerifiedDate ?? "",
+      verifiedBy: organization?.verifiedBy ?? "",
+      active: organization?.active ?? true,
     },
   });
 
@@ -211,6 +214,27 @@ export function AssociationChamberForm({
             )}
           />
           <Label>{t("latinoFocus")}</Label>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="lastVerifiedDate">{t("lastVerifiedDate")}</Label>
+          <Input id="lastVerifiedDate" type="date" {...register("lastVerifiedDate")} />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="verifiedBy">{t("verifiedBy")}</Label>
+          <Input id="verifiedBy" {...register("verifiedBy")} />
+        </div>
+
+        <div className="flex items-center gap-2 pt-6">
+          <Controller
+            control={control}
+            name="active"
+            render={({ field }) => (
+              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+            )}
+          />
+          <Label>{t("active")}</Label>
         </div>
       </div>
 

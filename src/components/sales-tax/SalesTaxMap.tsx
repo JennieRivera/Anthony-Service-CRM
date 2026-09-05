@@ -55,6 +55,7 @@ export function SalesTaxMap({
       businessRegistrationLink: "",
       notes: "",
       lastVerifiedDate: "",
+      verifiedBy: "",
     },
   });
 
@@ -79,6 +80,7 @@ export function SalesTaxMap({
               stateData?.info?.businessRegistrationLink ?? "",
             notes: stateData?.info?.notes ?? "",
             lastVerifiedDate: stateData?.info?.lastVerifiedDate ?? "",
+            verifiedBy: stateData?.info?.verifiedBy ?? "",
           });
         },
         tooltip: (
@@ -186,6 +188,10 @@ export function SalesTaxMap({
                   type="date"
                   {...register("lastVerifiedDate")}
                 />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="verifiedBy">{t("verifiedBy")}</Label>
+                <Input id="verifiedBy" {...register("verifiedBy")} />
               </div>
               <div className="flex flex-col gap-1.5 sm:col-span-2">
                 <Label htmlFor="salesTaxMapNotes">{t("notes")}</Label>
