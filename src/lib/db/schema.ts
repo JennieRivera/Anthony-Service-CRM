@@ -123,11 +123,30 @@ export const refundStatusEnum = pgEnum("refund_status", [
   "full",
 ]);
 
+// Phase 2, Session 7 — RBAC roles are modeled here and mapped to module
+// access in src/lib/permissions.ts, but NOT yet enforced: sign-in stays
+// restricted to the single ADMIN_EMAIL (src/auth.ts) per an explicit
+// decision to keep single-tenant login for now. This column is reserved
+// for when multi-staff login is turned on, same pattern as
+// cases.assignedUserId and tasks.assignedUserId.
+export const userRoleEnum = pgEnum("user_role", [
+  "admin",
+  "manager",
+  "tax_staff",
+  "bookkeeping_staff",
+  "notary_staff",
+  "consulting_staff",
+  "academy_staff",
+  "referral_manager",
+  "community_manager",
+]);
+
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   name: text("name"),
+  role: userRoleEnum("role"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -204,6 +223,9 @@ export const taskTypeEnum = pgEnum("task_type", [
   "payment_check",
   "document_reminder",
   "closing",
+  // Phase 2, Session 7 — created by the scheduled inactivity sweep
+  // (see src/app/api/cron/inactivity-check/route.ts), not from case actions.
+  "inactivity_alert",
 ]);
 
 export const taskStatusEnum = pgEnum("task_status", [

@@ -595,7 +595,8 @@
     "follow_up": "Follow-up",
     "payment_check": "Payment Check",
     "document_reminder": "Document Reminder",
-    "closing": "Closing"
+    "closing": "Closing",
+    "inactivity_alert": "Inactivity Alert"
   },
   "Tasks": {
     "title": "Tasks",

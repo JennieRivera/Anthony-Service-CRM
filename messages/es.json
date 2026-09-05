@@ -595,7 +595,8 @@
     "follow_up": "Seguimiento",
     "payment_check": "Verificación de Pago",
     "document_reminder": "Recordatorio de Documentos",
-    "closing": "Cierre"
+    "closing": "Cierre",
+    "inactivity_alert": "Alerta de Inactividad"
   },
   "Tasks": {
     "title": "Tareas",
