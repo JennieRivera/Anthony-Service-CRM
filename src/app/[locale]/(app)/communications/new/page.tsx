@@ -3,19 +3,21 @@ import { Link } from "@/i18n/navigation";
 import { CommunicationForm } from "@/components/communications/CommunicationForm";
 import { listClientsForSelect } from "@/lib/queries/cases";
 import { listCasesForSelect, listReferralsForSelect } from "@/lib/queries/referrals";
+import { getMessageTemplateById } from "@/lib/queries/messageTemplates";
 import { createCommunicationAction } from "../actions";
 
 export default async function NewCommunicationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ clientId?: string }>;
+  searchParams: Promise<{ clientId?: string; caseId?: string; templateId?: string }>;
 }) {
   const t = await getTranslations("Communications");
-  const { clientId } = await searchParams;
-  const [clients, cases, referrals] = await Promise.all([
+  const { clientId, caseId, templateId } = await searchParams;
+  const [clients, cases, referrals, template] = await Promise.all([
     listClientsForSelect(),
     listCasesForSelect(),
     listReferralsForSelect(),
+    templateId ? getMessageTemplateById(templateId) : Promise.resolve(null),
   ]);
 
   return (
@@ -37,6 +39,8 @@ export default async function NewCommunicationPage({
         cases={cases}
         referrals={referrals}
         defaultClientId={clientId}
+        defaultCaseId={caseId}
+        template={template}
         onSubmit={createCommunicationAction}
       />
     </div>

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Pencil, FileText } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getCaseById } from "@/lib/queries/cases";
+import { findActiveTemplate } from "@/lib/queries/messageTemplates";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -63,6 +64,14 @@ export default async function CaseDetailPage({
     documents,
     statusHistory,
   } = result;
+
+  // Phase 4, Session 6 — "When service status changes: prepare optional
+  // message template; do not send automatically" (spec #10). Surfaced as a
+  // suggestion staff can act on, not an automatic send.
+  const suggestedTemplate = await findActiveTemplate(
+    "service_update",
+    client.preferredLanguage as "en" | "es",
+  );
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -1120,6 +1129,36 @@ export default async function CaseDetailPage({
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {suggestedTemplate && (
+        <div className="flex flex-col gap-3 rounded-lg border border-dashed border-border bg-card p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("suggestedTemplateTitle")}
+            </h2>
+            <Badge variant="outline">{suggestedTemplate.name}</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {t("suggestedTemplateNote")}
+          </p>
+          <p className="whitespace-pre-wrap rounded-md border border-border bg-background p-3 text-sm text-foreground">
+            {suggestedTemplate.messageBody}
+          </p>
+          <div>
+            <Button
+              size="sm"
+              variant="outline"
+              render={
+                <Link
+                  href={`/communications/new?clientId=${client.id}&caseId=${id}&templateId=${suggestedTemplate.id}`}
+                />
+              }
+            >
+              {t("useSuggestedTemplate")}
+            </Button>
           </div>
         </div>
       )}

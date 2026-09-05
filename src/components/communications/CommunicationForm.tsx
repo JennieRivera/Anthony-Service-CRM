@@ -24,7 +24,7 @@ import {
   communicationStatusValues,
   type CommunicationFormValues,
 } from "@/lib/validation/communication";
-import type { ConversationMessage } from "@/lib/db/schema";
+import type { ConversationMessage, MessageTemplate } from "@/lib/db/schema";
 
 function nowForInput() {
   const d = new Date();
@@ -46,6 +46,8 @@ export function CommunicationForm({
   cases,
   referrals,
   defaultClientId,
+  defaultCaseId,
+  template,
   onSubmit,
 }: {
   communication?: ConversationMessage;
@@ -53,6 +55,8 @@ export function CommunicationForm({
   cases: { id: string; title: string }[];
   referrals: { id: string; referralSeq: number }[];
   defaultClientId?: string;
+  defaultCaseId?: string;
+  template?: MessageTemplate | null;
   onSubmit: (values: CommunicationFormValues) => Promise<void>;
 }) {
   const t = useTranslations("Communications.form");
@@ -61,6 +65,7 @@ export function CommunicationForm({
   const tStatus = useTranslations("CommunicationStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -72,17 +77,17 @@ export function CommunicationForm({
     resolver: zodResolver(communicationFormSchema),
     defaultValues: {
       clientId: communication?.clientId ?? defaultClientId ?? "",
-      caseId: communication?.caseId ?? "",
+      caseId: communication?.caseId ?? defaultCaseId ?? "",
       referralId: communication?.referralId ?? "",
       businessName: communication?.businessName ?? "",
-      channel: communication?.channel ?? "email",
+      channel: communication?.channel ?? template?.channel ?? "email",
       direction: communication?.direction ?? "outbound",
       occurredAt: communication
         ? toInputDateTime(communication.occurredAt)
         : nowForInput(),
-      subject: communication?.subject ?? "",
-      summary: communication?.summary ?? "",
-      fullMessage: communication?.fullMessage ?? "",
+      subject: communication?.subject ?? template?.subject ?? "",
+      summary: communication?.summary ?? (template ? template.name : ""),
+      fullMessage: communication?.fullMessage ?? template?.messageBody ?? "",
       durationMinutes: communication?.durationMinutes?.toString() ?? "",
       counterpart: communication?.counterpart ?? "",
       status: communication?.status ?? "new",
@@ -96,9 +101,22 @@ export function CommunicationForm({
 
   async function submit(values: CommunicationFormValues) {
     setSubmitting(true);
+    setError(null);
     try {
       await onSubmit(values);
-    } finally {
+    } catch (err) {
+      // Next.js redirect() (used on success) throws internally with this
+      // digest — let it propagate instead of treating it as a form error.
+      if (
+        err &&
+        typeof err === "object" &&
+        "digest" in err &&
+        typeof (err as { digest?: unknown }).digest === "string" &&
+        (err as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+      ) {
+        throw err;
+      }
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setSubmitting(false);
     }
   }
@@ -350,6 +368,12 @@ export function CommunicationForm({
           </div>
         )}
       </div>
+
+      {error && (
+        <p className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+          {error}
+        </p>
+      )}
 
       <div className="flex justify-end gap-3">
         <Button

@@ -10,6 +10,7 @@ import { ClientGrowthChart } from "@/components/dashboard/ClientGrowthChart";
 import { UpcomingAppointments } from "@/components/dashboard/UpcomingAppointments";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { ActionNeededList } from "@/components/dashboard/ActionNeededList";
+import { FollowUpTasksCard } from "@/components/dashboard/FollowUpTasksCard";
 
 function formatMoney(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -83,12 +84,13 @@ export default async function Home() {
         <UpcomingAppointments appointments={data.upcomingAppointments} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-3">
         <RecentActivity items={data.activity} />
         <ActionNeededList
           overdueInvoices={data.actionNeeded.overdueInvoices}
           stalledCases={data.actionNeeded.stalledCases}
         />
+        <FollowUpTasksCard tasks={data.followUpTasks} />
       </div>
     </div>
   );

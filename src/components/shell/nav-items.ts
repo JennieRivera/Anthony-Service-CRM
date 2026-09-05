@@ -14,6 +14,7 @@ import {
   Settings,
   Map,
   MessagesSquare,
+  NotepadText,
 } from "lucide-react";
 
 export type NavItem = {
@@ -30,6 +31,7 @@ export type NavItem = {
     | "tasks"
     | "alliances"
     | "communications"
+    | "templates"
     | "reports"
     | "companyRegistration"
     | "settings";
@@ -43,6 +45,7 @@ export const navItems: NavItem[] = [
   { href: "/tasks", labelKey: "tasks", icon: ListChecks },
   { href: "/appointments", labelKey: "appointments", icon: CalendarDays },
   { href: "/communications", labelKey: "communications", icon: MessagesSquare },
+  { href: "/templates", labelKey: "templates", icon: NotepadText },
   { href: "/invoices", labelKey: "invoices", icon: Receipt },
   { href: "/payments", labelKey: "payments", icon: Wallet },
   { href: "/referrals", labelKey: "referrals", icon: Handshake },

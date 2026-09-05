@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/db";
 import { clients, cases, invoices, documents } from "@/lib/db/schema";
 import { listUpcomingAppointments } from "./appointments";
+import { listOpenTasks } from "./tasks";
 
 function monthKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -17,13 +18,14 @@ function weekKey(d: Date) {
 export async function getDashboardData() {
   const db = getDb();
 
-  const [allClients, allCases, allInvoices, allDocuments, upcoming] =
+  const [allClients, allCases, allInvoices, allDocuments, upcoming, openTasks] =
     await Promise.all([
       db.select().from(clients),
       db.select().from(cases),
       db.select().from(invoices),
       db.select().from(documents),
       listUpcomingAppointments(5),
+      listOpenTasks(),
     ]);
 
   const now = new Date();
@@ -198,6 +200,14 @@ export async function getDashboardData() {
     (c) => c.status === "waiting_on_client",
   );
 
+  // Phase 4, Session 6 — "When Follow-Up Required = Yes ... display on
+  // dashboard" (spec #10). Surfaces both follow-up tasks (from logged
+  // communications) and inactivity alerts (from the cron sweep), since
+  // both are communication-driven follow-ups a staff member needs to act on.
+  const followUpTasks = openTasks
+    .filter((task) => task.type === "follow_up" || task.type === "inactivity_alert")
+    .slice(0, 8);
+
   return {
     kpis: {
       activeClients,
@@ -217,5 +227,6 @@ export async function getDashboardData() {
       overdueInvoices,
       stalledCases,
     },
+    followUpTasks,
   };
 }

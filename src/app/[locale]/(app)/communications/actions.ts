@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
-import { conversationMessages, tasks } from "@/lib/db/schema";
+import {
+  conversationMessages,
+  tasks,
+  clientCommunicationPreferences,
+} from "@/lib/db/schema";
 import {
   communicationFormSchema,
   type CommunicationFormValues,
@@ -33,6 +37,49 @@ function normalize(values: CommunicationFormValues) {
     followUpDate: values.followUpDate || null,
     updatedAt: new Date(),
   };
+}
+
+// Phase 4, Session 6 — "When client opts out ... prevent automated outbound
+// communication through that channel" (spec #10). Enforced here for the
+// three channels with a per-client consent record (WhatsApp/Email/SMS);
+// Facebook/Instagram opt-out lives on the thread itself (Session 4), not a
+// client-wide record, so isn't checked here. Inbound messages are never
+// blocked — a client can always reply on a channel they've opted out of
+// outbound messages on.
+async function assertOutboundChannelAllowed(
+  clientId: string,
+  channel: CommunicationFormValues["channel"],
+  direction: CommunicationFormValues["direction"],
+) {
+  if (direction !== "outbound") return;
+
+  const [prefs] = await getDb()
+    .select({
+      whatsappContactStatus: clientCommunicationPreferences.whatsappContactStatus,
+      emailStatus: clientCommunicationPreferences.emailStatus,
+      smsStatus: clientCommunicationPreferences.smsStatus,
+    })
+    .from(clientCommunicationPreferences)
+    .where(eq(clientCommunicationPreferences.clientId, clientId))
+    .limit(1);
+
+  if (!prefs) return;
+
+  if (channel === "whatsapp" && prefs.whatsappContactStatus === "opted_out") {
+    throw new Error(
+      "This client has opted out of WhatsApp. Outbound messages on this channel are blocked.",
+    );
+  }
+  if (channel === "email" && prefs.emailStatus === "unsubscribed") {
+    throw new Error(
+      "This client has unsubscribed from email. Outbound messages on this channel are blocked.",
+    );
+  }
+  if (channel === "sms" && prefs.smsStatus === "opted_out") {
+    throw new Error(
+      "This client has opted out of SMS. Outbound messages on this channel are blocked.",
+    );
+  }
 }
 
 // Session 1's slice of "Automated Communication Tasks" (Phase 4 spec #10):
@@ -68,6 +115,7 @@ export async function createCommunicationAction(
   rawValues: CommunicationFormValues,
 ) {
   const values = communicationFormSchema.parse(rawValues);
+  await assertOutboundChannelAllowed(values.clientId, values.channel, values.direction);
   const db = getDb();
   const session = await auth();
   const normalized = normalize(values);
@@ -93,6 +141,7 @@ export async function updateCommunicationAction(
   rawValues: CommunicationFormValues,
 ) {
   const values = communicationFormSchema.parse(rawValues);
+  await assertOutboundChannelAllowed(values.clientId, values.channel, values.direction);
   const db = getDb();
   const normalized = normalize(values);
 

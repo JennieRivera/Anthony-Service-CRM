@@ -451,6 +451,47 @@ export const integrationSettings = pgTable("integration_settings", {
   notes: text("notes"),
 });
 
+// Phase 4, Session 6 — Message Template Library.
+export const messageTemplateCategoryEnum = pgEnum("message_template_category", [
+  "welcome",
+  "appointment_confirmation",
+  "appointment_reminder",
+  "documents_requested",
+  "documents_missing",
+  "payment_reminder",
+  "invoice_sent",
+  "payment_received",
+  "service_update",
+  "referral_update",
+  "rri_referral_update",
+  "follow_up",
+  "thank_you",
+  "review_request",
+  "academy_welcome",
+  "academy_reminder",
+  "partner_communication",
+]);
+
+export const messageTemplates = pgTable("message_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  name: text("name").notNull(),
+  language: text("language", { enum: ["en", "es"] }).notNull(),
+  channel: conversationChannelEnum("channel").notNull(),
+  category: messageTemplateCategoryEnum("category").notNull(),
+  subject: text("subject"),
+  messageBody: text("message_body").notNull(),
+  active: boolean("active").notNull().default(true),
+  // Snapshot of the acting session's email — same reasoning as
+  // caseStatusHistory.changedByEmail; no populated users table yet.
+  createdByEmail: text("created_by_email"),
+});
+
 export const cases = pgTable("cases", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1316,6 +1357,7 @@ export type InstagramDmThread = typeof instagramDmThreads.$inferSelect;
 export type WebsiteChatSession = typeof websiteChatSessions.$inferSelect;
 export type ClientHighlevelSync = typeof clientHighlevelSync.$inferSelect;
 export type IntegrationSettingsRow = typeof integrationSettings.$inferSelect;
+export type MessageTemplate = typeof messageTemplates.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type CaseStatusHistory = typeof caseStatusHistory.$inferSelect;
