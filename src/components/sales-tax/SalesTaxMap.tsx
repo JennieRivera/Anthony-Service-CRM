@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -34,30 +34,63 @@ const COLOR_HEX: Record<SalesTaxMapStateData["color"], string> = {
 export function SalesTaxMap({
   data,
   onSave,
+  initialState,
 }: {
   data: Record<string, SalesTaxMapStateData>;
   onSave: (
     state: string,
     values: SalesTaxStateInfoFormValues,
   ) => Promise<void>;
+  // Set from a map "quick link" (e.g. the Company Registration map's
+  // per-state summary) so this map opens straight to that state instead
+  // of requiring a second click.
+  initialState?: string;
 }) {
   const t = useTranslations("SalesTaxMap");
-  const [selectedState, setSelectedState] = useState<string | null>(null);
+  // Resolved once at mount from the deep-linked state (if any) — feeds the
+  // form's initial defaultValues directly instead of opening via an
+  // effect, so there's no synchronous setState-in-effect and no flash of
+  // an empty dialog before it populates.
+  const initialStateAbbr =
+    initialState && StateAbbreviations.includes(initialState.toUpperCase())
+      ? initialState.toUpperCase()
+      : null;
+  const initialStateData = initialStateAbbr ? data[initialStateAbbr] : undefined;
+
+  const [selectedState, setSelectedState] = useState<string | null>(initialStateAbbr);
   const [isPending, startTransition] = useTransition();
 
   const { register, handleSubmit, reset } = useForm<SalesTaxStateInfoFormValues>({
     resolver: zodResolver(salesTaxStateInfoFormSchema),
     defaultValues: {
-      stateTaxAgency: "",
-      officialWebsite: "",
-      registrationLink: "",
-      filingPortalLink: "",
-      businessRegistrationLink: "",
-      notes: "",
-      lastVerifiedDate: "",
-      verifiedBy: "",
+      stateTaxAgency: initialStateData?.info?.stateTaxAgency ?? "",
+      officialWebsite: initialStateData?.info?.officialWebsite ?? "",
+      registrationLink: initialStateData?.info?.registrationLink ?? "",
+      filingPortalLink: initialStateData?.info?.filingPortalLink ?? "",
+      businessRegistrationLink: initialStateData?.info?.businessRegistrationLink ?? "",
+      notes: initialStateData?.info?.notes ?? "",
+      lastVerifiedDate: initialStateData?.info?.lastVerifiedDate ?? "",
+      verifiedBy: initialStateData?.info?.verifiedBy ?? "",
     },
   });
+
+  const openStateDialog = useCallback(
+    (abbr: string) => {
+      const stateData = data[abbr];
+      setSelectedState(abbr);
+      reset({
+        stateTaxAgency: stateData?.info?.stateTaxAgency ?? "",
+        officialWebsite: stateData?.info?.officialWebsite ?? "",
+        registrationLink: stateData?.info?.registrationLink ?? "",
+        filingPortalLink: stateData?.info?.filingPortalLink ?? "",
+        businessRegistrationLink: stateData?.info?.businessRegistrationLink ?? "",
+        notes: stateData?.info?.notes ?? "",
+        lastVerifiedDate: stateData?.info?.lastVerifiedDate ?? "",
+        verifiedBy: stateData?.info?.verifiedBy ?? "",
+      });
+    },
+    [data, reset],
+  );
 
   const states = useMemo(() => {
     const settings: Record<string, UsaStateMapStateConfig> = {};
@@ -69,20 +102,7 @@ export function SalesTaxMap({
       settings[abbr] = {
         fill: COLOR_HEX[color],
         stroke: "#0F1A2B",
-        onClick: () => {
-          setSelectedState(abbr);
-          reset({
-            stateTaxAgency: stateData?.info?.stateTaxAgency ?? "",
-            officialWebsite: stateData?.info?.officialWebsite ?? "",
-            registrationLink: stateData?.info?.registrationLink ?? "",
-            filingPortalLink: stateData?.info?.filingPortalLink ?? "",
-            businessRegistrationLink:
-              stateData?.info?.businessRegistrationLink ?? "",
-            notes: stateData?.info?.notes ?? "",
-            lastVerifiedDate: stateData?.info?.lastVerifiedDate ?? "",
-            verifiedBy: stateData?.info?.verifiedBy ?? "",
-          });
-        },
+        onClick: () => openStateDialog(abbr),
         tooltip: (
           <div style={{ fontSize: 12, padding: 2 }}>
             <strong>{abbr}</strong>
@@ -97,7 +117,7 @@ export function SalesTaxMap({
     });
 
     return settings;
-  }, [data, reset, t]);
+  }, [data, openStateDialog, t]);
 
   function submit(values: SalesTaxStateInfoFormValues) {
     if (!selectedState) return;

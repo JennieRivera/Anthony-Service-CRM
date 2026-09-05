@@ -1,22 +1,28 @@
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { listCompanies } from "@/lib/queries/companies";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { CompanyTable } from "@/components/companies/CompanyTable";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
-export default async function CompaniesPage() {
+export default async function CompaniesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ state?: string }>;
+}) {
   const t = await getTranslations("Companies");
   const configured = isDatabaseConfigured();
+  const { state } = await searchParams;
 
   let companies: Awaited<ReturnType<typeof listCompanies>> = [];
   let error: string | null = null;
 
   if (configured) {
     try {
-      companies = await listCompanies();
+      companies = await listCompanies(state);
     } catch (err) {
       error = err instanceof Error ? err.message : "Unknown error";
     }
@@ -31,6 +37,20 @@ export default async function CompaniesPage() {
           {t("newCompany")}
         </Button>
       </div>
+
+      {state && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            {t("filteredByState", { state })}
+          </span>
+          <Link href="/companies">
+            <Badge variant="outline" className="flex items-center gap-1">
+              {state}
+              <X className="h-3 w-3" />
+            </Badge>
+          </Link>
+        </div>
+      )}
 
       {!configured && <DatabaseNotConfigured />}
 

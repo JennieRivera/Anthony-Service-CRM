@@ -888,7 +888,8 @@
       "noCommunications": "Aún no hay comunicaciones registradas.",
       "noReferrals": "Aún no hay referidos.",
       "outstandingBalance": "Saldo Pendiente"
-    }
+    },
+    "filteredByState": "Filtrado por estado:"
   },
   "AuditLog": {
     "title": "Log de Auditoría",
@@ -1817,7 +1818,8 @@
     },
     "inactiveBadge": "Inactivo",
     "activate": "Activar",
-    "deactivate": "Desactivar"
+    "deactivate": "Desactivar",
+    "filteredByState": "Filtrado por estado:"
   },
   "LatinoOpportunityScore": {
     "very_high": "Muy Alto",

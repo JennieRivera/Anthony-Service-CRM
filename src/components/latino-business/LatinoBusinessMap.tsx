@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -104,40 +104,85 @@ function passesFilters(
 export function LatinoBusinessMap({
   data,
   onSave,
+  initialState,
 }: {
   data: Record<string, LatinoBusinessMapStateData>;
   onSave: (
     state: string,
     values: LatinoBusinessDataFormValues,
   ) => Promise<void>;
+  // Set from a map "quick link" (e.g. the Company Registration map's
+  // per-state summary) so this map opens straight to that state instead
+  // of requiring a second click.
+  initialState?: string;
 }) {
   const t = useTranslations("LatinoBusinessMap");
   const tScore = useTranslations("LatinoOpportunityScore");
-  const [selectedState, setSelectedState] = useState<string | null>(null);
+  // Resolved once at mount from the deep-linked state (if any) — feeds the
+  // form's initial defaultValues directly instead of opening via an
+  // effect, so there's no synchronous setState-in-effect and no flash of
+  // an empty dialog before it populates.
+  const initialStateAbbr =
+    initialState && StateAbbreviations.includes(initialState.toUpperCase())
+      ? initialState.toUpperCase()
+      : null;
+  const initialStateData = initialStateAbbr ? data[initialStateAbbr] : undefined;
+
+  const [selectedState, setSelectedState] = useState<string | null>(initialStateAbbr);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [isPending, startTransition] = useTransition();
 
   const { register, handleSubmit, control, reset } = useForm<LatinoBusinessDataFormValues>({
     resolver: zodResolver(latinoBusinessDataFormSchema),
     defaultValues: {
-      estimatedLatinoPopulation: "",
-      estimatedLatinoBusinessPresence: "",
-      topIndustries: "",
-      amsClientsCount: "",
-      amsLeadsCount: "",
-      revenueFromState: "",
-      opportunityScore: "insufficient_data",
-      potentialServices: "",
-      expansionNotes: "",
-      notes: "",
-      sourceName: "",
-      sourceUrl: "",
-      sourceYear: "",
-      sourceLastUpdated: "",
-      sourceDataType: "",
-      verifiedBy: "",
+      estimatedLatinoPopulation:
+        initialStateData?.info?.estimatedLatinoPopulation?.toString() ?? "",
+      estimatedLatinoBusinessPresence:
+        initialStateData?.info?.estimatedLatinoBusinessPresence?.toString() ?? "",
+      topIndustries: initialStateData?.info?.topIndustries ?? "",
+      amsClientsCount: initialStateData?.info?.amsClientsCount?.toString() ?? "",
+      amsLeadsCount: initialStateData?.info?.amsLeadsCount?.toString() ?? "",
+      revenueFromState: initialStateData?.info?.revenueFromState ?? "",
+      opportunityScore: initialStateData?.info?.opportunityScore ?? "insufficient_data",
+      potentialServices: initialStateData?.info?.potentialServices ?? "",
+      expansionNotes: initialStateData?.info?.expansionNotes ?? "",
+      notes: initialStateData?.info?.notes ?? "",
+      sourceName: initialStateData?.info?.sourceName ?? "",
+      sourceUrl: initialStateData?.info?.sourceUrl ?? "",
+      sourceYear: initialStateData?.info?.sourceYear?.toString() ?? "",
+      sourceLastUpdated: initialStateData?.info?.sourceLastUpdated ?? "",
+      sourceDataType: initialStateData?.info?.sourceDataType ?? "",
+      verifiedBy: initialStateData?.info?.verifiedBy ?? "",
     },
   });
+
+  const openStateDialog = useCallback(
+    (abbr: string) => {
+      const stateData = data[abbr];
+      setSelectedState(abbr);
+      reset({
+        estimatedLatinoPopulation:
+          stateData?.info?.estimatedLatinoPopulation?.toString() ?? "",
+        estimatedLatinoBusinessPresence:
+          stateData?.info?.estimatedLatinoBusinessPresence?.toString() ?? "",
+        topIndustries: stateData?.info?.topIndustries ?? "",
+        amsClientsCount: stateData?.info?.amsClientsCount?.toString() ?? "",
+        amsLeadsCount: stateData?.info?.amsLeadsCount?.toString() ?? "",
+        revenueFromState: stateData?.info?.revenueFromState ?? "",
+        opportunityScore: stateData?.info?.opportunityScore ?? "insufficient_data",
+        potentialServices: stateData?.info?.potentialServices ?? "",
+        expansionNotes: stateData?.info?.expansionNotes ?? "",
+        notes: stateData?.info?.notes ?? "",
+        sourceName: stateData?.info?.sourceName ?? "",
+        sourceUrl: stateData?.info?.sourceUrl ?? "",
+        sourceYear: stateData?.info?.sourceYear?.toString() ?? "",
+        sourceLastUpdated: stateData?.info?.sourceLastUpdated ?? "",
+        sourceDataType: stateData?.info?.sourceDataType ?? "",
+        verifiedBy: stateData?.info?.verifiedBy ?? "",
+      });
+    },
+    [data, reset],
+  );
 
   const states = useMemo(() => {
     const settings: Record<string, UsaStateMapStateConfig> = {};
@@ -150,29 +195,7 @@ export function LatinoBusinessMap({
       settings[abbr] = {
         fill: matches ? SCORE_COLOR[score] : DIMMED_FILL,
         stroke: "#0F1A2B",
-        onClick: () => {
-          setSelectedState(abbr);
-          reset({
-            estimatedLatinoPopulation:
-              stateData?.info?.estimatedLatinoPopulation?.toString() ?? "",
-            estimatedLatinoBusinessPresence:
-              stateData?.info?.estimatedLatinoBusinessPresence?.toString() ?? "",
-            topIndustries: stateData?.info?.topIndustries ?? "",
-            amsClientsCount: stateData?.info?.amsClientsCount?.toString() ?? "",
-            amsLeadsCount: stateData?.info?.amsLeadsCount?.toString() ?? "",
-            revenueFromState: stateData?.info?.revenueFromState ?? "",
-            opportunityScore: stateData?.info?.opportunityScore ?? "insufficient_data",
-            potentialServices: stateData?.info?.potentialServices ?? "",
-            expansionNotes: stateData?.info?.expansionNotes ?? "",
-            notes: stateData?.info?.notes ?? "",
-            sourceName: stateData?.info?.sourceName ?? "",
-            sourceUrl: stateData?.info?.sourceUrl ?? "",
-            sourceYear: stateData?.info?.sourceYear?.toString() ?? "",
-            sourceLastUpdated: stateData?.info?.sourceLastUpdated ?? "",
-            sourceDataType: stateData?.info?.sourceDataType ?? "",
-            verifiedBy: stateData?.info?.verifiedBy ?? "",
-          });
-        },
+        onClick: () => openStateDialog(abbr),
         tooltip: (
           <div style={{ fontSize: 12, padding: 2 }}>
             <strong>{abbr}</strong>
@@ -190,7 +213,7 @@ export function LatinoBusinessMap({
     });
 
     return settings;
-  }, [data, filters, reset, t, tScore]);
+  }, [data, filters, openStateDialog, t, tScore]);
 
   function submit(values: LatinoBusinessDataFormValues) {
     if (!selectedState) return;

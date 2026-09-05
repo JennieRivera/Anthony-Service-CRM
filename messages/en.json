@@ -888,7 +888,8 @@
       "noCommunications": "No communications logged yet.",
       "noReferrals": "No referrals yet.",
       "outstandingBalance": "Outstanding Balance"
-    }
+    },
+    "filteredByState": "Filtered by state:"
   },
   "AuditLog": {
     "title": "Audit Log",
@@ -1817,7 +1818,8 @@
     },
     "inactiveBadge": "Inactive",
     "activate": "Activate",
-    "deactivate": "Deactivate"
+    "deactivate": "Deactivate",
+    "filteredByState": "Filtered by state:"
   },
   "LatinoOpportunityScore": {
     "very_high": "Very High",

@@ -1,13 +1,19 @@
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { listAssociationsChambers } from "@/lib/queries/associationsChambers";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { AssociationTable } from "@/components/associations/AssociationTable";
 
-export default async function AssociationsPage() {
+export default async function AssociationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ state?: string }>;
+}) {
   const t = await getTranslations("Associations");
-  const organizations = await listAssociationsChambers();
+  const { state } = await searchParams;
+  const organizations = await listAssociationsChambers(state);
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -18,6 +24,20 @@ export default async function AssociationsPage() {
           {t("newOrganization")}
         </Button>
       </div>
+
+      {state && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            {t("filteredByState", { state })}
+          </span>
+          <Link href="/associations">
+            <Badge variant="outline" className="flex items-center gap-1">
+              {state}
+              <X className="h-3 w-3" />
+            </Badge>
+          </Link>
+        </div>
+      )}
 
       {organizations.length === 0 ? (
         <p className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">

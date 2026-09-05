@@ -31,8 +31,12 @@ export type CompanyTimelineEntry = {
   href?: string;
 };
 
-export async function listCompanies() {
-  return getDb().select().from(companies).orderBy(desc(companies.createdAt));
+export async function listCompanies(state?: string) {
+  return getDb()
+    .select()
+    .from(companies)
+    .where(state ? eq(companies.stateOfFormation, state) : undefined)
+    .orderBy(desc(companies.createdAt));
 }
 
 export async function listCompaniesForSelect() {

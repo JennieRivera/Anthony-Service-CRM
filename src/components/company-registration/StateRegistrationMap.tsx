@@ -157,20 +157,32 @@ export function StateRegistrationMap() {
               </div>
 
               <div className="flex flex-wrap gap-2 border-t border-border pt-3">
-                <Button size="sm" variant="outline" render={<Link href="/sales-tax-map" />}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  render={<Link href={`/sales-tax-map?state=${selectedState}`} />}
+                >
                   {t("viewSalesTaxMap")}
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
-                  render={<Link href="/latino-business-map" />}
+                  render={<Link href={`/latino-business-map?state=${selectedState}`} />}
                 >
                   {t("viewLatinoBusinessMap")}
                 </Button>
-                <Button size="sm" variant="outline" render={<Link href="/associations" />}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  render={<Link href={`/associations?state=${selectedState}`} />}
+                >
                   {t("viewAssociations")}
                 </Button>
-                <Button size="sm" variant="outline" render={<Link href="/companies" />}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  render={<Link href={`/companies?state=${selectedState}`} />}
+                >
                   {t("viewCompanies")}
                 </Button>
               </div>
