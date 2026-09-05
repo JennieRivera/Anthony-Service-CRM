@@ -33,6 +33,9 @@ export default async function CaseDetailPage({
   const tDeliverableStatus = await getTranslations("DeliverableStatus");
   const tBookkeepingCaseStatus = await getTranslations("BookkeepingCaseStatus");
   const tImmigrationCaseStatus = await getTranslations("ImmigrationCaseStatus");
+  const tCreditAccountType = await getTranslations("CreditAccountType");
+  const tCreditCaseStatus = await getTranslations("CreditCaseStatus");
+  const tConsultingCaseStatus = await getTranslations("ConsultingCaseStatus");
 
   const result = await getCaseById(id);
   if (!result) notFound();
@@ -46,6 +49,8 @@ export default async function CaseDetailPage({
     taxDetails,
     bookkeepingDetails,
     immigrationDetails,
+    creditDetails,
+    consultingDetails,
     documents,
     statusHistory,
   } = result;
@@ -630,6 +635,168 @@ export default async function CaseDetailPage({
               <p className="text-foreground">
                 {immigrationDetails.clientProvidedInstructions}
               </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {creditDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <p className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            {t("creditDisclaimer")}
+          </p>
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("creditServiceDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tCreditCaseStatus(creditDetails.status)}
+            </Badge>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.creditServiceType")}
+              </p>
+              <p className="text-foreground">
+                {creditDetails.creditServiceType ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.accountType")}</p>
+              <p className="text-foreground">
+                {creditDetails.accountType
+                  ? tCreditAccountType(creditDetails.accountType)
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.initialConsultationDate")}
+              </p>
+              <p className="text-foreground">
+                {creditDetails.initialConsultationDate
+                  ? new Date(
+                      creditDetails.initialConsultationDate,
+                    ).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.creditReportReviewDate")}
+              </p>
+              <p className="text-foreground">
+                {creditDetails.creditReportReviewDate
+                  ? new Date(
+                      creditDetails.creditReportReviewDate,
+                    ).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.creditEducationCompleted")}
+              </p>
+              <p className="text-foreground">
+                {creditDetails.creditEducationCompleted ? "✓" : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.mainClientGoal")}
+              </p>
+              <p className="text-foreground">
+                {creditDetails.mainClientGoal ?? "—"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {consultingDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("consultingServiceDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tConsultingCaseStatus(consultingDetails.status)}
+            </Badge>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.businessStage")}
+              </p>
+              <p className="text-foreground">
+                {consultingDetails.businessStage ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.consultingPackage")}
+              </p>
+              <p className="text-foreground">
+                {consultingDetails.consultingPackage ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.numberOfSessions")}
+              </p>
+              <p className="text-foreground">
+                {consultingDetails.sessionsCompleted ?? 0} /{" "}
+                {consultingDetails.numberOfSessions ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.completionPercentage")}
+              </p>
+              <p className="text-foreground">
+                {consultingDetails.completionPercentage != null
+                  ? `${consultingDetails.completionPercentage}%`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.goal30Day")}</p>
+              <p className="text-foreground">
+                {consultingDetails.goal30Day ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.goal90Day")}</p>
+              <p className="text-foreground">
+                {consultingDetails.goal90Day ?? "—"}
+              </p>
+            </div>
+          </div>
+          {consultingDetails.businessProblem && (
+            <div className="text-sm">
+              <p className="text-muted-foreground">
+                {t("form.businessProblem")}
+              </p>
+              <p className="text-foreground">
+                {consultingDetails.businessProblem}
+              </p>
+            </div>
+          )}
+          {consultingDetails.diagnosisSummary && (
+            <div className="text-sm">
+              <p className="text-muted-foreground">
+                {t("form.diagnosisSummary")}
+              </p>
+              <p className="text-foreground">
+                {consultingDetails.diagnosisSummary}
+              </p>
+            </div>
+          )}
+          {consultingDetails.actionPlan && (
+            <div className="text-sm">
+              <p className="text-muted-foreground">{t("form.actionPlan")}</p>
+              <p className="text-foreground">{consultingDetails.actionPlan}</p>
             </div>
           )}
         </div>

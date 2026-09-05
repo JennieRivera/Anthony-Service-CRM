@@ -114,6 +114,33 @@ export const immigrationCaseStatusValues = [
   "cancelled",
 ] as const;
 
+// Phase 2, Session 3
+export const creditAccountTypeValues = ["personal", "business"] as const;
+export const creditCaseStatusValues = [
+  "new_inquiry",
+  "consultation_scheduled",
+  "assessment",
+  "education",
+  "action_plan",
+  "follow_up",
+  "monitoring",
+  "completed",
+  "cancelled",
+] as const;
+
+export const consultingCaseStatusValues = [
+  "lead",
+  "discovery_call",
+  "diagnosis",
+  "proposal",
+  "agreement_signed",
+  "implementation",
+  "review",
+  "active_consulting",
+  "final_review",
+  "completed",
+] as const;
+
 const optionalString = z.string().trim().optional().or(z.literal(""));
 
 export const caseFormSchema = z.object({
@@ -227,6 +254,35 @@ export const caseFormSchema = z.object({
     .enum(immigrationCaseStatusValues)
     .optional()
     .or(z.literal("")),
+  // Credit service details (relevant when serviceType is Credit Financing)
+  creditServiceType: optionalString,
+  accountType: z.enum(creditAccountTypeValues).optional().or(z.literal("")),
+  initialConsultationDate: optionalString,
+  creditEducationCompleted: z.boolean().optional(),
+  creditReportReviewDate: optionalString,
+  mainClientGoal: optionalString,
+  creditCaseStatus: z
+    .enum(creditCaseStatusValues)
+    .optional()
+    .or(z.literal("")),
+  // Business consulting details (relevant when serviceType is Leadership)
+  businessProblem: optionalString,
+  businessStage: optionalString,
+  diagnosisSummary: optionalString,
+  primaryGoal: optionalString,
+  recommendedStrategy: optionalString,
+  consultingPackage: optionalString,
+  numberOfSessions: optionalString,
+  sessionsCompleted: optionalString,
+  milestones: optionalString,
+  actionPlan: optionalString,
+  goal30Day: optionalString,
+  goal90Day: optionalString,
+  completionPercentage: optionalString,
+  consultingCaseStatus: z
+    .enum(consultingCaseStatusValues)
+    .optional()
+    .or(z.literal("")),
 });
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
@@ -235,3 +291,5 @@ export const notaryServiceTypes = ["online_notary", "notary"];
 export const taxServiceTypes = ["tax_prep"];
 export const bookkeepingServiceTypes = ["bookkeeping"];
 export const immigrationServiceTypes = ["immigration"];
+export const creditServiceTypes = ["credit_financing"];
+export const consultingServiceTypes = ["leadership"];

@@ -12,6 +12,8 @@ import {
   taxServiceDetails,
   bookkeepingServiceDetails,
   immigrationServiceDetails,
+  creditServiceDetails,
+  consultingServiceDetails,
   caseStatusEnum,
   caseStatusHistory,
   tasks,
@@ -23,6 +25,8 @@ import {
   taxServiceTypes,
   bookkeepingServiceTypes,
   immigrationServiceTypes,
+  creditServiceTypes,
+  consultingServiceTypes,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { redirect } from "@/i18n/navigation";
@@ -187,6 +191,27 @@ function deriveEffectiveStatus(
     if (s === "completed") return "completed";
     if (s === "client_instructions_pending") return "waiting_on_client";
     if (s === "new_inquiry") return "new";
+    return "in_progress";
+  }
+
+  if (
+    creditServiceTypes.includes(values.serviceType) &&
+    values.creditCaseStatus
+  ) {
+    const s = values.creditCaseStatus;
+    if (s === "cancelled") return "cancelled";
+    if (s === "completed") return "completed";
+    if (s === "new_inquiry") return "new";
+    return "in_progress";
+  }
+
+  if (
+    consultingServiceTypes.includes(values.serviceType) &&
+    values.consultingCaseStatus
+  ) {
+    const s = values.consultingCaseStatus;
+    if (s === "completed") return "completed";
+    if (s === "lead") return "new";
     return "in_progress";
   }
 
@@ -396,6 +421,61 @@ async function upsertServiceDetails(
       .values({ caseId, ...detail })
       .onConflictDoUpdate({
         target: immigrationServiceDetails.caseId,
+        set: detail,
+      });
+    return;
+  }
+
+  if (creditServiceTypes.includes(values.serviceType)) {
+    const detail = {
+      creditServiceType: values.creditServiceType || null,
+      accountType: values.accountType || null,
+      initialConsultationDate: values.initialConsultationDate || null,
+      creditEducationCompleted: values.creditEducationCompleted ?? false,
+      creditReportReviewDate: values.creditReportReviewDate || null,
+      mainClientGoal: values.mainClientGoal || null,
+      status: values.creditCaseStatus || "new_inquiry",
+    };
+
+    await db
+      .insert(creditServiceDetails)
+      .values({ caseId, ...detail })
+      .onConflictDoUpdate({
+        target: creditServiceDetails.caseId,
+        set: detail,
+      });
+    return;
+  }
+
+  if (consultingServiceTypes.includes(values.serviceType)) {
+    const detail = {
+      businessProblem: values.businessProblem || null,
+      businessStage: values.businessStage || null,
+      diagnosisSummary: values.diagnosisSummary || null,
+      primaryGoal: values.primaryGoal || null,
+      recommendedStrategy: values.recommendedStrategy || null,
+      consultingPackage: values.consultingPackage || null,
+      numberOfSessions: values.numberOfSessions
+        ? Number(values.numberOfSessions)
+        : null,
+      sessionsCompleted: values.sessionsCompleted
+        ? Number(values.sessionsCompleted)
+        : null,
+      milestones: values.milestones || null,
+      actionPlan: values.actionPlan || null,
+      goal30Day: values.goal30Day || null,
+      goal90Day: values.goal90Day || null,
+      completionPercentage: values.completionPercentage
+        ? Number(values.completionPercentage)
+        : null,
+      status: values.consultingCaseStatus || "lead",
+    };
+
+    await db
+      .insert(consultingServiceDetails)
+      .values({ caseId, ...detail })
+      .onConflictDoUpdate({
+        target: consultingServiceDetails.caseId,
         set: detail,
       });
     return;

@@ -50,6 +50,13 @@
       "when": 1788577018959,
       "tag": "0006_late_cannonball",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788578333745,
+      "tag": "0007_legal_ricochet",
+      "breakpoints": true
     }
   ]
 }

@@ -37,6 +37,11 @@ import {
   deliverableStatusValues,
   bookkeepingCaseStatusValues,
   immigrationCaseStatusValues,
+  creditServiceTypes,
+  consultingServiceTypes,
+  creditAccountTypeValues,
+  creditCaseStatusValues,
+  consultingCaseStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
@@ -47,6 +52,8 @@ import type {
   TaxServiceDetails,
   BookkeepingServiceDetails,
   ImmigrationServiceDetails,
+  CreditServiceDetails,
+  ConsultingServiceDetails,
 } from "@/lib/db/schema";
 
 export function CaseForm({
@@ -55,6 +62,8 @@ export function CaseForm({
   taxDetails,
   bookkeepingDetails,
   immigrationDetails,
+  creditDetails,
+  consultingDetails,
   clients,
   defaultClientId,
   onSubmit,
@@ -64,6 +73,8 @@ export function CaseForm({
   taxDetails?: TaxServiceDetails | null;
   bookkeepingDetails?: BookkeepingServiceDetails | null;
   immigrationDetails?: ImmigrationServiceDetails | null;
+  creditDetails?: CreditServiceDetails | null;
+  consultingDetails?: ConsultingServiceDetails | null;
   clients: { id: string; fullName: string }[];
   defaultClientId?: string;
   onSubmit: (values: CaseFormValues) => Promise<void>;
@@ -86,6 +97,9 @@ export function CaseForm({
   const tDeliverableStatus = useTranslations("DeliverableStatus");
   const tBookkeepingCaseStatus = useTranslations("BookkeepingCaseStatus");
   const tImmigrationCaseStatus = useTranslations("ImmigrationCaseStatus");
+  const tCreditAccountType = useTranslations("CreditAccountType");
+  const tCreditCaseStatus = useTranslations("CreditCaseStatus");
+  const tConsultingCaseStatus = useTranslations("ConsultingCaseStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -189,6 +203,29 @@ export function CaseForm({
       attorneyReferralDate: immigrationDetails?.attorneyReferralDate ?? "",
       governmentFilingFee: immigrationDetails?.governmentFilingFee ?? "",
       immigrationCaseStatus: immigrationDetails?.status ?? "new_inquiry",
+      creditServiceType: creditDetails?.creditServiceType ?? "",
+      accountType: creditDetails?.accountType ?? "",
+      initialConsultationDate: creditDetails?.initialConsultationDate ?? "",
+      creditEducationCompleted: creditDetails?.creditEducationCompleted ?? false,
+      creditReportReviewDate: creditDetails?.creditReportReviewDate ?? "",
+      mainClientGoal: creditDetails?.mainClientGoal ?? "",
+      creditCaseStatus: creditDetails?.status ?? "new_inquiry",
+      businessProblem: consultingDetails?.businessProblem ?? "",
+      businessStage: consultingDetails?.businessStage ?? "",
+      diagnosisSummary: consultingDetails?.diagnosisSummary ?? "",
+      primaryGoal: consultingDetails?.primaryGoal ?? "",
+      recommendedStrategy: consultingDetails?.recommendedStrategy ?? "",
+      consultingPackage: consultingDetails?.consultingPackage ?? "",
+      numberOfSessions: consultingDetails?.numberOfSessions?.toString() ?? "",
+      sessionsCompleted:
+        consultingDetails?.sessionsCompleted?.toString() ?? "",
+      milestones: consultingDetails?.milestones ?? "",
+      actionPlan: consultingDetails?.actionPlan ?? "",
+      goal30Day: consultingDetails?.goal30Day ?? "",
+      goal90Day: consultingDetails?.goal90Day ?? "",
+      completionPercentage:
+        consultingDetails?.completionPercentage?.toString() ?? "",
+      consultingCaseStatus: consultingDetails?.status ?? "lead",
     },
   });
 
@@ -197,6 +234,8 @@ export function CaseForm({
   const isTax = taxServiceTypes.includes(serviceType);
   const isBookkeeping = bookkeepingServiceTypes.includes(serviceType);
   const isImmigration = immigrationServiceTypes.includes(serviceType);
+  const isCredit = creditServiceTypes.includes(serviceType);
+  const isConsulting = consultingServiceTypes.includes(serviceType);
   // Apostille / authentication fields are an optional add-on for Document Prep cases.
   const isApostille = serviceType === "document_prep";
 
@@ -272,7 +311,12 @@ export function CaseForm({
           />
         </div>
 
-        {!isNotary && !isTax && !isBookkeeping && !isImmigration && (
+        {!isNotary &&
+          !isTax &&
+          !isBookkeeping &&
+          !isImmigration &&
+          !isCredit &&
+          !isConsulting && (
           <div className="flex flex-col gap-1.5">
             <Label>{t("status")}</Label>
             <Controller
@@ -312,6 +356,12 @@ export function CaseForm({
       {isImmigration && (
         <p className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
           {tCases("immigrationDisclaimer")}
+        </p>
+      )}
+
+      {isCredit && (
+        <p className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          {tCases("creditDisclaimer")}
         </p>
       )}
 
@@ -1358,6 +1408,249 @@ export function CaseForm({
             <p className="text-xs text-muted-foreground">
               {t("noSensitiveDataWarning")}
             </p>
+          </div>
+        </div>
+      )}
+
+      {isCredit && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("creditServiceDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="creditServiceType">
+                {t("creditServiceType")}
+              </Label>
+              <Input
+                id="creditServiceType"
+                placeholder="Credit Repair, Credit Building..."
+                {...register("creditServiceType")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("accountType")}</Label>
+              <Controller
+                control={control}
+                name="accountType"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {creditAccountTypeValues.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {tCreditAccountType(type)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("creditCaseStatus")}</Label>
+              <Controller
+                control={control}
+                name="creditCaseStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {creditCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tCreditCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="initialConsultationDate">
+                {t("initialConsultationDate")}
+              </Label>
+              <Input
+                id="initialConsultationDate"
+                type="date"
+                {...register("initialConsultationDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="creditReportReviewDate">
+                {t("creditReportReviewDate")}
+              </Label>
+              <Input
+                id="creditReportReviewDate"
+                type="date"
+                {...register("creditReportReviewDate")}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="creditEducationCompleted"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("creditEducationCompleted")}</Label>
+            </div>
+
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <Label htmlFor="mainClientGoal">{t("mainClientGoal")}</Label>
+              <Input id="mainClientGoal" {...register("mainClientGoal")} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isConsulting && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("consultingServiceDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="businessStage">{t("businessStage")}</Label>
+              <Input id="businessStage" {...register("businessStage")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="consultingPackage">
+                {t("consultingPackage")}
+              </Label>
+              <Input
+                id="consultingPackage"
+                {...register("consultingPackage")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("consultingCaseStatus")}</Label>
+              <Controller
+                control={control}
+                name="consultingCaseStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {consultingCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tConsultingCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="numberOfSessions">
+                {t("numberOfSessions")}
+              </Label>
+              <Input
+                id="numberOfSessions"
+                type="number"
+                {...register("numberOfSessions")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="sessionsCompleted">
+                {t("sessionsCompleted")}
+              </Label>
+              <Input
+                id="sessionsCompleted"
+                type="number"
+                {...register("sessionsCompleted")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="completionPercentage">
+                {t("completionPercentage")}
+              </Label>
+              <Input
+                id="completionPercentage"
+                type="number"
+                min="0"
+                max="100"
+                {...register("completionPercentage")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="goal30Day">{t("goal30Day")}</Label>
+              <Input id="goal30Day" {...register("goal30Day")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="goal90Day">{t("goal90Day")}</Label>
+              <Input id="goal90Day" {...register("goal90Day")} />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="businessProblem">{t("businessProblem")}</Label>
+              <Textarea
+                id="businessProblem"
+                rows={2}
+                {...register("businessProblem")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="diagnosisSummary">
+                {t("diagnosisSummary")}
+              </Label>
+              <Textarea
+                id="diagnosisSummary"
+                rows={2}
+                {...register("diagnosisSummary")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="primaryGoal">{t("primaryGoal")}</Label>
+              <Textarea
+                id="primaryGoal"
+                rows={2}
+                {...register("primaryGoal")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="recommendedStrategy">
+                {t("recommendedStrategy")}
+              </Label>
+              <Textarea
+                id="recommendedStrategy"
+                rows={2}
+                {...register("recommendedStrategy")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="milestones">{t("milestones")}</Label>
+              <Textarea id="milestones" rows={2} {...register("milestones")} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="actionPlan">{t("actionPlan")}</Label>
+              <Textarea id="actionPlan" rows={2} {...register("actionPlan")} />
+            </div>
           </div>
         </div>
       )}

@@ -540,6 +540,80 @@ export const immigrationServiceDetails = pgTable("immigration_service_details", 
   status: immigrationCaseStatusEnum("status").notNull().default("new_inquiry"),
 });
 
+// Phase 2, Session 3 — Credit Services category.
+// Reuses the existing `credit_financing` service_type (its only 2 rows are
+// seed data — one credit-repair, one loan-application — confirming the
+// category split already anticipated for Commercial Finance/RRI later).
+// Always shown with a permanent "no outcome guaranteed" disclaimer.
+export const creditAccountTypeEnum = pgEnum("credit_account_type", [
+  "personal",
+  "business",
+]);
+
+export const creditCaseStatusEnum = pgEnum("credit_case_status", [
+  "new_inquiry",
+  "consultation_scheduled",
+  "assessment",
+  "education",
+  "action_plan",
+  "follow_up",
+  "monitoring",
+  "completed",
+  "cancelled",
+]);
+
+export const creditServiceDetails = pgTable("credit_service_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  creditServiceType: text("credit_service_type"),
+  accountType: creditAccountTypeEnum("account_type"),
+  initialConsultationDate: date("initial_consultation_date"),
+  creditEducationCompleted: boolean("credit_education_completed")
+    .notNull()
+    .default(false),
+  creditReportReviewDate: date("credit_report_review_date"),
+  mainClientGoal: text("main_client_goal"),
+  status: creditCaseStatusEnum("status").notNull().default("new_inquiry"),
+});
+
+// Phase 2, Session 3 — Business Consulting category.
+// Reuses the existing `leadership` service_type (0 existing rows; its
+// current template already describes "leadership coaching, training, or
+// consulting engagement", a close match with no data-migration risk).
+export const consultingCaseStatusEnum = pgEnum("consulting_case_status", [
+  "lead",
+  "discovery_call",
+  "diagnosis",
+  "proposal",
+  "agreement_signed",
+  "implementation",
+  "review",
+  "active_consulting",
+  "final_review",
+  "completed",
+]);
+
+export const consultingServiceDetails = pgTable("consulting_service_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  businessProblem: text("business_problem"),
+  businessStage: text("business_stage"),
+  diagnosisSummary: text("diagnosis_summary"),
+  primaryGoal: text("primary_goal"),
+  recommendedStrategy: text("recommended_strategy"),
+  consultingPackage: text("consulting_package"),
+  numberOfSessions: integer("number_of_sessions"),
+  sessionsCompleted: integer("sessions_completed"),
+  milestones: text("milestones"),
+  actionPlan: text("action_plan"),
+  goal30Day: text("goal_30_day"),
+  goal90Day: text("goal_90_day"),
+  completionPercentage: integer("completion_percentage"),
+  status: consultingCaseStatusEnum("status").notNull().default("lead"),
+});
+
 export const conversationMessages = pgTable("conversation_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -635,3 +709,6 @@ export type BookkeepingServiceDetails =
   typeof bookkeepingServiceDetails.$inferSelect;
 export type ImmigrationServiceDetails =
   typeof immigrationServiceDetails.$inferSelect;
+export type CreditServiceDetails = typeof creditServiceDetails.$inferSelect;
+export type ConsultingServiceDetails =
+  typeof consultingServiceDetails.$inferSelect;

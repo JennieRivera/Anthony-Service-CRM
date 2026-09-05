@@ -9,6 +9,8 @@ import {
   taxServiceDetails,
   bookkeepingServiceDetails,
   immigrationServiceDetails,
+  creditServiceDetails,
+  consultingServiceDetails,
   documents,
   caseStatusHistory,
 } from "@/lib/db/schema";
@@ -60,6 +62,8 @@ export async function getCaseById(id: string) {
     taxDetails,
     bookkeepingDetails,
     immigrationDetails,
+    creditDetails,
+    consultingDetails,
     caseDocuments,
     statusHistory,
   ] = await Promise.all([
@@ -95,6 +99,16 @@ export async function getCaseById(id: string) {
       .limit(1),
     db
       .select()
+      .from(creditServiceDetails)
+      .where(eq(creditServiceDetails.caseId, id))
+      .limit(1),
+    db
+      .select()
+      .from(consultingServiceDetails)
+      .where(eq(consultingServiceDetails.caseId, id))
+      .limit(1),
+    db
+      .select()
       .from(documents)
       .where(eq(documents.caseId, id))
       .orderBy(desc(documents.createdAt)),
@@ -114,6 +128,8 @@ export async function getCaseById(id: string) {
     taxDetails: taxDetails[0] ?? null,
     bookkeepingDetails: bookkeepingDetails[0] ?? null,
     immigrationDetails: immigrationDetails[0] ?? null,
+    creditDetails: creditDetails[0] ?? null,
+    consultingDetails: consultingDetails[0] ?? null,
     documents: caseDocuments,
     statusHistory,
   };
