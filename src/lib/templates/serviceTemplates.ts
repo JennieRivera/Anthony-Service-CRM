@@ -19,8 +19,8 @@ export type ServiceTemplate = {
 };
 
 const UPL_DISCLAIMER: Bilingual = {
-  en: "Anthony Service, LLC is not a law firm, and no one at Anthony Service, LLC is an attorney licensed to practice law in the State of Florida. We cannot give legal advice, explain your legal rights, select legal forms for you, or represent you before any court or government agency.",
-  es: "Anthony Service, LLC no es un bufete de abogados, y nadie en Anthony Service, LLC es abogado(a) autorizado(a) para ejercer la abogacía en el Estado de la Florida. No podemos brindar asesoría legal, explicar sus derechos legales, seleccionar formularios legales por usted, ni representarlo(a) ante ningún tribunal o agencia gubernamental.",
+  en: "Anthony Multiservice, LLC is not a law firm, and no one at Anthony Multiservice, LLC is an attorney licensed to practice law in the State of Florida. We cannot give legal advice, explain your legal rights, select legal forms for you, or represent you before any court or government agency.",
+  es: "Anthony Multiservice, LLC no es un bufete de abogados, y nadie en Anthony Multiservice, LLC es abogado(a) autorizado(a) para ejercer la abogacía en el Estado de la Florida. No podemos brindar asesoría legal, explicar sus derechos legales, seleccionar formularios legales por usted, ni representarlo(a) ante ningún tribunal o agencia gubernamental.",
 };
 
 const TAX_DISCLAIMER: Bilingual = {
@@ -29,8 +29,8 @@ const TAX_DISCLAIMER: Bilingual = {
 };
 
 const FINANCE_DISCLAIMER: Bilingual = {
-  en: "Anthony Service, LLC assists with document preparation and organization only. We do not guarantee approval by any lender or institution and do not provide financial or investment advice.",
-  es: "Anthony Service, LLC únicamente ayuda con la preparación y organización de documentos. No garantizamos la aprobación por parte de ningún prestamista o institución, ni ofrecemos asesoría financiera o de inversión.",
+  en: "Anthony Multiservice, LLC assists with document preparation and organization only. We do not guarantee approval by any lender or institution and do not provide financial or investment advice.",
+  es: "Anthony Multiservice, LLC únicamente ayuda con la preparación y organización de documentos. No garantizamos la aprobación por parte de ningún prestamista o institución, ni ofrecemos asesoría financiera o de inversión.",
 };
 
 const templates: Record<
@@ -80,8 +80,8 @@ const templates: Record<
       es: "Hoja de Admisión — Preparación de Documentos",
     },
     intro: {
-      en: "This intake sheet records the information you provide so that Anthony Service, LLC can prepare the requested document(s) for your review and signature. This covers general document preparation, immigration paperwork, and apostille/authentication requests.",
-      es: "Esta hoja de admisión registra la información que usted proporciona para que Anthony Service, LLC prepare el/los documento(s) solicitado(s) para su revisión y firma. Esto cubre preparación general de documentos, papeleo de inmigración, y solicitudes de apostilla/autenticación.",
+      en: "This intake sheet records the information you provide so that Anthony Multiservice, LLC can prepare the requested document(s) for your review and signature. This covers general document preparation, immigration paperwork, and apostille/authentication requests.",
+      es: "Esta hoja de admisión registra la información que usted proporciona para que Anthony Multiservice, LLC prepare el/los documento(s) solicitado(s) para su revisión y firma. Esto cubre preparación general de documentos, papeleo de inmigración, y solicitudes de apostilla/autenticación.",
     },
     sections: [
       {

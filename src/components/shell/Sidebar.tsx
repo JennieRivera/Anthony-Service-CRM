@@ -22,8 +22,8 @@ export function Sidebar() {
     >
       <div className="flex h-16 items-center overflow-hidden px-4">
         {collapsed ? (
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--sidebar-primary)] font-heading text-sm text-[var(--sidebar-primary)]">
-            AS
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--sidebar-primary)] font-heading text-xs text-[var(--sidebar-primary)]">
+            AMS
           </span>
         ) : (
           <Logo />

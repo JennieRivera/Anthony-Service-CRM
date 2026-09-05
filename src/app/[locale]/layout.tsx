@@ -17,8 +17,8 @@ const publicSans = Public_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Anthony Service CRM",
-  description: "CRM for Anthony Service, LLC",
+  title: "Anthony Multiservice CRM",
+  description: "CRM for Anthony Multiservice, LLC",
 };
 
 export function generateStaticParams() {

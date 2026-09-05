@@ -21,7 +21,7 @@ export default async function SettingsPage() {
             <p className="text-sm text-muted-foreground">
               {t("businessName")}
             </p>
-            <p className="text-foreground">Anthony Service, LLC</p>
+            <p className="text-foreground">Anthony Multiservice, LLC</p>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">{t("phone")}</p>

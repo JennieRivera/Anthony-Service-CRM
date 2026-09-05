@@ -1,6 +1,6 @@
-# Anthony Service CRM
+# Anthony Multiservice CRM
 
-A premium client-management platform for [Anthony Service, LLC](https://anthonyservice.com) (Kissimmee, FL) — tracks every client relationship and transaction across the business's service lines: notary (in-person, mobile, online), immigration, tax prep, apostille, document prep, and credit/financing.
+A premium client-management platform for [Anthony Multiservice, LLC](https://anthonyservice.com) (Kissimmee, FL) — tracks every client relationship and transaction across the business's service lines: notary (in-person, mobile, online), immigration, tax prep, apostille, document prep, and credit/financing.
 
 ## Modules
 

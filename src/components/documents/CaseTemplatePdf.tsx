@@ -171,7 +171,7 @@ export function CaseTemplatePdf({
       <Page size="LETTER" style={styles.page}>
         <View style={styles.header}>
           <View>
-            <Text style={styles.businessName}>Anthony Service, LLC</Text>
+            <Text style={styles.businessName}>Anthony Multiservice, LLC</Text>
             <Text style={styles.muted}>2610 Orchid Ln, Kissimmee, FL</Text>
             <Text style={styles.muted}>(407) 802-7252</Text>
           </View>

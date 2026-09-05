@@ -38,7 +38,7 @@ export function ReportPdf({
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
-        <Text style={styles.title}>Anthony Service, LLC — Report</Text>
+        <Text style={styles.title}>Anthony Multiservice, LLC — Report</Text>
         <Text style={styles.muted}>
           {from} to {to}
         </Text>
