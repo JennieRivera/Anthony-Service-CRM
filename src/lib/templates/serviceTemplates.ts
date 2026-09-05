@@ -203,6 +203,33 @@ const templates: Record<
     includeNotaryBlock: false,
   },
 
+  immigration: {
+    documentTitle: {
+      en: "Immigration Administrative Services Intake",
+      es: "Hoja de Admisión — Servicios Administrativos de Inmigración",
+    },
+    intro: {
+      en: "This intake sheet records the administrative document preparation assistance you are requesting.",
+      es: "Esta hoja de admisión registra la asistencia de preparación administrativa de documentos que usted solicita.",
+    },
+    sections: [
+      {
+        heading: { en: "Request Information", es: "Información de la Solicitud" },
+        fields: [
+          { en: "Administrative Service Type", es: "Tipo de Servicio Administrativo" },
+          { en: "Form Number (if known)", es: "Número de Formulario (si se conoce)" },
+          { en: "Preferred Language", es: "Idioma Preferido" },
+          { en: "Translation Needed?", es: "¿Necesita Traducción?" },
+        ],
+      },
+      {
+        heading: { en: "Important Notice", es: "Aviso Importante" },
+        body: [UPL_DISCLAIMER],
+      },
+    ],
+    includeNotaryBlock: false,
+  },
+
   tax_prep: {
     documentTitle: {
       en: "Tax & Accounting Intake Sheet",
@@ -230,6 +257,34 @@ const templates: Record<
           { en: "Rental Income", es: "Ingreso por Alquiler" },
           { en: "Business / Bookkeeping Records", es: "Registros de Negocio / Contabilidad" },
           { en: "Other", es: "Otro" },
+        ],
+      },
+      {
+        heading: { en: "Important Notice", es: "Aviso Importante" },
+        body: [TAX_DISCLAIMER],
+      },
+    ],
+    includeNotaryBlock: false,
+  },
+
+  bookkeeping: {
+    documentTitle: {
+      en: "Bookkeeping / Accounting Support Intake Sheet",
+      es: "Hoja de Admisión — Contabilidad",
+    },
+    intro: {
+      en: "Please gather the following information so we can assess and onboard your bookkeeping engagement.",
+      es: "Reúna la siguiente información para que podamos evaluar e iniciar su servicio de contabilidad.",
+    },
+    sections: [
+      {
+        heading: { en: "Business Information", es: "Información del Negocio" },
+        fields: [
+          { en: "Business Name", es: "Nombre del Negocio" },
+          { en: "Entity Type", es: "Tipo de Entidad" },
+          { en: "Industry", es: "Industria" },
+          { en: "Accounting Software Used", es: "Software de Contabilidad Utilizado" },
+          { en: "Bookkeeping Frequency (Monthly / Quarterly / Cleanup / Catch-Up)", es: "Frecuencia (Mensual / Trimestral / Limpieza / Al Día)" },
         ],
       },
       {

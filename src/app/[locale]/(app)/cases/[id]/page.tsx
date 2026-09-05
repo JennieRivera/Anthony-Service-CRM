@@ -29,6 +29,10 @@ export default async function CaseDetailPage({
   const tTaxJurisdiction = await getTranslations("TaxJurisdiction");
   const tTaxFilingStatus = await getTranslations("TaxFilingStatus");
   const tTaxCaseStatus = await getTranslations("TaxCaseStatus");
+  const tBookkeepingFrequency = await getTranslations("BookkeepingFrequency");
+  const tDeliverableStatus = await getTranslations("DeliverableStatus");
+  const tBookkeepingCaseStatus = await getTranslations("BookkeepingCaseStatus");
+  const tImmigrationCaseStatus = await getTranslations("ImmigrationCaseStatus");
 
   const result = await getCaseById(id);
   if (!result) notFound();
@@ -40,6 +44,8 @@ export default async function CaseDetailPage({
     apostille,
     notaryDetails,
     taxDetails,
+    bookkeepingDetails,
+    immigrationDetails,
     documents,
     statusHistory,
   } = result;
@@ -455,6 +461,175 @@ export default async function CaseDetailPage({
                 {t("form.internalNotes")}
               </p>
               <p className="text-foreground">{taxDetails.internalNotes}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {bookkeepingDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("bookkeepingServiceDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tBookkeepingCaseStatus(bookkeepingDetails.status)}
+            </Badge>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">{t("form.businessName")}</p>
+              <p className="text-foreground">
+                {bookkeepingDetails.businessName ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.bookkeepingFrequency")}
+              </p>
+              <p className="text-foreground">
+                {bookkeepingDetails.frequency
+                  ? tBookkeepingFrequency(bookkeepingDetails.frequency)
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.accountingSoftware")}
+              </p>
+              <p className="text-foreground">
+                {bookkeepingDetails.accountingSoftware ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.monthlyRevenueRange")}
+              </p>
+              <p className="text-foreground">
+                {bookkeepingDetails.monthlyRevenueRange ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.lastMonthReconciled")}
+              </p>
+              <p className="text-foreground">
+                {bookkeepingDetails.lastMonthReconciled
+                  ? new Date(
+                      bookkeepingDetails.lastMonthReconciled,
+                    ).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.nextBillingDate")}
+              </p>
+              <p className="text-foreground">
+                {bookkeepingDetails.nextBillingDate
+                  ? new Date(
+                      bookkeepingDetails.nextBillingDate,
+                    ).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.profitLossStatus")}
+              </p>
+              <p className="text-foreground">
+                {bookkeepingDetails.profitLossStatus
+                  ? tDeliverableStatus(bookkeepingDetails.profitLossStatus)
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.balanceSheetStatus")}
+              </p>
+              <p className="text-foreground">
+                {bookkeepingDetails.balanceSheetStatus
+                  ? tDeliverableStatus(bookkeepingDetails.balanceSheetStatus)
+                  : "—"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {immigrationDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <p className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            {t("immigrationDisclaimer")}
+          </p>
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("immigrationServiceDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tImmigrationCaseStatus(immigrationDetails.status)}
+            </Badge>
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.administrativeServiceType")}
+              </p>
+              <p className="text-foreground">
+                {immigrationDetails.administrativeServiceType ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.formNumber")}</p>
+              <p className="text-foreground">
+                {immigrationDetails.formNumber ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.language")}</p>
+              <p className="text-foreground">
+                {immigrationDetails.language ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.translationStatus")}
+              </p>
+              <p className="text-foreground">
+                {immigrationDetails.translationNeeded
+                  ? immigrationDetails.translationStatus
+                    ? tDeliverableStatus(immigrationDetails.translationStatus)
+                    : "—"
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.attorneyReferralNeeded")}
+              </p>
+              <p className="text-foreground">
+                {immigrationDetails.attorneyReferralNeeded ? "✓" : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.governmentFilingFee")}
+              </p>
+              <p className="text-foreground">
+                {immigrationDetails.governmentFilingFee
+                  ? `$${Number(immigrationDetails.governmentFilingFee).toFixed(2)}`
+                  : "—"}
+              </p>
+            </div>
+          </div>
+          {immigrationDetails.clientProvidedInstructions && (
+            <div className="text-sm">
+              <p className="text-muted-foreground">
+                {t("form.clientProvidedInstructions")}
+              </p>
+              <p className="text-foreground">
+                {immigrationDetails.clientProvidedInstructions}
+              </p>
             </div>
           )}
         </div>

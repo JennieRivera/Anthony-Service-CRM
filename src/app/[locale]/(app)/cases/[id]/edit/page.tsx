@@ -44,6 +44,8 @@ export default async function EditCasePage({
         caseRecord={result.case}
         notaryDetails={result.notaryDetails}
         taxDetails={result.taxDetails}
+        bookkeepingDetails={result.bookkeepingDetails}
+        immigrationDetails={result.immigrationDetails}
         clients={clients}
         onSubmit={submit}
       />

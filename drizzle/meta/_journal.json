@@ -43,6 +43,13 @@
       "when": 1788575698306,
       "tag": "0005_open_gladiator",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788577018959,
+      "tag": "0006_late_cannonball",
+      "breakpoints": true
     }
   ]
 }

@@ -23,6 +23,12 @@ export const serviceTypeEnum = pgEnum("service_type", [
   // `online_notary` is kept as-is for existing rows; new notary cases of
   // any modality (in person, mobile, RON, IPEN) use this value instead.
   "notary",
+  // Phase 2, Session 2
+  "bookkeeping",
+  // Kept separate from `document_prep` (which today mixes apostille and
+  // general document-prep work on 9 real cases) so existing rows aren't
+  // reinterpreted; new immigration administrative cases use this instead.
+  "immigration",
 ]);
 
 export const clientStatusEnum = pgEnum("client_status", [
@@ -438,6 +444,102 @@ export const taxServiceDetails = pgTable("tax_service_details", {
   status: taxCaseStatusEnum("status").notNull().default("new_client"),
 });
 
+// Phase 2, Session 2 — Bookkeeping / Accounting Support category.
+export const bookkeepingFrequencyEnum = pgEnum("bookkeeping_frequency", [
+  "monthly",
+  "quarterly",
+  "cleanup",
+  "catch_up",
+]);
+
+// Shared by any per-deliverable tracker (bookkeeping reports, translations,
+// etc.) that needs its own progress independent of the case's main pipeline.
+export const deliverableStatusEnum = pgEnum("deliverable_status", [
+  "not_started",
+  "in_progress",
+  "ready",
+  "delivered",
+]);
+
+export const bookkeepingCaseStatusEnum = pgEnum("bookkeeping_case_status", [
+  "lead",
+  "assessment",
+  "proposal_sent",
+  "onboarding",
+  "access_pending",
+  "documents_pending",
+  "bookkeeping_in_progress",
+  "reconciliation",
+  "internal_review",
+  "reports_ready",
+  "client_review",
+  "active_monthly",
+  "paused",
+  "closed",
+]);
+
+export const bookkeepingServiceDetails = pgTable("bookkeeping_service_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  businessName: text("business_name"),
+  entityType: text("entity_type"),
+  industry: text("industry"),
+  frequency: bookkeepingFrequencyEnum("frequency"),
+  accountingSoftware: text("accounting_software"),
+  numberOfBankAccounts: integer("number_of_bank_accounts"),
+  numberOfCreditCardAccounts: integer("number_of_credit_card_accounts"),
+  payrollUsed: boolean("payroll_used").notNull().default(false),
+  monthlyRevenueRange: text("monthly_revenue_range"),
+  lastMonthReconciled: date("last_month_reconciled"),
+  cleanupRequired: boolean("cleanup_required").notNull().default(false),
+  catchUpStartMonth: date("catch_up_start_month"),
+  catchUpEndMonth: date("catch_up_end_month"),
+  nextBillingDate: date("next_billing_date"),
+  reportsRequired: text("reports_required"),
+  profitLossStatus: deliverableStatusEnum("profit_loss_status"),
+  balanceSheetStatus: deliverableStatusEnum("balance_sheet_status"),
+  status: bookkeepingCaseStatusEnum("status").notNull().default("lead"),
+});
+
+// Phase 2, Session 2 — Immigration Administrative Services category.
+// Always shown with a permanent "not a law firm" disclaimer in the UI.
+export const immigrationCaseStatusEnum = pgEnum("immigration_case_status", [
+  "new_inquiry",
+  "administrative_intake",
+  "client_instructions_pending",
+  "documents_pending",
+  "administrative_preparation",
+  "client_review",
+  "signature_pending",
+  "ready_for_client_filing",
+  "attorney_referral",
+  "completed",
+  "cancelled",
+]);
+
+export const immigrationServiceDetails = pgTable("immigration_service_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  administrativeServiceType: text("administrative_service_type"),
+  formNumber: text("form_number"),
+  clientRequestedForm: boolean("client_requested_form").notNull().default(false),
+  clientProvidedInstructions: text("client_provided_instructions"),
+  language: text("language"),
+  translationNeeded: boolean("translation_needed").notNull().default(false),
+  translationStatus: deliverableStatusEnum("translation_status"),
+  attorneyReferralNeeded: boolean("attorney_referral_needed")
+    .notNull()
+    .default(false),
+  attorneyReferralDate: date("attorney_referral_date"),
+  governmentFilingFee: numeric("government_filing_fee", {
+    precision: 12,
+    scale: 2,
+  }),
+  status: immigrationCaseStatusEnum("status").notNull().default("new_inquiry"),
+});
+
 export const conversationMessages = pgTable("conversation_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -529,3 +631,7 @@ export type CaseStatusHistory = typeof caseStatusHistory.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type NotaryServiceDetails = typeof notaryServiceDetails.$inferSelect;
 export type TaxServiceDetails = typeof taxServiceDetails.$inferSelect;
+export type BookkeepingServiceDetails =
+  typeof bookkeepingServiceDetails.$inferSelect;
+export type ImmigrationServiceDetails =
+  typeof immigrationServiceDetails.$inferSelect;

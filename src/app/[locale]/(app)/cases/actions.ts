@@ -10,6 +10,8 @@ import {
   apostilleDetails,
   notaryServiceDetails,
   taxServiceDetails,
+  bookkeepingServiceDetails,
+  immigrationServiceDetails,
   caseStatusEnum,
   caseStatusHistory,
   tasks,
@@ -19,6 +21,8 @@ import {
   caseFormSchema,
   notaryServiceTypes,
   taxServiceTypes,
+  bookkeepingServiceTypes,
+  immigrationServiceTypes,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { redirect } from "@/i18n/navigation";
@@ -160,6 +164,29 @@ function deriveEffectiveStatus(
     if (s === "completed") return "completed";
     if (s === "rejected_correction_needed") return "waiting_on_client";
     if (s === "new_client") return "new";
+    return "in_progress";
+  }
+
+  if (
+    bookkeepingServiceTypes.includes(values.serviceType) &&
+    values.bookkeepingCaseStatus
+  ) {
+    const s = values.bookkeepingCaseStatus;
+    if (s === "closed") return "completed";
+    if (s === "paused") return "waiting_on_client";
+    if (s === "lead") return "new";
+    return "in_progress";
+  }
+
+  if (
+    immigrationServiceTypes.includes(values.serviceType) &&
+    values.immigrationCaseStatus
+  ) {
+    const s = values.immigrationCaseStatus;
+    if (s === "cancelled") return "cancelled";
+    if (s === "completed") return "completed";
+    if (s === "client_instructions_pending") return "waiting_on_client";
+    if (s === "new_inquiry") return "new";
     return "in_progress";
   }
 
@@ -308,6 +335,70 @@ async function upsertServiceDetails(
           },
         });
     }
+    return;
+  }
+
+  if (bookkeepingServiceTypes.includes(values.serviceType)) {
+    const detail = {
+      businessName: values.businessName || null,
+      entityType: values.entityType || null,
+      industry: values.industry || null,
+      frequency: values.bookkeepingFrequency || null,
+      accountingSoftware: values.accountingSoftware || null,
+      numberOfBankAccounts: values.numberOfBankAccounts
+        ? Number(values.numberOfBankAccounts)
+        : null,
+      numberOfCreditCardAccounts: values.numberOfCreditCardAccounts
+        ? Number(values.numberOfCreditCardAccounts)
+        : null,
+      payrollUsed: values.payrollUsed ?? false,
+      monthlyRevenueRange: values.monthlyRevenueRange || null,
+      lastMonthReconciled: values.lastMonthReconciled || null,
+      cleanupRequired: values.cleanupRequired ?? false,
+      catchUpStartMonth: values.catchUpStartMonth || null,
+      catchUpEndMonth: values.catchUpEndMonth || null,
+      nextBillingDate: values.nextBillingDate || null,
+      reportsRequired: values.reportsRequired || null,
+      profitLossStatus: values.profitLossStatus || null,
+      balanceSheetStatus: values.balanceSheetStatus || null,
+      status: values.bookkeepingCaseStatus || "lead",
+    };
+
+    await db
+      .insert(bookkeepingServiceDetails)
+      .values({ caseId, ...detail })
+      .onConflictDoUpdate({
+        target: bookkeepingServiceDetails.caseId,
+        set: detail,
+      });
+    return;
+  }
+
+  if (immigrationServiceTypes.includes(values.serviceType)) {
+    const detail = {
+      administrativeServiceType: values.administrativeServiceType || null,
+      formNumber: values.formNumber || null,
+      clientRequestedForm: values.clientRequestedForm ?? false,
+      clientProvidedInstructions: values.clientProvidedInstructions || null,
+      language: values.language || null,
+      translationNeeded: values.translationNeeded ?? false,
+      translationStatus: values.translationStatus || null,
+      attorneyReferralNeeded: values.attorneyReferralNeeded ?? false,
+      attorneyReferralDate: values.attorneyReferralDate || null,
+      governmentFilingFee: values.governmentFilingFee
+        ? Number(values.governmentFilingFee).toFixed(2)
+        : null,
+      status: values.immigrationCaseStatus || "new_inquiry",
+    };
+
+    await db
+      .insert(immigrationServiceDetails)
+      .values({ caseId, ...detail })
+      .onConflictDoUpdate({
+        target: immigrationServiceDetails.caseId,
+        set: detail,
+      });
+    return;
   }
 }
 

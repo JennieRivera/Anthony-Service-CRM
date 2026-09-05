@@ -70,6 +70,50 @@ export const taxCaseStatusValues = [
   "completed",
 ] as const;
 
+// Phase 2, Session 2
+export const bookkeepingFrequencyValues = [
+  "monthly",
+  "quarterly",
+  "cleanup",
+  "catch_up",
+] as const;
+export const deliverableStatusValues = [
+  "not_started",
+  "in_progress",
+  "ready",
+  "delivered",
+] as const;
+export const bookkeepingCaseStatusValues = [
+  "lead",
+  "assessment",
+  "proposal_sent",
+  "onboarding",
+  "access_pending",
+  "documents_pending",
+  "bookkeeping_in_progress",
+  "reconciliation",
+  "internal_review",
+  "reports_ready",
+  "client_review",
+  "active_monthly",
+  "paused",
+  "closed",
+] as const;
+
+export const immigrationCaseStatusValues = [
+  "new_inquiry",
+  "administrative_intake",
+  "client_instructions_pending",
+  "documents_pending",
+  "administrative_preparation",
+  "client_review",
+  "signature_pending",
+  "ready_for_client_filing",
+  "attorney_referral",
+  "completed",
+  "cancelled",
+] as const;
+
 const optionalString = z.string().trim().optional().or(z.literal(""));
 
 export const caseFormSchema = z.object({
@@ -137,9 +181,57 @@ export const caseFormSchema = z.object({
   taxAmountPaid: optionalString,
   internalNotes: optionalString,
   taxCaseStatus: z.enum(taxCaseStatusValues).optional().or(z.literal("")),
+  // Bookkeeping service details (relevant when serviceType is Bookkeeping)
+  businessName: optionalString,
+  entityType: optionalString,
+  industry: optionalString,
+  bookkeepingFrequency: z
+    .enum(bookkeepingFrequencyValues)
+    .optional()
+    .or(z.literal("")),
+  accountingSoftware: optionalString,
+  numberOfBankAccounts: optionalString,
+  numberOfCreditCardAccounts: optionalString,
+  payrollUsed: z.boolean().optional(),
+  monthlyRevenueRange: optionalString,
+  lastMonthReconciled: optionalString,
+  cleanupRequired: z.boolean().optional(),
+  catchUpStartMonth: optionalString,
+  catchUpEndMonth: optionalString,
+  nextBillingDate: optionalString,
+  reportsRequired: optionalString,
+  profitLossStatus: z.enum(deliverableStatusValues).optional().or(z.literal("")),
+  balanceSheetStatus: z
+    .enum(deliverableStatusValues)
+    .optional()
+    .or(z.literal("")),
+  bookkeepingCaseStatus: z
+    .enum(bookkeepingCaseStatusValues)
+    .optional()
+    .or(z.literal("")),
+  // Immigration administrative details (relevant when serviceType is Immigration)
+  administrativeServiceType: optionalString,
+  formNumber: optionalString,
+  clientRequestedForm: z.boolean().optional(),
+  clientProvidedInstructions: optionalString,
+  language: optionalString,
+  translationNeeded: z.boolean().optional(),
+  translationStatus: z
+    .enum(deliverableStatusValues)
+    .optional()
+    .or(z.literal("")),
+  attorneyReferralNeeded: z.boolean().optional(),
+  attorneyReferralDate: optionalString,
+  governmentFilingFee: optionalString,
+  immigrationCaseStatus: z
+    .enum(immigrationCaseStatusValues)
+    .optional()
+    .or(z.literal("")),
 });
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
 
 export const notaryServiceTypes = ["online_notary", "notary"];
 export const taxServiceTypes = ["tax_prep"];
+export const bookkeepingServiceTypes = ["bookkeeping"];
+export const immigrationServiceTypes = ["immigration"];

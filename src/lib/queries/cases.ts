@@ -7,6 +7,8 @@ import {
   apostilleDetails,
   notaryServiceDetails,
   taxServiceDetails,
+  bookkeepingServiceDetails,
+  immigrationServiceDetails,
   documents,
   caseStatusHistory,
 } from "@/lib/db/schema";
@@ -56,6 +58,8 @@ export async function getCaseById(id: string) {
     apostille,
     notaryDetails,
     taxDetails,
+    bookkeepingDetails,
+    immigrationDetails,
     caseDocuments,
     statusHistory,
   ] = await Promise.all([
@@ -81,6 +85,16 @@ export async function getCaseById(id: string) {
       .limit(1),
     db
       .select()
+      .from(bookkeepingServiceDetails)
+      .where(eq(bookkeepingServiceDetails.caseId, id))
+      .limit(1),
+    db
+      .select()
+      .from(immigrationServiceDetails)
+      .where(eq(immigrationServiceDetails.caseId, id))
+      .limit(1),
+    db
+      .select()
       .from(documents)
       .where(eq(documents.caseId, id))
       .orderBy(desc(documents.createdAt)),
@@ -98,6 +112,8 @@ export async function getCaseById(id: string) {
     apostille: apostille[0] ?? null,
     notaryDetails: notaryDetails[0] ?? null,
     taxDetails: taxDetails[0] ?? null,
+    bookkeepingDetails: bookkeepingDetails[0] ?? null,
+    immigrationDetails: immigrationDetails[0] ?? null,
     documents: caseDocuments,
     statusHistory,
   };

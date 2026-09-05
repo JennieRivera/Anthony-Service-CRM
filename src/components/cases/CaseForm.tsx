@@ -24,6 +24,8 @@ import {
   idVerificationMethodValues,
   notaryServiceTypes,
   taxServiceTypes,
+  bookkeepingServiceTypes,
+  immigrationServiceTypes,
   notaryModalityValues,
   idVerificationStatusValues,
   notaryCaseStatusValues,
@@ -31,6 +33,10 @@ import {
   taxJurisdictionValues,
   taxFilingStatusValues,
   taxCaseStatusValues,
+  bookkeepingFrequencyValues,
+  deliverableStatusValues,
+  bookkeepingCaseStatusValues,
+  immigrationCaseStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
@@ -39,12 +45,16 @@ import type {
   Case,
   NotaryServiceDetails,
   TaxServiceDetails,
+  BookkeepingServiceDetails,
+  ImmigrationServiceDetails,
 } from "@/lib/db/schema";
 
 export function CaseForm({
   caseRecord,
   notaryDetails,
   taxDetails,
+  bookkeepingDetails,
+  immigrationDetails,
   clients,
   defaultClientId,
   onSubmit,
@@ -52,6 +62,8 @@ export function CaseForm({
   caseRecord?: Case;
   notaryDetails?: NotaryServiceDetails | null;
   taxDetails?: TaxServiceDetails | null;
+  bookkeepingDetails?: BookkeepingServiceDetails | null;
+  immigrationDetails?: ImmigrationServiceDetails | null;
   clients: { id: string; fullName: string }[];
   defaultClientId?: string;
   onSubmit: (values: CaseFormValues) => Promise<void>;
@@ -70,6 +82,10 @@ export function CaseForm({
   const tTaxJurisdiction = useTranslations("TaxJurisdiction");
   const tTaxFilingStatus = useTranslations("TaxFilingStatus");
   const tTaxCaseStatus = useTranslations("TaxCaseStatus");
+  const tBookkeepingFrequency = useTranslations("BookkeepingFrequency");
+  const tDeliverableStatus = useTranslations("DeliverableStatus");
+  const tBookkeepingCaseStatus = useTranslations("BookkeepingCaseStatus");
+  const tImmigrationCaseStatus = useTranslations("ImmigrationCaseStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -139,12 +155,48 @@ export function CaseForm({
       taxAmountPaid: taxDetails?.amountPaid ?? "",
       internalNotes: taxDetails?.internalNotes ?? "",
       taxCaseStatus: taxDetails?.status ?? "new_client",
+      businessName: bookkeepingDetails?.businessName ?? "",
+      entityType: bookkeepingDetails?.entityType ?? "",
+      industry: bookkeepingDetails?.industry ?? "",
+      bookkeepingFrequency: bookkeepingDetails?.frequency ?? "",
+      accountingSoftware: bookkeepingDetails?.accountingSoftware ?? "",
+      numberOfBankAccounts:
+        bookkeepingDetails?.numberOfBankAccounts?.toString() ?? "",
+      numberOfCreditCardAccounts:
+        bookkeepingDetails?.numberOfCreditCardAccounts?.toString() ?? "",
+      payrollUsed: bookkeepingDetails?.payrollUsed ?? false,
+      monthlyRevenueRange: bookkeepingDetails?.monthlyRevenueRange ?? "",
+      lastMonthReconciled: bookkeepingDetails?.lastMonthReconciled ?? "",
+      cleanupRequired: bookkeepingDetails?.cleanupRequired ?? false,
+      catchUpStartMonth: bookkeepingDetails?.catchUpStartMonth ?? "",
+      catchUpEndMonth: bookkeepingDetails?.catchUpEndMonth ?? "",
+      nextBillingDate: bookkeepingDetails?.nextBillingDate ?? "",
+      reportsRequired: bookkeepingDetails?.reportsRequired ?? "",
+      profitLossStatus: bookkeepingDetails?.profitLossStatus ?? "",
+      balanceSheetStatus: bookkeepingDetails?.balanceSheetStatus ?? "",
+      bookkeepingCaseStatus: bookkeepingDetails?.status ?? "lead",
+      administrativeServiceType:
+        immigrationDetails?.administrativeServiceType ?? "",
+      formNumber: immigrationDetails?.formNumber ?? "",
+      clientRequestedForm: immigrationDetails?.clientRequestedForm ?? false,
+      clientProvidedInstructions:
+        immigrationDetails?.clientProvidedInstructions ?? "",
+      language: immigrationDetails?.language ?? "",
+      translationNeeded: immigrationDetails?.translationNeeded ?? false,
+      translationStatus: immigrationDetails?.translationStatus ?? "",
+      attorneyReferralNeeded:
+        immigrationDetails?.attorneyReferralNeeded ?? false,
+      attorneyReferralDate: immigrationDetails?.attorneyReferralDate ?? "",
+      governmentFilingFee: immigrationDetails?.governmentFilingFee ?? "",
+      immigrationCaseStatus: immigrationDetails?.status ?? "new_inquiry",
     },
   });
 
   const serviceType = watch("serviceType");
   const isNotary = notaryServiceTypes.includes(serviceType);
   const isTax = taxServiceTypes.includes(serviceType);
+  const isBookkeeping = bookkeepingServiceTypes.includes(serviceType);
+  const isImmigration = immigrationServiceTypes.includes(serviceType);
   // Apostille / authentication fields are an optional add-on for Document Prep cases.
   const isApostille = serviceType === "document_prep";
 
@@ -220,7 +272,7 @@ export function CaseForm({
           />
         </div>
 
-        {!isNotary && !isTax && (
+        {!isNotary && !isTax && !isBookkeeping && !isImmigration && (
           <div className="flex flex-col gap-1.5">
             <Label>{t("status")}</Label>
             <Controller
@@ -256,6 +308,12 @@ export function CaseForm({
           </div>
         )}
       </div>
+
+      {isImmigration && (
+        <p className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          {tCases("immigrationDisclaimer")}
+        </p>
+      )}
 
       <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
         <h3 className="font-heading text-base text-foreground">
@@ -896,6 +954,407 @@ export function CaseForm({
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="internalNotes">{t("internalNotes")}</Label>
             <Textarea id="internalNotes" rows={3} {...register("internalNotes")} />
+            <p className="text-xs text-muted-foreground">
+              {t("noSensitiveDataWarning")}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {isBookkeeping && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("bookkeepingServiceDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="businessName">{t("businessName")}</Label>
+              <Input id="businessName" {...register("businessName")} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="entityType">{t("entityType")}</Label>
+              <Input id="entityType" {...register("entityType")} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="industry">{t("industry")}</Label>
+              <Input id="industry" {...register("industry")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("bookkeepingFrequency")}</Label>
+              <Controller
+                control={control}
+                name="bookkeepingFrequency"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {bookkeepingFrequencyValues.map((freq) => (
+                        <SelectItem key={freq} value={freq}>
+                          {tBookkeepingFrequency(freq)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("bookkeepingCaseStatus")}</Label>
+              <Controller
+                control={control}
+                name="bookkeepingCaseStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {bookkeepingCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tBookkeepingCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="accountingSoftware">
+                {t("accountingSoftware")}
+              </Label>
+              <Input
+                id="accountingSoftware"
+                placeholder="QuickBooks, Xero, Wave..."
+                {...register("accountingSoftware")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="numberOfBankAccounts">
+                {t("numberOfBankAccounts")}
+              </Label>
+              <Input
+                id="numberOfBankAccounts"
+                type="number"
+                {...register("numberOfBankAccounts")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="numberOfCreditCardAccounts">
+                {t("numberOfCreditCardAccounts")}
+              </Label>
+              <Input
+                id="numberOfCreditCardAccounts"
+                type="number"
+                {...register("numberOfCreditCardAccounts")}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="payrollUsed"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("payrollUsed")}</Label>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="monthlyRevenueRange">
+                {t("monthlyRevenueRange")}
+              </Label>
+              <Input
+                id="monthlyRevenueRange"
+                placeholder="$10k-50k"
+                {...register("monthlyRevenueRange")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="lastMonthReconciled">
+                {t("lastMonthReconciled")}
+              </Label>
+              <Input
+                id="lastMonthReconciled"
+                type="date"
+                {...register("lastMonthReconciled")}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="cleanupRequired"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("cleanupRequired")}</Label>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="catchUpStartMonth">
+                {t("catchUpStartMonth")}
+              </Label>
+              <Input
+                id="catchUpStartMonth"
+                type="date"
+                {...register("catchUpStartMonth")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="catchUpEndMonth">{t("catchUpEndMonth")}</Label>
+              <Input
+                id="catchUpEndMonth"
+                type="date"
+                {...register("catchUpEndMonth")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="nextBillingDate">{t("nextBillingDate")}</Label>
+              <Input
+                id="nextBillingDate"
+                type="date"
+                {...register("nextBillingDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <Label htmlFor="reportsRequired">{t("reportsRequired")}</Label>
+              <Input id="reportsRequired" {...register("reportsRequired")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("profitLossStatus")}</Label>
+              <Controller
+                control={control}
+                name="profitLossStatus"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(value) =>
+                      field.onChange(value === "none" ? "" : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">—</SelectItem>
+                      {deliverableStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tDeliverableStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("balanceSheetStatus")}</Label>
+              <Controller
+                control={control}
+                name="balanceSheetStatus"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(value) =>
+                      field.onChange(value === "none" ? "" : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">—</SelectItem>
+                      {deliverableStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tDeliverableStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isImmigration && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("immigrationServiceDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="administrativeServiceType">
+                {t("administrativeServiceType")}
+              </Label>
+              <Input
+                id="administrativeServiceType"
+                {...register("administrativeServiceType")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="formNumber">{t("formNumber")}</Label>
+              <Input
+                id="formNumber"
+                placeholder="I-130, I-485, N-400..."
+                {...register("formNumber")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("immigrationCaseStatus")}</Label>
+              <Controller
+                control={control}
+                name="immigrationCaseStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {immigrationCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tImmigrationCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="clientRequestedForm"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("clientRequestedForm")}</Label>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="language">{t("language")}</Label>
+              <Input id="language" {...register("language")} />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="translationNeeded"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("translationNeeded")}</Label>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("translationStatus")}</Label>
+              <Controller
+                control={control}
+                name="translationStatus"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(value) =>
+                      field.onChange(value === "none" ? "" : value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">—</SelectItem>
+                      {deliverableStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tDeliverableStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <Controller
+                control={control}
+                name="attorneyReferralNeeded"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label>{t("attorneyReferralNeeded")}</Label>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="attorneyReferralDate">
+                {t("attorneyReferralDate")}
+              </Label>
+              <Input
+                id="attorneyReferralDate"
+                type="date"
+                {...register("attorneyReferralDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="governmentFilingFee">
+                {t("governmentFilingFee")}
+              </Label>
+              <Input
+                id="governmentFilingFee"
+                type="number"
+                step="0.01"
+                {...register("governmentFilingFee")}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5 sm:col-span-2">
+            <Label htmlFor="clientProvidedInstructions">
+              {t("clientProvidedInstructions")}
+            </Label>
+            <Textarea
+              id="clientProvidedInstructions"
+              rows={3}
+              {...register("clientProvidedInstructions")}
+            />
             <p className="text-xs text-muted-foreground">
               {t("noSensitiveDataWarning")}
             </p>
