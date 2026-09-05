@@ -381,6 +381,76 @@ export const websiteChatSessions = pgTable("website_chat_sessions", {
   followUpDate: date("follow_up_date"),
 });
 
+// Phase 4, Session 5 — shared by client_highlevel_sync.sync_status and
+// integration_settings.status: both describe the same lifecycle for a
+// prepared-but-not-yet-active connection.
+export const integrationSyncStatusEnum = pgEnum("integration_sync_status", [
+  "not_connected",
+  "ready",
+  "connected",
+  "syncing",
+  "error",
+  "paused",
+]);
+
+export const highlevelSyncDirectionEnum = pgEnum("highlevel_sync_direction", [
+  "crm_to_highlevel",
+  "highlevel_to_crm",
+  "two_way",
+]);
+
+// Phase 4, Session 5 — one optional row per client (same 1:1-extension
+// pattern as client_communication_preferences), holding only HighLevel's
+// own record identifiers and sync bookkeeping. The actual field values
+// HighLevel would receive (name, phone, email, language, ...) are never
+// duplicated here — see getHighLevelSyncPreview, which reads them live
+// from clients/cases/appointments/client_communication_preferences so
+// there is exactly one source of truth for each.
+export const clientHighlevelSync = pgTable("client_highlevel_sync", {
+  clientId: uuid("client_id")
+    .primaryKey()
+    .references(() => clients.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  highlevelContactId: text("highlevel_contact_id"),
+  highlevelOpportunityId: text("highlevel_opportunity_id"),
+  highlevelLocationId: text("highlevel_location_id"),
+  highlevelTag: text("highlevel_tag"),
+  highlevelPipeline: text("highlevel_pipeline"),
+  syncStatus: integrationSyncStatusEnum("sync_status")
+    .notNull()
+    .default("not_connected"),
+  syncDirection: highlevelSyncDirectionEnum("sync_direction"),
+  lastSyncAt: timestamp("last_sync_at", { withTimezone: true }),
+  lastSyncResult: text("last_sync_result"),
+});
+
+// Phase 4, Session 5 — global (not per-client) settings for the 13
+// integrations listed in the Phase 4 plan's "Future Integration
+// Architecture" section. Rows are created lazily (upsert on first edit)
+// rather than seeded, keyed by a static integrationKey defined in
+// src/lib/integrations.ts alongside each integration's display name,
+// category, and connection type. No credentials live here or anywhere in
+// the database — secrets stay in server environment variables only.
+export const integrationSettings = pgTable("integration_settings", {
+  integrationKey: text("integration_key").primaryKey(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  status: integrationSyncStatusEnum("status").notNull().default("not_connected"),
+  lastSyncAt: timestamp("last_sync_at", { withTimezone: true }),
+  lastError: text("last_error"),
+  connectedAccount: text("connected_account"),
+  notes: text("notes"),
+});
+
 export const cases = pgTable("cases", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1244,6 +1314,8 @@ export type FacebookMessengerThread =
   typeof facebookMessengerThreads.$inferSelect;
 export type InstagramDmThread = typeof instagramDmThreads.$inferSelect;
 export type WebsiteChatSession = typeof websiteChatSessions.$inferSelect;
+export type ClientHighlevelSync = typeof clientHighlevelSync.$inferSelect;
+export type IntegrationSettingsRow = typeof integrationSettings.$inferSelect;
 export type Referral = typeof referrals.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type CaseStatusHistory = typeof caseStatusHistory.$inferSelect;

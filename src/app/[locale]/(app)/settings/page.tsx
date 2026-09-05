@@ -1,8 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
+import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Plug } from "lucide-react";
 
 export default async function SettingsPage() {
   const t = await getTranslations("Settings");
@@ -88,6 +91,26 @@ export default async function SettingsPage() {
           <p className="text-sm text-muted-foreground">
             {t("staffAccountsComingSoon")}
           </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("integrations")}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <p className="text-sm text-muted-foreground">
+            {t("integrationsDescription")}
+          </p>
+          <div>
+            <Button
+              variant="outline"
+              render={<Link href="/settings/integrations" />}
+            >
+              <Plug className="h-4 w-4" />
+              {t("manageIntegrations")}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -59,7 +59,10 @@
     "notifyInvoicePaid": "Invoice paid",
     "notifyOverdueInvoice": "Invoice becomes overdue",
     "staffAccounts": "Staff Accounts",
-    "staffAccountsComingSoon": "This CRM currently supports a single admin account. Multi-staff logins with role-based permissions (Admin / Staff) are planned for a future update."
+    "staffAccountsComingSoon": "This CRM currently supports a single admin account. Multi-staff logins with role-based permissions (Admin / Staff) are planned for a future update.",
+    "integrations": "Integrations",
+    "integrationsDescription": "See the connection status of every external system prepared for this CRM, and test or disconnect them. No API keys are ever shown here — secrets live only in server environment variables.",
+    "manageIntegrations": "Manage Integrations"
   },
   "Nav": {
     "dashboard": "Dashboard",
@@ -529,6 +532,92 @@
       "save": "Save",
       "saving": "Saving..."
     }
+  },
+  "IntegrationSyncStatus": {
+    "not_connected": "Not Connected",
+    "ready": "Ready",
+    "connected": "Connected",
+    "syncing": "Syncing",
+    "error": "Error",
+    "paused": "Paused"
+  },
+  "IntegrationConnectionType": {
+    "api": "API",
+    "webhook": "Webhook",
+    "oauth": "OAuth",
+    "smtp": "SMTP",
+    "external_link": "External Link",
+    "manual": "Manual",
+    "unknown": "Unknown"
+  },
+  "HighlevelSyncDirection": {
+    "crm_to_highlevel": "CRM to HighLevel",
+    "highlevel_to_crm": "HighLevel to CRM",
+    "two_way": "Two-Way"
+  },
+  "Integrations": {
+    "title": "Integrations",
+    "description": "Every integration named in the Phase 4 plan, prepared but not yet activated. Test Connection checks only whether the server has the relevant environment variable set — it never reads or displays the value.",
+    "backToSettings": "Back to Settings",
+    "categories": {
+      "communications": "Communications",
+      "productivity": "Productivity",
+      "professional_systems": "Professional Systems"
+    },
+    "names": {
+      "highlevel": "HighLevel",
+      "whatsapp": "WhatsApp",
+      "meta_facebook": "Meta Facebook",
+      "meta_instagram": "Meta Instagram",
+      "email_provider": "Email Provider",
+      "sms_provider": "SMS Provider",
+      "google_drive": "Google Drive",
+      "quickbooks": "QuickBooks",
+      "tax_software": "Tax Software",
+      "bookkeeping_software": "Bookkeeping Software",
+      "consulting_software": "Consulting Software",
+      "startpoint": "StartPoint",
+      "rri_referral_portal": "RRI Referral Portal"
+    },
+    "connectionType": "Connection Type",
+    "connectedAccount": "Connected Account",
+    "lastSync": "Last Sync",
+    "lastError": "Last Error",
+    "notes": "Notes",
+    "notesPlaceholder": "Internal notes about this integration...",
+    "notesSaved": "Saved.",
+    "testConnection": "Test Connection",
+    "disconnect": "Disconnect"
+  },
+  "HighLevelSync": {
+    "title": "HighLevel Sync",
+    "contactId": "HighLevel Contact ID",
+    "opportunityId": "HighLevel Opportunity ID",
+    "locationId": "HighLevel Location ID",
+    "tag": "HighLevel Tag",
+    "pipeline": "HighLevel Pipeline",
+    "syncStatus": "HighLevel Sync Status",
+    "syncDirection": "Sync Direction",
+    "notSet": "Not Set",
+    "lastSyncDate": "Last Sync Date",
+    "lastSyncResult": "Last Sync Result",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Saved.",
+    "previewTitle": "Sync Preview (safe fields only)",
+    "previewNote": "This is a live read-only preview of the safe fields that would sync to HighLevel once connected. SSN, ITIN, bank details, card numbers, tax returns, and immigration documents are never included.",
+    "previewClientName": "Client Name",
+    "previewBusinessName": "Business Name",
+    "previewPhone": "Phone",
+    "previewEmail": "Email",
+    "previewLanguage": "Language",
+    "previewServiceInterest": "Service Interest",
+    "previewLeadSource": "Lead Source",
+    "previewAssignedUser": "Assigned User",
+    "previewAppointmentDate": "Appointment Date",
+    "previewClientStatus": "Client Status",
+    "previewAcademyInterest": "Academy Interest",
+    "previewConsent": "Communication Consent"
   },
   "Communications": {
     "title": "Communications",

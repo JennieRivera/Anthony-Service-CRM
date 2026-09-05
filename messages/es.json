@@ -59,7 +59,10 @@
     "notifyInvoicePaid": "Factura pagada",
     "notifyOverdueInvoice": "Factura vencida",
     "staffAccounts": "Cuentas de Personal",
-    "staffAccountsComingSoon": "Este CRM actualmente admite una sola cuenta de administrador. Los inicios de sesión de personal múltiple con permisos basados en roles (Admin / Personal) están planeados para una futura actualización."
+    "staffAccountsComingSoon": "Este CRM actualmente admite una sola cuenta de administrador. Los inicios de sesión de personal múltiple con permisos basados en roles (Admin / Personal) están planeados para una futura actualización.",
+    "integrations": "Integraciones",
+    "integrationsDescription": "Consulta el estado de conexión de cada sistema externo preparado para este CRM, y pruébalos o desconéctalos. Las llaves de API nunca se muestran aquí — los secretos viven solo en variables de entorno del servidor.",
+    "manageIntegrations": "Administrar Integraciones"
   },
   "Nav": {
     "dashboard": "Panel",
@@ -529,6 +532,92 @@
       "save": "Guardar",
       "saving": "Guardando..."
     }
+  },
+  "IntegrationSyncStatus": {
+    "not_connected": "No Conectado",
+    "ready": "Listo",
+    "connected": "Conectado",
+    "syncing": "Sincronizando",
+    "error": "Error",
+    "paused": "Pausado"
+  },
+  "IntegrationConnectionType": {
+    "api": "API",
+    "webhook": "Webhook",
+    "oauth": "OAuth",
+    "smtp": "SMTP",
+    "external_link": "Enlace Externo",
+    "manual": "Manual",
+    "unknown": "Desconocido"
+  },
+  "HighlevelSyncDirection": {
+    "crm_to_highlevel": "CRM a HighLevel",
+    "highlevel_to_crm": "HighLevel a CRM",
+    "two_way": "Bidireccional"
+  },
+  "Integrations": {
+    "title": "Integraciones",
+    "description": "Cada integración nombrada en el plan de Fase 4, preparada pero aún no activada. Probar Conexión solo verifica si el servidor tiene configurada la variable de entorno correspondiente — nunca lee ni muestra su valor.",
+    "backToSettings": "Volver a Configuración",
+    "categories": {
+      "communications": "Comunicaciones",
+      "productivity": "Productividad",
+      "professional_systems": "Sistemas Profesionales"
+    },
+    "names": {
+      "highlevel": "HighLevel",
+      "whatsapp": "WhatsApp",
+      "meta_facebook": "Meta Facebook",
+      "meta_instagram": "Meta Instagram",
+      "email_provider": "Proveedor de Correo",
+      "sms_provider": "Proveedor de SMS",
+      "google_drive": "Google Drive",
+      "quickbooks": "QuickBooks",
+      "tax_software": "Software de Taxes",
+      "bookkeeping_software": "Software de Bookkeeping",
+      "consulting_software": "Software de Consulting",
+      "startpoint": "StartPoint",
+      "rri_referral_portal": "Portal de Referidos RRI"
+    },
+    "connectionType": "Tipo de Conexión",
+    "connectedAccount": "Cuenta Conectada",
+    "lastSync": "Última Sincronización",
+    "lastError": "Último Error",
+    "notes": "Notas",
+    "notesPlaceholder": "Notas internas sobre esta integración...",
+    "notesSaved": "Guardado.",
+    "testConnection": "Probar Conexión",
+    "disconnect": "Desconectar"
+  },
+  "HighLevelSync": {
+    "title": "Sincronización HighLevel",
+    "contactId": "ID de Contacto de HighLevel",
+    "opportunityId": "ID de Oportunidad de HighLevel",
+    "locationId": "ID de Ubicación de HighLevel",
+    "tag": "Etiqueta de HighLevel",
+    "pipeline": "Pipeline de HighLevel",
+    "syncStatus": "Estado de Sincronización de HighLevel",
+    "syncDirection": "Dirección de Sincronización",
+    "notSet": "No Definido",
+    "lastSyncDate": "Fecha de Última Sincronización",
+    "lastSyncResult": "Resultado de Última Sincronización",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "saved": "Guardado.",
+    "previewTitle": "Vista Previa de Sincronización (solo campos seguros)",
+    "previewNote": "Esta es una vista previa en vivo, de solo lectura, de los campos seguros que se sincronizarían con HighLevel una vez conectado. El SSN, ITIN, datos bancarios, números de tarjeta, declaraciones de impuestos y documentos de inmigración nunca se incluyen.",
+    "previewClientName": "Nombre del Cliente",
+    "previewBusinessName": "Nombre del Negocio",
+    "previewPhone": "Teléfono",
+    "previewEmail": "Correo",
+    "previewLanguage": "Idioma",
+    "previewServiceInterest": "Servicio de Interés",
+    "previewLeadSource": "Fuente del Prospecto",
+    "previewAssignedUser": "Usuario Asignado",
+    "previewAppointmentDate": "Fecha de Cita",
+    "previewClientStatus": "Estado del Cliente",
+    "previewAcademyInterest": "Interés en Academia",
+    "previewConsent": "Consentimiento de Comunicación"
   },
   "Communications": {
     "title": "Comunicaciones",

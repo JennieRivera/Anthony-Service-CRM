@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getClientById } from "@/lib/queries/clients";
+import { getClientHighlevelSync, getHighLevelSyncPreview } from "@/lib/queries/highlevel";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,11 @@ export default async function ClientProfilePage({
 
   const result = await getClientById(id);
   if (!result) notFound();
+
+  const [highlevelSync, highlevelPreview] = await Promise.all([
+    getClientHighlevelSync(id),
+    getHighLevelSyncPreview(id),
+  ]);
 
   const {
     client,
@@ -110,6 +116,8 @@ export default async function ClientProfilePage({
         timeline={timeline}
         blobConfigured={isBlobConfigured()}
         communicationPreferences={communicationPreferences}
+        highlevelSync={highlevelSync}
+        highlevelPreview={highlevelPreview}
       />
     </div>
   );

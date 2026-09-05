@@ -17,6 +17,7 @@ import { DocumentUploader } from "@/components/documents/DocumentUploader";
 import { ConversationTimeline } from "./ConversationTimeline";
 import { LogConversationDialog } from "./LogConversationDialog";
 import { CommunicationPreferencesPanel } from "./CommunicationPreferencesPanel";
+import { HighLevelSyncPanel } from "./HighLevelSyncPanel";
 import { ReferralStatusBadge } from "@/components/referrals/ReferralStatusBadge";
 import { PaymentStatusBadge } from "@/components/payments/PaymentStatusBadge";
 import type {
@@ -29,8 +30,10 @@ import type {
   Task,
   Payment,
   ClientCommunicationPreferences,
+  ClientHighlevelSync,
 } from "@/lib/db/schema";
 import type { TimelineEntry } from "@/lib/queries/clients";
+import type { getHighLevelSyncPreview } from "@/lib/queries/highlevel";
 
 function formatMoney(value: string | null) {
   if (!value) return "—";
@@ -64,6 +67,8 @@ export function ClientProfileTabs({
   timeline,
   blobConfigured,
   communicationPreferences,
+  highlevelSync,
+  highlevelPreview,
 }: {
   clientId: string;
   cases: Case[];
@@ -77,6 +82,8 @@ export function ClientProfileTabs({
   timeline: TimelineEntry[];
   blobConfigured: boolean;
   communicationPreferences: ClientCommunicationPreferences | null;
+  highlevelSync: ClientHighlevelSync | null;
+  highlevelPreview: Awaited<ReturnType<typeof getHighLevelSyncPreview>>;
 }) {
   const t = useTranslations("Clients");
   const tCases = useTranslations("Cases");
@@ -360,6 +367,11 @@ export function ClientProfileTabs({
         <CommunicationPreferencesPanel
           clientId={clientId}
           preferences={communicationPreferences}
+        />
+        <HighLevelSyncPanel
+          clientId={clientId}
+          sync={highlevelSync}
+          preview={highlevelPreview}
         />
       </TabsContent>
     </Tabs>
