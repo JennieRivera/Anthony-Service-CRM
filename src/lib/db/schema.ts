@@ -82,6 +82,28 @@ export const conversationDirectionEnum = pgEnum("conversation_direction", [
   "outbound",
 ]);
 
+export const referralStatusEnum = pgEnum("referral_status", [
+  "submitted",
+  "in_progress",
+  "closed_won",
+  "closed_lost",
+]);
+
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "unpaid",
+  "partial",
+  "paid",
+  "overdue",
+  "refunded",
+  "cancelled",
+]);
+
+export const refundStatusEnum = pgEnum("refund_status", [
+  "none",
+  "partial",
+  "full",
+]);
+
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
@@ -251,6 +273,61 @@ export const conversationMessages = pgTable("conversation_messages", {
   loggedBy: uuid("logged_by").references(() => users.id),
 });
 
+export const referrals = pgTable("referrals", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  referralSeq: serial("referral_seq").notNull().unique(),
+  referralDate: date("referral_date").notNull().defaultNow(),
+  clientId: uuid("client_id")
+    .notNull()
+    .references(() => clients.id, { onDelete: "restrict" }),
+  caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  originatingBusiness: text("originating_business"),
+  referredBy: text("referred_by").notNull(),
+  receivingParty: text("receiving_party").notNull(),
+  status: referralStatusEnum("status").notNull().default("submitted"),
+  closedDate: date("closed_date"),
+  grossRevenue: numeric("gross_revenue", { precision: 12, scale: 2 }),
+  allowedDeductions: numeric("allowed_deductions", { precision: 12, scale: 2 }),
+  netServiceRevenue: numeric("net_service_revenue", {
+    precision: 12,
+    scale: 2,
+  }),
+  commissionPercentage: numeric("commission_percentage", {
+    precision: 5,
+    scale: 2,
+  }),
+  commissionDue: numeric("commission_due", { precision: 12, scale: 2 }),
+  commissionPaidDate: date("commission_paid_date"),
+  paymentMethod: text("payment_method"),
+  paymentConfirmation: text("payment_confirmation"),
+  notes: text("notes"),
+});
+
+export const payments = pgTable("payments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  invoiceId: uuid("invoice_id")
+    .notNull()
+    .references(() => invoices.id, { onDelete: "restrict" }),
+  amountTotal: numeric("amount_total", { precision: 12, scale: 2 }).notNull(),
+  depositAmount: numeric("deposit_amount", { precision: 12, scale: 2 }),
+  amountPaid: numeric("amount_paid", { precision: 12, scale: 2 })
+    .notNull()
+    .default("0"),
+  balanceDue: numeric("balance_due", { precision: 12, scale: 2 }).notNull(),
+  status: paymentStatusEnum("status").notNull().default("unpaid"),
+  paymentDate: date("payment_date"),
+  paymentMethod: text("payment_method"),
+  transactionConfirmation: text("transaction_confirmation"),
+  receiptNumber: text("receipt_number"),
+  refundStatus: refundStatusEnum("refund_status").notNull().default("none"),
+});
+
 export type User = typeof users.$inferSelect;
 export type Client = typeof clients.$inferSelect;
 export type Case = typeof cases.$inferSelect;
@@ -261,3 +338,5 @@ export type InvoiceLineItem = typeof invoiceLineItems.$inferSelect;
 export type NotaryLogEntry = typeof notaryLogEntries.$inferSelect;
 export type ApostilleDetails = typeof apostilleDetails.$inferSelect;
 export type ConversationMessage = typeof conversationMessages.$inferSelect;
+export type Referral = typeof referrals.$inferSelect;
+export type Payment = typeof payments.$inferSelect;

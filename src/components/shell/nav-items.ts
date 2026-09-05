@@ -6,6 +6,8 @@ import {
   FileText,
   CalendarDays,
   Receipt,
+  Handshake,
+  Wallet,
   BarChart3,
   Settings,
   Map,
@@ -20,6 +22,8 @@ export type NavItem = {
     | "documents"
     | "appointments"
     | "invoices"
+    | "referrals"
+    | "payments"
     | "reports"
     | "companyRegistration"
     | "settings";
@@ -32,6 +36,8 @@ export const navItems: NavItem[] = [
   { href: "/cases", labelKey: "cases", icon: Briefcase },
   { href: "/appointments", labelKey: "appointments", icon: CalendarDays },
   { href: "/invoices", labelKey: "invoices", icon: Receipt },
+  { href: "/payments", labelKey: "payments", icon: Wallet },
+  { href: "/referrals", labelKey: "referrals", icon: Handshake },
   { href: "/documents", labelKey: "documents", icon: FileText },
   { href: "/reports", labelKey: "reports", icon: BarChart3 },
   { href: "/company-registration", labelKey: "companyRegistration", icon: Map },
