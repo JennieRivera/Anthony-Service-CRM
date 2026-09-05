@@ -1,18 +1,24 @@
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { getCompanyById } from "@/lib/queries/companies";
+import { getCompanyById, getCompany360Data } from "@/lib/queries/companies";
 import { listClientsForSelect } from "@/lib/queries/cases";
+import { listCompanyDocumentChecklistItems } from "@/lib/queries/companyDocumentChecklist";
+import { getCompanyComplianceSummary } from "@/lib/queries/companyCompliance";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CompanyOwnersSection } from "@/components/companies/CompanyOwnersSection";
 import { CompanySimplePeopleSection } from "@/components/companies/CompanySimplePeopleSection";
+import { CompanyProfileTabs } from "@/components/companies/CompanyProfileTabs";
 import {
   createCompanyContactAction,
   deleteCompanyContactAction,
   createCompanyAuthorizedRepresentativeAction,
   deleteCompanyAuthorizedRepresentativeAction,
+  createCompanyChecklistItemAction,
+  updateCompanyChecklistItemAction,
+  deleteCompanyChecklistItemAction,
 } from "../actions";
 
 export default async function CompanyDetailPage({
@@ -28,26 +34,20 @@ export default async function CompanyDetailPage({
   const tContacts = await getTranslations("Companies.contacts");
   const tReps = await getTranslations("Companies.representatives");
 
-  const [result, clients] = await Promise.all([
-    getCompanyById(id),
-    listClientsForSelect(),
-  ]);
-  if (!result) notFound();
+  const [result, clients, checklistItems, complianceSummary, companyActivity] =
+    await Promise.all([
+      getCompanyById(id),
+      listClientsForSelect(),
+      listCompanyDocumentChecklistItems(id),
+      getCompanyComplianceSummary(id),
+      getCompany360Data(id),
+    ]);
+  if (!result || !complianceSummary) notFound();
 
   const { company, owners, contacts, representatives, linkedClients } = result;
 
-  return (
-    <div className="flex w-full flex-col gap-6 px-8 py-10">
-      <div className="flex items-center justify-between">
-        <Link href="/companies" className="text-sm text-muted-foreground underline">
-          &larr; {t("backToCompanies")}
-        </Link>
-        <Button render={<Link href={`/companies/${id}/edit`} />}>
-          <Pencil className="h-4 w-4" />
-          {t("editCompany")}
-        </Button>
-      </div>
-
+  const profile = (
+    <>
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -187,6 +187,40 @@ export default async function CompanyDetailPage({
         }}
         onCreate={createCompanyAuthorizedRepresentativeAction}
         onDelete={deleteCompanyAuthorizedRepresentativeAction}
+      />
+    </>
+  );
+
+  return (
+    <div className="flex w-full flex-col gap-6 px-8 py-10">
+      <div className="flex items-center justify-between">
+        <Link href="/companies" className="text-sm text-muted-foreground underline">
+          &larr; {t("backToCompanies")}
+        </Link>
+        <Button render={<Link href={`/companies/${id}/edit`} />}>
+          <Pencil className="h-4 w-4" />
+          {t("editCompany")}
+        </Button>
+      </div>
+
+      <CompanyProfileTabs
+        companyId={id}
+        profile={profile}
+        checklistItems={checklistItems}
+        complianceSummary={complianceSummary}
+        cases={companyActivity.cases}
+        invoices={companyActivity.invoices}
+        payments={companyActivity.payments}
+        appointments={companyActivity.appointments}
+        tasks={companyActivity.tasks}
+        conversations={companyActivity.conversations}
+        referrals={companyActivity.referrals}
+        documents={companyActivity.documents}
+        timeline={companyActivity.timeline}
+        outstandingBalance={companyActivity.outstandingBalance}
+        onCreateChecklistItem={createCompanyChecklistItemAction}
+        onUpdateChecklistItemStatus={updateCompanyChecklistItemAction}
+        onDeleteChecklistItem={deleteCompanyChecklistItemAction}
       />
     </div>
   );

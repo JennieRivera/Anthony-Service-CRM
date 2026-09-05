@@ -371,6 +371,54 @@ export const companyAuthorizedRepresentatives = pgTable(
   },
 );
 
+// Phase 5, Session 3 — Company Document Checklist. Categories can recur
+// (e.g. Tax Returns, one per year), so this is a plain list per company
+// rather than one unique row per category.
+export const companyDocumentCategoryEnum = pgEnum("company_document_category", [
+  "formation_documents",
+  "ein_documents",
+  "operating_agreement",
+  "bylaws",
+  "state_registration",
+  "annual_report",
+  "business_licenses",
+  "sales_tax",
+  "insurance",
+  "bookkeeping",
+  "tax_returns",
+  "contracts",
+  "financing_documents",
+  "other",
+]);
+
+export const companyDocumentChecklistStatusEnum = pgEnum(
+  "company_document_checklist_status",
+  ["requested", "received", "verified", "expired", "renewal_due"],
+);
+
+export const companyDocumentChecklistItems = pgTable(
+  "company_document_checklist_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    companyId: uuid("company_id")
+      .notNull()
+      .references(() => companies.id, { onDelete: "cascade" }),
+    category: companyDocumentCategoryEnum("category").notNull(),
+    description: text("description"),
+    status: companyDocumentChecklistStatusEnum("status")
+      .notNull()
+      .default("requested"),
+    dueDate: date("due_date"),
+    notes: text("notes"),
+  },
+);
+
 export const clients = pgTable("clients", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1627,6 +1675,8 @@ export type CompanyOwner = typeof companyOwners.$inferSelect;
 export type CompanyContact = typeof companyContacts.$inferSelect;
 export type CompanyAuthorizedRepresentative =
   typeof companyAuthorizedRepresentatives.$inferSelect;
+export type CompanyDocumentChecklistItem =
+  typeof companyDocumentChecklistItems.$inferSelect;
 export type AuditLogEntry = typeof auditLog.$inferSelect;
 export type ProfessionalSystem = typeof professionalSystems.$inferSelect;
 export type WebsiteLink = typeof websiteLinks.$inferSelect;

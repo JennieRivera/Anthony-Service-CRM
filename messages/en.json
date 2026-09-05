@@ -776,6 +776,60 @@
       "email": "Email",
       "save": "Save",
       "saving": "Saving..."
+    },
+    "checklist": {
+      "title": "Document Checklist",
+      "add": "Add Item",
+      "category": "Category",
+      "status": "Status",
+      "description": "Description",
+      "dueDate": "Due Date",
+      "notes": "Notes",
+      "save": "Save",
+      "saving": "Saving...",
+      "empty": "No document checklist items yet."
+    },
+    "compliance": {
+      "title": "Compliance Dashboard",
+      "entity": "Entity Status",
+      "registeredAgent": "Registered Agent Status",
+      "annualReport": "Annual Report Status",
+      "salesTax": "Sales Tax Status",
+      "businessLicense": "Business License Status",
+      "insurance": "Insurance Status",
+      "tax": "Tax Status",
+      "bookkeeping": "Bookkeeping Status",
+      "documentCompleteness": "Document Completeness",
+      "financingReadiness": "Financing Readiness",
+      "status": {
+        "green": "Good Standing",
+        "gold": "Needs Attention",
+        "red": "Action Required",
+        "gray": "Not Tracked"
+      }
+    },
+    "tabs": {
+      "profile": "Profile",
+      "checklist": "Checklist",
+      "compliance": "Compliance",
+      "timeline": "Timeline",
+      "cases": "Cases",
+      "invoices": "Invoices",
+      "payments": "Payments",
+      "appointments": "Appointments",
+      "tasks": "Tasks",
+      "communications": "Communications",
+      "referrals": "Referrals",
+      "documents": "Documents",
+      "noActivity": "No activity yet across this company's linked clients.",
+      "noCases": "No cases yet.",
+      "noInvoices": "No invoices yet.",
+      "noPayments": "No payments yet.",
+      "noAppointments": "No appointments yet.",
+      "noTasks": "No tasks yet.",
+      "noCommunications": "No communications logged yet.",
+      "noReferrals": "No referrals yet.",
+      "outstandingBalance": "Outstanding Balance"
     }
   },
   "AuditLog": {
@@ -1439,5 +1493,28 @@
     "live": "Live",
     "optimization": "Optimization",
     "completed": "Completed"
+  },
+  "CompanyDocumentCategory": {
+    "formation_documents": "Formation Documents",
+    "ein_documents": "EIN Documents",
+    "operating_agreement": "Operating Agreement",
+    "bylaws": "Bylaws",
+    "state_registration": "State Registration",
+    "annual_report": "Annual Report",
+    "business_licenses": "Business Licenses",
+    "sales_tax": "Sales Tax",
+    "insurance": "Insurance",
+    "bookkeeping": "Bookkeeping",
+    "tax_returns": "Tax Returns",
+    "contracts": "Contracts",
+    "financing_documents": "Financing Documents",
+    "other": "Other"
+  },
+  "CompanyDocumentChecklistStatus": {
+    "requested": "Requested",
+    "received": "Received",
+    "verified": "Verified",
+    "expired": "Expired",
+    "renewal_due": "Renewal Due"
   }
 }

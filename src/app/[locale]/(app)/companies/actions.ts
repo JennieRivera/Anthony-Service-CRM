@@ -8,6 +8,7 @@ import {
   companyOwners,
   companyContacts,
   companyAuthorizedRepresentatives,
+  companyDocumentChecklistItems,
 } from "@/lib/db/schema";
 import {
   companyFormSchema,
@@ -19,6 +20,10 @@ import {
   type CompanyContactFormValues,
   type CompanyAuthorizedRepresentativeFormValues,
 } from "@/lib/validation/company";
+import {
+  companyDocumentChecklistItemFormSchema,
+  type CompanyDocumentChecklistItemFormValues,
+} from "@/lib/validation/companyDocumentChecklist";
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { logAuditEvent } from "@/lib/audit";
@@ -239,5 +244,77 @@ export async function deleteCompanyAuthorizedRepresentativeAction(
     entityId: companyId,
     summary: "Removed an authorized representative",
   });
+  revalidatePath(`/companies/${companyId}`);
+}
+
+export async function createCompanyChecklistItemAction(
+  companyId: string,
+  rawValues: CompanyDocumentChecklistItemFormValues,
+) {
+  const values = companyDocumentChecklistItemFormSchema.parse(rawValues);
+  await getDb()
+    .insert(companyDocumentChecklistItems)
+    .values({
+      companyId,
+      category: values.category,
+      description: values.description || null,
+      status: values.status,
+      dueDate: values.dueDate || null,
+      notes: values.notes || null,
+    });
+
+  await logAuditEvent({
+    action: "company.checklist_item_added",
+    entityType: "company",
+    entityId: companyId,
+    summary: `Added document checklist item "${values.category}"`,
+  });
+
+  revalidatePath(`/companies/${companyId}`);
+}
+
+export async function updateCompanyChecklistItemAction(
+  companyId: string,
+  itemId: string,
+  rawValues: CompanyDocumentChecklistItemFormValues,
+) {
+  const values = companyDocumentChecklistItemFormSchema.parse(rawValues);
+  await getDb()
+    .update(companyDocumentChecklistItems)
+    .set({
+      category: values.category,
+      description: values.description || null,
+      status: values.status,
+      dueDate: values.dueDate || null,
+      notes: values.notes || null,
+      updatedAt: new Date(),
+    })
+    .where(eq(companyDocumentChecklistItems.id, itemId));
+
+  await logAuditEvent({
+    action: "company.checklist_item_updated",
+    entityType: "company",
+    entityId: companyId,
+    summary: `Updated document checklist item "${values.category}"`,
+  });
+
+  revalidatePath(`/companies/${companyId}`);
+}
+
+export async function deleteCompanyChecklistItemAction(
+  companyId: string,
+  itemId: string,
+) {
+  await getDb()
+    .delete(companyDocumentChecklistItems)
+    .where(eq(companyDocumentChecklistItems.id, itemId));
+
+  await logAuditEvent({
+    action: "company.checklist_item_removed",
+    entityType: "company",
+    entityId: companyId,
+    summary: "Removed a document checklist item",
+  });
+
   revalidatePath(`/companies/${companyId}`);
 }

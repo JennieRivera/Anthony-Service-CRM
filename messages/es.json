@@ -776,6 +776,60 @@
       "email": "Correo",
       "save": "Guardar",
       "saving": "Guardando..."
+    },
+    "checklist": {
+      "title": "Lista de Documentos",
+      "add": "Agregar Elemento",
+      "category": "Categoría",
+      "status": "Estado",
+      "description": "Descripción",
+      "dueDate": "Fecha Límite",
+      "notes": "Notas",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "empty": "Aún no hay elementos en la lista de documentos."
+    },
+    "compliance": {
+      "title": "Panel de Cumplimiento",
+      "entity": "Estado de la Entidad",
+      "registeredAgent": "Estado del Agente Registrado",
+      "annualReport": "Estado del Informe Anual",
+      "salesTax": "Estado del Impuesto sobre Ventas",
+      "businessLicense": "Estado de Licencias Comerciales",
+      "insurance": "Estado del Seguro",
+      "tax": "Estado Fiscal",
+      "bookkeeping": "Estado de Contabilidad",
+      "documentCompleteness": "Completitud de Documentos",
+      "financingReadiness": "Preparación para Financiamiento",
+      "status": {
+        "green": "En Regla",
+        "gold": "Requiere Atención",
+        "red": "Acción Requerida",
+        "gray": "Sin Seguimiento"
+      }
+    },
+    "tabs": {
+      "profile": "Perfil",
+      "checklist": "Lista de Documentos",
+      "compliance": "Cumplimiento",
+      "timeline": "Cronología",
+      "cases": "Casos",
+      "invoices": "Facturas",
+      "payments": "Pagos",
+      "appointments": "Citas",
+      "tasks": "Tareas",
+      "communications": "Comunicaciones",
+      "referrals": "Referidos",
+      "documents": "Documentos",
+      "noActivity": "Aún no hay actividad entre los clientes vinculados a esta empresa.",
+      "noCases": "Aún no hay casos.",
+      "noInvoices": "Aún no hay facturas.",
+      "noPayments": "Aún no hay pagos.",
+      "noAppointments": "Aún no hay citas.",
+      "noTasks": "Aún no hay tareas.",
+      "noCommunications": "Aún no hay comunicaciones registradas.",
+      "noReferrals": "Aún no hay referidos.",
+      "outstandingBalance": "Saldo Pendiente"
     }
   },
   "AuditLog": {
@@ -1439,5 +1493,28 @@
     "live": "En Vivo",
     "optimization": "Optimización",
     "completed": "Completado"
+  },
+  "CompanyDocumentCategory": {
+    "formation_documents": "Documentos de Formación",
+    "ein_documents": "Documentos del EIN",
+    "operating_agreement": "Acuerdo Operativo",
+    "bylaws": "Estatutos",
+    "state_registration": "Registro Estatal",
+    "annual_report": "Informe Anual",
+    "business_licenses": "Licencias Comerciales",
+    "sales_tax": "Impuesto sobre Ventas",
+    "insurance": "Seguro",
+    "bookkeeping": "Contabilidad",
+    "tax_returns": "Declaraciones de Impuestos",
+    "contracts": "Contratos",
+    "financing_documents": "Documentos de Financiamiento",
+    "other": "Otro"
+  },
+  "CompanyDocumentChecklistStatus": {
+    "requested": "Solicitado",
+    "received": "Recibido",
+    "verified": "Verificado",
+    "expired": "Vencido",
+    "renewal_due": "Renovación Pendiente"
   }
 }

@@ -141,6 +141,13 @@
       "when": 1788630412028,
       "tag": "0019_flawless_shocker",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1788632855162,
+      "tag": "0020_awesome_warlock",
+      "breakpoints": true
     }
   ]
 }
