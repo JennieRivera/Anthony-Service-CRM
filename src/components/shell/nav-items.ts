@@ -18,6 +18,7 @@ import {
   Building2,
   Landmark,
   Library,
+  FileStack,
 } from "lucide-react";
 
 export type NavItem = {
@@ -40,6 +41,7 @@ export type NavItem = {
     | "companyRegistration"
     | "salesTaxMap"
     | "irsResources"
+    | "immigrationForms"
     | "settings";
   icon: LucideIcon;
 };
@@ -62,5 +64,6 @@ export const navItems: NavItem[] = [
   { href: "/company-registration", labelKey: "companyRegistration", icon: Map },
   { href: "/sales-tax-map", labelKey: "salesTaxMap", icon: Landmark },
   { href: "/irs-resources", labelKey: "irsResources", icon: Library },
+  { href: "/immigration-forms", labelKey: "immigrationForms", icon: FileStack },
   { href: "/settings", labelKey: "settings", icon: Settings },
 ];

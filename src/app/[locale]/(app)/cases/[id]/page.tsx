@@ -1300,13 +1300,20 @@ export default async function CaseDetailPage({
           {tDocuments("title")}
         </h2>
         {isBlobConfigured() ? (
-          <DocumentUploader clientId={client.id} caseId={c.id} />
+          <DocumentUploader
+            clientId={client.id}
+            caseId={c.id}
+            showFolderSelect={c.serviceType === "immigration"}
+          />
         ) : (
           <p className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
             {tDocuments("notConfigured")}
           </p>
         )}
-        <DocumentList documents={documents} />
+        <DocumentList
+          documents={documents}
+          groupByFolder={c.serviceType === "immigration"}
+        />
       </div>
 
       {statusHistory.length > 0 && (

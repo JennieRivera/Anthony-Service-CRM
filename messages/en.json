@@ -115,7 +115,8 @@
     "collapseSidebar": "Collapse sidebar",
     "expandSidebar": "Expand sidebar",
     "salesTaxMap": "Sales Tax Map",
-    "irsResources": "IRS Resources"
+    "irsResources": "IRS Resources",
+    "immigrationForms": "Immigration Forms"
   },
   "ServiceType": {
     "online_notary": "Online Notary",
@@ -1065,7 +1066,10 @@
     "upload": "Upload",
     "uploading": "Uploading...",
     "notConfigured": "File storage isn't connected yet. Add BLOB_READ_WRITE_TOKEN to .env.local (create a Blob store in your Vercel project's Storage tab) to enable uploads.",
-    "uploadError": "Upload failed. Please try again."
+    "uploadError": "Upload failed. Please try again.",
+    "selectFolder": "Select folder (Immigration)",
+    "noFolder": "No folder",
+    "unfiled": "Unfiled"
   },
   "AppointmentStatus": {
     "scheduled": "Scheduled",
@@ -1656,6 +1660,61 @@
       "category": "Category",
       "url": "Official IRS URL",
       "description": "Description",
+      "lastVerifiedDate": "Last Verified Date",
+      "active": "Active",
+      "save": "Save",
+      "saving": "Saving..."
+    }
+  },
+  "ImmigrationDocumentFolder": {
+    "intake": "01 Intake",
+    "identity_documents": "02 Identity Documents",
+    "client_provided_information": "03 Client-Provided Information",
+    "government_forms": "04 Government Forms",
+    "supporting_documents": "05 Supporting Documents",
+    "translation": "06 Translation",
+    "signatures": "07 Signatures",
+    "filing_confirmation": "08 Filing Confirmation",
+    "government_notices": "09 Government Notices",
+    "final_documents": "10 Final Documents"
+  },
+  "ImmigrationFormCategory": {
+    "family_based": "Family-Based",
+    "employment_based": "Employment-Based",
+    "humanitarian": "Humanitarian",
+    "citizenship_naturalization": "Citizenship / Naturalization",
+    "permanent_residence": "Permanent Residence",
+    "work_authorization": "Work Authorization",
+    "travel_documents": "Travel Documents",
+    "affidavits_supporting_forms": "Affidavits / Supporting Forms",
+    "change_of_address": "Change of Address",
+    "fee_waivers": "Fee Waivers",
+    "uscis_general_forms": "USCIS General Forms",
+    "other": "Other"
+  },
+  "ImmigrationForms": {
+    "title": "Immigration Forms Library",
+    "instructions": "An internal reference directory of official USCIS forms. This is not a direct connection to any USCIS system, and never an editable copy of a government form.",
+    "disclaimer": "Anthony Multiservice LLC is not a law firm and does not provide legal advice. Immigration administrative document services are limited to permitted administrative assistance. The client or authorized legal professional must determine eligibility, legal strategy and appropriate legal remedies.",
+    "add": "Add Form",
+    "edit": "Edit Form",
+    "empty": "No immigration forms added yet.",
+    "retired": "Retired",
+    "retire": "Retire",
+    "reactivate": "Reactivate",
+    "lastVerifiedDate": "Last Verified",
+    "form": {
+      "formNumber": "Form Number",
+      "formName": "Form Name",
+      "category": "Category",
+      "officialSource": "Official Source",
+      "officialUrl": "Official USCIS URL",
+      "currentEditionDate": "Current Edition Date",
+      "editionNotes": "Expiration / Edition Notes",
+      "filingFeeReference": "Filing Fee Reference",
+      "instructionsUrl": "Instructions URL",
+      "checklist": "Checklist",
+      "internalNotes": "Internal Notes",
       "lastVerifiedDate": "Last Verified Date",
       "active": "Active",
       "save": "Save",

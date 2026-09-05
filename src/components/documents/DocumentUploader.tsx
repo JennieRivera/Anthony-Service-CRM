@@ -6,18 +6,32 @@ import { Upload } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 
 export function DocumentUploader({
   clientId,
   caseId,
+  showFolderSelect,
 }: {
   clientId: string;
   caseId?: string;
+  // Only meaningful for an Immigration Administrative Services case
+  // (spec section 6) — every other case type omits the folder picker.
+  showFolderSelect?: boolean;
 }) {
   const t = useTranslations("Documents");
+  const tFolder = useTranslations("ImmigrationDocumentFolder");
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [documentType, setDocumentType] = useState("");
+  const [folder, setFolder] = useState("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -33,6 +47,7 @@ export function DocumentUploader({
     formData.append("clientId", clientId);
     if (caseId) formData.append("caseId", caseId);
     if (documentType) formData.append("documentType", documentType);
+    if (showFolderSelect && folder) formData.append("folder", folder);
 
     try {
       const res = await fetch("/api/documents/upload", {
@@ -43,6 +58,7 @@ export function DocumentUploader({
 
       if (fileInputRef.current) fileInputRef.current.value = "";
       setDocumentType("");
+      setFolder("");
       router.refresh();
     } catch {
       setError(true);
@@ -61,6 +77,24 @@ export function DocumentUploader({
           placeholder={t("documentTypePlaceholder")}
           className="sm:max-w-xs"
         />
+        {showFolderSelect && (
+          <Select
+            value={folder || "none"}
+            onValueChange={(v) => setFolder(!v || v === "none" ? "" : v)}
+          >
+            <SelectTrigger className="sm:max-w-xs">
+              <SelectValue placeholder={t("selectFolder")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">{t("noFolder")}</SelectItem>
+              {immigrationDocumentFolderValues.map((value) => (
+                <SelectItem key={value} value={value}>
+                  {tFolder(value)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         <Button
           type="button"
           onClick={handleUpload}

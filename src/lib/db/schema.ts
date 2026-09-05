@@ -892,6 +892,26 @@ export const tasks = pgTable("tasks", {
   completedAt: timestamp("completed_at", { withTimezone: true }),
 });
 
+// Phase 5, Session 6 — Immigration Client Document Folders (spec section
+// 6). A fixed folder taxonomy for documents attached to an Immigration
+// Administrative Services case; nullable since it's meaningless for
+// documents on any other case type. Role-based access restricting this to
+// Immigration Staff + Admin is design-only until the RBAC role system
+// itself lands (Phase 5, Session 8) — the folder structure is built now so
+// that session has something to gate.
+export const immigrationDocumentFolderEnum = pgEnum("immigration_document_folder", [
+  "intake",
+  "identity_documents",
+  "client_provided_information",
+  "government_forms",
+  "supporting_documents",
+  "translation",
+  "signatures",
+  "filing_confirmation",
+  "government_notices",
+  "final_documents",
+]);
+
 export const documents = pgTable("documents", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -906,6 +926,9 @@ export const documents = pgTable("documents", {
   documentType: text("document_type"),
   status: documentStatusEnum("status"),
   uploadedBy: uuid("uploaded_by").references(() => users.id),
+  // Phase 5, Session 6 — only set for documents on an Immigration
+  // Administrative Services case; null for every other document.
+  folder: immigrationDocumentFolderEnum("folder"),
 });
 
 export const appointments = pgTable("appointments", {
@@ -1576,6 +1599,48 @@ export const irsResources = pgTable("irs_resources", {
   active: boolean("active").notNull().default(true),
 });
 
+// Phase 5, Session 6 — Immigration Forms Library (spec section 5), an
+// admin-managed directory of official USCIS forms, not a live USCIS
+// integration or an editable copy of the government form itself.
+export const immigrationFormCategoryEnum = pgEnum("immigration_form_category", [
+  "family_based",
+  "employment_based",
+  "humanitarian",
+  "citizenship_naturalization",
+  "permanent_residence",
+  "work_authorization",
+  "travel_documents",
+  "affidavits_supporting_forms",
+  "change_of_address",
+  "fee_waivers",
+  "uscis_general_forms",
+  "other",
+]);
+
+export const immigrationForms = pgTable("immigration_forms", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  formNumber: text("form_number").notNull(),
+  formName: text("form_name").notNull(),
+  category: immigrationFormCategoryEnum("category").notNull(),
+  officialSource: text("official_source"),
+  officialUrl: text("official_url").notNull(),
+  currentEditionDate: date("current_edition_date"),
+  editionNotes: text("edition_notes"),
+  filingFeeReference: text("filing_fee_reference"),
+  instructionsUrl: text("instructions_url"),
+  checklist: text("checklist"),
+  internalNotes: text("internal_notes"),
+  lastVerifiedDate: date("last_verified_date"),
+  active: boolean("active").notNull().default(true),
+});
+
+
 export const conversationMessages = pgTable("conversation_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1849,6 +1914,7 @@ export type SalesTaxCaseDetails = typeof salesTaxCaseDetails.$inferSelect;
 export type SalesTaxStateInfo = typeof salesTaxStateInfo.$inferSelect;
 export type IrsCaseDetails = typeof irsCaseDetails.$inferSelect;
 export type IrsResource = typeof irsResources.$inferSelect;
+export type ImmigrationForm = typeof immigrationForms.$inferSelect;
 export type AuditLogEntry = typeof auditLog.$inferSelect;
 export type ProfessionalSystem = typeof professionalSystems.$inferSelect;
 export type WebsiteLink = typeof websiteLinks.$inferSelect;

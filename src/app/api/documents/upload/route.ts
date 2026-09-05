@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import { documents } from "@/lib/db/schema";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { isDatabaseConfigured } from "@/lib/db/config";
+import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -24,6 +25,12 @@ export async function POST(request: Request) {
   const clientId = formData.get("clientId");
   const caseId = formData.get("caseId");
   const documentType = formData.get("documentType");
+  const folder = formData.get("folder");
+  const validFolder =
+    typeof folder === "string" &&
+    (immigrationDocumentFolderValues as readonly string[]).includes(folder)
+      ? (folder as (typeof immigrationDocumentFolderValues)[number])
+      : null;
 
   if (!(file instanceof File) || typeof clientId !== "string" || !clientId) {
     return NextResponse.json(
@@ -48,6 +55,7 @@ export async function POST(request: Request) {
         typeof documentType === "string" && documentType
           ? documentType
           : null,
+      folder: validFolder,
       status: "received",
     })
     .returning();

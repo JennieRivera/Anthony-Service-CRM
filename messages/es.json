@@ -115,7 +115,8 @@
     "collapseSidebar": "Contraer barra lateral",
     "expandSidebar": "Expandir barra lateral",
     "salesTaxMap": "Mapa de Sales Tax",
-    "irsResources": "Recursos IRS"
+    "irsResources": "Recursos IRS",
+    "immigrationForms": "Formularios de Inmigración"
   },
   "ServiceType": {
     "online_notary": "Notaría en Línea",
@@ -1065,7 +1066,10 @@
     "upload": "Subir",
     "uploading": "Subiendo...",
     "notConfigured": "El almacenamiento de archivos aún no está conectado. Agrega BLOB_READ_WRITE_TOKEN a .env.local (crea un almacén Blob en la pestaña Storage de tu proyecto de Vercel) para habilitar las subidas.",
-    "uploadError": "Error al subir. Inténtalo de nuevo."
+    "uploadError": "Error al subir. Inténtalo de nuevo.",
+    "selectFolder": "Seleccionar carpeta (Inmigración)",
+    "noFolder": "Sin carpeta",
+    "unfiled": "Sin Clasificar"
   },
   "AppointmentStatus": {
     "scheduled": "Programada",
@@ -1656,6 +1660,61 @@
       "category": "Categoría",
       "url": "URL Oficial del IRS",
       "description": "Descripción",
+      "lastVerifiedDate": "Fecha de Última Verificación",
+      "active": "Activo",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    }
+  },
+  "ImmigrationDocumentFolder": {
+    "intake": "01 Admisión",
+    "identity_documents": "02 Documentos de Identidad",
+    "client_provided_information": "03 Información Proporcionada por el Cliente",
+    "government_forms": "04 Formularios Gubernamentales",
+    "supporting_documents": "05 Documentos de Respaldo",
+    "translation": "06 Traducción",
+    "signatures": "07 Firmas",
+    "filing_confirmation": "08 Confirmación de Presentación",
+    "government_notices": "09 Avisos Gubernamentales",
+    "final_documents": "10 Documentos Finales"
+  },
+  "ImmigrationFormCategory": {
+    "family_based": "Basado en Familia",
+    "employment_based": "Basado en Empleo",
+    "humanitarian": "Humanitario",
+    "citizenship_naturalization": "Ciudadanía / Naturalización",
+    "permanent_residence": "Residencia Permanente",
+    "work_authorization": "Autorización de Trabajo",
+    "travel_documents": "Documentos de Viaje",
+    "affidavits_supporting_forms": "Declaraciones Juradas / Formularios de Respaldo",
+    "change_of_address": "Cambio de Dirección",
+    "fee_waivers": "Exenciones de Tarifas",
+    "uscis_general_forms": "Formularios Generales de USCIS",
+    "other": "Otro"
+  },
+  "ImmigrationForms": {
+    "title": "Biblioteca de Formularios de Inmigración",
+    "instructions": "Un directorio interno de referencia con formularios oficiales de USCIS. Esto no es una conexión directa a ningún sistema de USCIS, ni nunca una copia editable de un formulario gubernamental.",
+    "disclaimer": "Anthony Multiservice LLC no es un bufete de abogados y no brinda asesoría legal. Los servicios administrativos de documentos de inmigración se limitan a la asistencia administrativa permitida. El cliente o el profesional legal autorizado debe determinar la elegibilidad, la estrategia legal y los remedios legales apropiados.",
+    "add": "Agregar Formulario",
+    "edit": "Editar Formulario",
+    "empty": "Aún no se han agregado formularios de inmigración.",
+    "retired": "Retirado",
+    "retire": "Retirar",
+    "reactivate": "Reactivar",
+    "lastVerifiedDate": "Última Verificación",
+    "form": {
+      "formNumber": "Número de Formulario",
+      "formName": "Nombre del Formulario",
+      "category": "Categoría",
+      "officialSource": "Fuente Oficial",
+      "officialUrl": "URL Oficial de USCIS",
+      "currentEditionDate": "Fecha de Edición Actual",
+      "editionNotes": "Notas de Vencimiento / Edición",
+      "filingFeeReference": "Referencia de Tarifa de Presentación",
+      "instructionsUrl": "URL de Instrucciones",
+      "checklist": "Lista de Verificación",
+      "internalNotes": "Notas Internas",
       "lastVerifiedDate": "Fecha de Última Verificación",
       "active": "Activo",
       "save": "Guardar",
