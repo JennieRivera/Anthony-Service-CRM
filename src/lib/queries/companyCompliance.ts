@@ -3,7 +3,10 @@ import { getDb } from "@/lib/db";
 import {
   companies,
   companyDocumentChecklistItems,
+  salesTaxCaseDetails,
+  irsCaseDetails,
   type CompanyDocumentChecklistItem,
+  type IrsCaseDetails,
 } from "@/lib/db/schema";
 
 export type ComplianceIndicatorStatus = "green" | "gold" | "red" | "gray";
@@ -40,21 +43,68 @@ function checklistIndicator(
   return "red"; // expired
 }
 
-// The Sales Tax / Tax status indicators derive from the generic document
-// checklist for now. They'll get richer, purpose-built data once the Sales
-// Tax module (Phase 5 Session 4) and IRS module (Session 5) exist, at which
-// point those live case statuses should replace this placeholder signal.
+// Red beats gold beats green beats gray when a company has several open
+// cases of the same kind — one past-due filing should surface even if
+// three other cases are fine.
+function worstOf(colors: ComplianceIndicatorStatus[]): ComplianceIndicatorStatus | null {
+  if (colors.length === 0) return null;
+  if (colors.includes("red")) return "red";
+  if (colors.includes("gold")) return "gold";
+  if (colors.includes("green")) return "green";
+  return "gray";
+}
+
+const SALES_TAX_RED = new Set(["past_due"]);
+const SALES_TAX_GREEN = new Set(["approved", "account_active", "filed"]);
+
+// Closed cases don't represent a current obligation either way, so they're
+// excluded before this runs — an all-closed history falls through to the
+// checklist/required-flag fallback below instead of reading as "green".
+function salesTaxCaseColor(status: string): ComplianceIndicatorStatus {
+  if (SALES_TAX_RED.has(status)) return "red";
+  if (SALES_TAX_GREEN.has(status)) return "green";
+  return "gold"; // not_started, research_required, registration_pending, submitted, filing_due
+}
+
+function irsCaseColor(row: IrsCaseDetails): ComplianceIndicatorStatus {
+  if (row.caseType === "ein_assistance") {
+    if (!row.einStatus) return "gray";
+    if (row.einStatus === "ein_received" || row.einStatus === "closed") return "green";
+    return "gold"; // not_started, information_pending, ready, submitted
+  }
+  if (row.caseType === "itin_assistance") {
+    if (!row.itinStatus) return "gray";
+    if (row.itinStatus === "itin_received" || row.itinStatus === "closed") return "green";
+    if (row.itinStatus === "additional_information_requested") return "red";
+    return "gold";
+  }
+  // business_account_follow_up, irs_correspondence, other
+  if (!row.applicationStatus) return "gray";
+  if (row.applicationStatus === "resolved" || row.applicationStatus === "closed") {
+    return "green";
+  }
+  return "gold";
+}
+
 export async function getCompanyComplianceSummary(
   companyId: string,
 ): Promise<CompanyComplianceSummary | null> {
   const db = getDb();
 
-  const [[company], items] = await Promise.all([
+  const [[company], items, salesTaxCases, irsCases] = await Promise.all([
     db.select().from(companies).where(eq(companies.id, companyId)).limit(1),
     db
       .select()
       .from(companyDocumentChecklistItems)
       .where(eq(companyDocumentChecklistItems.companyId, companyId)),
+    db
+      .select()
+      .from(salesTaxCaseDetails)
+      .where(eq(salesTaxCaseDetails.companyId, companyId)),
+    db
+      .select()
+      .from(irsCaseDetails)
+      .where(eq(irsCaseDetails.companyId, companyId)),
   ]);
 
   if (!company) return null;
@@ -72,9 +122,14 @@ export async function getCompanyComplianceSummary(
 
   const annualReport = checklistIndicator(items, "annual_report");
 
+  // Sales Tax — real case data (Phase 5, Session 4) takes priority over the
+  // generic document checklist, which was only ever a placeholder signal
+  // for companies that don't have a Sales Tax case yet.
+  const openSalesTaxCases = salesTaxCases.filter((c) => c.status !== "closed");
   const salesTax: ComplianceIndicatorStatus = !company.salesTaxRequired
     ? "gray"
-    : checklistIndicator(items, "sales_tax");
+    : (worstOf(openSalesTaxCases.map((c) => salesTaxCaseColor(c.status))) ??
+      checklistIndicator(items, "sales_tax"));
 
   const businessLicense = checklistIndicator(items, "business_licenses");
 
@@ -86,7 +141,17 @@ export async function getCompanyComplianceSummary(
         ? "green"
         : "gray";
 
-  const tax = checklistIndicator(items, "tax_returns");
+  // Tax / IRS administrative standing — real EIN/ITIN/correspondence case
+  // data (Phase 5, Session 5) takes priority over the generic tax-returns
+  // checklist category, same fallback pattern as Sales Tax above.
+  const openIrsCases = irsCases.filter(
+    (c) =>
+      c.einStatus !== "closed" &&
+      c.itinStatus !== "closed" &&
+      c.applicationStatus !== "closed",
+  );
+  const tax: ComplianceIndicatorStatus =
+    worstOf(openIrsCases.map(irsCaseColor)) ?? checklistIndicator(items, "tax_returns");
 
   const bookkeepingChecklist = checklistIndicator(items, "bookkeeping");
   const bookkeeping: ComplianceIndicatorStatus =
