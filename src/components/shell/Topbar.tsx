@@ -15,7 +15,7 @@ import { MobileNav } from "./MobileNav";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { SignOutMenuItem } from "./SignOutMenuItem";
 
-export async function Topbar() {
+export async function Topbar({ visibleHrefs }: { visibleHrefs: string[] }) {
   const t = await getTranslations("Nav");
   const session = await auth();
   const email = session?.user?.email ?? "";
@@ -23,7 +23,7 @@ export async function Topbar() {
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-card px-4 md:px-6">
-      <MobileNav />
+      <MobileNav visibleHrefs={visibleHrefs} />
 
       <div className="relative w-full max-w-sm">
         <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

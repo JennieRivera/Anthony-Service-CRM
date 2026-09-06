@@ -10,10 +10,11 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { navItems } from "./nav-items";
 import { Logo } from "./Logo";
 
-export function MobileNav() {
+export function MobileNav({ visibleHrefs }: { visibleHrefs: string[] }) {
   const t = useTranslations("Nav");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const items = navItems.filter((item) => visibleHrefs.includes(item.href));
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -35,7 +36,7 @@ export function MobileNav() {
           <Logo />
         </div>
         <nav className="flex flex-col gap-1 px-3 py-2">
-          {navItems.map((item) => {
+          {items.map((item) => {
             const isActive =
               item.href === "/"
                 ? pathname === "/"

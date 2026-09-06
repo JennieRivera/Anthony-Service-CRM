@@ -22,6 +22,7 @@ import {
   MapPinned,
   UsersRound,
 } from "lucide-react";
+import { canAccessRoute, type Role } from "@/lib/permissions";
 
 export type NavItem = {
   href: string;
@@ -73,3 +74,18 @@ export const navItems: NavItem[] = [
   { href: "/associations", labelKey: "associations", icon: UsersRound },
   { href: "/settings", labelKey: "settings", icon: Settings },
 ];
+
+// Multi-staff login — reuses the exact same rules src/proxy.ts enforces
+// (via canAccessRoute/ROUTE_ACCESS in @/lib/permissions), so the sidebar
+// never shows a link that would just redirect the user away.
+//
+// Returns hrefs only (plain strings) rather than full NavItem objects:
+// NavItem carries a Lucide icon component reference, and those can't
+// cross the server→client prop boundary ("Only plain objects can be
+// passed to Client Components..."). Sidebar/MobileNav import the full
+// navItems list themselves and filter it down to these hrefs.
+export function getVisibleNavHrefs(role: Role | null): string[] {
+  return navItems
+    .filter((item) => canAccessRoute(role, item.href))
+    .map((item) => item.href);
+}

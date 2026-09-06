@@ -88,14 +88,13 @@
     "languages": "Idiomas Atendidos",
     "account": "Cuenta",
     "signedInAs": "Sesión iniciada como",
-    "accessNote": "El acceso a este CRM está restringido a esta única cuenta.",
+    "accessNote": "El acceso se gestiona desde Cuentas de Personal más abajo. Solo las cuentas agregadas ahí (más la cuenta de administrador principal) pueden iniciar sesión.",
     "notifications": "Preferencias de Notificación",
     "notificationsComingSoon": "Las preferencias de notificación por correo/SMS estarán disponibles próximamente.",
     "notifyNewAppointment": "Nueva cita reservada",
     "notifyInvoicePaid": "Factura pagada",
     "notifyOverdueInvoice": "Factura vencida",
     "staffAccounts": "Cuentas de Personal",
-    "staffAccountsComingSoon": "Este CRM actualmente admite una sola cuenta de administrador. Los inicios de sesión de personal múltiple con permisos basados en roles (Admin / Personal) están planeados para una futura actualización.",
     "integrations": "Integraciones",
     "integrationsDescription": "Consulta el estado de conexión de cada sistema externo preparado para este CRM, y pruébalos o desconéctalos. Las llaves de API nunca se muestran aquí — los secretos viven solo en variables de entorno del servidor.",
     "manageIntegrations": "Administrar Integraciones",
@@ -105,7 +104,9 @@
     "professionalSystemsCard": "Sistemas Profesionales y Sitios Web",
     "professionalSystemsCardDescription": "Administra las tarjetas de acceso rápido que se muestran en el Panel para tu software profesional y tus sitios web.",
     "manageProfessionalSystems": "Administrar Sistemas Profesionales",
-    "manageWebsites": "Administrar Sitios Web"
+    "manageWebsites": "Administrar Sitios Web",
+    "staffAccountsDescription": "Agregue las cuentas de Google que su personal usa para iniciar sesión y asígneles un rol. Los roles controlan qué partes del CRM pueden ver.",
+    "manageStaffAccounts": "Gestionar Cuentas de Personal"
   },
   "Nav": {
     "dashboard": "Panel",
@@ -1862,5 +1863,34 @@
     "save": "Guardar",
     "saving": "Guardando...",
     "verifiedBy": "Verificado Por"
+  },
+  "UserRole": {
+    "admin": "Administrador",
+    "manager": "Gerente",
+    "tax_staff": "Personal de Impuestos",
+    "bookkeeping_staff": "Personal de Contabilidad",
+    "notary_staff": "Personal de Notaría",
+    "consulting_staff": "Personal de Consultoría",
+    "academy_staff": "Personal de Academia",
+    "referral_manager": "Gerente de Referidos",
+    "community_manager": "Gerente de Comunidad",
+    "immigration_staff": "Personal de Inmigración"
+  },
+  "StaffAccounts": {
+    "title": "Cuentas de Personal",
+    "instructions": "Cada correo abajo puede iniciar sesión con Google usando exactamente esa dirección. La cuenta de administrador principal (definida por ADMIN_EMAIL) no aparece aquí y siempre tiene acceso total.",
+    "backToSettings": "Volver a Configuración",
+    "add": "Agregar Cuenta de Personal",
+    "edit": "Editar Cuenta de Personal",
+    "empty": "Aún no se han agregado cuentas de personal — solo el administrador principal puede iniciar sesión.",
+    "noRole": "Sin rol asignado",
+    "form": {
+      "email": "Correo de Google",
+      "emailNotEditable": "El correo no se puede cambiar después de crear la cuenta.",
+      "name": "Nombre",
+      "role": "Rol",
+      "save": "Guardar",
+      "saving": "Guardando..."
+    }
   }
 }

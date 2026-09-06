@@ -88,14 +88,13 @@
     "languages": "Languages Served",
     "account": "Account",
     "signedInAs": "Signed in as",
-    "accessNote": "Access to this CRM is restricted to this single account.",
+    "accessNote": "Access is managed through Staff Accounts below. Only accounts added there (plus the primary admin account) can sign in.",
     "notifications": "Notification Preferences",
     "notificationsComingSoon": "Email/SMS notification preferences are coming soon.",
     "notifyNewAppointment": "New appointment booked",
     "notifyInvoicePaid": "Invoice paid",
     "notifyOverdueInvoice": "Invoice becomes overdue",
     "staffAccounts": "Staff Accounts",
-    "staffAccountsComingSoon": "This CRM currently supports a single admin account. Multi-staff logins with role-based permissions (Admin / Staff) are planned for a future update.",
     "integrations": "Integrations",
     "integrationsDescription": "See the connection status of every external system prepared for this CRM, and test or disconnect them. No API keys are ever shown here — secrets live only in server environment variables.",
     "manageIntegrations": "Manage Integrations",
@@ -105,7 +104,9 @@
     "professionalSystemsCard": "Professional Systems & Websites",
     "professionalSystemsCardDescription": "Manage the quick-launch cards shown on the Dashboard for your professional software and your websites.",
     "manageProfessionalSystems": "Manage Professional Systems",
-    "manageWebsites": "Manage Websites"
+    "manageWebsites": "Manage Websites",
+    "staffAccountsDescription": "Add the Google accounts your staff use to sign in and assign each one a role. Roles control which parts of the CRM they can reach.",
+    "manageStaffAccounts": "Manage Staff Accounts"
   },
   "Nav": {
     "dashboard": "Dashboard",
@@ -1862,5 +1863,34 @@
     "save": "Save",
     "saving": "Saving...",
     "verifiedBy": "Verified By"
+  },
+  "UserRole": {
+    "admin": "Admin",
+    "manager": "Manager",
+    "tax_staff": "Tax Staff",
+    "bookkeeping_staff": "Bookkeeping Staff",
+    "notary_staff": "Notary Staff",
+    "consulting_staff": "Consulting Staff",
+    "academy_staff": "Academy Staff",
+    "referral_manager": "Referral Manager",
+    "community_manager": "Community Manager",
+    "immigration_staff": "Immigration Staff"
+  },
+  "StaffAccounts": {
+    "title": "Staff Accounts",
+    "instructions": "Every email below can sign in with Google using that exact address. The primary admin account (set via ADMIN_EMAIL) isn't listed here and always has full access.",
+    "backToSettings": "Back to Settings",
+    "add": "Add Staff Account",
+    "edit": "Edit Staff Account",
+    "empty": "No staff accounts added yet — only the primary admin can sign in.",
+    "noRole": "No role assigned",
+    "form": {
+      "email": "Google Email Address",
+      "emailNotEditable": "Email can't be changed after the account is created.",
+      "name": "Name",
+      "role": "Role",
+      "save": "Save",
+      "saving": "Saving..."
+    }
   }
 }

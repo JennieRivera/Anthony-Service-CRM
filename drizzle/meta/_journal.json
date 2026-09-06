@@ -183,6 +183,13 @@
       "when": 1788648063528,
       "tag": "0025_stormy_doomsday",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1788652990084,
+      "tag": "0026_narrow_mother_askani",
+      "breakpoints": true
     }
   ]
 }
