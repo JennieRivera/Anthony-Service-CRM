@@ -1,10 +1,12 @@
 // Phase 2, Session 7 — RBAC design reference. Extended in Phase 5,
 // Session 8 to add the Immigration Staff role and cover every module
-// added across Phase 5 (spec section 17). Enforced starting in the
-// multi-staff login session: src/auth.ts populates a signed-in user's
-// role from the `users` table, src/proxy.ts blocks direct navigation to
-// an area outside that role's access, and the sidebar/mobile nav only
-// render the items a role can reach (src/components/shell/nav-items.ts).
+// added across Phase 5 (spec section 17).
+//
+// This map is NOT enforced anywhere yet. Sign-in is still restricted to
+// the single ADMIN_EMAIL (src/auth.ts) by explicit decision when this was
+// built — multi-staff Google login and a "Staff Accounts" management UI
+// would need to ship first. `users.role` exists in the schema (reserved,
+// unpopulated) for when that happens.
 //
 // Categories with no dedicated role (Credit Services, Business Formation,
 // Marketing/Automation, and the legacy Document Prep/apostille category)
@@ -53,11 +55,7 @@ export type AccessArea =
   | "irs_administrative"
   | "irs_resources"
   | "immigration_forms"
-  | "associations"
-  // Not named in spec section 17's role list; granted to Community
-  // Manager alongside associations/chambers since it's the same
-  // community/expansion-development work.
-  | "latino_business_map";
+  | "associations";
 
 export const ROLE_PERMISSIONS: Record<Role, AccessArea[] | "*"> = {
   admin: "*",
@@ -72,7 +70,7 @@ export const ROLE_PERMISSIONS: Record<Role, AccessArea[] | "*"> = {
   academy_staff: ["academy"],
   referral_manager: ["referrals"],
   // "Community Manager: associations and chambers"
-  community_manager: ["alliances", "associations", "latino_business_map"],
+  community_manager: ["alliances", "associations"],
   // "Immigration Staff: immigration administrative cases only" — cases,
   // the Immigration Forms Library, and per-case document folders (which
   // live on the immigration case's own documents, so no separate area).
@@ -81,46 +79,7 @@ export const ROLE_PERMISSIONS: Record<Role, AccessArea[] | "*"> = {
 
 export function canAccessArea(role: Role, area: AccessArea): boolean {
   const allowed = ROLE_PERMISSIONS[role];
-  if (!allowed) return false; // unrecognized role — deny rather than throw
   return allowed === "*" || allowed.includes(area);
-}
-
-// Multi-staff login, enforcement — maps each single-purpose module route
-// to the AccessArea (or "admin-only") that gates it. Deliberately does
-// NOT cover the cross-cutting pages every role needs regardless of area
-// (dashboard, clients, cases, tasks, appointments, communications,
-// invoices, payments, documents, templates, reports) — those list every
-// service type mixed together and aren't filtered by role yet; that's a
-// known, separate follow-up, not an oversight here.
-export const ROUTE_ACCESS: {
-  prefix: string;
-  area?: AccessArea;
-  adminOnly?: boolean;
-}[] = [
-  { prefix: "/settings", adminOnly: true },
-  { prefix: "/companies", area: "companies" },
-  { prefix: "/company-registration", area: "company_registration" },
-  { prefix: "/sales-tax-map", area: "sales_tax" },
-  { prefix: "/irs-resources", area: "irs_resources" },
-  { prefix: "/immigration-forms", area: "immigration_forms" },
-  { prefix: "/latino-business-map", area: "latino_business_map" },
-  { prefix: "/associations", area: "associations" },
-  { prefix: "/alliances", area: "alliances" },
-  { prefix: "/referrals", area: "referrals" },
-];
-
-// Shared by src/proxy.ts (route redirect) and nav-items.ts (hiding links
-// the current role can't reach). `role: null` means signed in but with no
-// role assigned yet — deny every gated route, same as any other role
-// lacking that area.
-export function canAccessRoute(role: Role | null, pathname: string): boolean {
-  const rule = ROUTE_ACCESS.find(
-    (r) => pathname === r.prefix || pathname.startsWith(`${r.prefix}/`),
-  );
-  if (!rule) return true;
-  if (!role) return false;
-  if (rule.adminOnly) return role === "admin" || role === "manager";
-  return rule.area ? canAccessArea(role, rule.area) : true;
 }
 
 // Phase 4, Session 7 — "Communication Security" role rules (spec #13),
@@ -157,7 +116,6 @@ export function canAccessCommunication(
   communication: { caseServiceType?: AccessArea | null; referralId?: string | null },
 ): boolean {
   const allowed = ROLE_PERMISSIONS[role];
-  if (!allowed) return false; // unrecognized role — deny rather than throw
   if (allowed === "*") return true;
 
   const area = getCommunicationAccessArea(communication);

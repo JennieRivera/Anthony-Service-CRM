@@ -8,11 +8,10 @@ import { cn } from "@/lib/utils";
 import { navItems } from "./nav-items";
 import { Logo } from "./Logo";
 
-export function Sidebar({ visibleHrefs }: { visibleHrefs: string[] }) {
+export function Sidebar() {
   const t = useTranslations("Nav");
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const items = navItems.filter((item) => visibleHrefs.includes(item.href));
 
   return (
     <aside
@@ -32,7 +31,7 @@ export function Sidebar({ visibleHrefs }: { visibleHrefs: string[] }) {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 px-3 py-2">
-        {items.map((item) => {
+        {navItems.map((item) => {
           const isActive =
             item.href === "/"
               ? pathname === "/"

@@ -198,10 +198,7 @@ export const userRoleEnum = pgEnum("user_role", [
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
-  // Nullable: staff sign in via Google OAuth only (src/auth.ts), never a
-  // password. This column predates that decision and is kept only in case
-  // a credentials flow is ever explicitly requested.
-  passwordHash: text("password_hash"),
+  passwordHash: text("password_hash").notNull(),
   name: text("name"),
   role: userRoleEnum("role"),
   createdAt: timestamp("created_at", { withTimezone: true })
