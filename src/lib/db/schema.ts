@@ -916,6 +916,24 @@ export const immigrationDocumentFolderEnum = pgEnum("immigration_document_folder
   "final_documents",
 ]);
 
+// General, business-wide document folder — distinct from the fine-grained
+// immigration-only `folder` above. "immigration" is set automatically
+// whenever `folder` is set (i.e. the document also has a fine immigration
+// sub-folder); it isn't meant to be picked by hand alongside a manual one.
+export const documentCategoryEnum = pgEnum("document_category", [
+  "identification",
+  "proof_of_address",
+  "signed_forms",
+  "contracts",
+  "payment_receipts",
+  "government_correspondence",
+  "tax_documents",
+  "financial_documents",
+  "notarized_documents",
+  "immigration",
+  "other",
+]);
+
 export const documents = pgTable("documents", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -933,6 +951,9 @@ export const documents = pgTable("documents", {
   // Phase 5, Session 6 — only set for documents on an Immigration
   // Administrative Services case; null for every other document.
   folder: immigrationDocumentFolderEnum("folder"),
+  // Nullable: documents uploaded before this field existed have no category
+  // and show up under an "Uncategorized" bucket in the general Documents view.
+  category: documentCategoryEnum("category"),
 });
 
 export const appointments = pgTable("appointments", {

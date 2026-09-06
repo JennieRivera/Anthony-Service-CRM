@@ -27,6 +27,8 @@ export async function listAllDocuments() {
       blobUrl: documents.blobUrl,
       documentType: documents.documentType,
       status: documents.status,
+      folder: documents.folder,
+      category: documents.category,
       clientId: clients.id,
       clientName: clients.fullName,
       caseTitle: cases.title,

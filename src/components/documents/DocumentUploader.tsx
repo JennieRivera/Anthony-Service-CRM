@@ -14,6 +14,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
+import { selectableDocumentCategoryValues } from "@/lib/validation/documentCategory";
+import { DOCUMENT_ACCEPT, uploadErrorKey } from "./documentUploadShared";
 
 export function DocumentUploader({
   clientId,
@@ -28,40 +30,51 @@ export function DocumentUploader({
 }) {
   const t = useTranslations("Documents");
   const tFolder = useTranslations("ImmigrationDocumentFolder");
+  const tCategory = useTranslations("DocumentCategory");
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [documentType, setDocumentType] = useState("");
   const [folder, setFolder] = useState("");
+  const [category, setCategory] = useState("other");
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState(false);
+  const [errorKey, setErrorKey] = useState<string | null>(null);
 
   async function handleUpload() {
     const file = fileInputRef.current?.files?.[0];
     if (!file) return;
 
     setUploading(true);
-    setError(false);
+    setErrorKey(null);
 
     const formData = new FormData();
     formData.append("file", file);
     formData.append("clientId", clientId);
     if (caseId) formData.append("caseId", caseId);
     if (documentType) formData.append("documentType", documentType);
-    if (showFolderSelect && folder) formData.append("folder", folder);
+    if (showFolderSelect && folder) {
+      formData.append("folder", folder);
+    } else {
+      formData.append("category", category);
+    }
 
     try {
       const res = await fetch("/api/documents/upload", {
         method: "POST",
         body: formData,
       });
-      if (!res.ok) throw new Error("Upload failed");
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        setErrorKey(uploadErrorKey(body));
+        return;
+      }
 
       if (fileInputRef.current) fileInputRef.current.value = "";
       setDocumentType("");
       setFolder("");
+      setCategory("other");
       router.refresh();
     } catch {
-      setError(true);
+      setErrorKey("uploadError");
     } finally {
       setUploading(false);
     }
@@ -70,14 +83,19 @@ export function DocumentUploader({
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <Input ref={fileInputRef} type="file" className="sm:max-w-xs" />
+        <Input
+          ref={fileInputRef}
+          type="file"
+          accept={DOCUMENT_ACCEPT}
+          className="sm:max-w-xs"
+        />
         <Input
           value={documentType}
           onChange={(e) => setDocumentType(e.target.value)}
           placeholder={t("documentTypePlaceholder")}
           className="sm:max-w-xs"
         />
-        {showFolderSelect && (
+        {showFolderSelect ? (
           <Select
             value={folder || "none"}
             onValueChange={(v) => setFolder(!v || v === "none" ? "" : v)}
@@ -94,6 +112,19 @@ export function DocumentUploader({
               ))}
             </SelectContent>
           </Select>
+        ) : (
+          <Select value={category} onValueChange={(v) => setCategory(v ?? "other")}>
+            <SelectTrigger className="sm:max-w-xs">
+              <SelectValue placeholder={t("selectCategory")} />
+            </SelectTrigger>
+            <SelectContent>
+              {selectableDocumentCategoryValues.map((value) => (
+                <SelectItem key={value} value={value}>
+                  {tCategory(value)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
         <Button
           type="button"
@@ -105,8 +136,8 @@ export function DocumentUploader({
           {uploading ? t("uploading") : t("upload")}
         </Button>
       </div>
-      {error && (
-        <p className="text-sm text-destructive">{t("uploadError")}</p>
+      {errorKey && (
+        <p className="text-sm text-destructive">{t(errorKey)}</p>
       )}
     </div>
   );

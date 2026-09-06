@@ -1,27 +1,43 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { FileText } from "lucide-react";
+import { FileText, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { DocumentStatusPill } from "./StatusPill";
+import { downloadHref } from "./downloadHref";
+import { MoveCategorySelect } from "./MoveCategorySelect";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 import type { Document } from "@/lib/db/schema";
 
 function DocumentRow({ doc }: { doc: Document }) {
+  const t = useTranslations("Documents");
+
   return (
-    <li className="flex items-center justify-between p-4">
+    <li className="flex items-center justify-between gap-3 p-4">
       <a
         href={doc.blobUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 font-medium text-foreground hover:underline"
+        className="flex min-w-0 items-center gap-2 font-medium text-foreground hover:underline"
       >
         <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
-        {doc.fileName}
+        <span className="truncate">{doc.fileName}</span>
       </a>
-      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+      <div className="flex shrink-0 items-center gap-3 text-sm text-muted-foreground">
         {doc.documentType && <span>{doc.documentType}</span>}
         <DocumentStatusPill status={doc.status} />
         <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
+        {/* A document with a fine immigration sub-folder stays tied to it —
+            moving it to a general folder here would desync the two. */}
+        {!doc.folder && <MoveCategorySelect documentId={doc.id} category={doc.category} />}
+        <Button
+          variant="outline"
+          size="sm"
+          render={<a href={downloadHref(doc.blobUrl)} download={doc.fileName} />}
+        >
+          <Download className="h-4 w-4" />
+          {t("download")}
+        </Button>
       </div>
     </li>
   );

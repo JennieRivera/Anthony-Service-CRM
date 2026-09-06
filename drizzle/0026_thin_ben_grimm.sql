@@ -1,0 +1,2 @@
+CREATE TYPE "public"."document_category" AS ENUM('identification', 'proof_of_address', 'signed_forms', 'contracts', 'payment_receipts', 'government_correspondence', 'tax_documents', 'financial_documents', 'notarized_documents', 'immigration', 'other');--> statement-breakpoint
+ALTER TABLE "documents" ADD COLUMN "category" "document_category";
