@@ -136,7 +136,8 @@
     "immigrationForms": "Immigration Forms",
     "latinoBusinessMap": "Latino Business Map",
     "associations": "Associations & Chambers",
-    "marketingContent": "Marketing Content"
+    "marketingContent": "Marketing Content",
+    "aiTeam": "AI Team"
   },
   "ServiceType": {
     "online_notary": "Online Notary",
@@ -2060,5 +2061,65 @@
     "save": "Save",
     "saving": "Saving...",
     "verifiedBy": "Verified By"
+  },
+  "AiTeam": {
+    "title": "AI Team",
+    "subtitle": "A visual management layer over the rules and automations this CRM already runs — not a generative-AI chatbot connected to an outside provider.",
+    "aiAssistantBadge": "AI Assistant",
+    "comingSoonBadge": "Coming Soon",
+    "assignedClients": "Assigned Clients",
+    "tasksToday": "Today's Tasks",
+    "openEscalations": "Open Escalations",
+    "knowledgeBaseEntries": "Knowledge Base",
+    "knowledgeBaseEntriesCount": "{count} entries",
+    "activePermissions": "{active}/{total} active permissions",
+    "openAgent": "Open Agent",
+    "pauseAgent": "Pause Agent",
+    "resumeAgent": "Resume Agent",
+    "settings": "Settings",
+    "settingsComingSoon": "Editing arrives in the next session",
+    "backToAiTeam": "Back to AI Team",
+    "bio": "About",
+    "welcomeMessage": "Welcome Message",
+    "disclaimer": "Standing Disclaimer",
+    "department": "Department",
+    "language": "Language",
+    "status": "Status",
+    "comingSoonMessage": "This agent's card is reserved — it isn't active yet."
+  },
+  "AiAgentStatus": {
+    "online": "Online",
+    "offline": "Offline",
+    "paused": "Paused",
+    "needs_review": "Needs Review",
+    "escalated": "Escalated"
+  },
+  "AiAgentDepartment": {
+    "client_service": "Client Service & Reception",
+    "tax_bookkeeping": "Taxes & Bookkeeping",
+    "commercial_finance": "Commercial Finance & Referrals",
+    "immigration": "Immigration Administrative Services",
+    "document_services": "Document Services",
+    "business_consulting": "Business Consulting",
+    "community_academy": "Community & Academy",
+    "operations": "Operations & Systems"
+  },
+  "AiAgentLanguage": {
+    "en": "English",
+    "es": "Spanish",
+    "bilingual": "Bilingual (EN/ES)"
+  },
+  "AiKnowledgeBaseSection": {
+    "approved_services": "Approved Services",
+    "approved_scripts": "Approved Scripts",
+    "faqs": "FAQs",
+    "policies": "Policies",
+    "disclaimers": "Disclaimers",
+    "checklists": "Checklists",
+    "workflows": "Workflows",
+    "forms": "Forms",
+    "official_resources": "Official Resources",
+    "escalation_rules": "Escalation Rules",
+    "prohibited_actions": "Prohibited Actions"
   }
 }

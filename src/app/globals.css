@@ -105,3 +105,22 @@
     font-family: var(--font-heading);
   }
 }
+
+/* Phase 6, Session 2 — AI Team avatars. A small, continuous idle motion
+   (not a talking/video avatar — section 8 explicitly defers that) so a
+   card reads as "alive" without drawing attention away from its data. */
+@keyframes ai-avatar-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-avatar-float {
+    animation: none;
+  }
+}

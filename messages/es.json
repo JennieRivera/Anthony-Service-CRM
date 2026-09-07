@@ -136,7 +136,8 @@
     "immigrationForms": "Formularios de Inmigración",
     "latinoBusinessMap": "Mapa de Negocios Latinos",
     "associations": "Asociaciones y Cámaras",
-    "marketingContent": "Contenido de Marketing"
+    "marketingContent": "Contenido de Marketing",
+    "aiTeam": "Equipo IA"
   },
   "ServiceType": {
     "online_notary": "Notaría en Línea",
@@ -2060,5 +2061,65 @@
     "save": "Guardar",
     "saving": "Guardando...",
     "verifiedBy": "Verificado Por"
+  },
+  "AiTeam": {
+    "title": "Equipo IA",
+    "subtitle": "Una capa visual de organización sobre las reglas y automatizaciones que este CRM ya ejecuta — no es un chatbot de IA generativa conectado a un proveedor externo.",
+    "aiAssistantBadge": "Asistente de IA",
+    "comingSoonBadge": "Próximamente",
+    "assignedClients": "Clientes Asignados",
+    "tasksToday": "Tareas de Hoy",
+    "openEscalations": "Escalaciones Abiertas",
+    "knowledgeBaseEntries": "Base de Conocimiento",
+    "knowledgeBaseEntriesCount": "{count} entradas",
+    "activePermissions": "{active}/{total} permisos activos",
+    "openAgent": "Abrir Agente",
+    "pauseAgent": "Pausar Agente",
+    "resumeAgent": "Reanudar Agente",
+    "settings": "Configuración",
+    "settingsComingSoon": "La edición llega en la próxima sesión",
+    "backToAiTeam": "Volver a AI Team",
+    "bio": "Acerca de",
+    "welcomeMessage": "Mensaje de Bienvenida",
+    "disclaimer": "Descargo Permanente",
+    "department": "Departamento",
+    "language": "Idioma",
+    "status": "Estado",
+    "comingSoonMessage": "La tarjeta de este agente está reservada — todavía no está activo."
+  },
+  "AiAgentStatus": {
+    "online": "En línea",
+    "offline": "Fuera de línea",
+    "paused": "Pausado",
+    "needs_review": "Requiere revisión",
+    "escalated": "Escalado"
+  },
+  "AiAgentDepartment": {
+    "client_service": "Recepción y Servicio al Cliente",
+    "tax_bookkeeping": "Taxes y Bookkeeping",
+    "commercial_finance": "Financiamiento Comercial y Referidos",
+    "immigration": "Servicios Administrativos de Inmigración",
+    "document_services": "Servicios Documentales",
+    "business_consulting": "Consultoría de Negocios",
+    "community_academy": "Comunidad y Academia",
+    "operations": "Operaciones y Sistemas"
+  },
+  "AiAgentLanguage": {
+    "en": "Inglés",
+    "es": "Español",
+    "bilingual": "Bilingüe (EN/ES)"
+  },
+  "AiKnowledgeBaseSection": {
+    "approved_services": "Servicios Aprobados",
+    "approved_scripts": "Guiones Aprobados",
+    "faqs": "Preguntas Frecuentes",
+    "policies": "Políticas",
+    "disclaimers": "Descargos",
+    "checklists": "Checklists",
+    "workflows": "Flujos de Trabajo",
+    "forms": "Formularios",
+    "official_resources": "Recursos Oficiales",
+    "escalation_rules": "Reglas de Escalación",
+    "prohibited_actions": "Acciones Prohibidas"
   }
 }
