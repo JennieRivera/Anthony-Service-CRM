@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { AppointmentForm } from "@/components/appointments/AppointmentForm";
-import { listClientsForSelect } from "@/lib/queries/cases";
+import { listClientsForSelect, listCasesForAppointmentSelect } from "@/lib/queries/cases";
 import { createAppointmentAction } from "../actions";
 
 export default async function NewAppointmentPage({
@@ -11,7 +11,10 @@ export default async function NewAppointmentPage({
 }) {
   const t = await getTranslations("Appointments");
   const { clientId, start } = await searchParams;
-  const clients = await listClientsForSelect();
+  const [clients, cases] = await Promise.all([
+    listClientsForSelect(),
+    listCasesForAppointmentSelect(),
+  ]);
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -29,6 +32,7 @@ export default async function NewAppointmentPage({
 
       <AppointmentForm
         clients={clients}
+        cases={cases}
         defaultClientId={clientId}
         defaultStart={start}
         onSubmit={createAppointmentAction}

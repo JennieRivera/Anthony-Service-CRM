@@ -40,6 +40,15 @@ export async function listCasesWithClient() {
     .orderBy(desc(cases.createdAt));
 }
 
+// Calendar enhancement, Session 2 — feeds the appointment form's case
+// selector, filtered client-side to the chosen client's own cases.
+export async function listCasesForAppointmentSelect() {
+  return getDb()
+    .select({ id: cases.id, title: cases.title, clientId: cases.clientId })
+    .from(cases)
+    .orderBy(desc(cases.createdAt));
+}
+
 export async function listClientsForSelect() {
   return getDb()
     .select({

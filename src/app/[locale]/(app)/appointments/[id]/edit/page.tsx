@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getAppointmentById } from "@/lib/queries/appointments";
-import { listClientsForSelect } from "@/lib/queries/cases";
+import { listClientsForSelect, listCasesForAppointmentSelect } from "@/lib/queries/cases";
 import { Link } from "@/i18n/navigation";
 import { AppointmentForm } from "@/components/appointments/AppointmentForm";
 import { updateAppointmentAction } from "../../actions";
@@ -15,9 +15,10 @@ export default async function EditAppointmentPage({
   const { id } = await params;
   const t = await getTranslations("Appointments");
 
-  const [result, clients] = await Promise.all([
+  const [result, clients, cases] = await Promise.all([
     getAppointmentById(id),
     listClientsForSelect(),
+    listCasesForAppointmentSelect(),
   ]);
 
   if (!result) notFound();
@@ -44,6 +45,7 @@ export default async function EditAppointmentPage({
       <AppointmentForm
         appointment={result.appointment}
         clients={clients}
+        cases={cases}
         onSubmit={submit}
       />
     </div>

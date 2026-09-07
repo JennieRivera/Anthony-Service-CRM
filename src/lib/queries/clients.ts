@@ -1,4 +1,4 @@
-import { desc, eq, inArray } from "drizzle-orm";
+import { desc, eq, inArray, or, ilike } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
   clients,
@@ -11,7 +11,70 @@ import {
   referrals,
   tasks,
   clientCommunicationPreferences,
+  companies,
 } from "@/lib/db/schema";
+
+// Calendar enhancement, Session 2 (CALENDAR-PLAN.md section 3) — "search
+// before creating, never duplicate". Phone/email are compared digit- and
+// case-normalized since staff enters them free-form during a live call;
+// business name goes through the Company Master Registry (clients have no
+// business-name field of their own — only an optional companyId) and
+// matches whichever clients are linked to a company whose name matches.
+// The client table is small enough for this business that fetching every
+// row and filtering in JS (the same style already used in dashboard.ts) is
+// simpler and safer than hand-rolling normalization in SQL.
+export async function searchClientsForMatch(query: {
+  phone?: string;
+  email?: string;
+  businessName?: string;
+}) {
+  const db = getDb();
+  const normalizedPhone = query.phone?.replace(/\D/g, "") || undefined;
+  const normalizedEmail = query.email?.trim().toLowerCase() || undefined;
+  const businessName = query.businessName?.trim() || undefined;
+
+  if (!normalizedPhone && !normalizedEmail && !businessName) return [];
+
+  const matchedCompanyIds = businessName
+    ? (
+        await db
+          .select({ id: companies.id })
+          .from(companies)
+          .where(
+            or(
+              ilike(companies.legalBusinessName, `%${businessName}%`),
+              ilike(companies.dbaName, `%${businessName}%`),
+            ),
+          )
+      ).map((c) => c.id)
+    : [];
+
+  const candidates = await db
+    .select({
+      id: clients.id,
+      fullName: clients.fullName,
+      email: clients.email,
+      phone: clients.phone,
+      status: clients.status,
+      companyId: clients.companyId,
+    })
+    .from(clients);
+
+  return candidates
+    .filter((c) => {
+      if (normalizedPhone && c.phone && c.phone.replace(/\D/g, "") === normalizedPhone) {
+        return true;
+      }
+      if (normalizedEmail && c.email && c.email.toLowerCase() === normalizedEmail) {
+        return true;
+      }
+      if (matchedCompanyIds.length > 0 && c.companyId && matchedCompanyIds.includes(c.companyId)) {
+        return true;
+      }
+      return false;
+    })
+    .slice(0, 10);
+}
 
 export type TimelineEntry = {
   date: Date;
