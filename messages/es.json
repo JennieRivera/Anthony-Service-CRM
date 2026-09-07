@@ -214,7 +214,11 @@
       "notes": "Notas",
       "save": "Guardar Cliente",
       "saving": "Guardando...",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "attachDocument": "Adjuntar un documento (opcional)",
+      "attachDocumentHint": "¿Recibiste un archivo de este cliente? Adjúntalo ahora — se guardará en su ficha al guardar.",
+      "folderNumber": "Número de carpeta",
+      "folderNumberPlaceholder": "ej. 001"
     }
   },
   "Cases": {
@@ -1105,7 +1109,31 @@
     "allFolders": "Todas las carpetas",
     "uncategorized": "Sin categoría",
     "moveToFolder": "Mover a carpeta",
-    "columnFolder": "Carpeta"
+    "columnFolder": "Carpeta",
+    "backToDrawers": "Todas las carpetas",
+    "backToClients": "Regresar",
+    "clientsDrawerHint": "Todos los clientes, sin importar el servicio.",
+    "referralsDrawerHint": "Una carpeta por cada referido.",
+    "otrosDrawerHint": "Documentos etiquetados como \"Otros\" que no pertenecen a un servicio específico.",
+    "clientFolderCount": "{count, plural, =0 {sin documentos} one {1 documento} other {# documentos}}",
+    "editFolderNumber": "Número de carpeta",
+    "editFolderNumberPlaceholder": "ej. 001",
+    "noClientsInDrawer": "Aún no hay clientes con un caso en este servicio.",
+    "noReferrals": "Aún no hay referidos."
+  },
+  "DocumentDrawer": {
+    "notaria": "Notaría",
+    "impuestos": "Impuestos",
+    "bookkeeping": "Bookkeeping",
+    "inmigracion": "Inmigración",
+    "credito": "Crédito y Financiamiento",
+    "consultoria": "Consultoría",
+    "formacion": "Formación de Empresas",
+    "academia": "Academia",
+    "marketing": "Marketing",
+    "clientes": "Clientes",
+    "referidos": "Referidos y Alianzas",
+    "otros": "Otros"
   },
   "DocumentCategory": {
     "identification": "Identificación",

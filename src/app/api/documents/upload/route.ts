@@ -29,6 +29,7 @@ export async function POST(request: Request) {
   const file = formData.get("file");
   const clientId = formData.get("clientId");
   const caseId = formData.get("caseId");
+  const referralId = formData.get("referralId");
   const documentType = formData.get("documentType");
   const folder = formData.get("folder");
   const validFolder =
@@ -82,6 +83,7 @@ export async function POST(request: Request) {
     .values({
       clientId,
       caseId: typeof caseId === "string" && caseId ? caseId : null,
+      referralId: typeof referralId === "string" && referralId ? referralId : null,
       fileName: file.name,
       blobUrl: blob.url,
       documentType:

@@ -39,6 +39,8 @@ export const clientFormSchema = z.object({
   interestedServices: z.array(z.enum(serviceTypeValues)),
   notes: z.string().trim().optional().or(z.literal("")),
   companyId: z.string().trim().optional().or(z.literal("")),
+  // Free-text document-cabinet folder label (e.g. "001"), edited by staff.
+  folderNumber: z.string().trim().optional().or(z.literal("")),
 });
 
 export type ClientFormValues = z.infer<typeof clientFormSchema>;

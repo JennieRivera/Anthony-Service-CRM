@@ -21,10 +21,25 @@ function normalize(values: ClientFormValues) {
       : null,
     notes: values.notes || null,
     companyId: values.companyId || null,
+    folderNumber: values.folderNumber || null,
   };
 }
 
 export async function createClientAction(rawValues: ClientFormValues) {
+  const id = await insertClient(rawValues);
+  const locale = await getLocale();
+  redirect({ href: `/clients/${id}`, locale });
+}
+
+// Used by the New Client form when a document is staged alongside it: a
+// document can't be attached before the client row exists, so this
+// creates the client and hands back its id (no redirect) so the caller
+// can upload the file, then navigate itself.
+export async function createClientForUploadAction(rawValues: ClientFormValues) {
+  return insertClient(rawValues);
+}
+
+async function insertClient(rawValues: ClientFormValues) {
   const values = clientFormSchema.parse(rawValues);
   const db = getDb();
 
@@ -34,8 +49,7 @@ export async function createClientAction(rawValues: ClientFormValues) {
     .returning({ id: clients.id });
 
   revalidatePath("/clients");
-  const locale = await getLocale();
-  redirect({ href: `/clients/${created.id}`, locale });
+  return created.id;
 }
 
 export async function updateClientAction(

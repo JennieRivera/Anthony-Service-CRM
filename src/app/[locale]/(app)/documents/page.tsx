@@ -1,9 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { isBlobConfigured } from "@/lib/blob/config";
-import { listAllDocuments } from "@/lib/queries/documents";
+import { listAllDocuments, listReferralsForFolders } from "@/lib/queries/documents";
 import { listCasesWithClient, listClientsForSelect } from "@/lib/queries/cases";
-import { DocumentsBrowser } from "@/components/documents/DocumentsBrowser";
+import { DocumentsCabinet } from "@/components/documents/DocumentsCabinet";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
 export default async function DocumentsPage() {
@@ -11,17 +11,19 @@ export default async function DocumentsPage() {
   const configured = isDatabaseConfigured();
   const blobConfigured = isBlobConfigured();
 
-  let rows: Awaited<ReturnType<typeof listAllDocuments>> = [];
+  let documents: Awaited<ReturnType<typeof listAllDocuments>> = [];
   let clients: Awaited<ReturnType<typeof listClientsForSelect>> = [];
   let cases: Awaited<ReturnType<typeof listCasesWithClient>> = [];
+  let referrals: Awaited<ReturnType<typeof listReferralsForFolders>> = [];
   let error: string | null = null;
 
   if (configured) {
     try {
-      [rows, clients, cases] = await Promise.all([
+      [documents, clients, cases, referrals] = await Promise.all([
         listAllDocuments(),
         listClientsForSelect(),
         listCasesWithClient(),
+        listReferralsForFolders(),
       ]);
     } catch (err) {
       error = err instanceof Error ? err.message : "Unknown error";
@@ -47,10 +49,16 @@ export default async function DocumentsPage() {
       )}
 
       {configured && !error && (
-        <DocumentsBrowser
-          documents={rows}
+        <DocumentsCabinet
+          documents={documents}
           clients={clients}
-          cases={cases.map((c) => ({ id: c.id, title: c.title, clientId: c.clientId }))}
+          cases={cases.map((c) => ({
+            id: c.id,
+            title: c.title,
+            clientId: c.clientId,
+            serviceType: c.serviceType,
+          }))}
+          referrals={referrals}
           blobConfigured={blobConfigured}
         />
       )}

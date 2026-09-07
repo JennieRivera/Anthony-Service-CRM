@@ -448,6 +448,10 @@ export const clients = pgTable("clients", {
   companyId: uuid("company_id").references(() => companies.id, {
     onDelete: "set null",
   }),
+  // Document-cabinet folder label (e.g. "001") — free-text, set/edited by
+  // staff, not auto-generated. Purely a display label for the Documents
+  // module's per-client sub-folder; carries no other meaning.
+  folderNumber: text("folder_number"),
 });
 
 // Phase 4, Session 3 — one optional row per client, the same 1:1-extension
@@ -943,6 +947,12 @@ export const documents = pgTable("documents", {
     .notNull()
     .references(() => clients.id, { onDelete: "cascade" }),
   caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  // Lets a document be filed under a referral in the Documents cabinet's
+  // "Referidos y Alianzas" drawer even when there's no case yet (or in
+  // addition to one) — independent of caseId.
+  referralId: uuid("referral_id").references(() => referrals.id, {
+    onDelete: "set null",
+  }),
   fileName: text("file_name").notNull(),
   blobUrl: text("blob_url").notNull(),
   documentType: text("document_type"),

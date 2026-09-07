@@ -20,13 +20,19 @@ import { DOCUMENT_ACCEPT, uploadErrorKey } from "./documentUploadShared";
 export function DocumentUploader({
   clientId,
   caseId,
+  referralId,
   showFolderSelect,
+  defaultCategory,
 }: {
   clientId: string;
   caseId?: string;
+  // Files a document under a referral in the Documents cabinet's
+  // "Referidos y Alianzas" drawer, independent of caseId.
+  referralId?: string;
   // Only meaningful for an Immigration Administrative Services case
   // (spec section 6) — every other case type omits the folder picker.
   showFolderSelect?: boolean;
+  defaultCategory?: string;
 }) {
   const t = useTranslations("Documents");
   const tFolder = useTranslations("ImmigrationDocumentFolder");
@@ -35,7 +41,7 @@ export function DocumentUploader({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [documentType, setDocumentType] = useState("");
   const [folder, setFolder] = useState("");
-  const [category, setCategory] = useState("other");
+  const [category, setCategory] = useState(defaultCategory ?? "other");
   const [uploading, setUploading] = useState(false);
   const [errorKey, setErrorKey] = useState<string | null>(null);
 
@@ -50,6 +56,7 @@ export function DocumentUploader({
     formData.append("file", file);
     formData.append("clientId", clientId);
     if (caseId) formData.append("caseId", caseId);
+    if (referralId) formData.append("referralId", referralId);
     if (documentType) formData.append("documentType", documentType);
     if (showFolderSelect && folder) {
       formData.append("folder", folder);
@@ -71,7 +78,7 @@ export function DocumentUploader({
       if (fileInputRef.current) fileInputRef.current.value = "";
       setDocumentType("");
       setFolder("");
-      setCategory("other");
+      setCategory(defaultCategory ?? "other");
       router.refresh();
     } catch {
       setErrorKey("uploadError");

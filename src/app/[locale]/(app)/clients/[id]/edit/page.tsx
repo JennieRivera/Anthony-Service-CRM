@@ -5,7 +5,9 @@ import { clients } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { Link } from "@/i18n/navigation";
 import { ClientForm } from "@/components/clients/ClientForm";
+import { DocumentUploader } from "@/components/documents/DocumentUploader";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
+import { isBlobConfigured } from "@/lib/blob/config";
 import { updateClientAction } from "../../actions";
 import type { ClientFormValues } from "@/lib/validation/client";
 
@@ -16,6 +18,8 @@ export default async function EditClientPage({
 }) {
   const { id } = await params;
   const t = await getTranslations("Clients");
+  const tDocuments = await getTranslations("Documents");
+  const blobConfigured = isBlobConfigured();
 
   const [[client], companies] = await Promise.all([
     getDb().select().from(clients).where(eq(clients.id, id)).limit(1),
@@ -44,6 +48,15 @@ export default async function EditClientPage({
       </div>
 
       <ClientForm client={client} companies={companies} onSubmit={submit} />
+
+      {blobConfigured && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <h2 className="font-heading text-lg text-foreground">
+            {tDocuments("uploadDialogTitle")}
+          </h2>
+          <DocumentUploader clientId={client.id} />
+        </div>
+      )}
     </div>
   );
 }

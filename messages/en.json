@@ -214,7 +214,11 @@
       "notes": "Notes",
       "save": "Save Client",
       "saving": "Saving...",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "attachDocument": "Attach a document (optional)",
+      "attachDocumentHint": "Received a file from this client? Attach it now — it'll be saved to their profile once you save.",
+      "folderNumber": "Folder number",
+      "folderNumberPlaceholder": "e.g. 001"
     }
   },
   "Cases": {
@@ -1105,7 +1109,31 @@
     "allFolders": "All folders",
     "uncategorized": "Uncategorized",
     "moveToFolder": "Move to folder",
-    "columnFolder": "Folder"
+    "columnFolder": "Folder",
+    "backToDrawers": "All folders",
+    "backToClients": "Back",
+    "clientsDrawerHint": "Every client, regardless of service.",
+    "referralsDrawerHint": "One folder per referral.",
+    "otrosDrawerHint": "Documents tagged \"Other\" that don't belong to a specific service.",
+    "clientFolderCount": "{count, plural, =0 {no documents} one {1 document} other {# documents}}",
+    "editFolderNumber": "Folder number",
+    "editFolderNumberPlaceholder": "e.g. 001",
+    "noClientsInDrawer": "No clients have a case in this service yet.",
+    "noReferrals": "No referrals yet."
+  },
+  "DocumentDrawer": {
+    "notaria": "Notary",
+    "impuestos": "Tax Services",
+    "bookkeeping": "Bookkeeping",
+    "inmigracion": "Immigration",
+    "credito": "Credit & Financing",
+    "consultoria": "Consulting",
+    "formacion": "Business Formation",
+    "academia": "Academy",
+    "marketing": "Marketing",
+    "clientes": "Clients",
+    "referidos": "Referrals & Alliances",
+    "otros": "Other"
   },
   "DocumentCategory": {
     "identification": "Identification",

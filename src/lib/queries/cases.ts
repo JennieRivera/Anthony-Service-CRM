@@ -41,7 +41,11 @@ export async function listCasesWithClient() {
 
 export async function listClientsForSelect() {
   return getDb()
-    .select({ id: clients.id, fullName: clients.fullName })
+    .select({
+      id: clients.id,
+      fullName: clients.fullName,
+      folderNumber: clients.folderNumber,
+    })
     .from(clients)
     .orderBy(clients.fullName);
 }
