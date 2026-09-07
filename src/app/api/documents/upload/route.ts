@@ -69,8 +69,11 @@ export async function POST(request: Request) {
     );
   }
 
+  // Private: these are notary/immigration/tax documents. Reading one back
+  // always goes through /api/documents/[id]/file, which checks auth() and
+  // streams it server-side — never a direct public Blob URL.
   const blob = await put(`documents/${clientId}/${file.name}`, file, {
-    access: "public",
+    access: "private",
     addRandomSuffix: true,
   });
 

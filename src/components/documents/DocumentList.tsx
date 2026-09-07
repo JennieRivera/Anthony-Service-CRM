@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { FileText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DocumentStatusPill } from "./StatusPill";
-import { downloadHref } from "./downloadHref";
+import { viewHref, downloadHref } from "./downloadHref";
 import { MoveCategorySelect } from "./MoveCategorySelect";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 import type { Document } from "@/lib/db/schema";
@@ -15,7 +15,7 @@ function DocumentRow({ doc }: { doc: Document }) {
   return (
     <li className="flex items-center justify-between gap-3 p-4">
       <a
-        href={doc.blobUrl}
+        href={viewHref(doc.id)}
         target="_blank"
         rel="noopener noreferrer"
         className="flex min-w-0 items-center gap-2 font-medium text-foreground hover:underline"
@@ -33,7 +33,7 @@ function DocumentRow({ doc }: { doc: Document }) {
         <Button
           variant="outline"
           size="sm"
-          render={<a href={downloadHref(doc.blobUrl)} download={doc.fileName} />}
+          render={<a href={downloadHref(doc.id)} />}
         >
           <Download className="h-4 w-4" />
           {t("download")}

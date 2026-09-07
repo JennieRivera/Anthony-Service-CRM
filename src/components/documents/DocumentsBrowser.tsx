@@ -15,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DocumentStatusPill } from "@/components/documents/StatusPill";
-import { downloadHref } from "@/components/documents/downloadHref";
+import { viewHref, downloadHref } from "@/components/documents/downloadHref";
 import { MoveCategorySelect } from "@/components/documents/MoveCategorySelect";
 import { GeneralDocumentUploadDialog } from "@/components/documents/GeneralDocumentUploadDialog";
 import { documentCategoryValues } from "@/lib/validation/documentCategory";
@@ -136,7 +136,7 @@ export function DocumentsBrowser({
                   <TableRow key={doc.id}>
                     <TableCell>
                       <a
-                        href={doc.blobUrl}
+                        href={viewHref(doc.id)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 font-medium text-foreground hover:underline"
@@ -178,9 +178,7 @@ export function DocumentsBrowser({
                       <Button
                         variant="outline"
                         size="sm"
-                        render={
-                          <a href={downloadHref(doc.blobUrl)} download={doc.fileName} />
-                        }
+                        render={<a href={downloadHref(doc.id)} />}
                       >
                         <Download className="h-4 w-4" />
                         {t("download")}
