@@ -137,7 +137,8 @@
     "latinoBusinessMap": "Mapa de Negocios Latinos",
     "associations": "Asociaciones y Cámaras",
     "marketingContent": "Contenido de Marketing",
-    "aiTeam": "Equipo IA"
+    "aiTeam": "Equipo IA",
+    "aiEscalations": "Escalaciones de IA"
   },
   "ServiceType": {
     "online_notary": "Notaría en Línea",
@@ -2170,6 +2171,52 @@
     "send_message": "Mensaje Enviado",
     "escalate": "Escalado",
     "other": "Otro"
+  },
+  "AiEscalationRiskLevel": {
+    "low": "Bajo",
+    "medium": "Medio",
+    "high": "Alto",
+    "critical": "Crítico"
+  },
+  "AiEscalationStatus": {
+    "open": "Abierto",
+    "in_progress": "En Progreso",
+    "resolved": "Resuelto",
+    "closed": "Cerrado"
+  },
+  "AiEscalations": {
+    "title": "Escalaciones de IA",
+    "newEscalation": "Nueva Escalación",
+    "backToEscalations": "Volver a Escalaciones de IA",
+    "empty": "Aún no hay escalaciones registradas.",
+    "columnNumber": "Escalación #",
+    "columnAgent": "Agente",
+    "columnClient": "Cliente",
+    "columnService": "Servicio",
+    "columnRiskLevel": "Nivel de Riesgo",
+    "columnDate": "Fecha",
+    "columnAssignedHuman": "Humano Asignado",
+    "columnStatus": "Estado",
+    "escalateToAgent": "Escalar a {agent}",
+    "escalateGeneric": "Escalar al Equipo IA",
+    "form": {
+      "agent": "Agente",
+      "selectAgent": "Selecciona un agente",
+      "client": "Cliente",
+      "selectClient": "Selecciona un cliente",
+      "case": "Caso Relacionado",
+      "noCase": "Ninguno",
+      "reason": "Motivo",
+      "riskLevel": "Nivel de Riesgo",
+      "resolutionTitle": "Resolución",
+      "status": "Estado",
+      "assignedHuman": "Humano Asignado",
+      "resolutionDate": "Fecha de Resolución",
+      "resolution": "Resolución",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "cancel": "Cancelar"
+    }
   },
   "AiKnowledgeBaseSection": {
     "approved_services": "Servicios Aprobados",

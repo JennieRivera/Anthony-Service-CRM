@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
-import { Pencil, FileText } from "lucide-react";
+import { Pencil, FileText, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getCaseById } from "@/lib/queries/cases";
 import { findActiveTemplate } from "@/lib/queries/messageTemplates";
 import { isBlobConfigured } from "@/lib/blob/config";
+import { getActiveAgentIdForServiceType } from "@/lib/ai/agentActivity";
+import { getAiAgentById } from "@/lib/queries/aiAgents";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { CaseStatusBadge } from "@/components/clients/StatusBadge";
@@ -52,6 +54,7 @@ export default async function CaseDetailPage({
   const tInsuranceComplianceType = await getTranslations("InsuranceComplianceType");
   const tInsuranceComplianceStatus = await getTranslations("InsuranceComplianceStatus");
   const tDocumentPrepCaseStatus = await getTranslations("DocumentPrepCaseStatus");
+  const tAiEscalations = await getTranslations("AiEscalations");
 
   const result = await getCaseById(id);
   if (!result) notFound();
@@ -88,6 +91,14 @@ export default async function CaseDetailPage({
     client.preferredLanguage as "en" | "es",
   );
 
+  // Phase 6, Session 5 — only offer to escalate when a launched agent
+  // actually covers this case's service type (see agentActivity.ts); no
+  // button when there's nothing real to escalate to.
+  const escalationAgentId = await getActiveAgentIdForServiceType(c.serviceType);
+  const escalationAgent = escalationAgentId
+    ? await getAiAgentById(escalationAgentId)
+    : null;
+
   // Computed once here (not inline in JSX) so render stays a pure function
   // of this value — "expiring soon" is never stored, just compared to today
   // at render time (see insuranceComplianceDetails in schema.ts).
@@ -117,6 +128,19 @@ export default async function CaseDetailPage({
             <Pencil className="h-4 w-4" />
             {t("editCase")}
           </Button>
+          {escalationAgent && (
+            <Button
+              variant="outline"
+              render={
+                <Link
+                  href={`/ai-escalations/new?agentId=${escalationAgent.id}&clientId=${client.id}&caseId=${id}`}
+                />
+              }
+            >
+              <ShieldAlert className="h-4 w-4" />
+              {tAiEscalations("escalateToAgent", { agent: escalationAgent.name })}
+            </Button>
+          )}
         </div>
       </div>
 

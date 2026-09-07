@@ -137,7 +137,8 @@
     "latinoBusinessMap": "Latino Business Map",
     "associations": "Associations & Chambers",
     "marketingContent": "Marketing Content",
-    "aiTeam": "AI Team"
+    "aiTeam": "AI Team",
+    "aiEscalations": "AI Escalations"
   },
   "ServiceType": {
     "online_notary": "Online Notary",
@@ -2170,6 +2171,52 @@
     "send_message": "Sent Message",
     "escalate": "Escalated",
     "other": "Other"
+  },
+  "AiEscalationRiskLevel": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
+  },
+  "AiEscalationStatus": {
+    "open": "Open",
+    "in_progress": "In Progress",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "AiEscalations": {
+    "title": "AI Escalations",
+    "newEscalation": "New Escalation",
+    "backToEscalations": "Back to AI Escalations",
+    "empty": "No escalations logged yet.",
+    "columnNumber": "Escalation #",
+    "columnAgent": "Agent",
+    "columnClient": "Client",
+    "columnService": "Service",
+    "columnRiskLevel": "Risk Level",
+    "columnDate": "Date",
+    "columnAssignedHuman": "Assigned Human",
+    "columnStatus": "Status",
+    "escalateToAgent": "Escalate to {agent}",
+    "escalateGeneric": "Escalate to AI Team",
+    "form": {
+      "agent": "Agent",
+      "selectAgent": "Select an agent",
+      "client": "Client",
+      "selectClient": "Select a client",
+      "case": "Related Case",
+      "noCase": "None",
+      "reason": "Reason",
+      "riskLevel": "Risk Level",
+      "resolutionTitle": "Resolution",
+      "status": "Status",
+      "assignedHuman": "Assigned Human",
+      "resolutionDate": "Resolution Date",
+      "resolution": "Resolution",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    }
   },
   "AiKnowledgeBaseSection": {
     "approved_services": "Approved Services",

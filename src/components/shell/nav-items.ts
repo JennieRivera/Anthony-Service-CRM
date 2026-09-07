@@ -23,6 +23,7 @@ import {
   UsersRound,
   Megaphone,
   Bot,
+  ShieldAlert,
 } from "lucide-react";
 
 export type NavItem = {
@@ -50,6 +51,7 @@ export type NavItem = {
     | "associations"
     | "marketingContent"
     | "aiTeam"
+    | "aiEscalations"
     | "settings";
   icon: LucideIcon;
 };
@@ -77,5 +79,6 @@ export const navItems: NavItem[] = [
   { href: "/latino-business-map", labelKey: "latinoBusinessMap", icon: MapPinned },
   { href: "/associations", labelKey: "associations", icon: UsersRound },
   { href: "/ai-team", labelKey: "aiTeam", icon: Bot },
+  { href: "/ai-escalations", labelKey: "aiEscalations", icon: ShieldAlert },
   { href: "/settings", labelKey: "settings", icon: Settings },
 ];

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Pencil } from "lucide-react";
+import { Pencil, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getClientById } from "@/lib/queries/clients";
 import { getClientHighlevelSync, getHighLevelSyncPreview } from "@/lib/queries/highlevel";
@@ -16,6 +16,7 @@ export default async function ClientProfilePage({
 }) {
   const { id } = await params;
   const t = await getTranslations("Clients");
+  const tAiEscalations = await getTranslations("AiEscalations");
 
   const result = await getClientById(id);
   if (!result) notFound();
@@ -46,10 +47,19 @@ export default async function ClientProfilePage({
         <Link href="/clients" className="text-sm text-muted-foreground underline">
           &larr; {t("backToClients")}
         </Link>
-        <Button variant="outline" render={<Link href={`/clients/${id}/edit`} />}>
-          <Pencil className="h-4 w-4" />
-          {t("editClient")}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            render={<Link href={`/ai-escalations/new?clientId=${id}`} />}
+          >
+            <ShieldAlert className="h-4 w-4" />
+            {tAiEscalations("escalateGeneric")}
+          </Button>
+          <Button variant="outline" render={<Link href={`/clients/${id}/edit`} />}>
+            <Pencil className="h-4 w-4" />
+            {t("editClient")}
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
