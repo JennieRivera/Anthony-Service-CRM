@@ -941,6 +941,7 @@
     "backToSettings": "Back to Settings",
     "categories": {
       "communications": "Communications",
+      "calendar_sync": "Calendar Sync",
       "productivity": "Productivity",
       "professional_systems": "Professional Systems"
     },
@@ -957,7 +958,12 @@
       "bookkeeping_software": "Bookkeeping Software",
       "consulting_software": "Consulting Software",
       "startpoint": "StartPoint",
-      "rri_referral_portal": "RRI Referral Portal"
+      "rri_referral_portal": "RRI Referral Portal",
+      "google_calendar": "Google Calendar",
+      "outlook_calendar": "Microsoft Outlook Calendar",
+      "highlevel_calendar": "HighLevel Calendar",
+      "zoom": "Zoom",
+      "google_meet": "Google Meet"
     },
     "connectionType": "Connection Type",
     "connectedAccount": "Connected Account",

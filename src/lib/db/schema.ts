@@ -91,6 +91,18 @@ export const appointmentTypeEnum = pgEnum("appointment_type", [
   "other",
 ]);
 
+// Calendar enhancement, Session 7 (section 12) — "preparar pero NO
+// activar" Google Calendar / Outlook / HighLevel Calendar / Zoom / Google
+// Meet. Which of these five systems a given appointment would sync to,
+// once that integration is actually built.
+export const externalCalendarProviderEnum = pgEnum("external_calendar_provider", [
+  "google_calendar",
+  "outlook_calendar",
+  "highlevel_calendar",
+  "zoom",
+  "google_meet",
+]);
+
 export const invoiceStatusEnum = pgEnum("invoice_status", [
   "unpaid",
   "paid",
@@ -1086,6 +1098,19 @@ export const appointments = pgTable("appointments", {
     (): AnyPgColumn => appointments.id,
     { onDelete: "set null" },
   ),
+  // Calendar enhancement, Session 7 (section 12) — "preparar pero NO
+  // activar" future external-calendar sync. Reserved and entirely
+  // unpopulated until a real Google Calendar/Outlook/HighLevel
+  // Calendar/Zoom/Meet integration exists, same pattern as
+  // assignedUserId above. externalCalendarEventId is the dedup key a
+  // future sync job would check before creating another external event
+  // for the same appointment ("Evitar citas duplicadas al sincronizar").
+  externalCalendarProvider: externalCalendarProviderEnum("external_calendar_provider"),
+  externalCalendarEventId: text("external_calendar_event_id"),
+  externalSyncStatus: integrationSyncStatusEnum("external_sync_status")
+    .notNull()
+    .default("not_connected"),
+  lastExternalSyncAt: timestamp("last_external_sync_at", { withTimezone: true }),
 });
 
 // Calendar enhancement, Session 1 (section 4) — one centralized, admin-

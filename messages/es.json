@@ -941,6 +941,7 @@
     "backToSettings": "Volver a Configuración",
     "categories": {
       "communications": "Comunicaciones",
+      "calendar_sync": "Sincronización de Calendario",
       "productivity": "Productividad",
       "professional_systems": "Sistemas Profesionales"
     },
@@ -957,7 +958,12 @@
       "bookkeeping_software": "Software de Bookkeeping",
       "consulting_software": "Software de Consulting",
       "startpoint": "StartPoint",
-      "rri_referral_portal": "Portal de Referidos RRI"
+      "rri_referral_portal": "Portal de Referidos RRI",
+      "google_calendar": "Google Calendar",
+      "outlook_calendar": "Microsoft Outlook Calendar",
+      "highlevel_calendar": "HighLevel Calendar",
+      "zoom": "Zoom",
+      "google_meet": "Google Meet"
     },
     "connectionType": "Tipo de Conexión",
     "connectedAccount": "Cuenta Conectada",

@@ -16,7 +16,11 @@ export type IntegrationConnectionType =
 
 export type IntegrationDefinition = {
   key: string;
-  category: "communications" | "productivity" | "professional_systems";
+  category:
+    | "communications"
+    | "productivity"
+    | "professional_systems"
+    | "calendar_sync";
   connectionType: IntegrationConnectionType;
   envVarName?: string;
 };
@@ -35,6 +39,15 @@ export const INTEGRATION_DEFINITIONS: IntegrationDefinition[] = [
   { key: "consulting_software", category: "professional_systems", connectionType: "unknown", envVarName: "CONSULTING_SOFTWARE_API_KEY" },
   { key: "startpoint", category: "professional_systems", connectionType: "external_link" },
   { key: "rri_referral_portal", category: "professional_systems", connectionType: "manual" },
+  // CALENDAR-PLAN.md section 12 — "preparar pero NO activar". Mirrors
+  // appointments.externalCalendarProvider in schema.ts exactly; this is
+  // the descriptive half (name/category/connection type), that column is
+  // the per-appointment sync-bookkeeping half.
+  { key: "google_calendar", category: "calendar_sync", connectionType: "oauth", envVarName: "GOOGLE_CALENDAR_CLIENT_ID" },
+  { key: "outlook_calendar", category: "calendar_sync", connectionType: "oauth", envVarName: "OUTLOOK_CALENDAR_CLIENT_ID" },
+  { key: "highlevel_calendar", category: "calendar_sync", connectionType: "api", envVarName: "HIGHLEVEL_API_KEY" },
+  { key: "zoom", category: "calendar_sync", connectionType: "oauth", envVarName: "ZOOM_CLIENT_ID" },
+  { key: "google_meet", category: "calendar_sync", connectionType: "oauth", envVarName: "GOOGLE_MEET_CLIENT_ID" },
 ];
 
 export function getIntegrationDefinition(key: string) {

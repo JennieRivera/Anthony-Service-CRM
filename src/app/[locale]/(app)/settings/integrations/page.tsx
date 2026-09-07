@@ -7,6 +7,7 @@ import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
 const CATEGORY_ORDER = [
   "communications",
+  "calendar_sync",
   "productivity",
   "professional_systems",
 ] as const;
