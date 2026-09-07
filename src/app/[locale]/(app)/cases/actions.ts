@@ -19,6 +19,7 @@ import {
   marketingProjectDetails,
   salesTaxCaseDetails,
   irsCaseDetails,
+  insuranceComplianceDetails,
   caseStatusEnum,
   caseStatusHistory,
   tasks,
@@ -37,6 +38,7 @@ import {
   marketingServiceTypes,
   salesTaxServiceTypes,
   irsServiceTypes,
+  insuranceComplianceServiceTypes,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { redirect } from "@/i18n/navigation";
@@ -292,6 +294,18 @@ function deriveEffectiveStatus(
       if (s === "not_started") return "new";
       return "in_progress";
     }
+  }
+
+  if (
+    insuranceComplianceServiceTypes.includes(values.serviceType) &&
+    values.insuranceStatus
+  ) {
+    const s = values.insuranceStatus;
+    if (s === "active" || s === "renewed") return "completed";
+    if (s === "expired") return "waiting_on_client";
+    if (s === "cancelled") return "cancelled";
+    if (s === "not_started") return "new";
+    return "in_progress";
   }
 
   return values.status;
@@ -702,6 +716,38 @@ async function upsertServiceDetails(
       .values({ caseId, ...detail })
       .onConflictDoUpdate({
         target: irsCaseDetails.caseId,
+        set: detail,
+      });
+    return;
+  }
+
+  if (insuranceComplianceServiceTypes.includes(values.serviceType)) {
+    const detail = {
+      companyId: values.companyId || null,
+      subType: values.insuranceSubType || "general_insurance",
+      provider: values.insuranceProvider || null,
+      policyOrAccountNumber: values.insurancePolicyOrAccountNumber || null,
+      coverageAmount: values.insuranceCoverageAmount
+        ? Number(values.insuranceCoverageAmount).toFixed(2)
+        : null,
+      premiumAmount: values.insurancePremiumAmount
+        ? Number(values.insurancePremiumAmount).toFixed(2)
+        : null,
+      effectiveDate: values.insuranceEffectiveDate || null,
+      expirationDate: values.insuranceExpirationDate || null,
+      renewalReminderDays: values.insuranceRenewalReminderDays
+        ? Number(values.insuranceRenewalReminderDays)
+        : 30,
+      status: values.insuranceStatus || "not_started",
+      lastRenewedDate: values.insuranceLastRenewedDate || null,
+      complianceNotes: values.insuranceComplianceNotes || null,
+    };
+
+    await db
+      .insert(insuranceComplianceDetails)
+      .values({ caseId, ...detail })
+      .onConflictDoUpdate({
+        target: insuranceComplianceDetails.caseId,
         set: detail,
       });
     return;

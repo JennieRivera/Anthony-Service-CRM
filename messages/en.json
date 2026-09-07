@@ -151,7 +151,8 @@
     "academy": "Academy / Training",
     "marketing": "Marketing / Branding / AI / Automation",
     "sales_tax": "Sales Tax Registration",
-    "irs_administrative": "IRS / EIN / ITIN Administrative"
+    "irs_administrative": "IRS / EIN / ITIN Administrative",
+    "insurance_compliance": "Insurance & Compliance"
   },
   "ClientStatus": {
     "lead": "Lead",
@@ -431,10 +432,24 @@
       "irsApplicationStatus": "Application Status",
       "irsLetterReceived": "IRS Letter Received",
       "irsLetterDate": "IRS Letter Date",
-      "irsDisclaimer": "Do not enter full SSN, ITIN, or passport numbers here. Use the last 4 digits only, or reference a secure document instead."
+      "irsDisclaimer": "Do not enter full SSN, ITIN, or passport numbers here. Use the last 4 digits only, or reference a secure document instead.",
+      "insuranceSubType": "Type",
+      "insuranceProvider": "Provider / Carrier",
+      "insurancePolicyOrAccountNumber": "Policy / Account Number",
+      "insuranceCoverageAmount": "Coverage Amount",
+      "insurancePremiumAmount": "Premium / Cost",
+      "insuranceEffectiveDate": "Effective Date",
+      "insuranceExpirationDate": "Expiration Date",
+      "insuranceRenewalReminderDays": "Remind Me (Days Before Expiration)",
+      "insuranceStatus": "Status",
+      "insuranceLastRenewedDate": "Last Renewed",
+      "insuranceComplianceNotes": "Compliance Notes"
     },
     "salesTaxCaseDetails": "Sales Tax Registration Details",
-    "irsCaseDetails": "IRS / EIN / ITIN Case Details"
+    "irsCaseDetails": "IRS / EIN / ITIN Case Details",
+    "insuranceComplianceDetails": "Insurance & Compliance Details",
+    "expiredBadge": "Expired",
+    "expiringInDaysBadge": "{count, plural, =0 {Expires today} one {Expires in 1 day} other {Expires in # days}}"
   },
   "NotarialActType": {
     "jurat": "Jurat",
@@ -1140,6 +1155,7 @@
     "formacion": "Business Formation",
     "academia": "Academy",
     "marketing": "Marketing",
+    "seguros": "Insurance & Compliance",
     "clientes": "Clients",
     "referidos": "Referrals & Alliances",
     "otros": "Other"
@@ -1787,6 +1803,22 @@
     "submitted": "Submitted",
     "resolved": "Resolved",
     "closed": "Closed"
+  },
+  "InsuranceComplianceType": {
+    "workers_comp": "Workers Compensation",
+    "liability_insurance": "Liability Insurance",
+    "payroll": "Payroll",
+    "hipaa_compliance": "HIPAA Compliance",
+    "general_insurance": "General Insurance",
+    "other": "Other"
+  },
+  "InsuranceComplianceStatus": {
+    "not_started": "Not Started",
+    "in_progress": "In Progress",
+    "active": "Active",
+    "expired": "Expired",
+    "renewed": "Renewed",
+    "cancelled": "Cancelled"
   },
   "IrsResourceCategory": {
     "ein": "EIN",

@@ -49,6 +49,8 @@ export default async function CaseDetailPage({
   const tIrsEinStatus = await getTranslations("IrsEinStatus");
   const tIrsItinStatus = await getTranslations("IrsItinStatus");
   const tIrsApplicationStatus = await getTranslations("IrsApplicationStatus");
+  const tInsuranceComplianceType = await getTranslations("InsuranceComplianceType");
+  const tInsuranceComplianceStatus = await getTranslations("InsuranceComplianceStatus");
 
   const result = await getCaseById(id);
   if (!result) notFound();
@@ -71,6 +73,8 @@ export default async function CaseDetailPage({
     salesTaxCompany,
     irsDetails,
     irsCompany,
+    insuranceDetails,
+    insuranceCompany,
     documents,
     statusHistory,
   } = result;
@@ -82,6 +86,17 @@ export default async function CaseDetailPage({
     "service_update",
     client.preferredLanguage as "en" | "es",
   );
+
+  // Computed once here (not inline in JSX) so render stays a pure function
+  // of this value — "expiring soon" is never stored, just compared to today
+  // at render time (see insuranceComplianceDetails in schema.ts).
+  const today = new Date();
+  const insuranceDaysLeft = insuranceDetails?.expirationDate
+    ? Math.ceil(
+        (new Date(insuranceDetails.expirationDate).getTime() - today.getTime()) /
+          (1000 * 60 * 60 * 24),
+      )
+    : null;
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -1292,6 +1307,111 @@ export default async function CaseDetailPage({
           <p className="text-xs text-muted-foreground">
             {t("form.irsDisclaimer")}
           </p>
+        </div>
+      )}
+
+      {insuranceDetails && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("insuranceComplianceDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tInsuranceComplianceType(insuranceDetails.subType)}
+            </Badge>
+            <Badge variant="outline">
+              {tInsuranceComplianceStatus(insuranceDetails.status)}
+            </Badge>
+            {insuranceDaysLeft !== null &&
+              insuranceDetails.status !== "cancelled" &&
+              (insuranceDaysLeft < 0 ? (
+                <Badge variant="destructive">{t("expiredBadge")}</Badge>
+              ) : (
+                insuranceDaysLeft <= insuranceDetails.renewalReminderDays && (
+                  <Badge variant="destructive">
+                    {t("expiringInDaysBadge", { count: insuranceDaysLeft })}
+                  </Badge>
+                )
+              ))}
+          </div>
+          <div className="grid gap-3 text-sm sm:grid-cols-4">
+            <div>
+              <p className="text-muted-foreground">{t("form.company")}</p>
+              <p className="text-foreground">
+                {insuranceCompany?.legalBusinessName ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.insuranceProvider")}</p>
+              <p className="text-foreground">{insuranceDetails.provider ?? "—"}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.insurancePolicyOrAccountNumber")}
+              </p>
+              <p className="text-foreground">
+                {insuranceDetails.policyOrAccountNumber ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.insuranceCoverageAmount")}
+              </p>
+              <p className="text-foreground">
+                {insuranceDetails.coverageAmount
+                  ? `$${Number(insuranceDetails.coverageAmount).toFixed(2)}`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.insurancePremiumAmount")}
+              </p>
+              <p className="text-foreground">
+                {insuranceDetails.premiumAmount
+                  ? `$${Number(insuranceDetails.premiumAmount).toFixed(2)}`
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.insuranceEffectiveDate")}
+              </p>
+              <p className="text-foreground">
+                {insuranceDetails.effectiveDate
+                  ? new Date(insuranceDetails.effectiveDate).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.insuranceExpirationDate")}
+              </p>
+              <p className="text-foreground">
+                {insuranceDetails.expirationDate
+                  ? new Date(insuranceDetails.expirationDate).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">
+                {t("form.insuranceLastRenewedDate")}
+              </p>
+              <p className="text-foreground">
+                {insuranceDetails.lastRenewedDate
+                  ? new Date(insuranceDetails.lastRenewedDate).toLocaleDateString()
+                  : "—"}
+              </p>
+            </div>
+          </div>
+          {insuranceDetails.complianceNotes && (
+            <div className="text-sm">
+              <p className="text-muted-foreground">
+                {t("form.insuranceComplianceNotes")}
+              </p>
+              <p className="text-foreground">{insuranceDetails.complianceNotes}</p>
+            </div>
+          )}
         </div>
       )}
 

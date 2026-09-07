@@ -40,6 +40,12 @@ export const serviceTypeEnum = pgEnum("service_type", [
   "sales_tax",
   // Phase 5, Session 5 — IRS / EIN / ITIN Administrative Services.
   "irs_administrative",
+  // Documents-cabinet follow-up — Workers Comp, Liability Insurance,
+  // Payroll, HIPAA Compliance, and general Insurance, previously handled
+  // informally under Bookkeeping/Consulting/Formation. One service type
+  // with a subType (see insuranceComplianceTypeEnum below), same pattern
+  // as irs_administrative's own caseType.
+  "insurance_compliance",
 ]);
 
 export const clientStatusEnum = pgEnum("client_status", [
@@ -873,6 +879,11 @@ export const taskTypeEnum = pgEnum("task_type", [
   // Phase 2, Session 7 — created by the scheduled inactivity sweep
   // (see src/app/api/cron/inactivity-check/route.ts), not from case actions.
   "inactivity_alert",
+  // Documents-cabinet follow-up — created by the scheduled renewal sweep
+  // (see src/app/api/cron/renewal-check/route.ts) when an Insurance &
+  // Compliance case's expirationDate falls inside its renewalReminderDays
+  // window.
+  "renewal_reminder",
 ]);
 
 export const taskStatusEnum = pgEnum("task_status", [
@@ -1633,6 +1644,50 @@ export const irsCaseDetails = pgTable("irs_case_details", {
   irsLetterDate: date("irs_letter_date"),
 });
 
+// Insurance & Compliance — Workers Comp, Liability Insurance, Payroll,
+// HIPAA Compliance, and general Insurance, one service type with a subType
+// (see irsCaseTypeEnum above for the same pattern). "Expiring soon" is
+// deliberately not a stored status — it's computed from expirationDate vs.
+// today wherever it's displayed, so it can never drift out of sync; the
+// renewal-check cron reads the same computation to create a task.
+export const insuranceComplianceTypeEnum = pgEnum("insurance_compliance_type", [
+  "workers_comp",
+  "liability_insurance",
+  "payroll",
+  "hipaa_compliance",
+  "general_insurance",
+  "other",
+]);
+
+export const insuranceComplianceStatusEnum = pgEnum("insurance_compliance_status", [
+  "not_started",
+  "in_progress",
+  "active",
+  "expired",
+  "renewed",
+  "cancelled",
+]);
+
+export const insuranceComplianceDetails = pgTable("insurance_compliance_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  companyId: uuid("company_id").references(() => companies.id, {
+    onDelete: "set null",
+  }),
+  subType: insuranceComplianceTypeEnum("sub_type").notNull().default("general_insurance"),
+  provider: text("provider"),
+  policyOrAccountNumber: text("policy_or_account_number"),
+  coverageAmount: numeric("coverage_amount", { precision: 12, scale: 2 }),
+  premiumAmount: numeric("premium_amount", { precision: 12, scale: 2 }),
+  effectiveDate: date("effective_date"),
+  expirationDate: date("expiration_date"),
+  renewalReminderDays: integer("renewal_reminder_days").notNull().default(30),
+  status: insuranceComplianceStatusEnum("status").notNull().default("not_started"),
+  lastRenewedDate: date("last_renewed_date"),
+  complianceNotes: text("compliance_notes"),
+});
+
 // IRS Official Resource Center (spec section 4) — an admin-managed
 // directory of official IRS.gov links, not a live IRS integration.
 export const irsResourceCategoryEnum = pgEnum("irs_resource_category", [
@@ -2126,6 +2181,8 @@ export type CompanyDocumentChecklistItem =
 export type SalesTaxCaseDetails = typeof salesTaxCaseDetails.$inferSelect;
 export type SalesTaxStateInfo = typeof salesTaxStateInfo.$inferSelect;
 export type IrsCaseDetails = typeof irsCaseDetails.$inferSelect;
+export type InsuranceComplianceDetails =
+  typeof insuranceComplianceDetails.$inferSelect;
 export type IrsResource = typeof irsResources.$inferSelect;
 export type ImmigrationForm = typeof immigrationForms.$inferSelect;
 export type AssociationChamber = typeof associationsChambers.$inferSelect;

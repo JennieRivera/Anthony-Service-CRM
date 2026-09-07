@@ -59,6 +59,9 @@ import {
   irsEinStatusValues,
   irsItinStatusValues,
   irsApplicationStatusValues,
+  insuranceComplianceServiceTypes,
+  insuranceComplianceTypeValues,
+  insuranceComplianceStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
@@ -76,6 +79,7 @@ import type {
   MarketingProjectDetails,
   SalesTaxCaseDetails,
   IrsCaseDetails,
+  InsuranceComplianceDetails,
 } from "@/lib/db/schema";
 
 export function CaseForm({
@@ -91,6 +95,7 @@ export function CaseForm({
   marketingDetails,
   salesTaxDetails,
   irsDetails,
+  insuranceDetails,
   clients,
   companies,
   defaultClientId,
@@ -108,6 +113,7 @@ export function CaseForm({
   marketingDetails?: MarketingProjectDetails | null;
   salesTaxDetails?: SalesTaxCaseDetails | null;
   irsDetails?: IrsCaseDetails | null;
+  insuranceDetails?: InsuranceComplianceDetails | null;
   clients: { id: string; fullName: string }[];
   companies: { id: string; legalBusinessName: string }[];
   defaultClientId?: string;
@@ -146,6 +152,8 @@ export function CaseForm({
   const tIrsEinStatus = useTranslations("IrsEinStatus");
   const tIrsItinStatus = useTranslations("IrsItinStatus");
   const tIrsApplicationStatus = useTranslations("IrsApplicationStatus");
+  const tInsuranceComplianceType = useTranslations("InsuranceComplianceType");
+  const tInsuranceComplianceStatus = useTranslations("InsuranceComplianceStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -337,6 +345,18 @@ export function CaseForm({
       irsApplicationStatus: irsDetails?.applicationStatus ?? "not_started",
       irsLetterReceived: irsDetails?.irsLetterReceived ?? false,
       irsLetterDate: irsDetails?.irsLetterDate ?? "",
+      insuranceSubType: insuranceDetails?.subType ?? "general_insurance",
+      insuranceProvider: insuranceDetails?.provider ?? "",
+      insurancePolicyOrAccountNumber: insuranceDetails?.policyOrAccountNumber ?? "",
+      insuranceCoverageAmount: insuranceDetails?.coverageAmount ?? "",
+      insurancePremiumAmount: insuranceDetails?.premiumAmount ?? "",
+      insuranceEffectiveDate: insuranceDetails?.effectiveDate ?? "",
+      insuranceExpirationDate: insuranceDetails?.expirationDate ?? "",
+      insuranceRenewalReminderDays:
+        insuranceDetails?.renewalReminderDays?.toString() ?? "30",
+      insuranceStatus: insuranceDetails?.status ?? "not_started",
+      insuranceLastRenewedDate: insuranceDetails?.lastRenewedDate ?? "",
+      insuranceComplianceNotes: insuranceDetails?.complianceNotes ?? "",
     },
   });
 
@@ -353,6 +373,7 @@ export function CaseForm({
   const isSalesTax = salesTaxServiceTypes.includes(serviceType);
   const isIrs = irsServiceTypes.includes(serviceType);
   const irsCaseType = watch("irsCaseType");
+  const isInsurance = insuranceComplianceServiceTypes.includes(serviceType);
   // Apostille / authentication fields are an optional add-on for Document Prep cases.
   const isApostille = serviceType === "document_prep";
 
@@ -2583,6 +2604,179 @@ export function CaseForm({
           <p className="text-xs text-muted-foreground">
             {t("irsDisclaimer")}
           </p>
+        </div>
+      )}
+
+      {isInsurance && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">
+            {tCases("insuranceComplianceDetails")}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("insuranceSubType")}</Label>
+              <Controller
+                control={control}
+                name="insuranceSubType"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {insuranceComplianceTypeValues.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {tInsuranceComplianceType(type)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("company")}</Label>
+              <Controller
+                control={control}
+                name="companyId"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{t("noCompany")}</SelectItem>
+                      {companies.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.legalBusinessName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("insuranceStatus")}</Label>
+              <Controller
+                control={control}
+                name="insuranceStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {insuranceComplianceStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tInsuranceComplianceStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="insuranceProvider">{t("insuranceProvider")}</Label>
+              <Input id="insuranceProvider" {...register("insuranceProvider")} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="insurancePolicyOrAccountNumber">
+                {t("insurancePolicyOrAccountNumber")}
+              </Label>
+              <Input
+                id="insurancePolicyOrAccountNumber"
+                {...register("insurancePolicyOrAccountNumber")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="insuranceCoverageAmount">
+                {t("insuranceCoverageAmount")}
+              </Label>
+              <Input
+                id="insuranceCoverageAmount"
+                type="number"
+                step="0.01"
+                {...register("insuranceCoverageAmount")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="insurancePremiumAmount">
+                {t("insurancePremiumAmount")}
+              </Label>
+              <Input
+                id="insurancePremiumAmount"
+                type="number"
+                step="0.01"
+                {...register("insurancePremiumAmount")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="insuranceEffectiveDate">
+                {t("insuranceEffectiveDate")}
+              </Label>
+              <Input
+                id="insuranceEffectiveDate"
+                type="date"
+                {...register("insuranceEffectiveDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="insuranceExpirationDate">
+                {t("insuranceExpirationDate")}
+              </Label>
+              <Input
+                id="insuranceExpirationDate"
+                type="date"
+                {...register("insuranceExpirationDate")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="insuranceRenewalReminderDays">
+                {t("insuranceRenewalReminderDays")}
+              </Label>
+              <Input
+                id="insuranceRenewalReminderDays"
+                type="number"
+                {...register("insuranceRenewalReminderDays")}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="insuranceLastRenewedDate">
+                {t("insuranceLastRenewedDate")}
+              </Label>
+              <Input
+                id="insuranceLastRenewedDate"
+                type="date"
+                {...register("insuranceLastRenewedDate")}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="insuranceComplianceNotes">
+              {t("insuranceComplianceNotes")}
+            </Label>
+            <Textarea
+              id="insuranceComplianceNotes"
+              rows={3}
+              {...register("insuranceComplianceNotes")}
+            />
+          </div>
         </div>
       )}
 

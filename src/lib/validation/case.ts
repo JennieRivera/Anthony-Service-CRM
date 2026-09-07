@@ -258,6 +258,25 @@ export const irsApplicationStatusValues = [
   "closed",
 ] as const;
 
+// Insurance & Compliance — Workers Comp, Liability Insurance, Payroll,
+// HIPAA Compliance, general Insurance.
+export const insuranceComplianceTypeValues = [
+  "workers_comp",
+  "liability_insurance",
+  "payroll",
+  "hipaa_compliance",
+  "general_insurance",
+  "other",
+] as const;
+export const insuranceComplianceStatusValues = [
+  "not_started",
+  "in_progress",
+  "active",
+  "expired",
+  "renewed",
+  "cancelled",
+] as const;
+
 const optionalString = z.string().trim().optional().or(z.literal(""));
 
 export const caseFormSchema = z.object({
@@ -489,6 +508,24 @@ export const caseFormSchema = z.object({
     .or(z.literal("")),
   irsLetterReceived: z.boolean().optional(),
   irsLetterDate: optionalString,
+  // Insurance & Compliance details (relevant when serviceType is Insurance & Compliance)
+  insuranceSubType: z
+    .enum(insuranceComplianceTypeValues)
+    .optional()
+    .or(z.literal("")),
+  insuranceProvider: optionalString,
+  insurancePolicyOrAccountNumber: optionalString,
+  insuranceCoverageAmount: optionalString,
+  insurancePremiumAmount: optionalString,
+  insuranceEffectiveDate: optionalString,
+  insuranceExpirationDate: optionalString,
+  insuranceRenewalReminderDays: optionalString,
+  insuranceStatus: z
+    .enum(insuranceComplianceStatusValues)
+    .optional()
+    .or(z.literal("")),
+  insuranceLastRenewedDate: optionalString,
+  insuranceComplianceNotes: optionalString,
 });
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
@@ -504,3 +541,4 @@ export const academyServiceTypes = ["academy"];
 export const marketingServiceTypes = ["marketing"];
 export const salesTaxServiceTypes = ["sales_tax"];
 export const irsServiceTypes = ["irs_administrative"];
+export const insuranceComplianceServiceTypes = ["insurance_compliance"];

@@ -477,6 +477,29 @@ const templates: Record<
     ],
     includeNotaryBlock: false,
   },
+  insurance_compliance: {
+    documentTitle: {
+      en: "Insurance & Compliance Intake",
+      es: "Admisión — Seguros y Cumplimiento",
+    },
+    intro: {
+      en: "This sheet organizes the information needed for Workers Compensation, Liability Insurance, Payroll, HIPAA Compliance, or general Insurance. We are not an insurance agency or law firm — we assist with administrative preparation and document tracking only.",
+      es: "Esta hoja organiza la información necesaria para Workers Compensation, Seguro de Responsabilidad Civil, Nómina, Cumplimiento HIPAA, o Seguro General. No somos una agencia de seguros ni un despacho legal — únicamente ayudamos con la preparación administrativa y el seguimiento de documentos.",
+    },
+    sections: [
+      {
+        heading: { en: "Case Information", es: "Información del Caso" },
+        fields: [
+          { en: "Type (Workers Comp / Liability / Payroll / HIPAA / General)", es: "Tipo (Workers Comp / Responsabilidad Civil / Nómina / HIPAA / General)" },
+          { en: "Provider / Carrier", es: "Proveedor / Aseguradora" },
+          { en: "Policy / Account Number", es: "Número de Póliza / Cuenta" },
+          { en: "Effective Date", es: "Fecha de Inicio" },
+          { en: "Expiration Date", es: "Fecha de Vencimiento" },
+        ],
+      },
+    ],
+    includeNotaryBlock: false,
+  },
 };
 
 export function getServiceTemplate(

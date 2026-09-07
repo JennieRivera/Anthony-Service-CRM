@@ -151,7 +151,8 @@
     "academy": "Academia / Capacitación",
     "marketing": "Marketing / Marca / IA / Automatización",
     "sales_tax": "Registro de Sales Tax",
-    "irs_administrative": "Administrativo IRS / EIN / ITIN"
+    "irs_administrative": "Administrativo IRS / EIN / ITIN",
+    "insurance_compliance": "Seguros y Cumplimiento"
   },
   "ClientStatus": {
     "lead": "Prospecto",
@@ -431,10 +432,24 @@
       "irsApplicationStatus": "Estado de la Solicitud",
       "irsLetterReceived": "Carta del IRS Recibida",
       "irsLetterDate": "Fecha de la Carta del IRS",
-      "irsDisclaimer": "No ingrese el número completo de SSN, ITIN ni pasaporte aquí. Use solo los últimos 4 dígitos, o haga referencia a un documento seguro."
+      "irsDisclaimer": "No ingrese el número completo de SSN, ITIN ni pasaporte aquí. Use solo los últimos 4 dígitos, o haga referencia a un documento seguro.",
+      "insuranceSubType": "Tipo",
+      "insuranceProvider": "Proveedor / Aseguradora",
+      "insurancePolicyOrAccountNumber": "Número de Póliza / Cuenta",
+      "insuranceCoverageAmount": "Monto de Cobertura",
+      "insurancePremiumAmount": "Prima / Costo",
+      "insuranceEffectiveDate": "Fecha de Inicio",
+      "insuranceExpirationDate": "Fecha de Vencimiento",
+      "insuranceRenewalReminderDays": "Avisarme (Días Antes del Vencimiento)",
+      "insuranceStatus": "Estado",
+      "insuranceLastRenewedDate": "Última Renovación",
+      "insuranceComplianceNotes": "Notas de Cumplimiento"
     },
     "salesTaxCaseDetails": "Detalles de Registro de Sales Tax",
-    "irsCaseDetails": "Detalles de Caso IRS / EIN / ITIN"
+    "irsCaseDetails": "Detalles de Caso IRS / EIN / ITIN",
+    "insuranceComplianceDetails": "Detalles de Seguros y Cumplimiento",
+    "expiredBadge": "Vencido",
+    "expiringInDaysBadge": "{count, plural, =0 {Vence hoy} one {Vence en 1 día} other {Vence en # días}}"
   },
   "NotarialActType": {
     "jurat": "Jurat",
@@ -1140,6 +1155,7 @@
     "formacion": "Formación de Empresas",
     "academia": "Academia",
     "marketing": "Marketing",
+    "seguros": "Seguros y Cumplimiento",
     "clientes": "Clientes",
     "referidos": "Referidos y Alianzas",
     "otros": "Otros"
@@ -1787,6 +1803,22 @@
     "submitted": "Enviado",
     "resolved": "Resuelto",
     "closed": "Cerrado"
+  },
+  "InsuranceComplianceType": {
+    "workers_comp": "Workers Compensation",
+    "liability_insurance": "Seguro de Responsabilidad Civil",
+    "payroll": "Nómina",
+    "hipaa_compliance": "Cumplimiento HIPAA",
+    "general_insurance": "Seguro General",
+    "other": "Otro"
+  },
+  "InsuranceComplianceStatus": {
+    "not_started": "No Iniciado",
+    "in_progress": "En Proceso",
+    "active": "Activo",
+    "expired": "Vencido",
+    "renewed": "Renovado",
+    "cancelled": "Cancelado"
   },
   "IrsResourceCategory": {
     "ein": "EIN",

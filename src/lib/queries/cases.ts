@@ -16,6 +16,7 @@ import {
   marketingProjectDetails,
   salesTaxCaseDetails,
   irsCaseDetails,
+  insuranceComplianceDetails,
   companies,
   documents,
   caseStatusHistory,
@@ -79,6 +80,7 @@ export async function getCaseById(id: string) {
     marketingDetails,
     salesTaxDetails,
     irsDetails,
+    insuranceDetails,
     caseDocuments,
     statusHistory,
   ] = await Promise.all([
@@ -149,6 +151,11 @@ export async function getCaseById(id: string) {
       .limit(1),
     db
       .select()
+      .from(insuranceComplianceDetails)
+      .where(eq(insuranceComplianceDetails.caseId, id))
+      .limit(1),
+    db
+      .select()
       .from(documents)
       .where(eq(documents.caseId, id))
       .orderBy(desc(documents.createdAt)),
@@ -181,6 +188,17 @@ export async function getCaseById(id: string) {
       )[0] ?? null
     : null;
 
+  const insuranceCompanyId = insuranceDetails[0]?.companyId;
+  const insuranceCompany = insuranceCompanyId
+    ? (
+        await db
+          .select({ id: companies.id, legalBusinessName: companies.legalBusinessName })
+          .from(companies)
+          .where(eq(companies.id, insuranceCompanyId))
+          .limit(1)
+      )[0] ?? null
+    : null;
+
   return {
     case: row.case,
     client: row.client,
@@ -199,6 +217,8 @@ export async function getCaseById(id: string) {
     salesTaxCompany,
     irsDetails: irsDetails[0] ?? null,
     irsCompany,
+    insuranceDetails: insuranceDetails[0] ?? null,
+    insuranceCompany,
     documents: caseDocuments,
     statusHistory,
   };
