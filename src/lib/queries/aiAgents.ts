@@ -1,9 +1,10 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
   aiAgents,
   aiAgentKnowledgeBase,
   aiEscalations,
+  aiActivityLog,
   clients,
   cases,
   referrals,
@@ -12,6 +13,26 @@ import {
 
 export async function listAiAgents() {
   return getDb().select().from(aiAgents).orderBy(aiAgents.sortOrder);
+}
+
+export async function getAiAgentRecentActivity(agentId: string, limit = 10) {
+  return getDb()
+    .select({
+      id: aiActivityLog.id,
+      occurredAt: aiActivityLog.occurredAt,
+      action: aiActivityLog.action,
+      actionDetail: aiActivityLog.actionDetail,
+      outcome: aiActivityLog.outcome,
+      approvalLevel: aiActivityLog.approvalLevel,
+      clientName: clients.fullName,
+      caseTitle: cases.title,
+    })
+    .from(aiActivityLog)
+    .leftJoin(clients, eq(aiActivityLog.clientId, clients.id))
+    .leftJoin(cases, eq(aiActivityLog.caseId, cases.id))
+    .where(eq(aiActivityLog.agentId, agentId))
+    .orderBy(desc(aiActivityLog.occurredAt))
+    .limit(limit);
 }
 
 export async function getAiAgentById(id: string) {

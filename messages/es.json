@@ -2086,6 +2086,8 @@
     "language": "Idioma",
     "status": "Estado",
     "comingSoonMessage": "La tarjeta de este agente está reservada — todavía no está activo.",
+    "recentActivity": "Actividad Reciente",
+    "recentActivityEmpty": "Aún no hay actividad automatizada registrada.",
     "editHint": "Los cambios aquí se aplican de inmediato a la tarjeta y al perfil de este agente.",
     "form": {
       "name": "Nombre del Agente",
@@ -2156,6 +2158,18 @@
     "changeOwnershipData": "Cambiar datos de propiedad",
     "changeAdminSettings": "Cambiar configuración de Admin",
     "viewSystemSecrets": "Ver secretos del sistema"
+  },
+  "AiActivityAction": {
+    "create_task": "Tarea Creada",
+    "create_note": "Nota Creada",
+    "create_reminder": "Recordatorio Creado",
+    "classify_service": "Servicio Clasificado",
+    "draft_message": "Borrador Redactado",
+    "change_status": "Estado Cambiado",
+    "send_draft": "Borrador Enviado",
+    "send_message": "Mensaje Enviado",
+    "escalate": "Escalado",
+    "other": "Otro"
   },
   "AiKnowledgeBaseSection": {
     "approved_services": "Servicios Aprobados",

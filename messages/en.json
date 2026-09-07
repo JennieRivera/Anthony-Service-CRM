@@ -2086,6 +2086,8 @@
     "language": "Language",
     "status": "Status",
     "comingSoonMessage": "This agent's card is reserved — it isn't active yet.",
+    "recentActivity": "Recent Activity",
+    "recentActivityEmpty": "No automated activity logged yet.",
     "editHint": "Changes here take effect immediately for this agent's card and profile.",
     "form": {
       "name": "Agent Name",
@@ -2156,6 +2158,18 @@
     "changeOwnershipData": "Change ownership data",
     "changeAdminSettings": "Change Admin settings",
     "viewSystemSecrets": "View system secrets"
+  },
+  "AiActivityAction": {
+    "create_task": "Created Task",
+    "create_note": "Created Note",
+    "create_reminder": "Created Reminder",
+    "classify_service": "Classified Service",
+    "draft_message": "Drafted Message",
+    "change_status": "Changed Status",
+    "send_draft": "Sent Draft",
+    "send_message": "Sent Message",
+    "escalate": "Escalated",
+    "other": "Other"
   },
   "AiKnowledgeBaseSection": {
     "approved_services": "Approved Services",

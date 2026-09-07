@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { getAiAgentBySlug } from "@/lib/queries/aiAgents";
+import { getAiAgentBySlug, getAiAgentRecentActivity } from "@/lib/queries/aiAgents";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,11 +18,15 @@ export default async function AiAgentDetailPage({
   const tDepartment = await getTranslations("AiAgentDepartment");
   const tLanguage = await getTranslations("AiAgentLanguage");
   const tSection = await getTranslations("AiKnowledgeBaseSection");
+  const tAction = await getTranslations("AiActivityAction");
 
   const result = await getAiAgentBySlug(slug);
   if (!result) notFound();
   const { agent, knowledgeBase } = result;
   const isComingSoon = agent.launchStatus === "coming_soon";
+  const recentActivity = isComingSoon
+    ? []
+    : await getAiAgentRecentActivity(agent.id);
 
   const kbBySection = new Map<string, typeof knowledgeBase>();
   for (const entry of knowledgeBase) {
@@ -143,6 +147,37 @@ export default async function AiAgentDetailPage({
               ))}
             </div>
           )}
+
+          <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("recentActivity")}
+            </h2>
+            {recentActivity.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {t("recentActivityEmpty")}
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {recentActivity.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="flex flex-wrap items-center gap-2 border-t border-border pt-2 text-sm first:border-t-0 first:pt-0"
+                  >
+                    <Badge variant="outline">{tAction(entry.action)}</Badge>
+                    <span className="text-foreground">{entry.actionDetail}</span>
+                    {entry.clientName && (
+                      <span className="text-muted-foreground">
+                        — {entry.clientName}
+                      </span>
+                    )}
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {new Date(entry.occurredAt).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>

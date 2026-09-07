@@ -3,6 +3,11 @@ import { and, desc, eq, isNull, lt, notInArray } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { cases, tasks, clients, conversationMessages } from "@/lib/db/schema";
+import {
+  getActiveAgentIdForServiceType,
+  getActiveAgentIdForDepartment,
+  logAiActivity,
+} from "@/lib/ai/agentActivity";
 
 // Phase 2, Session 7 — scheduled inactivity sweep (see vercel.json `crons`).
 // No period was specified in PHASE2-PLAN.md, so 14 days is a sensible default
@@ -33,7 +38,12 @@ export async function GET(request: NextRequest) {
   threshold.setDate(threshold.getDate() - INACTIVITY_THRESHOLD_DAYS);
 
   const staleCases = await db
-    .select({ id: cases.id, clientId: cases.clientId, title: cases.title })
+    .select({
+      id: cases.id,
+      clientId: cases.clientId,
+      title: cases.title,
+      serviceType: cases.serviceType,
+    })
     .from(cases)
     .where(
       and(
@@ -64,6 +74,19 @@ export async function GET(request: NextRequest) {
         title: `Inactivity alert: ${c.title}`,
       });
       created += 1;
+
+      // Phase 6, Session 4 — attribute to the launched agent whose
+      // department covers this case's service type, when one exists.
+      const agentId = await getActiveAgentIdForServiceType(c.serviceType);
+      if (agentId) {
+        await logAiActivity({
+          agentId,
+          clientId: c.clientId,
+          caseId: c.id,
+          action: "create_task",
+          actionDetail: `Created inactivity alert for stale case "${c.title}"`,
+        });
+      }
     }
   }
 
@@ -80,6 +103,11 @@ export async function GET(request: NextRequest) {
     .selectDistinct({ clientId: cases.clientId })
     .from(cases)
     .where(notInArray(cases.status, ["completed", "cancelled"]));
+
+  // A general "no communication logged" alert isn't tied to any one
+  // service line — it's reception/relationship follow-up, Christal's
+  // domain (client_service), not any of the service-specific agents.
+  const receptionAgentId = await getActiveAgentIdForDepartment("client_service");
 
   let communicationAlertsCreated = 0;
   for (const { clientId } of activeClientIds) {
@@ -121,6 +149,15 @@ export async function GET(request: NextRequest) {
         title: "No communication logged recently",
       });
       communicationAlertsCreated += 1;
+
+      if (receptionAgentId) {
+        await logAiActivity({
+          agentId: receptionAgentId,
+          clientId,
+          action: "create_task",
+          actionDetail: "Created follow-up alert for a client with no recent communication logged",
+        });
+      }
     }
   }
 

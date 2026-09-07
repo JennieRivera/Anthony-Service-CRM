@@ -44,6 +44,7 @@ import {
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
+import { getActiveAgentIdForServiceType, logAiActivity } from "@/lib/ai/agentActivity";
 
 const CLOSED_STATUSES = ["completed", "cancelled"] as const;
 
@@ -70,14 +71,16 @@ async function recordStatusChange(
 }
 
 // Avoids spamming a duplicate task every time a case is re-saved while the
-// same pending condition (unpaid, documents missing) still applies.
+// same pending condition (unpaid, documents missing) still applies. Returns
+// whether a task was actually created, so callers only log AI activity for
+// a genuinely new automated action, not a no-op re-save.
 async function ensureOpenTask(
   clientId: string,
   caseId: string,
   type: (typeof taskTypeEnum.enumValues)[number],
   title: string,
   dueDate: string | null,
-) {
+): Promise<boolean> {
   const db = getDb();
   const [existing] = await db
     .select({ id: tasks.id })
@@ -91,14 +94,37 @@ async function ensureOpenTask(
     )
     .limit(1);
 
-  if (!existing) {
-    await db.insert(tasks).values({ clientId, caseId, type, title, dueDate });
-  }
+  if (existing) return false;
+  await db.insert(tasks).values({ clientId, caseId, type, title, dueDate });
+  return true;
+}
+
+// Phase 6, Session 4 — attributes this automation to the agent whose
+// department covers the case's service type (see
+// src/lib/ai/agentActivity.ts), when one is launched. Cases in a
+// department with no agent yet (notary, academy, credit_financing, etc.)
+// simply get no attribution — never invented.
+async function logTaskActivity(
+  serviceType: string,
+  clientId: string,
+  caseId: string,
+  detail: string,
+) {
+  const agentId = await getActiveAgentIdForServiceType(serviceType);
+  if (!agentId) return;
+  await logAiActivity({
+    agentId,
+    clientId,
+    caseId,
+    action: "create_task",
+    actionDetail: detail,
+  });
 }
 
 async function runAutomaticTasks(params: {
   caseId: string;
   clientId: string;
+  serviceType: string;
   title: string;
   isNewCase: boolean;
   justCompleted: boolean;
@@ -110,6 +136,7 @@ async function runAutomaticTasks(params: {
   const {
     caseId,
     clientId,
+    serviceType,
     title,
     isNewCase,
     justCompleted,
@@ -128,26 +155,48 @@ async function runAutomaticTasks(params: {
       title: `Follow up: ${title}`,
       dueDate: followUpDate,
     });
+    await logTaskActivity(
+      serviceType,
+      clientId,
+      caseId,
+      `Created follow-up task for new case "${title}"`,
+    );
   }
 
   if (paymentStatus && !["paid", "refunded", "cancelled"].includes(paymentStatus)) {
-    await ensureOpenTask(
+    const created = await ensureOpenTask(
       clientId,
       caseId,
       "payment_check",
       `Payment check: ${title}`,
       followUpDate,
     );
+    if (created) {
+      await logTaskActivity(
+        serviceType,
+        clientId,
+        caseId,
+        `Created payment-check task for "${title}" (status: ${paymentStatus})`,
+      );
+    }
   }
 
   if (documentsRequested && !documentsReceived) {
-    await ensureOpenTask(
+    const created = await ensureOpenTask(
       clientId,
       caseId,
       "document_reminder",
       `Documents pending: ${title}`,
       followUpDate,
     );
+    if (created) {
+      await logTaskActivity(
+        serviceType,
+        clientId,
+        caseId,
+        `Created document-reminder task for "${title}"`,
+      );
+    }
   }
 
   if (justCompleted) {
@@ -157,6 +206,12 @@ async function runAutomaticTasks(params: {
       type: "closing",
       title: `Close out: ${title}`,
     });
+    await logTaskActivity(
+      serviceType,
+      clientId,
+      caseId,
+      `Created closing task for completed case "${title}"`,
+    );
   }
 }
 
@@ -791,6 +846,7 @@ export async function createCaseAction(rawValues: CaseFormValues) {
   await runAutomaticTasks({
     caseId: created.id,
     clientId: values.clientId,
+    serviceType: values.serviceType,
     title: values.title,
     isNewCase: true,
     justCompleted: effectiveStatus === "completed",
@@ -853,6 +909,7 @@ export async function updateCaseAction(id: string, rawValues: CaseFormValues) {
   await runAutomaticTasks({
     caseId: id,
     clientId: values.clientId,
+    serviceType: values.serviceType,
     title: values.title,
     isNewCase: false,
     justCompleted,
