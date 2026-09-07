@@ -2413,6 +2413,11 @@ export const aiModuleKeyEnum = pgEnum("ai_module_key", [
   "uscis_official_resources",
   "authorized_client_document_folders",
   "document_prep_records",
+  // Added when Valentina (AI Business Consulting Assistant) was activated —
+  // same specificity as tax_records/referral_records/document_prep_records,
+  // covering consultingServiceDetails (diagnosis, package, sessions,
+  // milestones, action plan, 30/90-day goals).
+  "consulting_service_records",
 ]);
 
 export const aiKnowledgeBaseSectionEnum = pgEnum("ai_knowledge_base_section", [

@@ -253,6 +253,13 @@
       "when": 1788821300440,
       "tag": "0035_sparkling_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1788824130803,
+      "tag": "0036_sleepy_alex_power",
+      "breakpoints": true
     }
   ]
 }

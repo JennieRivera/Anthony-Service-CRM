@@ -1,0 +1,1 @@
+ALTER TYPE "public"."ai_module_key" ADD VALUE 'consulting_service_records';
