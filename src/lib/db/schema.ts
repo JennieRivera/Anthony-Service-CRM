@@ -2216,6 +2216,282 @@ export const allianceStatusHistory = pgTable("alliance_status_history", {
   note: text("note"),
 });
 
+// ===================================================================
+// Phase 6, Session 1 — AI Team / Equipo IA (foundation)
+//
+// These agents are a visual management layer over automation the system
+// already runs (automatic tasks, renewal/inactivity cron alerts) — not
+// generative-AI chatbots wired to an external model. An agent "acts" only
+// through the same rules-based mechanisms other parts of the app already
+// use; nothing here calls an LLM or messages a client autonomously. Every
+// agent reads/writes the same clients/cases/referrals rows everyone else
+// does (see aiActivityLog below) — an agent never gets its own copy of
+// client data.
+// ===================================================================
+
+export const aiAgentDepartmentEnum = pgEnum("ai_agent_department", [
+  "client_service",
+  "tax_bookkeeping",
+  "commercial_finance",
+  "immigration",
+  "document_services",
+  "business_consulting",
+  "community_academy",
+  "operations",
+]);
+
+export const aiAgentLanguageEnum = pgEnum("ai_agent_language", [
+  "en",
+  "es",
+  "bilingual",
+]);
+
+export const aiAgentStatusEnum = pgEnum("ai_agent_status", [
+  "online",
+  "offline",
+  "paused",
+  "needs_review",
+  "escalated",
+]);
+
+// Separate from aiAgentStatusEnum on purpose: the 3 future agents (Valentina,
+// Camila, Marco) aren't part of the online/offline/paused state machine yet
+// — they're inactive placeholder cards until their session builds them out.
+export const aiAgentLaunchStatusEnum = pgEnum("ai_agent_launch_status", [
+  "active",
+  "coming_soon",
+]);
+
+export const aiAgentAvatarStyleEnum = pgEnum("ai_agent_avatar_style", [
+  "human",
+  "robot",
+]);
+
+// Every distinct data/module category referenced across the 5 initial
+// agents' "Acceso permitido" / "Acceso NO permitido" lists in
+// PHASE6-PLAN.md, deduplicated. Deliberately specific rather than reusing
+// serviceTypeEnum — these are data-access grants, not service categories.
+export const aiModuleKeyEnum = pgEnum("ai_module_key", [
+  "clients",
+  "client_360_basic",
+  "client_basic_profile",
+  "services",
+  "appointments",
+  "tasks",
+  "communications",
+  "lead_referral_source",
+  "full_financial_records",
+  "tax_return_details",
+  "sensitive_immigration_files",
+  "banking_data",
+  "full_commission_details",
+  "admin_settings",
+  "system_credentials",
+  "tax_records",
+  "bookkeeping_records",
+  "document_status",
+  "payment_status",
+  "client_business_profile",
+  "company_registry_limited_fields",
+  "company_registry",
+  "company_registry_business_profile",
+  "referral_records",
+  "commercial_finance_module",
+  "referral_commission_records",
+  "commission_payment_status_basic",
+  "immigration_admin_service_records",
+  "immigration_forms_library",
+  "uscis_official_resources",
+  "authorized_client_document_folders",
+  "document_prep_records",
+]);
+
+export const aiKnowledgeBaseSectionEnum = pgEnum("ai_knowledge_base_section", [
+  "approved_services",
+  "approved_scripts",
+  "faqs",
+  "policies",
+  "disclaimers",
+  "checklists",
+  "workflows",
+  "forms",
+  "official_resources",
+  "escalation_rules",
+  "prohibited_actions",
+]);
+
+export const aiEscalationRiskLevelEnum = pgEnum("ai_escalation_risk_level", [
+  "low",
+  "medium",
+  "high",
+  "critical",
+]);
+
+export const aiEscalationStatusEnum = pgEnum("ai_escalation_status", [
+  "open",
+  "in_progress",
+  "resolved",
+  "closed",
+]);
+
+export const aiActivityActionEnum = pgEnum("ai_activity_action", [
+  "create_task",
+  "create_note",
+  "create_reminder",
+  "classify_service",
+  "draft_message",
+  "change_status",
+  "send_draft",
+  "send_message",
+  "escalate",
+  "other",
+]);
+
+export const aiActivityOutcomeEnum = pgEnum("ai_activity_outcome", [
+  "success",
+  "failed",
+  "pending_approval",
+]);
+
+// Section 11's 3-tier approval policy — a fixed rule about which *kind* of
+// action requires a human, not a per-agent setting. Recorded on each log
+// row so the AI dashboard can surface "Revisiones Humanas Pendientes"
+// without re-deriving it from the action type every time.
+export const aiApprovalLevelEnum = pgEnum("ai_approval_level", [
+  "level_1_automatic",
+  "level_2_human_review",
+  "level_3_human_only",
+]);
+
+export const aiAgents = pgTable("ai_agents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  slug: text("slug").notNull().unique(),
+  name: text("name").notNull(),
+  title: text("title").notNull(),
+  department: aiAgentDepartmentEnum("department").notNull(),
+  language: aiAgentLanguageEnum("language").notNull().default("bilingual"),
+  status: aiAgentStatusEnum("status").notNull().default("offline"),
+  launchStatus: aiAgentLaunchStatusEnum("launch_status")
+    .notNull()
+    .default("active"),
+  sortOrder: integer("sort_order").notNull().default(0),
+
+  // Section 8 — avatar system. avatarUrl is populated later (Session 2)
+  // once an upload flow exists; illustrated placeholder art ships first.
+  avatarUrl: text("avatar_url"),
+  avatarStyle: aiAgentAvatarStyleEnum("avatar_style")
+    .notNull()
+    .default("robot"),
+  accentColor: text("accent_color"),
+  voiceEnabled: boolean("voice_enabled").notNull().default(false),
+  videoAvatarEnabled: boolean("video_avatar_enabled").notNull().default(false),
+  bio: text("bio"),
+  welcomeMessage: text("welcome_message"),
+  disclaimerText: text("disclaimer_text"),
+
+  // Section 10 — the 8 action permissions. There is deliberately no
+  // "canDelete"/"canChangeCommission"/"canChangeAdminSettings" column at
+  // all — section 10's default-deny list isn't a toggle an agent could
+  // ever have set to true, it's the absence of the capability entirely.
+  canRead: boolean("can_read").notNull().default(true),
+  canWrite: boolean("can_write").notNull().default(false),
+  canCreateTask: boolean("can_create_task").notNull().default(true),
+  canCreateNote: boolean("can_create_note").notNull().default(true),
+  canChangeStatus: boolean("can_change_status").notNull().default(false),
+  canSendDraft: boolean("can_send_draft").notNull().default(true),
+  canSendMessage: boolean("can_send_message").notNull().default(false),
+  canEscalate: boolean("can_escalate").notNull().default(true),
+
+  // Sections 2-6 — per-agent module/data-access allowlist and denylist.
+  allowedModules: aiModuleKeyEnum("allowed_modules").array(),
+  deniedModules: aiModuleKeyEnum("denied_modules").array(),
+});
+
+// Section 9 — one row per knowledge-base entry, grouped by section, so an
+// agent can hold several FAQs/checklists/etc. under the same category.
+export const aiAgentKnowledgeBase = pgTable("ai_agent_knowledge_base", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  agentId: uuid("agent_id")
+    .notNull()
+    .references(() => aiAgents.id, { onDelete: "cascade" }),
+  section: aiKnowledgeBaseSectionEnum("section").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
+// Section 12 — AI Escalations Center. FKs are onDelete "set null" (never
+// cascade), same reasoning as caseStatusHistory/notaryLogEntries: this is
+// an accountability record and must survive the agent, client, or case it
+// referenced being deleted later.
+export const aiEscalations = pgTable("ai_escalations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  escalationSeq: serial("escalation_seq").notNull().unique(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  agentId: uuid("agent_id").references(() => aiAgents.id, {
+    onDelete: "set null",
+  }),
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  reason: text("reason").notNull(),
+  riskLevel: aiEscalationRiskLevelEnum("risk_level")
+    .notNull()
+    .default("medium"),
+  status: aiEscalationStatusEnum("status").notNull().default("open"),
+  assignedHumanEmail: text("assigned_human_email"),
+  resolution: text("resolution"),
+  resolutionDate: date("resolution_date"),
+});
+
+// Section 13 — full audit trail of every agent action. Same "set null,
+// never cascade" reasoning as aiEscalations above: an audit log entry must
+// outlive the record it describes.
+export const aiActivityLog = pgTable("ai_activity_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  occurredAt: timestamp("occurred_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  agentId: uuid("agent_id").references(() => aiAgents.id, {
+    onDelete: "set null",
+  }),
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  action: aiActivityActionEnum("action").notNull(),
+  actionDetail: text("action_detail"),
+  previousValue: text("previous_value"),
+  newValue: text("new_value"),
+  approvalLevel: aiApprovalLevelEnum("approval_level")
+    .notNull()
+    .default("level_1_automatic"),
+  requiresHumanApproval: boolean("requires_human_approval")
+    .notNull()
+    .default(false),
+  humanApproved: boolean("human_approved"),
+  outcome: aiActivityOutcomeEnum("outcome").notNull().default("success"),
+  errorMessage: text("error_message"),
+});
+
 export type User = typeof users.$inferSelect;
 export type Client = typeof clients.$inferSelect;
 export type Case = typeof cases.$inferSelect;
@@ -2279,3 +2555,8 @@ export type AllianceStatusHistory =
   typeof allianceStatusHistory.$inferSelect;
 export type MarketingProjectDetails =
   typeof marketingProjectDetails.$inferSelect;
+export type AiAgent = typeof aiAgents.$inferSelect;
+export type AiAgentKnowledgeBaseEntry =
+  typeof aiAgentKnowledgeBase.$inferSelect;
+export type AiEscalation = typeof aiEscalations.$inferSelect;
+export type AiActivityLogEntry = typeof aiActivityLog.$inferSelect;

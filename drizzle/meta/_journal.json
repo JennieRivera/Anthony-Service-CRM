@@ -225,6 +225,13 @@
       "when": 1788792390546,
       "tag": "0031_productive_rocket_raccoon",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1788794902363,
+      "tag": "0032_complex_the_hand",
+      "breakpoints": true
     }
   ]
 }
