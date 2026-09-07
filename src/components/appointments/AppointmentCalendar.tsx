@@ -96,7 +96,7 @@ export function AppointmentCalendar({
           };
         }}
         onSelectEvent={(event) =>
-          router.push(`/appointments/${(event as unknown as AppointmentEvent).id}/edit`)
+          router.push(`/appointments/${(event as unknown as AppointmentEvent).id}`)
         }
         onSelectSlot={(slotInfo) => {
           const iso = slotInfo.start.toISOString().slice(0, 16);

@@ -1,6 +1,6 @@
 import { asc, desc, eq, gte } from "drizzle-orm";
 import { getDb } from "@/lib/db";
-import { appointments, clients } from "@/lib/db/schema";
+import { appointments, clients, companies, cases } from "@/lib/db/schema";
 
 export async function listAppointmentsWithClient() {
   return getDb()
@@ -39,9 +39,16 @@ export async function listUpcomingAppointments(limit = 5) {
 export async function getAppointmentById(id: string) {
   const db = getDb();
   const [row] = await db
-    .select({ appointment: appointments, client: clients })
+    .select({
+      appointment: appointments,
+      client: clients,
+      companyName: companies.legalBusinessName,
+      caseTitle: cases.title,
+    })
     .from(appointments)
     .innerJoin(clients, eq(appointments.clientId, clients.id))
+    .leftJoin(companies, eq(clients.companyId, companies.id))
+    .leftJoin(cases, eq(appointments.caseId, cases.id))
     .where(eq(appointments.id, id))
     .limit(1);
 
