@@ -1,33 +1,55 @@
 import { cn } from "@/lib/utils";
 
-// Section 8 — illustrated avatar system. No uploaded image exists yet (that
-// lands once Session 3 builds the upload flow), so every agent renders from
-// its avatarStyle (human/robot) + accentColor. Deliberately simple shapes,
-// not a photorealistic or talking avatar — section 1 calls for "avatares
-// bien diseñados... con animación simple", explicitly not video.
+// Section 8 — illustrated avatar system, with an uploaded image (Session 3)
+// taking priority over the illustration once an agent has one. Deliberately
+// simple shapes for the fallback, not a photorealistic or talking avatar —
+// section 1 calls for "avatares bien diseñados... con animación simple",
+// explicitly not video.
 export function AiAgentAvatar({
   style,
   accentColor,
+  agentId,
+  hasUploadedImage = false,
   dimmed = false,
   size = 72,
   className,
 }: {
   style: "human" | "robot";
   accentColor: string;
+  agentId?: string;
+  hasUploadedImage?: boolean;
   dimmed?: boolean;
   size?: number;
   className?: string;
 }) {
+  const wrapperStyle = {
+    width: size,
+    height: size,
+    animation: dimmed ? "none" : "ai-avatar-float 4s ease-in-out infinite",
+    opacity: dimmed ? 0.5 : 1,
+  };
+
+  if (hasUploadedImage && agentId) {
+    return (
+      <div
+        className={cn("ai-avatar-float overflow-hidden rounded-full", className)}
+        style={wrapperStyle}
+      >
+        {/* next/image's optimizer fetches server-side without the viewer's
+            session cookie, which this authenticated route requires — a
+            plain <img> (same-origin, cookie sent normally) is correct here. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/api/ai-agents/${agentId}/avatar`}
+          alt=""
+          className="h-full w-full object-cover"
+        />
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={cn("ai-avatar-float", className)}
-      style={{
-        width: size,
-        height: size,
-        animation: dimmed ? "none" : "ai-avatar-float 4s ease-in-out infinite",
-        opacity: dimmed ? 0.5 : 1,
-      }}
-    >
+    <div className={cn("ai-avatar-float", className)} style={wrapperStyle}>
       <svg
         viewBox="0 0 72 72"
         width={size}

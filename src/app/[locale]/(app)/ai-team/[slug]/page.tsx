@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
+import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getAiAgentBySlug } from "@/lib/queries/aiAgents";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { AiAgentAvatar } from "@/components/ai-team/AiAgentAvatar";
 
 export default async function AiAgentDetailPage({
@@ -31,17 +33,25 @@ export default async function AiAgentDetailPage({
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
-      <Link
-        href="/ai-team"
-        className="text-sm text-muted-foreground underline"
-      >
-        &larr; {t("backToAiTeam")}
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          href="/ai-team"
+          className="text-sm text-muted-foreground underline"
+        >
+          &larr; {t("backToAiTeam")}
+        </Link>
+        <Button render={<Link href={`/ai-team/${agent.slug}/edit`} />}>
+          <Pencil className="h-4 w-4" />
+          {t("settings")}
+        </Button>
+      </div>
 
       <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 sm:flex-row sm:items-start">
         <AiAgentAvatar
           style={agent.avatarStyle}
           accentColor={agent.accentColor ?? "#3A86FF"}
+          agentId={agent.id}
+          hasUploadedImage={Boolean(agent.avatarUrl)}
           dimmed={isComingSoon}
           size={96}
         />

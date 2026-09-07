@@ -2085,7 +2085,32 @@
     "department": "Departamento",
     "language": "Idioma",
     "status": "Estado",
-    "comingSoonMessage": "La tarjeta de este agente está reservada — todavía no está activo."
+    "comingSoonMessage": "La tarjeta de este agente está reservada — todavía no está activo.",
+    "editHint": "Los cambios aquí se aplican de inmediato a la tarjeta y al perfil de este agente.",
+    "form": {
+      "name": "Nombre del Agente",
+      "title": "Cargo / Posición",
+      "department": "Departamento",
+      "language": "Idioma",
+      "avatarStyle": "Estilo de Avatar",
+      "accentColor": "Color de Acento",
+      "bio": "Acerca de",
+      "welcomeMessage": "Mensaje de Bienvenida",
+      "disclaimerText": "Descargo Permanente",
+      "permissionsTitle": "Permisos",
+      "permanentRestrictionsTitle": "Restricciones Permanentes",
+      "permanentRestrictionsHint": "Estas nunca se le pueden otorgar a ningún agente — no existe una opción que las active.",
+      "save": "Guardar Cambios",
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "uploadAvatar": "Subir Imagen",
+      "uploading": "Subiendo...",
+      "knowledgeBaseTitle": "Base de Conocimiento",
+      "knowledgeBaseEmpty": "Aún no hay entradas en la base de conocimiento.",
+      "addEntry": "Agregar Entrada",
+      "kbTitlePlaceholder": "Título de la entrada",
+      "kbContentPlaceholder": "Contenido de la entrada"
+    }
   },
   "AiAgentStatus": {
     "online": "En línea",
@@ -2108,6 +2133,29 @@
     "en": "Inglés",
     "es": "Español",
     "bilingual": "Bilingüe (EN/ES)"
+  },
+  "AiAgentAvatarStyle": {
+    "human": "Humano",
+    "robot": "Robot"
+  },
+  "AiAgentPermission": {
+    "canRead": "Lectura",
+    "canWrite": "Escritura",
+    "canCreateTask": "Crear Tarea",
+    "canCreateNote": "Crear Nota",
+    "canChangeStatus": "Cambiar Estado",
+    "canSendDraft": "Enviar Borrador",
+    "canSendMessage": "Enviar Mensaje",
+    "canEscalate": "Escalar"
+  },
+  "AiAgentPermanentRestriction": {
+    "deleteClientRecords": "Eliminar registros de clientes",
+    "deletePayments": "Eliminar pagos",
+    "deleteReferrals": "Eliminar referidos",
+    "modifyCommission": "Modificar porcentajes de comisión",
+    "changeOwnershipData": "Cambiar datos de propiedad",
+    "changeAdminSettings": "Cambiar configuración de Admin",
+    "viewSystemSecrets": "Ver secretos del sistema"
   },
   "AiKnowledgeBaseSection": {
     "approved_services": "Servicios Aprobados",

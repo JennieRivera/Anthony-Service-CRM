@@ -2085,7 +2085,32 @@
     "department": "Department",
     "language": "Language",
     "status": "Status",
-    "comingSoonMessage": "This agent's card is reserved — it isn't active yet."
+    "comingSoonMessage": "This agent's card is reserved — it isn't active yet.",
+    "editHint": "Changes here take effect immediately for this agent's card and profile.",
+    "form": {
+      "name": "Agent Name",
+      "title": "Title / Position",
+      "department": "Department",
+      "language": "Language",
+      "avatarStyle": "Avatar Style",
+      "accentColor": "Accent Color",
+      "bio": "About",
+      "welcomeMessage": "Welcome Message",
+      "disclaimerText": "Standing Disclaimer",
+      "permissionsTitle": "Permissions",
+      "permanentRestrictionsTitle": "Permanent Restrictions",
+      "permanentRestrictionsHint": "These can never be granted to any agent — there is no setting that turns them on.",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "uploadAvatar": "Upload Image",
+      "uploading": "Uploading...",
+      "knowledgeBaseTitle": "Knowledge Base",
+      "knowledgeBaseEmpty": "No knowledge base entries yet.",
+      "addEntry": "Add Entry",
+      "kbTitlePlaceholder": "Entry title",
+      "kbContentPlaceholder": "Entry content"
+    }
   },
   "AiAgentStatus": {
     "online": "Online",
@@ -2108,6 +2133,29 @@
     "en": "English",
     "es": "Spanish",
     "bilingual": "Bilingual (EN/ES)"
+  },
+  "AiAgentAvatarStyle": {
+    "human": "Human",
+    "robot": "Robot"
+  },
+  "AiAgentPermission": {
+    "canRead": "Read",
+    "canWrite": "Write",
+    "canCreateTask": "Create Task",
+    "canCreateNote": "Create Note",
+    "canChangeStatus": "Change Status",
+    "canSendDraft": "Send Draft",
+    "canSendMessage": "Send Message",
+    "canEscalate": "Escalate"
+  },
+  "AiAgentPermanentRestriction": {
+    "deleteClientRecords": "Delete client records",
+    "deletePayments": "Delete payments",
+    "deleteReferrals": "Delete referrals",
+    "modifyCommission": "Modify commission percentages",
+    "changeOwnershipData": "Change ownership data",
+    "changeAdminSettings": "Change Admin settings",
+    "viewSystemSecrets": "View system secrets"
   },
   "AiKnowledgeBaseSection": {
     "approved_services": "Approved Services",

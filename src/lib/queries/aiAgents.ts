@@ -14,6 +14,15 @@ export async function listAiAgents() {
   return getDb().select().from(aiAgents).orderBy(aiAgents.sortOrder);
 }
 
+export async function getAiAgentById(id: string) {
+  const [agent] = await getDb()
+    .select()
+    .from(aiAgents)
+    .where(eq(aiAgents.id, id))
+    .limit(1);
+  return agent ?? null;
+}
+
 export async function getAiAgentKnowledgeBaseCounts() {
   const db = getDb();
   const rows = await db

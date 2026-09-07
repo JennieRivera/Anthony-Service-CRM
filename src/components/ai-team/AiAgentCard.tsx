@@ -54,6 +54,8 @@ export function AiAgentCard({
         <AiAgentAvatar
           style={agent.avatarStyle}
           accentColor={agent.accentColor ?? "#3A86FF"}
+          agentId={agent.id}
+          hasUploadedImage={Boolean(agent.avatarUrl)}
           dimmed={isComingSoon}
         />
         <div className="flex flex-1 flex-col gap-1">
@@ -189,7 +191,11 @@ export function AiAgentCard({
                 </form>
               )}
 
-              <Button size="sm" variant="ghost" disabled title={t("settingsComingSoon")}>
+              <Button
+                size="sm"
+                variant="ghost"
+                render={<Link href={`/ai-team/${agent.slug}/edit`} />}
+              >
                 <Settings className="h-4 w-4" />
                 {t("settings")}
               </Button>

@@ -8,7 +8,7 @@
 // each agent's knowledge-base rows are fully replaced on every run so this
 // script always reflects exactly what's written below.
 import { config } from "dotenv";
-import { eq, inArray } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 import { getDb } from "../src/lib/db";
 import { aiAgents, aiAgentKnowledgeBase } from "../src/lib/db/schema";
 
@@ -301,6 +301,7 @@ async function main() {
   const agentIds: Record<string, string> = {};
 
   for (const agent of agents) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured only to exclude it from agentRow
     const { knowledgeBase, ...agentRow } = agent;
     const [row] = await db
       .insert(aiAgents)
