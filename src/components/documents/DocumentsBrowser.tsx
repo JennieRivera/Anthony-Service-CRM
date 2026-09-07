@@ -128,22 +128,30 @@ export function DocumentsBrowser({
                   <TableHead>{t("columnFolder")}</TableHead>
                   <TableHead>{t("columnStatus")}</TableHead>
                   <TableHead>{t("columnUploaded")}</TableHead>
-                  <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {visibleDocuments.map((doc) => (
                   <TableRow key={doc.id}>
                     <TableCell>
-                      <a
-                        href={viewHref(doc.id)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 font-medium text-foreground hover:underline"
-                      >
-                        <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
-                        {doc.fileName}
-                      </a>
+                      <div className="flex items-center gap-1">
+                        <a
+                          href={viewHref(doc.id)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex min-w-0 items-center gap-2 font-medium text-foreground hover:underline"
+                        >
+                          <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          <span className="truncate">{doc.fileName}</span>
+                        </a>
+                        <Button
+                          variant="ghost"
+                          size="icon-xs"
+                          render={<a href={downloadHref(doc.id)} title={t("download")} />}
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Link
@@ -173,16 +181,6 @@ export function DocumentsBrowser({
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {new Date(doc.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        render={<a href={downloadHref(doc.id)} />}
-                      >
-                        <Download className="h-4 w-4" />
-                        {t("download")}
-                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

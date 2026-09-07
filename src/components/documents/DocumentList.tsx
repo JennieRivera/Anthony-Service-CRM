@@ -13,7 +13,7 @@ function DocumentRow({ doc }: { doc: Document }) {
   const t = useTranslations("Documents");
 
   return (
-    <li className="flex items-center justify-between gap-3 p-4">
+    <li className="flex flex-wrap items-center justify-between gap-3 p-4">
       <a
         href={viewHref(doc.id)}
         target="_blank"
@@ -23,7 +23,7 @@ function DocumentRow({ doc }: { doc: Document }) {
         <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
         <span className="truncate">{doc.fileName}</span>
       </a>
-      <div className="flex shrink-0 items-center gap-3 text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
         {doc.documentType && <span>{doc.documentType}</span>}
         <DocumentStatusPill status={doc.status} />
         <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
