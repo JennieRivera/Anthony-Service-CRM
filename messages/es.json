@@ -135,7 +135,8 @@
     "irsResources": "Recursos IRS",
     "immigrationForms": "Formularios de Inmigración",
     "latinoBusinessMap": "Mapa de Negocios Latinos",
-    "associations": "Asociaciones y Cámaras"
+    "associations": "Asociaciones y Cámaras",
+    "marketingContent": "Contenido de Marketing"
   },
   "ServiceType": {
     "online_notary": "Notaría en Línea",
@@ -1134,6 +1135,39 @@
     "clientes": "Clientes",
     "referidos": "Referidos y Alianzas",
     "otros": "Otros"
+  },
+  "MarketingContent": {
+    "title": "Contenido de Marketing",
+    "subtitle": "Tu banco de fotos y videos de marketing/redes sociales — organizado por servicio, fecha, y dónde se publicó.",
+    "upload": "Subir contenido",
+    "uploading": "Subiendo...",
+    "uploadDialogTitle": "Subir contenido de marketing",
+    "file": "Archivo (imagen o video)",
+    "service": "Servicio",
+    "generalService": "General (sin servicio específico)",
+    "publishedDate": "Fecha",
+    "channel": "Publicado en",
+    "selectChannel": "Selecciona dónde se publicó",
+    "caption": "Descripción / notas",
+    "captionPlaceholder": "¿Qué es esto, y a dónde se envió?",
+    "allServices": "Todos los servicios",
+    "empty": "Aún no hay contenido de marketing.",
+    "noResultsForFilter": "Aún no hay nada en este servicio.",
+    "download": "Descargar",
+    "notConfigured": "El almacenamiento de archivos aún no está conectado.",
+    "uploadError": "Error al subir. Inténtalo de nuevo.",
+    "uploadErrorUnsupportedType": "Ese tipo de archivo no es compatible. Sube una imagen o un video.",
+    "uploadErrorSensitiveSsn": "Esto parece contener un SSN o ITIN completo y no se puede subir.",
+    "uploadErrorSensitiveCard": "Esto parece contener un número de tarjeta completo y no se puede subir.",
+    "uploadErrorSensitivePassword": "Esto parece contener una contraseña y no se puede subir."
+  },
+  "MarketingChannel": {
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "email": "Correo Electrónico",
+    "whatsapp": "WhatsApp",
+    "other": "Otro"
   },
   "DocumentCategory": {
     "identification": "Identificación",

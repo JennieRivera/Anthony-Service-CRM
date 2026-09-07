@@ -21,6 +21,7 @@ import {
   FileStack,
   MapPinned,
   UsersRound,
+  Megaphone,
 } from "lucide-react";
 
 export type NavItem = {
@@ -46,6 +47,7 @@ export type NavItem = {
     | "immigrationForms"
     | "latinoBusinessMap"
     | "associations"
+    | "marketingContent"
     | "settings";
   icon: LucideIcon;
 };
@@ -64,6 +66,7 @@ export const navItems: NavItem[] = [
   { href: "/referrals", labelKey: "referrals", icon: Handshake },
   { href: "/alliances", labelKey: "alliances", icon: Network },
   { href: "/documents", labelKey: "documents", icon: FileText },
+  { href: "/marketing-content", labelKey: "marketingContent", icon: Megaphone },
   { href: "/reports", labelKey: "reports", icon: BarChart3 },
   { href: "/company-registration", labelKey: "companyRegistration", icon: Map },
   { href: "/sales-tax-map", labelKey: "salesTaxMap", icon: Landmark },

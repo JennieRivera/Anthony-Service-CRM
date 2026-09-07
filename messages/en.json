@@ -135,7 +135,8 @@
     "irsResources": "IRS Resources",
     "immigrationForms": "Immigration Forms",
     "latinoBusinessMap": "Latino Business Map",
-    "associations": "Associations & Chambers"
+    "associations": "Associations & Chambers",
+    "marketingContent": "Marketing Content"
   },
   "ServiceType": {
     "online_notary": "Online Notary",
@@ -1134,6 +1135,39 @@
     "clientes": "Clients",
     "referidos": "Referrals & Alliances",
     "otros": "Other"
+  },
+  "MarketingContent": {
+    "title": "Marketing Content",
+    "subtitle": "Your library of marketing/social media photos and videos — organized by service, date, and where it was posted.",
+    "upload": "Upload content",
+    "uploading": "Uploading...",
+    "uploadDialogTitle": "Upload marketing content",
+    "file": "File (image or video)",
+    "service": "Service",
+    "generalService": "General (no specific service)",
+    "publishedDate": "Date",
+    "channel": "Posted to",
+    "selectChannel": "Select where this was posted",
+    "caption": "Caption / notes",
+    "captionPlaceholder": "What is this, and where did it go?",
+    "allServices": "All services",
+    "empty": "No marketing content yet.",
+    "noResultsForFilter": "Nothing in this service yet.",
+    "download": "Download",
+    "notConfigured": "File storage isn't connected yet.",
+    "uploadError": "Upload failed. Please try again.",
+    "uploadErrorUnsupportedType": "That file type isn't supported. Please upload an image or a video.",
+    "uploadErrorSensitiveSsn": "This appears to contain a full SSN or ITIN and can't be uploaded.",
+    "uploadErrorSensitiveCard": "This appears to contain a full card number and can't be uploaded.",
+    "uploadErrorSensitivePassword": "This appears to contain a password and can't be uploaded."
+  },
+  "MarketingChannel": {
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "other": "Other"
   },
   "DocumentCategory": {
     "identification": "Identification",

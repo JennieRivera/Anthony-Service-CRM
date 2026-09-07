@@ -966,6 +966,33 @@ export const documents = pgTable("documents", {
   category: documentCategoryEnum("category"),
 });
 
+// Phase 1 follow-up — a content library for marketing/social assets, kept
+// deliberately separate from `documents`: it has no client, isn't
+// compliance-sensitive the same way, and is organized by service + publish
+// date + channel rather than by who it belongs to.
+export const marketingChannelEnum = pgEnum("marketing_channel", [
+  "facebook",
+  "instagram",
+  "tiktok",
+  "email",
+  "whatsapp",
+  "other",
+]);
+
+export const marketingContentAssets = pgTable("marketing_content_assets", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  // Null = general content not tied to one service line.
+  serviceType: serviceTypeEnum("service_type"),
+  publishedDate: date("published_date"),
+  channel: marketingChannelEnum("channel"),
+  caption: text("caption"),
+  fileName: text("file_name").notNull(),
+  blobUrl: text("blob_url").notNull(),
+});
+
 export const appointments = pgTable("appointments", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
