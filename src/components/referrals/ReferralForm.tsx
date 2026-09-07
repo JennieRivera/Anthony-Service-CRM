@@ -31,6 +31,7 @@ export function ReferralForm({
   rriDetails,
   clients,
   cases,
+  alliances,
   defaultClientId,
   onSubmit,
 }: {
@@ -38,6 +39,7 @@ export function ReferralForm({
   rriDetails?: RriReferralDetails | null;
   clients: { id: string; fullName: string }[];
   cases: { id: string; title: string }[];
+  alliances: { id: string; organizationName: string }[];
   defaultClientId?: string;
   onSubmit: (values: ReferralFormValues) => Promise<void>;
 }) {
@@ -63,6 +65,7 @@ export function ReferralForm({
       referralDate:
         referral?.referralDate ?? new Date().toISOString().slice(0, 10),
       category: referral?.category ?? "general",
+      allianceId: referral?.allianceId ?? "",
       originatingBusiness: referral?.originatingBusiness ?? "",
       referredBy: referral?.referredBy ?? "",
       receivingParty: referral?.receivingParty ?? "",
@@ -225,6 +228,32 @@ export function ReferralForm({
             />
           </div>
         )}
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("alliance")}</Label>
+          <Controller
+            control={control}
+            name="allianceId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(v) => field.onChange(!v || v === "none" ? "" : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t("noAlliance")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noAlliance")}</SelectItem>
+                  {alliances.map((alliance) => (
+                    <SelectItem key={alliance.id} value={alliance.id}>
+                      {alliance.organizationName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="originatingBusiness">

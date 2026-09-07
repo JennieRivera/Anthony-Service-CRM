@@ -33,6 +33,7 @@ export const referralFormSchema = z.object({
   caseId: z.string().optional().or(z.literal("")),
   referralDate: z.string().min(1, "Referral date is required"),
   category: z.enum(referralCategoryValues),
+  allianceId: optionalString,
   originatingBusiness: optionalString,
   referredBy: z.string().trim().min(1, "Referred by is required"),
   receivingParty: z.string().trim().min(1, "Receiving party is required"),

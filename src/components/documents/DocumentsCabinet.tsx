@@ -32,12 +32,16 @@ import {
   type Drawer,
 } from "@/lib/validation/documentDrawer";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
+import { AllianceDocumentUploader } from "@/components/alliances/AllianceDocumentUploader";
 import type { listAllDocuments, listReferralsForFolders } from "@/lib/queries/documents";
+import type { listAlliances, listAllianceDocuments } from "@/lib/queries/alliances";
 import type { serviceTypeValues } from "@/lib/validation/client";
 
 type ServiceType = (typeof serviceTypeValues)[number];
 type DocumentRow = Awaited<ReturnType<typeof listAllDocuments>>[number];
 type ReferralFolder = Awaited<ReturnType<typeof listReferralsForFolders>>[number];
+type AllianceRow = Awaited<ReturnType<typeof listAlliances>>[number];
+type AllianceDocRow = Awaited<ReturnType<typeof listAllianceDocuments>>[number];
 type ClientOption = { id: string; fullName: string; folderNumber: string | null };
 type CaseOption = { id: string; title: string; clientId: string; serviceType: ServiceType };
 
@@ -74,6 +78,8 @@ type View =
   | { level: "client-docs"; drawer: Drawer; clientId: string }
   | { level: "referrals" }
   | { level: "referral-docs"; referralId: string }
+  | { level: "alliances" }
+  | { level: "alliance-docs"; allianceId: string }
   | { level: "otros" };
 
 export function DocumentsCabinet({
@@ -81,12 +87,16 @@ export function DocumentsCabinet({
   clients,
   cases,
   referrals,
+  alliances,
+  allianceDocuments,
   blobConfigured,
 }: {
   documents: DocumentRow[];
   clients: ClientOption[];
   cases: CaseOption[];
   referrals: ReferralFolder[];
+  alliances: AllianceRow[];
+  allianceDocuments: AllianceDocRow[];
   blobConfigured: boolean;
 }) {
   const t = useTranslations("Documents");
@@ -100,8 +110,9 @@ export function DocumentsCabinet({
       if (drawer) map.set(drawer, (map.get(drawer) ?? 0) + 1);
     }
     map.set("clientes", documents.length);
+    map.set("referidos", (map.get("referidos") ?? 0) + allianceDocuments.length);
     return map;
-  }, [documents]);
+  }, [documents, allianceDocuments]);
 
   if (view.level === "drawers") {
     return (
@@ -246,6 +257,14 @@ export function DocumentsCabinet({
             { label: tDrawer("referidos") },
           ]}
         />
+        <div className="flex gap-2">
+          <Button variant="default" size="sm" disabled>
+            {t("byReferredClient")}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setView({ level: "alliances" })}>
+            {t("byAlliance")}
+          </Button>
+        </div>
         {referrals.length === 0 ? (
           <p className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
             {t("noReferrals")}
@@ -275,6 +294,143 @@ export function DocumentsCabinet({
             })}
           </div>
         )}
+      </div>
+    );
+  }
+
+  if (view.level === "alliances") {
+    return (
+      <div className="flex flex-col gap-4">
+        <Breadcrumb
+          items={[
+            { label: t("backToDrawers"), onClick: () => setView({ level: "drawers" }) },
+            { label: tDrawer("referidos"), onClick: () => setView({ level: "referrals" }) },
+          ]}
+        />
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setView({ level: "referrals" })}>
+            {t("byReferredClient")}
+          </Button>
+          <Button variant="default" size="sm" disabled>
+            {t("byAlliance")}
+          </Button>
+        </div>
+        {alliances.length === 0 ? (
+          <p className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
+            {t("noAlliancesLinked")}
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {alliances.map((alliance) => {
+              const count =
+                referrals.filter((r) => r.allianceId === alliance.id).length +
+                allianceDocuments.filter((d) => d.allianceId === alliance.id).length;
+              return (
+                <button
+                  key={alliance.id}
+                  type="button"
+                  onClick={() => setView({ level: "alliance-docs", allianceId: alliance.id })}
+                  className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-4 text-left hover:border-foreground/30"
+                >
+                  <span className="flex items-center gap-2 min-w-0">
+                    <Folder className="h-4 w-4 shrink-0" style={{ color: drawerColor("referidos") }} />
+                    <span className="truncate text-sm font-medium text-foreground">
+                      {alliance.organizationName}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {t("clientFolderCount", { count })}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (view.level === "alliance-docs") {
+    const alliance = alliances.find((a) => a.id === view.allianceId);
+    const linkedReferrals = referrals.filter((r) => r.allianceId === view.allianceId);
+    const allianceDocs = allianceDocuments.filter((d) => d.allianceId === view.allianceId);
+    const contractSigned = alliance?.referralAgreement || alliance?.commissionAgreement;
+
+    return (
+      <div className="flex flex-col gap-4">
+        <Breadcrumb
+          items={[
+            { label: t("backToDrawers"), onClick: () => setView({ level: "drawers" }) },
+            { label: tDrawer("referidos"), onClick: () => setView({ level: "referrals" }) },
+            { label: t("byAlliance"), onClick: () => setView({ level: "alliances" }) },
+            { label: alliance?.organizationName ?? "" },
+          ]}
+        />
+
+        {alliance && (
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-muted-foreground">{t("contractStatusLabel")}:</span>
+            <span
+              className={
+                contractSigned
+                  ? "rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800"
+                  : "rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800"
+              }
+            >
+              {contractSigned ? t("signed") : t("pendingSignature")}
+            </span>
+          </div>
+        )}
+
+        {blobConfigured && alliance && <AllianceDocumentUploader allianceId={alliance.id} />}
+
+        {allianceDocs.length === 0 ? (
+          <p className="text-muted-foreground">{t("empty")}</p>
+        ) : (
+          <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">
+            {allianceDocs.map((doc) => (
+              <li key={doc.id} className="flex items-center justify-between gap-3 p-4">
+                <span className="flex min-w-0 items-center gap-2 font-medium text-foreground">
+                  <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span className="truncate">{doc.fileName}</span>
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  render={
+                    <a
+                      href={`/api/alliance-documents/${doc.id}/file?download=1`}
+                      title={t("download")}
+                    />
+                  }
+                >
+                  <Download className="h-3.5 w-3.5" />
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="flex flex-col gap-2">
+          <h4 className="text-sm font-medium text-foreground">{t("linkedReferralsLabel")}</h4>
+          {linkedReferrals.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("noLinkedReferralsInline")}</p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">
+              {linkedReferrals.map((referral) => (
+                <li key={referral.id} className="p-3">
+                  <button
+                    type="button"
+                    onClick={() => setView({ level: "referral-docs", referralId: referral.id })}
+                    className="text-sm font-medium text-foreground hover:underline"
+                  >
+                    R-{String(referral.referralSeq).padStart(3, "0")} — {referral.clientName}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     );
   }

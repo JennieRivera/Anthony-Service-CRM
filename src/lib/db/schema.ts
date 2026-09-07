@@ -1899,6 +1899,12 @@ export const referrals = pgTable("referrals", {
     .notNull()
     .references(() => clients.id, { onDelete: "restrict" }),
   caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  // Optional link to the Strategic Alliances record this referral actually
+  // came from — `originatingBusiness` stays free text for referrals with no
+  // formal alliance on file.
+  allianceId: uuid("alliance_id").references(() => strategicAlliances.id, {
+    onDelete: "set null",
+  }),
   originatingBusiness: text("originating_business"),
   referredBy: text("referred_by").notNull(),
   receivingParty: text("receiving_party").notNull(),
@@ -2059,6 +2065,22 @@ export const strategicAlliances = pgTable("strategic_alliances", {
   nextFollowUp: date("next_follow_up"),
   status: allianceStatusEnum("status").notNull().default("prospect"),
   notes: text("notes"),
+});
+
+// Phase 1 follow-up — files tied to the partnership itself (the signed
+// referral/commission agreement, etc.), not to any one client. Kept
+// separate from `documents` because that table requires a clientId, which
+// an alliance-level contract doesn't have.
+export const allianceDocuments = pgTable("alliance_documents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  allianceId: uuid("alliance_id")
+    .notNull()
+    .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+  fileName: text("file_name").notNull(),
+  blobUrl: text("blob_url").notNull(),
 });
 
 export const allianceStatusHistory = pgTable("alliance_status_history", {

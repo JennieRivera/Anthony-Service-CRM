@@ -1120,7 +1120,15 @@
     "editFolderNumber": "Número de carpeta",
     "editFolderNumberPlaceholder": "ej. 001",
     "noClientsInDrawer": "Aún no hay clientes con un caso en este servicio.",
-    "noReferrals": "Aún no hay referidos."
+    "noReferrals": "Aún no hay referidos.",
+    "byReferredClient": "Por cliente referido",
+    "byAlliance": "Por alianza/socio",
+    "noAlliancesLinked": "Aún no hay alianzas.",
+    "contractStatusLabel": "Contrato",
+    "signed": "Firmado",
+    "pendingSignature": "Pendiente de firma",
+    "linkedReferralsLabel": "Referidos de esta alianza",
+    "noLinkedReferralsInline": "Aún no hay referidos vinculados."
   },
   "DocumentDrawer": {
     "notaria": "Notaría",
@@ -1313,6 +1321,8 @@
       "noCase": "Ninguno",
       "referralDate": "Fecha del Referido",
       "category": "Categoría",
+      "alliance": "Alianza / Socio",
+      "noAlliance": "Sin alianza registrada",
       "originatingBusiness": "Negocio/Parte de Origen del Cliente",
       "referredBy": "Referido Por",
       "receivingParty": "Parte Receptora",
@@ -1640,6 +1650,24 @@
       "save": "Guardar Alianza",
       "saving": "Guardando...",
       "cancel": "Cancelar"
+    },
+    "contractStatus": "Estado del Contrato",
+    "signed": "Firmado",
+    "pending": "Pendiente de firma",
+    "linkedReferrals": "Referidos de esta alianza",
+    "noLinkedReferrals": "Aún no hay referidos vinculados a esta alianza.",
+    "commission": "Comisión",
+    "documentsTitle": "Documentos y Contratos",
+    "documents": {
+      "upload": "Subir",
+      "uploading": "Subiendo...",
+      "empty": "Aún no hay documentos.",
+      "download": "Descargar",
+      "uploadError": "Error al subir. Inténtalo de nuevo.",
+      "uploadErrorUnsupportedType": "Ese tipo de archivo no es compatible. Sube un PDF, imagen, Word o Excel.",
+      "uploadErrorSensitiveSsn": "Este archivo parece contener un SSN o ITIN completo y no se puede subir.",
+      "uploadErrorSensitiveCard": "Este archivo parece contener un número de tarjeta completo y no se puede subir.",
+      "uploadErrorSensitivePassword": "Este archivo parece contener una contraseña y no se puede subir."
     }
   },
   "ProjectType": {

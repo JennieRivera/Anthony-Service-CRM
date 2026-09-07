@@ -101,6 +101,7 @@ function normalize(values: ReferralFormValues, effectiveStatus: string) {
     caseId: values.caseId || null,
     referralDate: values.referralDate,
     category: values.category,
+    allianceId: values.allianceId || null,
     originatingBusiness: values.originatingBusiness || null,
     referredBy: values.referredBy,
     receivingParty: values.receivingParty,

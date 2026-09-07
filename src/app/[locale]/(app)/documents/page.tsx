@@ -3,6 +3,7 @@ import { isDatabaseConfigured } from "@/lib/db/config";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { listAllDocuments, listReferralsForFolders } from "@/lib/queries/documents";
 import { listCasesWithClient, listClientsForSelect } from "@/lib/queries/cases";
+import { listAlliances, listAllianceDocuments } from "@/lib/queries/alliances";
 import { DocumentsCabinet } from "@/components/documents/DocumentsCabinet";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
@@ -15,15 +16,19 @@ export default async function DocumentsPage() {
   let clients: Awaited<ReturnType<typeof listClientsForSelect>> = [];
   let cases: Awaited<ReturnType<typeof listCasesWithClient>> = [];
   let referrals: Awaited<ReturnType<typeof listReferralsForFolders>> = [];
+  let alliances: Awaited<ReturnType<typeof listAlliances>> = [];
+  let allianceDocuments: Awaited<ReturnType<typeof listAllianceDocuments>> = [];
   let error: string | null = null;
 
   if (configured) {
     try {
-      [documents, clients, cases, referrals] = await Promise.all([
+      [documents, clients, cases, referrals, alliances, allianceDocuments] = await Promise.all([
         listAllDocuments(),
         listClientsForSelect(),
         listCasesWithClient(),
         listReferralsForFolders(),
+        listAlliances(),
+        listAllianceDocuments(),
       ]);
     } catch (err) {
       error = err instanceof Error ? err.message : "Unknown error";
@@ -59,6 +64,8 @@ export default async function DocumentsPage() {
             serviceType: c.serviceType,
           }))}
           referrals={referrals}
+          alliances={alliances}
+          allianceDocuments={allianceDocuments}
           blobConfigured={blobConfigured}
         />
       )}

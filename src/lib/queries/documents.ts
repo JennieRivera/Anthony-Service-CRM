@@ -64,6 +64,7 @@ export async function listReferralsForFolders() {
       originatingBusiness: referrals.originatingBusiness,
       category: referrals.category,
       status: referrals.status,
+      allianceId: referrals.allianceId,
     })
     .from(referrals)
     .innerJoin(clients, eq(referrals.clientId, clients.id))

@@ -1120,7 +1120,15 @@
     "editFolderNumber": "Folder number",
     "editFolderNumberPlaceholder": "e.g. 001",
     "noClientsInDrawer": "No clients have a case in this service yet.",
-    "noReferrals": "No referrals yet."
+    "noReferrals": "No referrals yet.",
+    "byReferredClient": "By referred client",
+    "byAlliance": "By alliance/partner",
+    "noAlliancesLinked": "No alliances yet.",
+    "contractStatusLabel": "Contract",
+    "signed": "Signed",
+    "pendingSignature": "Pending signature",
+    "linkedReferralsLabel": "Referrals from this alliance",
+    "noLinkedReferralsInline": "No referrals linked yet."
   },
   "DocumentDrawer": {
     "notaria": "Notary",
@@ -1313,6 +1321,8 @@
       "noCase": "None",
       "referralDate": "Referral Date",
       "category": "Category",
+      "alliance": "Alliance / Partner",
+      "noAlliance": "No alliance on file",
       "originatingBusiness": "Client's Originating Business/Party",
       "referredBy": "Referred By",
       "receivingParty": "Receiving Party",
@@ -1640,6 +1650,24 @@
       "save": "Save Alliance",
       "saving": "Saving...",
       "cancel": "Cancel"
+    },
+    "contractStatus": "Contract Status",
+    "signed": "Signed",
+    "pending": "Pending signature",
+    "linkedReferrals": "Referrals from this alliance",
+    "noLinkedReferrals": "No referrals linked to this alliance yet.",
+    "commission": "Commission",
+    "documentsTitle": "Documents & Contracts",
+    "documents": {
+      "upload": "Upload",
+      "uploading": "Uploading...",
+      "empty": "No documents yet.",
+      "download": "Download",
+      "uploadError": "Upload failed. Please try again.",
+      "uploadErrorUnsupportedType": "That file type isn't supported. Please upload a PDF, image, Word, or Excel file.",
+      "uploadErrorSensitiveSsn": "This file appears to contain a full SSN or ITIN and can't be uploaded.",
+      "uploadErrorSensitiveCard": "This file appears to contain a full card number and can't be uploaded.",
+      "uploadErrorSensitivePassword": "This file appears to contain a password and can't be uploaded."
     }
   },
   "ProjectType": {

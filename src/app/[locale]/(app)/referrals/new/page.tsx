@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { ReferralForm } from "@/components/referrals/ReferralForm";
 import { listClientsForSelect } from "@/lib/queries/cases";
 import { listCasesForSelect } from "@/lib/queries/referrals";
+import { listAlliancesForSelect } from "@/lib/queries/alliances";
 import { createReferralAction } from "../actions";
 
 export default async function NewReferralPage({
@@ -12,9 +13,10 @@ export default async function NewReferralPage({
 }) {
   const t = await getTranslations("Referrals");
   const { clientId } = await searchParams;
-  const [clients, cases] = await Promise.all([
+  const [clients, cases, alliances] = await Promise.all([
     listClientsForSelect(),
     listCasesForSelect(),
+    listAlliancesForSelect(),
   ]);
 
   return (
@@ -34,6 +36,7 @@ export default async function NewReferralPage({
       <ReferralForm
         clients={clients}
         cases={cases}
+        alliances={alliances}
         defaultClientId={clientId}
         onSubmit={createReferralAction}
       />

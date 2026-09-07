@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { ReferralForm } from "@/components/referrals/ReferralForm";
 import { listClientsForSelect } from "@/lib/queries/cases";
 import { listCasesForSelect, getReferralById } from "@/lib/queries/referrals";
+import { listAlliancesForSelect } from "@/lib/queries/alliances";
 import { updateReferralAction } from "../../actions";
 import type { ReferralFormValues } from "@/lib/validation/referral";
 
@@ -18,9 +19,10 @@ export default async function EditReferralPage({
   const result = await getReferralById(id);
   if (!result) notFound();
 
-  const [clients, cases] = await Promise.all([
+  const [clients, cases, alliances] = await Promise.all([
     listClientsForSelect(),
     listCasesForSelect(),
+    listAlliancesForSelect(),
   ]);
 
   async function submit(values: ReferralFormValues) {
@@ -47,6 +49,7 @@ export default async function EditReferralPage({
         rriDetails={result.rriDetails}
         clients={clients}
         cases={cases}
+        alliances={alliances}
         onSubmit={submit}
       />
     </div>
