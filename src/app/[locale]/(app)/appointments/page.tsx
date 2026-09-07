@@ -2,21 +2,29 @@ import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { listAppointmentsWithClient } from "@/lib/queries/appointments";
+import { listServiceColorSettings, getServiceColorMap } from "@/lib/queries/serviceColors";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 import { AppointmentCalendar } from "@/components/appointments/AppointmentCalendar";
+import { ServiceColorLegend } from "@/components/appointments/ServiceColorLegend";
 
 export default async function AppointmentsPage() {
   const t = await getTranslations("Appointments");
   const configured = isDatabaseConfigured();
 
   let appointments: Awaited<ReturnType<typeof listAppointmentsWithClient>> = [];
+  let colorSettings: Awaited<ReturnType<typeof listServiceColorSettings>> = [];
+  let colorMap: Record<string, string> = {};
   let error: string | null = null;
 
   if (configured) {
     try {
-      appointments = await listAppointmentsWithClient();
+      [appointments, colorSettings, colorMap] = await Promise.all([
+        listAppointmentsWithClient(),
+        listServiceColorSettings(),
+        getServiceColorMap(),
+      ]);
     } catch (err) {
       error = err instanceof Error ? err.message : "Unknown error";
     }
@@ -43,7 +51,10 @@ export default async function AppointmentsPage() {
       )}
 
       {configured && !error && (
-        <AppointmentCalendar appointments={appointments} />
+        <>
+          <ServiceColorLegend colors={colorSettings} />
+          <AppointmentCalendar appointments={appointments} colors={colorMap} />
+        </>
       )}
     </div>
   );

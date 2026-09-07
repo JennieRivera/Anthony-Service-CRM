@@ -105,7 +105,10 @@
     "professionalSystemsCard": "Sistemas Profesionales y Sitios Web",
     "professionalSystemsCardDescription": "Administra las tarjetas de acceso rápido que se muestran en el Panel para tu software profesional y tus sitios web.",
     "manageProfessionalSystems": "Administrar Sistemas Profesionales",
-    "manageWebsites": "Administrar Sitios Web"
+    "manageWebsites": "Administrar Sitios Web",
+    "serviceColorsCard": "Colores de Servicio del Calendario",
+    "serviceColorsCardDescription": "Define el color que usa cada servicio en el calendario de citas — los cambios se aplican de inmediato en todas partes, nada está fijo en el código.",
+    "manageServiceColors": "Administrar Colores de Servicio"
   },
   "Nav": {
     "dashboard": "Panel",
@@ -1279,6 +1282,22 @@
     "virtual": "Virtual",
     "mobile_service": "Servicio Móvil",
     "ron": "RON",
+    "other": "Otro"
+  },
+  "ServiceColors": {
+    "title": "Colores de Servicio del Calendario",
+    "description": "Cada cita usa el color asignado a su servicio. Edita cualquier color abajo — los cambios se aplican al calendario de inmediato.",
+    "backToSettings": "Volver a Configuración",
+    "colorName": "Nombre del Color",
+    "colorHex": "Valor Hexadecimal",
+    "edit": "Editar",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar"
+  },
+  "ServiceColorKey": {
+    "commercial_finance_referral": "Financiamiento Comercial / Referidos RRI",
+    "community_strategic_alliances": "Comunidad / Alianzas Estratégicas",
     "other": "Otro"
   },
   "InvoiceStatus": {

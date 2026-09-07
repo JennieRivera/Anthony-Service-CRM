@@ -105,7 +105,10 @@
     "professionalSystemsCard": "Professional Systems & Websites",
     "professionalSystemsCardDescription": "Manage the quick-launch cards shown on the Dashboard for your professional software and your websites.",
     "manageProfessionalSystems": "Manage Professional Systems",
-    "manageWebsites": "Manage Websites"
+    "manageWebsites": "Manage Websites",
+    "serviceColorsCard": "Calendar Service Colors",
+    "serviceColorsCardDescription": "Set the color each service uses on the appointment calendar — changes apply everywhere immediately, nothing is hardcoded.",
+    "manageServiceColors": "Manage Service Colors"
   },
   "Nav": {
     "dashboard": "Dashboard",
@@ -1279,6 +1282,22 @@
     "virtual": "Virtual",
     "mobile_service": "Mobile Service",
     "ron": "RON",
+    "other": "Other"
+  },
+  "ServiceColors": {
+    "title": "Calendar Service Colors",
+    "description": "Every appointment uses the color assigned to its service. Edit any color below — changes apply to the calendar immediately.",
+    "backToSettings": "Back to Settings",
+    "colorName": "Color Name",
+    "colorHex": "Hex Value",
+    "edit": "Edit",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel"
+  },
+  "ServiceColorKey": {
+    "commercial_finance_referral": "Commercial Finance / RRI Referrals",
+    "community_strategic_alliances": "Community / Strategic Alliances",
     "other": "Other"
   },
   "InvoiceStatus": {

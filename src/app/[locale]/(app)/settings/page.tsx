@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Plug, ShieldCheck, LayoutGrid, Globe } from "lucide-react";
+import { Plug, ShieldCheck, LayoutGrid, Globe, Palette } from "lucide-react";
 
 export default async function SettingsPage() {
   const t = await getTranslations("Settings");
@@ -91,6 +91,26 @@ export default async function SettingsPage() {
           <p className="text-sm text-muted-foreground">
             {t("staffAccountsComingSoon")}
           </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("serviceColorsCard")}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <p className="text-sm text-muted-foreground">
+            {t("serviceColorsCardDescription")}
+          </p>
+          <div>
+            <Button
+              variant="outline"
+              render={<Link href="/settings/service-colors" />}
+            >
+              <Palette className="h-4 w-4" />
+              {t("manageServiceColors")}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
