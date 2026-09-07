@@ -1,11 +1,19 @@
 import { z } from "zod";
 import { serviceTypeValues } from "./client";
 
+// Calendar enhancement, Session 1 — the 4 original values are kept as-is,
+// with the 5 new statuses from CALENDAR-PLAN.md section 7 appended,
+// matching the appointment_status enum in schema.ts exactly.
 export const appointmentStatusValues = [
   "scheduled",
   "completed",
   "cancelled",
   "no_show",
+  "requested",
+  "confirmed",
+  "checked_in",
+  "in_progress",
+  "rescheduled",
 ] as const;
 
 export const appointmentFormSchema = z

@@ -1220,7 +1220,12 @@
     "scheduled": "Programada",
     "completed": "Completada",
     "cancelled": "Cancelada",
-    "no_show": "No Asistió"
+    "no_show": "No Asistió",
+    "requested": "Solicitada",
+    "confirmed": "Confirmada",
+    "checked_in": "Registrado/Llegó",
+    "in_progress": "En Proceso",
+    "rescheduled": "Reprogramada"
   },
   "Appointments": {
     "title": "Citas",

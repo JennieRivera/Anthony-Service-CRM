@@ -10,6 +10,7 @@ import {
   time,
   boolean,
   pgEnum,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
 export const serviceTypeEnum = pgEnum("service_type", [
@@ -64,11 +65,30 @@ export const caseStatusEnum = pgEnum("case_status", [
   "cancelled",
 ]);
 
+// Calendar enhancement, Session 1 — the 4 original values are kept as-is
+// (Postgres enums only support adding values, never renaming/removing —
+// see AGENTS.md), with the 5 new statuses from the plan appended.
 export const appointmentStatusEnum = pgEnum("appointment_status", [
   "scheduled",
   "completed",
   "cancelled",
   "no_show",
+  "requested",
+  "confirmed",
+  "checked_in",
+  "in_progress",
+  "rescheduled",
+]);
+
+export const appointmentTypeEnum = pgEnum("appointment_type", [
+  "in_person",
+  "phone",
+  "zoom",
+  "google_meet",
+  "virtual",
+  "mobile_service",
+  "ron",
+  "other",
 ]);
 
 export const invoiceStatusEnum = pgEnum("invoice_status", [
@@ -1014,6 +1034,9 @@ export const appointments = pgTable("appointments", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   clientId: uuid("client_id")
     .notNull()
     .references(() => clients.id, { onDelete: "cascade" }),
@@ -1023,8 +1046,56 @@ export const appointments = pgTable("appointments", {
   startAt: timestamp("start_at", { withTimezone: true }).notNull(),
   endAt: timestamp("end_at", { withTimezone: true }).notNull(),
   location: text("location"),
+  appointmentType: appointmentTypeEnum("appointment_type")
+    .notNull()
+    .default("in_person"),
   status: appointmentStatusEnum("status").notNull().default("scheduled"),
   notes: text("notes"),
+  // Reserved for the future staff/role system — same unpopulated-until-
+  // multi-user-login pattern as cases.assignedUserId (section 13 of
+  // CALENDAR-PLAN.md is explicitly deferred until that exists).
+  assignedUserId: uuid("assigned_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  referralSource: text("referral_source"),
+  documentsNeeded: text("documents_needed"),
+  paymentRequired: boolean("payment_required").notNull().default(false),
+  paymentStatus: paymentStatusEnum("payment_status"),
+  // Snapshot of the acting session's email, same reasoning as
+  // caseStatusHistory.changedByEmail — there's no populated users table yet.
+  createdByEmail: text("created_by_email"),
+  // Set on the NEW appointment created by a reschedule, pointing back at the
+  // original (which gets status "rescheduled" and is never deleted — see
+  // CALENDAR-PLAN.md section 8). Self-referencing FK — the callback's
+  // return type must be annotated AnyPgColumn to avoid a circular type
+  // error; every other column keeps its normal inferred type.
+  rescheduledFromId: uuid("rescheduled_from_id").references(
+    (): AnyPgColumn => appointments.id,
+    { onDelete: "set null" },
+  ),
+});
+
+// Calendar enhancement, Session 1 (section 4) — one centralized, admin-
+// editable color per service, instead of hardcoding colors in the calendar
+// component. Keyed by a plain string rather than a hard FK to
+// serviceTypeEnum: this covers all 14 real case/appointment service types
+// plus 2 categories from CALENDAR-PLAN.md that aren't a serviceType at all
+// today — commercial_finance_referral (a referrals.category, not a case
+// type) and community_strategic_alliances (its own standalone table, see
+// strategicAlliances below) — so Admin can configure their color ahead of
+// whichever future session wires an appointment to a referral/alliance.
+// "other" is the explicit fallback for anything not covered.
+export const serviceColorSettings = pgTable("service_color_settings", {
+  key: text("key").primaryKey(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  colorName: text("color_name").notNull(),
+  colorHex: text("color_hex").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
 });
 
 export const invoices = pgTable("invoices", {
@@ -2560,3 +2631,4 @@ export type AiAgentKnowledgeBaseEntry =
   typeof aiAgentKnowledgeBase.$inferSelect;
 export type AiEscalation = typeof aiEscalations.$inferSelect;
 export type AiActivityLogEntry = typeof aiActivityLog.$inferSelect;
+export type ServiceColorSetting = typeof serviceColorSettings.$inferSelect;

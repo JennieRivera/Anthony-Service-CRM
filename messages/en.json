@@ -1220,7 +1220,12 @@
     "scheduled": "Scheduled",
     "completed": "Completed",
     "cancelled": "Cancelled",
-    "no_show": "No Show"
+    "no_show": "No Show",
+    "requested": "Requested",
+    "confirmed": "Confirmed",
+    "checked_in": "Checked In",
+    "in_progress": "In Progress",
+    "rescheduled": "Rescheduled"
   },
   "Appointments": {
     "title": "Appointments",

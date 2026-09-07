@@ -232,6 +232,13 @@
       "when": 1788794902363,
       "tag": "0032_complex_the_hand",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1788814139903,
+      "tag": "0033_cheerful_killmonger",
+      "breakpoints": true
     }
   ]
 }
