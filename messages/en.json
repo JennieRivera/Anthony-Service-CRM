@@ -2087,6 +2087,15 @@
     "language": "Language",
     "status": "Status",
     "comingSoonMessage": "This agent's card is reserved — it isn't active yet.",
+    "dashboardTitle": "AI Dashboard",
+    "onlineAgents": "Online Agents",
+    "tasksCreatedByAi": "Tasks Created by AI",
+    "clientsServedToday": "Clients Served Today",
+    "referralsHandled": "Referrals Handled",
+    "pendingDocuments": "Pending Documents",
+    "taxBookkeepingAlerts": "Tax/Bookkeeping Alerts",
+    "immigrationEscalations": "Immigration Escalations",
+    "pendingHumanReviews": "Pending Human Reviews",
     "recentActivity": "Recent Activity",
     "recentActivityEmpty": "No automated activity logged yet.",
     "editHint": "Changes here take effect immediately for this agent's card and profile.",
@@ -2171,6 +2180,11 @@
     "send_message": "Sent Message",
     "escalate": "Escalated",
     "other": "Other"
+  },
+  "AiApprovalLevel": {
+    "level_1_automatic": "Level 1 — Automatic",
+    "level_2_human_review": "Level 2 — Human Review Required",
+    "level_3_human_only": "Level 3 — Human Only"
   },
   "AiEscalationRiskLevel": {
     "low": "Low",

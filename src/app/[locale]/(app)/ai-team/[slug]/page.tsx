@@ -19,6 +19,7 @@ export default async function AiAgentDetailPage({
   const tLanguage = await getTranslations("AiAgentLanguage");
   const tSection = await getTranslations("AiKnowledgeBaseSection");
   const tAction = await getTranslations("AiActivityAction");
+  const tApprovalLevel = await getTranslations("AiApprovalLevel");
 
   const result = await getAiAgentBySlug(slug);
   if (!result) notFound();
@@ -164,6 +165,15 @@ export default async function AiAgentDetailPage({
                     className="flex flex-wrap items-center gap-2 border-t border-border pt-2 text-sm first:border-t-0 first:pt-0"
                   >
                     <Badge variant="outline">{tAction(entry.action)}</Badge>
+                    <Badge
+                      variant={
+                        entry.approvalLevel === "level_1_automatic"
+                          ? "secondary"
+                          : "destructive"
+                      }
+                    >
+                      {tApprovalLevel(entry.approvalLevel)}
+                    </Badge>
                     <span className="text-foreground">{entry.actionDetail}</span>
                     {entry.clientName && (
                       <span className="text-muted-foreground">

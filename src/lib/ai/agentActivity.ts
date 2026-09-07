@@ -9,6 +9,23 @@ import {
 
 type Department = (typeof aiAgentDepartmentEnum.enumValues)[number];
 type ActivityAction = (typeof aiActivityActionEnum.enumValues)[number];
+type ApprovalLevel = "level_1_automatic" | "level_2_human_review" | "level_3_human_only";
+
+// Section 11's 3-tier policy, keyed by action type — a fixed rule, not a
+// per-agent or admin-editable setting. Level 1 covers "crear tarea, crear
+// nota, crear recordatorio, clasificar servicio, redactar mensaje (borrador,
+// no enviado)" — every action type this codebase's automation actually
+// performs today. Actually sending a message to a client is Level 2 for
+// this business (every service line here — taxes, immigration, credit,
+// commercial finance — is on section 11's Level 2 topic list), so
+// send_message never resolves to Level 1, even though no caller uses it
+// yet; nothing here can reach Level 3, since no action type represents a
+// legal/financial/government decision — those stay entirely human by the
+// absence of any code path, not by a check in this function.
+export function getApprovalLevelForAction(action: ActivityAction): ApprovalLevel {
+  if (action === "send_message") return "level_2_human_review";
+  return "level_1_automatic";
+}
 
 // Phase 6, Session 4 — the only case service types with a launched agent
 // today (see PHASE6-PLAN.md sections 2-6). A service type with no entry
@@ -61,6 +78,9 @@ export async function logAiActivity(params: {
   previousValue?: string | null;
   newValue?: string | null;
 }) {
+  const approvalLevel = getApprovalLevelForAction(params.action);
+  const requiresHumanApproval = approvalLevel !== "level_1_automatic";
+
   await getDb()
     .insert(aiActivityLog)
     .values({
@@ -71,8 +91,8 @@ export async function logAiActivity(params: {
       actionDetail: params.actionDetail ?? null,
       previousValue: params.previousValue ?? null,
       newValue: params.newValue ?? null,
-      approvalLevel: "level_1_automatic",
-      requiresHumanApproval: false,
-      outcome: "success",
+      approvalLevel,
+      requiresHumanApproval,
+      outcome: requiresHumanApproval ? "pending_approval" : "success",
     });
 }

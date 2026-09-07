@@ -2087,6 +2087,15 @@
     "language": "Idioma",
     "status": "Estado",
     "comingSoonMessage": "La tarjeta de este agente está reservada — todavía no está activo.",
+    "dashboardTitle": "Dashboard de IA",
+    "onlineAgents": "Agentes en Línea",
+    "tasksCreatedByAi": "Tareas Creadas por IA",
+    "clientsServedToday": "Clientes Atendidos Hoy",
+    "referralsHandled": "Referidos Atendidos",
+    "pendingDocuments": "Documentos Pendientes",
+    "taxBookkeepingAlerts": "Alertas de Taxes/Bookkeeping",
+    "immigrationEscalations": "Escalaciones de Inmigración",
+    "pendingHumanReviews": "Revisiones Humanas Pendientes",
     "recentActivity": "Actividad Reciente",
     "recentActivityEmpty": "Aún no hay actividad automatizada registrada.",
     "editHint": "Los cambios aquí se aplican de inmediato a la tarjeta y al perfil de este agente.",
@@ -2171,6 +2180,11 @@
     "send_message": "Mensaje Enviado",
     "escalate": "Escalado",
     "other": "Otro"
+  },
+  "AiApprovalLevel": {
+    "level_1_automatic": "Nivel 1 — Automático",
+    "level_2_human_review": "Nivel 2 — Requiere Revisión Humana",
+    "level_3_human_only": "Nivel 3 — Solo Humano"
   },
   "AiEscalationRiskLevel": {
     "low": "Bajo",
