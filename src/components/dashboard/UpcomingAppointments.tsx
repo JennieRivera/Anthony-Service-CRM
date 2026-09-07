@@ -24,7 +24,7 @@ export async function UpcomingAppointments({
         {appointments.map((appt) => (
           <Link
             key={appt.id}
-            href={`/appointments/${appt.id}/edit`}
+            href={`/appointments/${appt.id}`}
             className="flex items-start gap-3 rounded-md border border-border p-3 transition-colors hover:bg-muted"
           >
             <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />

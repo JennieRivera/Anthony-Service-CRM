@@ -1541,7 +1541,10 @@
     "payment_check": "Payment Check",
     "document_reminder": "Document Reminder",
     "closing": "Closing",
-    "inactivity_alert": "Inactivity Alert"
+    "inactivity_alert": "Inactivity Alert",
+    "renewal_reminder": "Renewal Reminder",
+    "appointment_confirmation": "Appointment Confirmation",
+    "appointment_reminder": "Appointment Reminder"
   },
   "Tasks": {
     "title": "Tasks",

@@ -909,6 +909,11 @@ export const taskTypeEnum = pgEnum("task_type", [
   // Compliance case's expirationDate falls inside its renewalReminderDays
   // window.
   "renewal_reminder",
+  // Calendar enhancement, Session 5 (section 8) — "Creada -> crear tarea de
+  // confirmación si aplica" and "24h antes / 2h antes -> preparar
+  // recordatorio". Both dedupe per appointment via tasks.appointmentId.
+  "appointment_confirmation",
+  "appointment_reminder",
 ]);
 
 export const taskStatusEnum = pgEnum("task_status", [
@@ -934,6 +939,14 @@ export const tasks = pgTable("tasks", {
     onDelete: "set null",
   }),
   completedAt: timestamp("completed_at", { withTimezone: true }),
+  // Calendar enhancement, Session 5 — lets appointment_confirmation and
+  // appointment_reminder tasks (and Session 4's "Create Follow-Up" button)
+  // dedupe per appointment rather than per case: a case can have several
+  // appointments, and a caseId-only dedup would wrongly skip a reminder
+  // for appointment #2 just because appointment #1's is still open.
+  appointmentId: uuid("appointment_id").references(() => appointments.id, {
+    onDelete: "set null",
+  }),
 });
 
 // Phase 5, Session 6 — Immigration Client Document Folders (spec section

@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
-import { appointments, clients, tasks } from "@/lib/db/schema";
+import { appointments, clients, tasks, cases } from "@/lib/db/schema";
 import type { Appointment } from "@/lib/db/schema";
 import {
   appointmentFormSchema,
@@ -91,12 +91,27 @@ export async function createAppointmentAction(
   const values = appointmentFormSchema.parse(rawValues);
   const clientId = await resolveClientId(values);
   const session = await auth();
+  const db = getDb();
 
-  await getDb()
+  const [created] = await db
     .insert(appointments)
-    .values(normalize(values, clientId, session?.user?.email ?? null));
+    .values(normalize(values, clientId, session?.user?.email ?? null))
+    .returning({ id: appointments.id });
+
+  // Section 8: "Creada -> ... crear tarea de confirmación si aplica" — only
+  // when it isn't already past the "needs confirming" stage.
+  if (values.status === "requested" || values.status === "scheduled") {
+    await db.insert(tasks).values({
+      clientId,
+      caseId: values.caseId || null,
+      appointmentId: created.id,
+      type: "appointment_confirmation",
+      title: `Confirm: ${values.title}`,
+    });
+  }
 
   revalidatePath("/appointments");
+  revalidatePath("/tasks");
   revalidatePath(`/clients/${clientId}`);
   const locale = await getLocale();
   redirect({ href: "/appointments", locale });
@@ -108,16 +123,91 @@ export async function updateAppointmentAction(
 ) {
   const values = appointmentFormSchema.parse(rawValues);
   const clientId = await resolveClientId(values);
+  const db = getDb();
 
-  await getDb()
+  const [existing] = await db
+    .select({ status: appointments.status })
+    .from(appointments)
+    .where(eq(appointments.id, id))
+    .limit(1);
+
+  await db
     .update(appointments)
     .set(normalize(values, clientId))
     .where(eq(appointments.id, id));
+
+  await runAppointmentStatusWorkflow(id, existing?.status ?? null, values.status);
 
   revalidatePath("/appointments");
   revalidatePath(`/clients/${clientId}`);
   const locale = await getLocale();
   redirect({ href: "/appointments", locale });
+}
+
+// Section 8's "Completada" and "No Show" workflows: a follow-up task
+// (retitled for no-shows), deduped per appointment via tasks.appointmentId
+// so a second appointment on the same case still gets its own. "Cancelada
+// -> preservar el registro, NO eliminar" needs no code — every update here
+// only ever changes status, never deletes.
+async function runAppointmentStatusWorkflow(
+  appointmentId: string,
+  previousStatus: Appointment["status"] | null,
+  newStatus: Appointment["status"],
+) {
+  if (previousStatus === newStatus) return;
+  if (newStatus !== "completed" && newStatus !== "no_show") return;
+
+  const db = getDb();
+  const [appt] = await db
+    .select({
+      title: appointments.title,
+      clientId: appointments.clientId,
+      caseId: appointments.caseId,
+    })
+    .from(appointments)
+    .where(eq(appointments.id, appointmentId))
+    .limit(1);
+  if (!appt) return;
+
+  const taskTitle =
+    newStatus === "no_show"
+      ? `No-show follow-up: ${appt.title}`
+      : `Follow up: ${appt.title}`;
+
+  const [existingTask] = await db
+    .select({ id: tasks.id })
+    .from(tasks)
+    .where(
+      and(
+        eq(tasks.appointmentId, appointmentId),
+        eq(tasks.type, "follow_up"),
+        eq(tasks.status, "open"),
+      ),
+    )
+    .limit(1);
+
+  if (!existingTask) {
+    await db.insert(tasks).values({
+      clientId: appt.clientId,
+      caseId: appt.caseId,
+      appointmentId,
+      type: "follow_up",
+      title: taskTitle,
+    });
+  }
+
+  // "actualizar estado del servicio relacionado si aplica" — refreshes
+  // staleness only; the case's coarse status stays derived from its own
+  // service-specific pipeline field (AGENTS.md), which an appointment has
+  // no way to know the right value for.
+  if (newStatus === "completed" && appt.caseId) {
+    await db
+      .update(cases)
+      .set({ updatedAt: new Date() })
+      .where(eq(cases.id, appt.caseId));
+  }
+
+  revalidatePath("/tasks");
 }
 
 // Section 6's "Mark Completed" / "Cancel" buttons — a plain status
@@ -127,10 +217,19 @@ export async function updateAppointmentStatusAction(
   id: string,
   status: Appointment["status"],
 ) {
-  await getDb()
+  const db = getDb();
+  const [existing] = await db
+    .select({ status: appointments.status })
+    .from(appointments)
+    .where(eq(appointments.id, id))
+    .limit(1);
+
+  await db
     .update(appointments)
     .set({ status, updatedAt: new Date() })
     .where(eq(appointments.id, id));
+
+  await runAppointmentStatusWorkflow(id, existing?.status ?? null, status);
 
   revalidatePath("/appointments");
   revalidatePath(`/appointments/${id}`);
@@ -182,7 +281,9 @@ export async function addAppointmentNoteAction(id: string, note: string) {
 // Section 6's "Create Follow-Up" button — a real row in the same tasks
 // table every other module's automatic follow-ups already use, due the
 // day after the appointment; staff can retitle/reschedule it from Tasks
-// like any other task.
+// like any other task. Dedupes against Session 5's automatic
+// completed/no-show workflow via appointmentId + type, so clicking this
+// and later marking the appointment completed doesn't create two.
 export async function createFollowUpTaskAction(id: string) {
   const db = getDb();
   const [appt] = await db
@@ -197,12 +298,26 @@ export async function createFollowUpTaskAction(id: string) {
     .limit(1);
   if (!appt) return;
 
+  const [existingTask] = await db
+    .select({ id: tasks.id })
+    .from(tasks)
+    .where(
+      and(
+        eq(tasks.appointmentId, id),
+        eq(tasks.type, "follow_up"),
+        eq(tasks.status, "open"),
+      ),
+    )
+    .limit(1);
+  if (existingTask) return;
+
   const dueDate = new Date(appt.startAt);
   dueDate.setDate(dueDate.getDate() + 1);
 
   await db.insert(tasks).values({
     clientId: appt.clientId,
     caseId: appt.caseId,
+    appointmentId: id,
     type: "follow_up",
     title: `Follow up: ${appt.title}`,
     dueDate: dueDate.toISOString().slice(0, 10),

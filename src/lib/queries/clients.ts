@@ -215,7 +215,7 @@ export async function getClientById(id: string) {
       date: a.createdAt,
       type: "appointment" as const,
       label: a.title,
-      href: `/appointments/${a.id}/edit`,
+      href: `/appointments/${a.id}`,
     })),
     ...clientConversations.map((c) => ({
       date: c.createdAt,

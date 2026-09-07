@@ -1541,7 +1541,10 @@
     "payment_check": "Verificación de Pago",
     "document_reminder": "Recordatorio de Documentos",
     "closing": "Cierre",
-    "inactivity_alert": "Alerta de Inactividad"
+    "inactivity_alert": "Alerta de Inactividad",
+    "renewal_reminder": "Recordatorio de Renovación",
+    "appointment_confirmation": "Confirmación de Cita",
+    "appointment_reminder": "Recordatorio de Cita"
   },
   "Tasks": {
     "title": "Tareas",
