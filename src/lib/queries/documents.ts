@@ -1,6 +1,12 @@
 import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
-import { documents, clients, cases, referrals } from "@/lib/db/schema";
+import {
+  documents,
+  clients,
+  cases,
+  referrals,
+  academyEnrollmentDetails,
+} from "@/lib/db/schema";
 
 export async function listDocumentsForClient(clientId: string) {
   return getDb()
@@ -69,4 +75,27 @@ export async function listReferralsForFolders() {
     .from(referrals)
     .innerJoin(clients, eq(referrals.clientId, clients.id))
     .orderBy(referrals.referralSeq);
+}
+
+// Shown inside a student's sub-folder in the "Academia" drawer — one row
+// per academy case (a student can be enrolled in more than one course).
+// cases.dueDate doubles as the course's target/expected end date, the same
+// generic field every other case type already uses for "next deadline".
+export async function listAcademyEnrollmentsForFolders() {
+  return getDb()
+    .select({
+      caseId: cases.id,
+      clientId: cases.clientId,
+      title: cases.title,
+      dueDate: cases.dueDate,
+      program: academyEnrollmentDetails.program,
+      course: academyEnrollmentDetails.course,
+      enrollmentDate: academyEnrollmentDetails.enrollmentDate,
+      certificateDate: academyEnrollmentDetails.certificateDate,
+      progressPercentage: academyEnrollmentDetails.progressPercentage,
+      status: academyEnrollmentDetails.status,
+    })
+    .from(academyEnrollmentDetails)
+    .innerJoin(cases, eq(academyEnrollmentDetails.caseId, cases.id))
+    .orderBy(desc(academyEnrollmentDetails.enrollmentDate));
 }

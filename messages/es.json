@@ -1143,7 +1143,11 @@
     "signed": "Firmado",
     "pendingSignature": "Pendiente de firma",
     "linkedReferralsLabel": "Referidos de esta alianza",
-    "noLinkedReferralsInline": "Aún no hay referidos vinculados."
+    "noLinkedReferralsInline": "Aún no hay referidos vinculados.",
+    "enrolledCourses": "Cursos inscritos",
+    "startDate": "Inicio",
+    "endDate": "Término",
+    "targetDate": "Meta:"
   },
   "DocumentDrawer": {
     "notaria": "Notaría",

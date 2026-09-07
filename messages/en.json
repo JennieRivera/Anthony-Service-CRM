@@ -1143,7 +1143,11 @@
     "signed": "Signed",
     "pendingSignature": "Pending signature",
     "linkedReferralsLabel": "Referrals from this alliance",
-    "noLinkedReferralsInline": "No referrals linked yet."
+    "noLinkedReferralsInline": "No referrals linked yet.",
+    "enrolledCourses": "Enrolled courses",
+    "startDate": "Start",
+    "endDate": "End",
+    "targetDate": "Target:"
   },
   "DocumentDrawer": {
     "notaria": "Notary",

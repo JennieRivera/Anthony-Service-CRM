@@ -22,6 +22,7 @@ import {
   Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { DocumentStatusPill } from "@/components/documents/StatusPill";
 import { viewHref, downloadHref } from "@/components/documents/downloadHref";
 import { MoveCategorySelect } from "@/components/documents/MoveCategorySelect";
@@ -34,7 +35,11 @@ import {
 } from "@/lib/validation/documentDrawer";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 import { AllianceDocumentUploader } from "@/components/alliances/AllianceDocumentUploader";
-import type { listAllDocuments, listReferralsForFolders } from "@/lib/queries/documents";
+import type {
+  listAllDocuments,
+  listReferralsForFolders,
+  listAcademyEnrollmentsForFolders,
+} from "@/lib/queries/documents";
 import type { listAlliances, listAllianceDocuments } from "@/lib/queries/alliances";
 import type { serviceTypeValues } from "@/lib/validation/client";
 
@@ -43,6 +48,7 @@ type DocumentRow = Awaited<ReturnType<typeof listAllDocuments>>[number];
 type ReferralFolder = Awaited<ReturnType<typeof listReferralsForFolders>>[number];
 type AllianceRow = Awaited<ReturnType<typeof listAlliances>>[number];
 type AllianceDocRow = Awaited<ReturnType<typeof listAllianceDocuments>>[number];
+type AcademyEnrollmentRow = Awaited<ReturnType<typeof listAcademyEnrollmentsForFolders>>[number];
 type ClientOption = { id: string; fullName: string; folderNumber: string | null };
 type CaseOption = { id: string; title: string; clientId: string; serviceType: ServiceType };
 
@@ -91,6 +97,7 @@ export function DocumentsCabinet({
   referrals,
   alliances,
   allianceDocuments,
+  academyEnrollments,
   blobConfigured,
 }: {
   documents: DocumentRow[];
@@ -99,6 +106,7 @@ export function DocumentsCabinet({
   referrals: ReferralFolder[];
   alliances: AllianceRow[];
   allianceDocuments: AllianceDocRow[];
+  academyEnrollments: AcademyEnrollmentRow[];
   blobConfigured: boolean;
 }) {
   const t = useTranslations("Documents");
@@ -222,6 +230,10 @@ export function DocumentsCabinet({
       (c) => c.clientId === clientId && (drawer === "clientes" || SERVICE_TYPE_TO_DRAWER[c.serviceType] === drawer),
     );
     const isImmigration = drawer === "inmigracion";
+    const isAcademia = drawer === "academia";
+    const studentEnrollments = isAcademia
+      ? academyEnrollments.filter((e) => e.clientId === clientId)
+      : [];
 
     return (
       <div className="flex flex-col gap-4">
@@ -232,6 +244,8 @@ export function DocumentsCabinet({
             { label: client ? folderLabel(client.folderNumber, client.fullName) : "" },
           ]}
         />
+
+        {isAcademia && <StudentEnrollments enrollments={studentEnrollments} />}
 
         {blobConfigured && (
           <ClientDocUploader
@@ -508,6 +522,43 @@ function Breadcrumb({ items }: { items: { label: string; onClick?: () => void }[
           )}
         </span>
       ))}
+    </div>
+  );
+}
+
+function StudentEnrollments({ enrollments }: { enrollments: AcademyEnrollmentRow[] }) {
+  const t = useTranslations("Documents");
+  const tStatus = useTranslations("AcademyCaseStatus");
+
+  if (enrollments.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <h4 className="text-sm font-medium text-foreground">{t("enrolledCourses")}</h4>
+      <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">
+        {enrollments.map((e) => (
+          <li key={e.caseId} className="flex flex-wrap items-center justify-between gap-2 p-3 text-sm">
+            <span className="font-medium text-foreground">
+              {[e.program, e.course].filter(Boolean).join(" — ") || e.title}
+            </span>
+            <span className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+              <Badge variant="outline">{tStatus(e.status)}</Badge>
+              <span>
+                {t("startDate")}:{" "}
+                {e.enrollmentDate ? new Date(e.enrollmentDate).toLocaleDateString() : "—"}
+              </span>
+              <span>
+                {t("endDate")}:{" "}
+                {e.certificateDate
+                  ? new Date(e.certificateDate).toLocaleDateString()
+                  : e.dueDate
+                    ? `${t("targetDate")} ${new Date(e.dueDate).toLocaleDateString()}`
+                    : "—"}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

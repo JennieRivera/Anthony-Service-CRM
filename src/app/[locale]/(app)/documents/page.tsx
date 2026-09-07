@@ -1,7 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { isBlobConfigured } from "@/lib/blob/config";
-import { listAllDocuments, listReferralsForFolders } from "@/lib/queries/documents";
+import {
+  listAllDocuments,
+  listReferralsForFolders,
+  listAcademyEnrollmentsForFolders,
+} from "@/lib/queries/documents";
 import { listCasesWithClient, listClientsForSelect } from "@/lib/queries/cases";
 import { listAlliances, listAllianceDocuments } from "@/lib/queries/alliances";
 import { DocumentsCabinet } from "@/components/documents/DocumentsCabinet";
@@ -18,18 +22,21 @@ export default async function DocumentsPage() {
   let referrals: Awaited<ReturnType<typeof listReferralsForFolders>> = [];
   let alliances: Awaited<ReturnType<typeof listAlliances>> = [];
   let allianceDocuments: Awaited<ReturnType<typeof listAllianceDocuments>> = [];
+  let academyEnrollments: Awaited<ReturnType<typeof listAcademyEnrollmentsForFolders>> = [];
   let error: string | null = null;
 
   if (configured) {
     try {
-      [documents, clients, cases, referrals, alliances, allianceDocuments] = await Promise.all([
-        listAllDocuments(),
-        listClientsForSelect(),
-        listCasesWithClient(),
-        listReferralsForFolders(),
-        listAlliances(),
-        listAllianceDocuments(),
-      ]);
+      [documents, clients, cases, referrals, alliances, allianceDocuments, academyEnrollments] =
+        await Promise.all([
+          listAllDocuments(),
+          listClientsForSelect(),
+          listCasesWithClient(),
+          listReferralsForFolders(),
+          listAlliances(),
+          listAllianceDocuments(),
+          listAcademyEnrollmentsForFolders(),
+        ]);
     } catch (err) {
       error = err instanceof Error ? err.message : "Unknown error";
     }
@@ -66,6 +73,7 @@ export default async function DocumentsPage() {
           referrals={referrals}
           alliances={alliances}
           allianceDocuments={allianceDocuments}
+          academyEnrollments={academyEnrollments}
           blobConfigured={blobConfigured}
         />
       )}
