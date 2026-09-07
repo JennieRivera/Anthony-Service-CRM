@@ -115,6 +115,11 @@ export const conversationChannelEnum = pgEnum("conversation_channel", [
   "highlevel",
   "in_person",
   "other",
+  // Registration only — no API connection, no publishing. Same posture as
+  // every other channel here until its integration is explicitly built.
+  "youtube",
+  "tiktok",
+  "linkedin",
 ]);
 
 export const conversationDirectionEnum = pgEnum("conversation_direction", [
@@ -1079,6 +1084,21 @@ export const notaryLogEntries = pgTable("notary_log_entries", {
   notes: text("notes"),
 });
 
+// Document Preparation never got its own pipeline in the original Phase 2
+// plan (it predates it) — added on explicit request, modeled on the real
+// lifecycle of the apostille work that makes up most of this category:
+// documents come in, get sent out for authentication, and come back.
+export const documentPrepCaseStatusEnum = pgEnum("document_prep_case_status", [
+  "new_request",
+  "documents_pending",
+  "ready_to_submit",
+  "submitted",
+  "processing",
+  "returned",
+  "completed",
+  "cancelled",
+]);
+
 export const apostilleDetails = pgTable("apostille_details", {
   caseId: uuid("case_id")
     .primaryKey()
@@ -1089,6 +1109,7 @@ export const apostilleDetails = pgTable("apostille_details", {
   expectedReturnDate: date("expected_return_date"),
   actualReturnDate: date("actual_return_date"),
   notes: text("notes"),
+  status: documentPrepCaseStatusEnum("status").notNull().default("new_request"),
 });
 
 // Phase 2, Session 1 — Notary / RON / IPEN / Loan Signing category.
@@ -1939,6 +1960,41 @@ export const referralCategoryEnum = pgEnum("referral_category", [
   "commercial_finance",
 ]);
 
+// Referral direction — which way the introduction flowed. Nullable and
+// never backfilled for existing referrals (there's no reliable way to
+// infer this from history); staff assign it going forward.
+export const referralDirectionEnum = pgEnum("referral_direction", [
+  "ams_to_rri",
+  "rri_to_ams",
+  "ams_to_other_partner",
+  "other_partner_to_ams",
+  "b2b",
+  "community",
+  "strategic_alliance",
+]);
+
+// The single, general referral pipeline — generalized from what was
+// rri_status (Commercial Finance/RRI only) below, now the fine-grained
+// status for every referral regardless of category. `referrals.status`
+// (the coarse submitted/in_progress/closed_won/closed_lost above) is kept
+// and derived from this, same coarse+fine pattern as cases.status vs.
+// e.g. taxCaseStatusEnum.
+export const referralPipelineStatusEnum = pgEnum("referral_pipeline_status", [
+  "new_referral",
+  "registered",
+  "consent_pending",
+  "sent_to_partner",
+  "under_review",
+  "documents_pending",
+  "qualified",
+  "service_in_progress",
+  "closed_funded",
+  "commission_due",
+  "commission_paid",
+  "declined",
+  "cancelled",
+]);
+
 export const referrals = pgTable("referrals", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -1963,6 +2019,10 @@ export const referrals = pgTable("referrals", {
   originatingBusiness: text("originating_business"),
   referredBy: text("referred_by").notNull(),
   receivingParty: text("receiving_party").notNull(),
+  direction: referralDirectionEnum("direction"),
+  pipelineStatus: referralPipelineStatusEnum("pipeline_status")
+    .notNull()
+    .default("new_referral"),
   status: referralStatusEnum("status").notNull().default("submitted"),
   closedDate: date("closed_date"),
   grossRevenue: numeric("gross_revenue", { precision: 12, scale: 2 }),
@@ -2034,6 +2094,10 @@ export const rriReferralDetails = pgTable("rri_referral_details", {
   consentToShareInformation: boolean("consent_to_share_information")
     .notNull()
     .default(false),
+  // Deprecated: superseded by referrals.pipelineStatus, which now applies
+  // to every referral, not just Commercial Finance/RRI ones. Column and
+  // enum kept (not dropped) so no historical data is lost; new code
+  // reads/writes referrals.pipelineStatus instead.
   status: rriStatusEnum("status").notNull().default("new_referral"),
 });
 

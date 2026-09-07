@@ -10,6 +10,9 @@ export const referralStatusValues = [
 // Phase 2, Session 4 — Commercial Finance / RRI Referrals
 export const referralCategoryValues = ["general", "commercial_finance"] as const;
 
+// Deprecated: kept only so historical rri_referral_details rows still
+// type-check. New code uses referralPipelineStatusValues below, which
+// applies to every referral (not just Commercial Finance/RRI ones).
 export const rriStatusValues = [
   "new_referral",
   "consent_pending",
@@ -26,6 +29,37 @@ export const rriStatusValues = [
   "closed",
 ] as const;
 
+// Which way the introduction flowed — set by staff per referral, never
+// inferred/guessed for historical rows.
+export const referralDirectionValues = [
+  "ams_to_rri",
+  "rri_to_ams",
+  "ams_to_other_partner",
+  "other_partner_to_ams",
+  "b2b",
+  "community",
+  "strategic_alliance",
+] as const;
+
+// The one general referral pipeline (generalized from what used to be
+// RRI-only rriStatusValues above) — applies to every referral regardless
+// of category.
+export const referralPipelineStatusValues = [
+  "new_referral",
+  "registered",
+  "consent_pending",
+  "sent_to_partner",
+  "under_review",
+  "documents_pending",
+  "qualified",
+  "service_in_progress",
+  "closed_funded",
+  "commission_due",
+  "commission_paid",
+  "declined",
+  "cancelled",
+] as const;
+
 const optionalString = z.string().trim().optional().or(z.literal(""));
 
 export const referralFormSchema = z.object({
@@ -34,9 +68,11 @@ export const referralFormSchema = z.object({
   referralDate: z.string().min(1, "Referral date is required"),
   category: z.enum(referralCategoryValues),
   allianceId: optionalString,
+  direction: z.enum(referralDirectionValues).optional().or(z.literal("")),
   originatingBusiness: optionalString,
   referredBy: z.string().trim().min(1, "Referred by is required"),
   receivingParty: z.string().trim().min(1, "Receiving party is required"),
+  pipelineStatus: z.enum(referralPipelineStatusValues),
   status: z.enum(referralStatusValues),
   closedDate: optionalString,
   grossRevenue: optionalString,

@@ -62,6 +62,7 @@ import {
   insuranceComplianceServiceTypes,
   insuranceComplianceTypeValues,
   insuranceComplianceStatusValues,
+  documentPrepCaseStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { serviceTypeValues } from "@/lib/validation/client";
@@ -80,6 +81,7 @@ import type {
   SalesTaxCaseDetails,
   IrsCaseDetails,
   InsuranceComplianceDetails,
+  ApostilleDetails,
 } from "@/lib/db/schema";
 
 export function CaseForm({
@@ -96,6 +98,7 @@ export function CaseForm({
   salesTaxDetails,
   irsDetails,
   insuranceDetails,
+  apostille,
   clients,
   companies,
   defaultClientId,
@@ -114,6 +117,7 @@ export function CaseForm({
   salesTaxDetails?: SalesTaxCaseDetails | null;
   irsDetails?: IrsCaseDetails | null;
   insuranceDetails?: InsuranceComplianceDetails | null;
+  apostille?: ApostilleDetails | null;
   clients: { id: string; fullName: string }[];
   companies: { id: string; legalBusinessName: string }[];
   defaultClientId?: string;
@@ -154,6 +158,7 @@ export function CaseForm({
   const tIrsApplicationStatus = useTranslations("IrsApplicationStatus");
   const tInsuranceComplianceType = useTranslations("InsuranceComplianceType");
   const tInsuranceComplianceStatus = useTranslations("InsuranceComplianceStatus");
+  const tDocumentPrepCaseStatus = useTranslations("DocumentPrepCaseStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -184,11 +189,12 @@ export function CaseForm({
       notarialActType: undefined,
       idVerificationMethod: undefined,
       notaryFeeCharged: "",
-      destinationCountry: "",
-      instrumentType: "",
-      submissionDate: "",
-      expectedReturnDate: "",
-      actualReturnDate: "",
+      destinationCountry: apostille?.destinationCountry ?? "",
+      instrumentType: apostille?.instrumentType ?? "",
+      submissionDate: apostille?.submissionDate ?? "",
+      expectedReturnDate: apostille?.expectedReturnDate ?? "",
+      actualReturnDate: apostille?.actualReturnDate ?? "",
+      documentPrepStatus: apostille?.status ?? "new_request",
       notaryModality: notaryDetails?.modality ?? "",
       appointmentDate: notaryDetails?.appointmentDate ?? "",
       appointmentTime: notaryDetails?.appointmentTime ?? "",
@@ -705,6 +711,27 @@ export function CaseForm({
                 id="actualReturnDate"
                 type="date"
                 {...register("actualReturnDate")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("documentPrepStatus")}</Label>
+              <Controller
+                control={control}
+                name="documentPrepStatus"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {documentPrepCaseStatusValues.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {tDocumentPrepCaseStatus(status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               />
             </div>
           </div>

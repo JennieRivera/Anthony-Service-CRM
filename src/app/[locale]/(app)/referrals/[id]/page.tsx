@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ReferralStatusBadge } from "@/components/referrals/ReferralStatusBadge";
+import { ReferralPipelineStatusBadge } from "@/components/referrals/ReferralPipelineStatusBadge";
 
 export default async function ReferralDetailPage({
   params,
@@ -15,7 +16,7 @@ export default async function ReferralDetailPage({
   const { id } = await params;
   const t = await getTranslations("Referrals");
   const tCategory = await getTranslations("ReferralCategory");
-  const tRriStatus = await getTranslations("RriStatus");
+  const tDirection = await getTranslations("ReferralDirection");
 
   const result = await getReferralById(id);
   if (!result) notFound();
@@ -46,7 +47,10 @@ export default async function ReferralDetailPage({
             </h1>
             <Badge variant="outline">{tCategory(referral.category)}</Badge>
           </div>
-          <ReferralStatusBadge status={referral.status} />
+          <div className="flex items-center gap-2">
+            <ReferralPipelineStatusBadge status={referral.pipelineStatus} />
+            <ReferralStatusBadge status={referral.status} />
+          </div>
         </div>
         <div className="grid gap-3 text-sm sm:grid-cols-4">
           <div>
@@ -62,6 +66,12 @@ export default async function ReferralDetailPage({
             <p className="text-muted-foreground">{t("columnDate")}</p>
             <p className="text-foreground">
               {new Date(referral.referralDate).toLocaleDateString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.direction")}</p>
+            <p className="text-foreground">
+              {referral.direction ? tDirection(referral.direction) : "—"}
             </p>
           </div>
           {caseTitle && (
@@ -194,7 +204,6 @@ export default async function ReferralDetailPage({
             <h2 className="font-heading text-lg text-foreground">
               {t("rriDetails")}
             </h2>
-            <Badge variant="outline">{tRriStatus(rriDetails.status)}</Badge>
           </div>
           <div className="grid gap-3 text-sm sm:grid-cols-4">
             <div>

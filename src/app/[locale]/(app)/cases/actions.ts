@@ -296,6 +296,15 @@ function deriveEffectiveStatus(
     }
   }
 
+  if (values.serviceType === "document_prep" && values.documentPrepStatus) {
+    const s = values.documentPrepStatus;
+    if (s === "completed") return "completed";
+    if (s === "cancelled") return "cancelled";
+    if (s === "new_request") return "new";
+    if (s === "documents_pending") return "waiting_on_client";
+    return "in_progress";
+  }
+
   if (
     insuranceComplianceServiceTypes.includes(values.serviceType) &&
     values.insuranceStatus
@@ -432,25 +441,21 @@ async function upsertServiceDetails(
 
   if (values.serviceType === "document_prep") {
     if (values.destinationCountry && values.instrumentType) {
+      const detail = {
+        destinationCountry: values.destinationCountry,
+        instrumentType: values.instrumentType,
+        submissionDate: values.submissionDate || null,
+        expectedReturnDate: values.expectedReturnDate || null,
+        actualReturnDate: values.actualReturnDate || null,
+        status: values.documentPrepStatus || "new_request",
+      };
+
       await db
         .insert(apostilleDetails)
-        .values({
-          caseId,
-          destinationCountry: values.destinationCountry,
-          instrumentType: values.instrumentType,
-          submissionDate: values.submissionDate || null,
-          expectedReturnDate: values.expectedReturnDate || null,
-          actualReturnDate: values.actualReturnDate || null,
-        })
+        .values({ caseId, ...detail })
         .onConflictDoUpdate({
           target: apostilleDetails.caseId,
-          set: {
-            destinationCountry: values.destinationCountry,
-            instrumentType: values.instrumentType,
-            submissionDate: values.submissionDate || null,
-            expectedReturnDate: values.expectedReturnDate || null,
-            actualReturnDate: values.actualReturnDate || null,
-          },
+          set: detail,
         });
     }
     return;

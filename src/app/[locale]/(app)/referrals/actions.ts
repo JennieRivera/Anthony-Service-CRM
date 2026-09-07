@@ -26,22 +26,19 @@ function computeRevenue(values: ReferralFormValues) {
   return { net, commissionDue };
 }
 
-// Commercial Finance/RRI referrals drive the coarse referrals.status from
-// their own granular pipeline, the same way each Phase 2 case category
-// drives cases.status — so this referral shows up correctly on any view
-// that only understands the coarse submitted/in_progress/closed_won/
-// closed_lost states.
+// Every referral's coarse referrals.status is now driven by its general
+// pipelineStatus, the same way each Phase 2 case category drives
+// cases.status from its own fine-grained status — so this referral shows
+// up correctly on any view that only understands the coarse
+// submitted/in_progress/closed_won/closed_lost states.
 function deriveEffectiveStatus(
   values: ReferralFormValues,
 ): (typeof referralStatusEnum.enumValues)[number] {
-  if (values.category === "commercial_finance" && values.rriStatus) {
-    const s = values.rriStatus;
-    if (s === "declined") return "closed_lost";
-    if (s === "closed") return "closed_won";
-    if (s === "new_referral") return "submitted";
-    return "in_progress";
-  }
-  return values.status;
+  const s = values.pipelineStatus;
+  if (s === "closed_funded" || s === "commission_paid") return "closed_won";
+  if (s === "declined" || s === "cancelled") return "closed_lost";
+  if (s === "new_referral" || s === "registered") return "submitted";
+  return "in_progress";
 }
 
 async function recordStatusChange(
@@ -80,7 +77,8 @@ async function upsertRriDetails(referralId: string, values: ReferralFormValues) 
     documentsRequested: values.rriDocumentsRequested || null,
     documentsReceived: values.rriDocumentsReceived || null,
     consentToShareInformation: values.consentToShareInformation ?? false,
-    status: values.rriStatus || "new_referral",
+    // status intentionally not written here anymore — referrals.pipelineStatus
+    // is now the single source of truth for every referral (see schema.ts).
   };
 
   await db
@@ -102,9 +100,11 @@ function normalize(values: ReferralFormValues, effectiveStatus: string) {
     referralDate: values.referralDate,
     category: values.category,
     allianceId: values.allianceId || null,
+    direction: values.direction || null,
     originatingBusiness: values.originatingBusiness || null,
     referredBy: values.referredBy,
     receivingParty: values.receivingParty,
+    pipelineStatus: values.pipelineStatus,
     status: effectiveStatus as (typeof referralStatusEnum.enumValues)[number],
     closedDate: values.closedDate || null,
     grossRevenue: hasGross ? Number(values.grossRevenue).toFixed(2) : null,

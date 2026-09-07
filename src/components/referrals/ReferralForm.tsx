@@ -19,9 +19,9 @@ import {
 } from "@/components/ui/select";
 import {
   referralFormSchema,
-  referralStatusValues,
   referralCategoryValues,
-  rriStatusValues,
+  referralDirectionValues,
+  referralPipelineStatusValues,
   type ReferralFormValues,
 } from "@/lib/validation/referral";
 import type { Referral, RriReferralDetails } from "@/lib/db/schema";
@@ -45,9 +45,9 @@ export function ReferralForm({
 }) {
   const t = useTranslations("Referrals.form");
   const tReferrals = useTranslations("Referrals");
-  const tStatus = useTranslations("ReferralStatus");
   const tCategory = useTranslations("ReferralCategory");
-  const tRriStatus = useTranslations("RriStatus");
+  const tDirection = useTranslations("ReferralDirection");
+  const tPipelineStatus = useTranslations("ReferralPipelineStatus");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -66,9 +66,11 @@ export function ReferralForm({
         referral?.referralDate ?? new Date().toISOString().slice(0, 10),
       category: referral?.category ?? "general",
       allianceId: referral?.allianceId ?? "",
+      direction: referral?.direction ?? "",
       originatingBusiness: referral?.originatingBusiness ?? "",
       referredBy: referral?.referredBy ?? "",
       receivingParty: referral?.receivingParty ?? "",
+      pipelineStatus: referral?.pipelineStatus ?? "new_referral",
       status: referral?.status ?? "submitted",
       closedDate: referral?.closedDate ?? "",
       grossRevenue: referral?.grossRevenue ?? "",
@@ -205,29 +207,53 @@ export function ReferralForm({
           />
         </div>
 
-        {!isCommercialFinance && (
-          <div className="flex flex-col gap-1.5">
-            <Label>{t("status")}</Label>
-            <Controller
-              control={control}
-              name="status"
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {referralStatusValues.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {tStatus(status)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </div>
-        )}
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("direction")}</Label>
+          <Controller
+            control={control}
+            name="direction"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(v) => field.onChange(!v || v === "none" ? "" : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t("selectDirection")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("selectDirection")}</SelectItem>
+                  {referralDirectionValues.map((direction) => (
+                    <SelectItem key={direction} value={direction}>
+                      {tDirection(direction)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("pipelineStatus")}</Label>
+          <Controller
+            control={control}
+            name="pipelineStatus"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {referralPipelineStatusValues.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {tPipelineStatus(status)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
 
         <div className="flex flex-col gap-1.5">
           <Label>{t("alliance")}</Label>
@@ -442,28 +468,6 @@ export function ReferralForm({
               <Label htmlFor="fundingPurpose">{t("fundingPurpose")}</Label>
               <Input id="fundingPurpose" {...register("fundingPurpose")} />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <Label>{t("rriStatus")}</Label>
-              <Controller
-                control={control}
-                name="rriStatus"
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {rriStatusValues.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {tRriStatus(status)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="rriDocumentsRequested">
                 {t("rriDocumentsRequested")}

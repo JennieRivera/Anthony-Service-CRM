@@ -51,6 +51,7 @@ export default async function CaseDetailPage({
   const tIrsApplicationStatus = await getTranslations("IrsApplicationStatus");
   const tInsuranceComplianceType = await getTranslations("InsuranceComplianceType");
   const tInsuranceComplianceStatus = await getTranslations("InsuranceComplianceStatus");
+  const tDocumentPrepCaseStatus = await getTranslations("DocumentPrepCaseStatus");
 
   const result = await getCaseById(id);
   if (!result) notFound();
@@ -262,9 +263,14 @@ export default async function CaseDetailPage({
 
       {apostille && (
         <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
-          <h2 className="font-heading text-lg text-foreground">
-            {t("apostilleDetails")}
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg text-foreground">
+              {t("apostilleDetails")}
+            </h2>
+            <Badge variant="outline">
+              {tDocumentPrepCaseStatus(apostille.status)}
+            </Badge>
+          </div>
           <div className="grid gap-3 text-sm sm:grid-cols-3">
             <div>
               <p className="text-muted-foreground">

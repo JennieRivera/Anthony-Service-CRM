@@ -258,6 +258,19 @@ export const irsApplicationStatusValues = [
   "closed",
 ] as const;
 
+// Document Preparation — modeled on the apostille lifecycle since that's
+// the primary real use of this category today.
+export const documentPrepCaseStatusValues = [
+  "new_request",
+  "documents_pending",
+  "ready_to_submit",
+  "submitted",
+  "processing",
+  "returned",
+  "completed",
+  "cancelled",
+] as const;
+
 // Insurance & Compliance — Workers Comp, Liability Insurance, Payroll,
 // HIPAA Compliance, general Insurance.
 export const insuranceComplianceTypeValues = [
@@ -306,6 +319,10 @@ export const caseFormSchema = z.object({
   submissionDate: optionalString,
   expectedReturnDate: optionalString,
   actualReturnDate: optionalString,
+  documentPrepStatus: z
+    .enum(documentPrepCaseStatusValues)
+    .optional()
+    .or(z.literal("")),
   // Notary service details (relevant when serviceType is Notary)
   notaryModality: z.enum(notaryModalityValues).optional().or(z.literal("")),
   appointmentDate: optionalString,
@@ -542,3 +559,4 @@ export const marketingServiceTypes = ["marketing"];
 export const salesTaxServiceTypes = ["sales_tax"];
 export const irsServiceTypes = ["irs_administrative"];
 export const insuranceComplianceServiceTypes = ["insurance_compliance"];
+export const documentPrepServiceTypes = ["document_prep"];

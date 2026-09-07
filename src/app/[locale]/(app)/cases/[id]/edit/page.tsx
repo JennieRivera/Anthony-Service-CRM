@@ -56,6 +56,7 @@ export default async function EditCasePage({
         salesTaxDetails={result.salesTaxDetails}
         irsDetails={result.irsDetails}
         insuranceDetails={result.insuranceDetails}
+        apostille={result.apostille}
         clients={clients}
         companies={companies}
         onSubmit={submit}

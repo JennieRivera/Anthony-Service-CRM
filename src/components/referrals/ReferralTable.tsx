@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ReferralStatusBadge } from "./ReferralStatusBadge";
+import { ReferralPipelineStatusBadge } from "./ReferralPipelineStatusBadge";
 import type { listReferralsWithClient } from "@/lib/queries/referrals";
 
 export async function ReferralTable({
@@ -19,6 +19,7 @@ export async function ReferralTable({
 }) {
   const t = await getTranslations("Referrals");
   const tCategory = await getTranslations("ReferralCategory");
+  const tDirection = await getTranslations("ReferralDirection");
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card">
@@ -28,8 +29,9 @@ export async function ReferralTable({
             <TableHead>{t("columnNumber")}</TableHead>
             <TableHead>{t("columnClient")}</TableHead>
             <TableHead>{t("columnCategory")}</TableHead>
+            <TableHead>{t("columnDirection")}</TableHead>
             <TableHead>{t("columnDate")}</TableHead>
-            <TableHead>{t("columnStatus")}</TableHead>
+            <TableHead>{t("columnPipelineStatus")}</TableHead>
             <TableHead>{t("columnCommissionDue")}</TableHead>
             <TableHead>{t("columnCommissionPaid")}</TableHead>
           </TableRow>
@@ -57,10 +59,13 @@ export async function ReferralTable({
                 <Badge variant="outline">{tCategory(referral.category)}</Badge>
               </TableCell>
               <TableCell className="text-muted-foreground">
+                {referral.direction ? tDirection(referral.direction) : "—"}
+              </TableCell>
+              <TableCell className="text-muted-foreground">
                 {new Date(referral.referralDate).toLocaleDateString()}
               </TableCell>
               <TableCell>
-                <ReferralStatusBadge status={referral.status} />
+                <ReferralPipelineStatusBadge status={referral.pipelineStatus} />
               </TableCell>
               <TableCell className="font-medium text-foreground">
                 {referral.commissionDue

@@ -15,6 +15,9 @@ import {
   MoreHorizontal,
   ArrowDownLeft,
   ArrowUpRight,
+  Clapperboard,
+  Music2,
+  Briefcase,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,8 +35,8 @@ import type { ConversationMessage, Case } from "@/lib/db/schema";
 
 // Phase 4, Session 1 — every conversation_channel enum value needs an entry
 // here or this Record indexing fails to type-check. lucide-react doesn't
-// ship trademarked brand logos (no Facebook/Instagram icon), so those two
-// use generic stand-ins instead.
+// ship trademarked brand logos (no Facebook/Instagram/YouTube/TikTok/LinkedIn
+// icon), so those use generic stand-ins instead.
 const channelIcons = {
   email: Mail,
   call: Phone,
@@ -41,6 +44,9 @@ const channelIcons = {
   sms: MessageSquare,
   facebook_messenger: MessageSquareText,
   instagram_dm: Camera,
+  youtube: Clapperboard,
+  tiktok: Music2,
+  linkedin: Briefcase,
   website_chat: Globe,
   highlevel: Zap,
   in_person: MapPin,
