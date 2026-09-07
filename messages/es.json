@@ -2121,7 +2121,8 @@
       "knowledgeBaseEmpty": "Aún no hay entradas en la base de conocimiento.",
       "addEntry": "Agregar Entrada",
       "kbTitlePlaceholder": "Título de la entrada",
-      "kbContentPlaceholder": "Contenido de la entrada"
+      "kbContentPlaceholder": "Contenido de la entrada",
+      "sensitiveDataWarning": "Esto parece contener un número de Seguro Social o ITIN. Las entradas de la base de conocimiento se comparten en cada uso de este agente — elimínalo antes de guardar."
     }
   },
   "AiAgentStatus": {
@@ -2227,6 +2228,7 @@
       "assignedHuman": "Humano Asignado",
       "resolutionDate": "Fecha de Resolución",
       "resolution": "Resolución",
+      "sensitiveDataWarning": "Esto parece contener un número de Seguro Social o ITIN. Los registros de escalación no son el lugar para eso — elimínalo antes de guardar.",
       "save": "Guardar",
       "saving": "Guardando...",
       "cancel": "Cancelar"

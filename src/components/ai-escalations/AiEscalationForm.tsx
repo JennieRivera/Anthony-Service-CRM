@@ -20,6 +20,7 @@ import {
   aiEscalationRiskLevelValues,
   type AiEscalationFormValues,
 } from "@/lib/validation/aiEscalation";
+import { containsLikelySsnOrItin } from "@/lib/sensitiveDataCheck";
 
 export function AiEscalationForm({
   agents,
@@ -48,6 +49,7 @@ export function AiEscalationForm({
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors },
   } = useForm<AiEscalationFormValues>({
     resolver: zodResolver(aiEscalationFormSchema),
@@ -59,6 +61,9 @@ export function AiEscalationForm({
       riskLevel: "medium",
     },
   });
+
+  const reasonValue = watch("reason");
+  const showSensitiveDataWarning = containsLikelySsnOrItin(reasonValue ?? "");
 
   async function submit(values: AiEscalationFormValues) {
     setSubmitting(true);
@@ -192,6 +197,12 @@ export function AiEscalationForm({
           <p className="text-sm text-destructive">{errors.reason.message}</p>
         )}
       </div>
+
+      {showSensitiveDataWarning && (
+        <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          {t("sensitiveDataWarning")}
+        </p>
+      )}
 
       {error && (
         <p className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">

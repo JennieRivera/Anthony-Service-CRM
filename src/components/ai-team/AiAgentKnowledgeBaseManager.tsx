@@ -21,6 +21,7 @@ import {
   updateKnowledgeBaseEntryAction,
   deleteKnowledgeBaseEntryAction,
 } from "@/app/[locale]/(app)/ai-team/actions";
+import { containsLikelySsnOrItin } from "@/lib/sensitiveDataCheck";
 
 type Section = (typeof aiKnowledgeBaseSectionValues)[number];
 
@@ -68,6 +69,11 @@ function EntryFields({
         value={content}
         onChange={(e) => onContentChange(e.target.value)}
       />
+      {containsLikelySsnOrItin(content) && (
+        <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          {t("sensitiveDataWarning")}
+        </p>
+      )}
     </div>
   );
 }

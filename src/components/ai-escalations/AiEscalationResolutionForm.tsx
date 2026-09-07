@@ -21,6 +21,7 @@ import {
   type AiEscalationResolutionFormValues,
 } from "@/lib/validation/aiEscalation";
 import type { AiEscalation } from "@/lib/db/schema";
+import { containsLikelySsnOrItin } from "@/lib/sensitiveDataCheck";
 
 export function AiEscalationResolutionForm({
   escalation,
@@ -38,6 +39,7 @@ export function AiEscalationResolutionForm({
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors },
   } = useForm<AiEscalationResolutionFormValues>({
     resolver: zodResolver(aiEscalationResolutionFormSchema),
@@ -48,6 +50,9 @@ export function AiEscalationResolutionForm({
       resolutionDate: escalation.resolutionDate ?? "",
     },
   });
+
+  const resolutionValue = watch("resolution");
+  const showSensitiveDataWarning = containsLikelySsnOrItin(resolutionValue ?? "");
 
   async function submit(values: AiEscalationResolutionFormValues) {
     setSubmitting(true);
@@ -116,6 +121,12 @@ export function AiEscalationResolutionForm({
           <p className="text-sm text-destructive">{errors.resolution.message}</p>
         )}
       </div>
+
+      {showSensitiveDataWarning && (
+        <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          {t("sensitiveDataWarning")}
+        </p>
+      )}
 
       {error && (
         <p className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">

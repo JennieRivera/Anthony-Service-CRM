@@ -2121,7 +2121,8 @@
       "knowledgeBaseEmpty": "No knowledge base entries yet.",
       "addEntry": "Add Entry",
       "kbTitlePlaceholder": "Entry title",
-      "kbContentPlaceholder": "Entry content"
+      "kbContentPlaceholder": "Entry content",
+      "sensitiveDataWarning": "This looks like it may contain a Social Security or ITIN number. Knowledge base entries are shared across every use of this agent — please remove it before saving."
     }
   },
   "AiAgentStatus": {
@@ -2227,6 +2228,7 @@
       "assignedHuman": "Assigned Human",
       "resolutionDate": "Resolution Date",
       "resolution": "Resolution",
+      "sensitiveDataWarning": "This looks like it may contain a Social Security or ITIN number. Escalation records are not the place for that — please remove it before saving.",
       "save": "Save",
       "saving": "Saving...",
       "cancel": "Cancel"
