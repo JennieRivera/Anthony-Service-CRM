@@ -20,6 +20,7 @@ import { CommunicationPreferencesPanel } from "./CommunicationPreferencesPanel";
 import { HighLevelSyncPanel } from "./HighLevelSyncPanel";
 import { ReferralStatusBadge } from "@/components/referrals/ReferralStatusBadge";
 import { PaymentStatusBadge } from "@/components/payments/PaymentStatusBadge";
+import { AppointmentStatusBadge } from "@/components/appointments/AppointmentStatusBadge";
 import type {
   Case,
   Invoice,
@@ -93,6 +94,43 @@ export function ClientProfileTabs({
   const tService = useTranslations("ServiceType");
   const tReferrals = useTranslations("Referrals");
   const tTaskType = useTranslations("TaskType");
+
+  // Calendar enhancement, Session 6 (section 9) — every appointment lands
+  // in exactly one bucket (including "rescheduled", a real status this
+  // phase introduced that section 9's 4 named buckets don't have a home
+  // for) so nothing is silently dropped from the client's history.
+  const now = new Date();
+  const upcoming = appointments
+    .filter(
+      (a) =>
+        !["cancelled", "no_show", "rescheduled"].includes(a.status) &&
+        new Date(a.startAt) >= now,
+    )
+    .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime());
+  const past = appointments
+    .filter(
+      (a) =>
+        !["cancelled", "no_show", "rescheduled"].includes(a.status) &&
+        new Date(a.startAt) < now,
+    )
+    .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime());
+  const cancelled = appointments
+    .filter((a) => a.status === "cancelled")
+    .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime());
+  const noShow = appointments
+    .filter((a) => a.status === "no_show")
+    .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime());
+  const rescheduled = appointments
+    .filter((a) => a.status === "rescheduled")
+    .sort((a, b) => new Date(b.startAt).getTime() - new Date(a.startAt).getTime());
+
+  const appointmentBuckets = [
+    { key: "upcoming", label: t("upcomingAppointments"), items: upcoming },
+    { key: "past", label: t("pastAppointments"), items: past },
+    { key: "cancelled", label: t("cancelledAppointments"), items: cancelled },
+    { key: "noShow", label: t("noShowAppointments"), items: noShow },
+    { key: "rescheduled", label: t("rescheduledAppointments"), items: rescheduled },
+  ];
 
   return (
     <Tabs defaultValue="timeline">
@@ -295,7 +333,7 @@ export function ClientProfileTabs({
         ))}
       </TabsContent>
 
-      <TabsContent value="appointments" className="flex flex-col gap-2 pt-4">
+      <TabsContent value="appointments" className="flex flex-col gap-4 pt-4">
         <div className="flex justify-end">
           <Button
             size="sm"
@@ -309,22 +347,34 @@ export function ClientProfileTabs({
         {appointments.length === 0 && (
           <p className="text-muted-foreground">{t("noAppointments")}</p>
         )}
-        {appointments.map((appt) => (
-          <div
-            key={appt.id}
-            className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
-          >
-            <div className="flex flex-col gap-1">
-              <span className="font-medium text-foreground">
-                {appt.title}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {new Date(appt.startAt).toLocaleString()}
-              </span>
-            </div>
-            <Badge variant="outline">{appt.status}</Badge>
-          </div>
-        ))}
+        {appointmentBuckets.map(
+          ({ key, label, items }) =>
+            items.length > 0 && (
+              <div key={key} className="flex flex-col gap-2">
+                <h3 className="font-heading text-sm text-foreground">
+                  {label} ({items.length})
+                </h3>
+                {items.map((appt) => (
+                  <Link
+                    key={appt.id}
+                    href={`/appointments/${appt.id}`}
+                    className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted"
+                  >
+                    <div className="flex flex-col gap-1">
+                      <span className="font-medium text-foreground">
+                        {appt.title}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {tService(appt.serviceType)} ·{" "}
+                        {new Date(appt.startAt).toLocaleString()}
+                      </span>
+                    </div>
+                    <AppointmentStatusBadge status={appt.status} />
+                  </Link>
+                ))}
+              </div>
+            ),
+        )}
       </TabsContent>
 
       <TabsContent value="tasks" className="flex flex-col gap-2 pt-4">

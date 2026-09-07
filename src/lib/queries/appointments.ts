@@ -1,8 +1,65 @@
-import { asc, desc, eq, gte } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ilike, lt } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { appointments, clients, companies, cases } from "@/lib/db/schema";
 
-export async function listAppointmentsWithClient() {
+// Calendar enhancement, Session 6 (section 10) — every dimension is
+// optional and additive (AND'd together); "Personal Asignado" is
+// deliberately absent since there's no populated staff/role system yet
+// (see AGENTS.md / CALENDAR-PLAN.md section 13 deferral).
+export type AppointmentListFilters = {
+  serviceType?: string;
+  status?: string;
+  appointmentType?: string;
+  client?: string;
+  location?: string;
+  date?: string;
+  language?: string;
+  referralSource?: string;
+};
+
+export async function listAppointmentsWithClient(
+  filters: AppointmentListFilters = {},
+) {
+  const conditions = [
+    filters.serviceType
+      ? eq(
+          appointments.serviceType,
+          filters.serviceType as (typeof appointments.serviceType.enumValues)[number],
+        )
+      : undefined,
+    filters.status
+      ? eq(
+          appointments.status,
+          filters.status as (typeof appointments.status.enumValues)[number],
+        )
+      : undefined,
+    filters.appointmentType
+      ? eq(
+          appointments.appointmentType,
+          filters.appointmentType as (typeof appointments.appointmentType.enumValues)[number],
+        )
+      : undefined,
+    filters.client ? ilike(clients.fullName, `%${filters.client}%`) : undefined,
+    filters.location
+      ? ilike(appointments.location, `%${filters.location}%`)
+      : undefined,
+    filters.referralSource
+      ? ilike(appointments.referralSource, `%${filters.referralSource}%`)
+      : undefined,
+    filters.language
+      ? eq(
+          clients.preferredLanguage,
+          filters.language as (typeof clients.preferredLanguage.enumValues)[number],
+        )
+      : undefined,
+    filters.date
+      ? and(
+          gte(appointments.startAt, new Date(`${filters.date}T00:00:00`)),
+          lt(appointments.startAt, new Date(`${filters.date}T23:59:59.999`)),
+        )
+      : undefined,
+  ].filter((c): c is NonNullable<typeof c> => c !== undefined);
+
   return getDb()
     .select({
       id: appointments.id,
@@ -17,6 +74,7 @@ export async function listAppointmentsWithClient() {
     })
     .from(appointments)
     .innerJoin(clients, eq(appointments.clientId, clients.id))
+    .where(conditions.length ? and(...conditions) : undefined)
     .orderBy(desc(appointments.startAt));
 }
 

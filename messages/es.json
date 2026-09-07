@@ -201,6 +201,11 @@
     "noPayments": "Aún no hay pagos.",
     "noReferrals": "Aún no hay referidos.",
     "noAppointments": "Aún no hay citas.",
+    "upcomingAppointments": "Próximas Citas",
+    "pastAppointments": "Citas Pasadas",
+    "cancelledAppointments": "Citas Canceladas",
+    "noShowAppointments": "No Shows",
+    "rescheduledAppointments": "Reprogramadas",
     "noTasks": "Aún no hay tareas.",
     "noActivity": "Aún no hay actividad.",
     "of": "de",
@@ -1300,6 +1305,18 @@
       "addNotePlaceholder": "¿Qué pasó?",
       "save": "Guardar",
       "saving": "Guardando..."
+    },
+    "filters": {
+      "allServices": "Todos los Servicios",
+      "allStatuses": "Todos los Estados",
+      "allTypes": "Todos los Tipos de Cita",
+      "allLanguages": "Todos los Idiomas",
+      "languageEnglish": "Inglés",
+      "languageSpanish": "Español",
+      "clientPlaceholder": "Nombre del cliente...",
+      "locationPlaceholder": "Ubicación...",
+      "referralSourcePlaceholder": "Fuente de referido...",
+      "clear": "Limpiar"
     }
   },
   "AppointmentType": {

@@ -201,6 +201,11 @@
     "noPayments": "No payments yet.",
     "noReferrals": "No referrals yet.",
     "noAppointments": "No appointments yet.",
+    "upcomingAppointments": "Upcoming Appointments",
+    "pastAppointments": "Past Appointments",
+    "cancelledAppointments": "Cancelled Appointments",
+    "noShowAppointments": "No Shows",
+    "rescheduledAppointments": "Rescheduled",
     "noTasks": "No tasks yet.",
     "noActivity": "No activity yet.",
     "of": "of",
@@ -1300,6 +1305,18 @@
       "addNotePlaceholder": "What happened?",
       "save": "Save",
       "saving": "Saving..."
+    },
+    "filters": {
+      "allServices": "All Services",
+      "allStatuses": "All Statuses",
+      "allTypes": "All Appointment Types",
+      "allLanguages": "All Languages",
+      "languageEnglish": "English",
+      "languageSpanish": "Spanish",
+      "clientPlaceholder": "Client name...",
+      "locationPlaceholder": "Location...",
+      "referralSourcePlaceholder": "Referral source...",
+      "clear": "Clear"
     }
   },
   "AppointmentType": {
