@@ -145,12 +145,12 @@ export default async function SettingsPage() {
           <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
-              render={<Link href="/settings/professional-systems" />}
+              render={<Link href="/professional-systems" />}
             >
               <LayoutGrid className="h-4 w-4" />
               {t("manageProfessionalSystems")}
             </Button>
-            <Button variant="outline" render={<Link href="/settings/websites" />}>
+            <Button variant="outline" render={<Link href="/websites" />}>
               <Globe className="h-4 w-4" />
               {t("manageWebsites")}
             </Button>

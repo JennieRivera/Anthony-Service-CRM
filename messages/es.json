@@ -121,7 +121,7 @@
     "payments": "Pagos",
     "referrals": "Referidos",
     "tasks": "Tareas",
-    "alliances": "Alianzas",
+    "community": "Comunidad y Alianzas Estratégicas",
     "communications": "Comunicaciones",
     "templates": "Plantillas",
     "reports": "Reportes",
@@ -138,10 +138,11 @@
     "irsResources": "Recursos IRS",
     "immigrationForms": "Formularios de Inmigración",
     "latinoBusinessMap": "Mapa de Negocios Latinos",
-    "associations": "Asociaciones y Cámaras",
     "marketingContent": "Contenido de Marketing",
     "aiTeam": "Equipo IA",
-    "aiEscalations": "Escalaciones de IA"
+    "aiEscalations": "Escalaciones de IA",
+    "professionalSystems": "Sistemas Profesionales",
+    "websites": "Sitios Web"
   },
   "ServiceType": {
     "online_notary": "Notaría en Línea",
@@ -1779,6 +1780,11 @@
     "active_partner": "Socio Activo",
     "paused": "Pausado",
     "inactive": "Inactivo"
+  },
+  "Community": {
+    "title": "Comunidad y Alianzas Estratégicas",
+    "tabAlliances": "Alianzas",
+    "tabAssociations": "Asociaciones y Cámaras"
   },
   "Alliances": {
     "title": "Alianzas Estratégicas",

@@ -191,7 +191,7 @@ export default async function Home() {
       </DashboardSection>
 
       {/* 9. Community */}
-      <DashboardSection title={t("sectionCommunity")} viewAllHref="/alliances" viewAllLabel={t("viewAll")}>
+      <DashboardSection title={t("sectionCommunity")} viewAllHref="/community" viewAllLabel={t("viewAll")}>
         <div className="grid gap-4 sm:grid-cols-2">
           <KpiCard
             label={t("activeAlliances")}

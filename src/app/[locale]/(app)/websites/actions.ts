@@ -44,7 +44,7 @@ export async function createWebsiteLinkAction(rawValues: WebsiteLinkFormValues) 
     summary: `Added website "${values.name}"`,
   });
 
-  revalidatePath("/settings/websites");
+  revalidatePath("/websites");
   revalidatePath("/");
 }
 
@@ -66,7 +66,7 @@ export async function updateWebsiteLinkAction(
     summary: `Updated website "${values.name}" (status: ${values.status})`,
   });
 
-  revalidatePath("/settings/websites");
+  revalidatePath("/websites");
   revalidatePath("/");
 }
 
@@ -83,7 +83,7 @@ export async function toggleWebsiteLinkActiveAction(id: string, active: boolean)
     summary: `Website ${active ? "enabled" : "disabled"}`,
   });
 
-  revalidatePath("/settings/websites");
+  revalidatePath("/websites");
   revalidatePath("/");
 }
 
@@ -112,6 +112,6 @@ export async function reorderWebsiteLinkAction(id: string, direction: "up" | "do
       .where(eq(websiteLinks.id, swapWith.id)),
   ]);
 
-  revalidatePath("/settings/websites");
+  revalidatePath("/websites");
   revalidatePath("/");
 }

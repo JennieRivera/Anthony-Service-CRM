@@ -21,7 +21,7 @@ export async function ProfessionalSystemsSection({
         <Button
           size="sm"
           variant="outline"
-          render={<Link href="/settings/professional-systems" />}
+          render={<Link href="/professional-systems" />}
         >
           <Settings className="h-3.5 w-3.5" />
           {t("manage")}

@@ -13,7 +13,7 @@ export default async function NewAlliancePage() {
           {t("newAlliance")}
         </h1>
         <Link
-          href="/alliances"
+          href="/community"
           className="text-sm text-muted-foreground underline"
         >
           &larr; {t("backToAlliances")}

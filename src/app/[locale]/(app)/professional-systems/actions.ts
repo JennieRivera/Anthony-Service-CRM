@@ -50,7 +50,7 @@ export async function createProfessionalSystemAction(
     summary: `Added professional system "${values.name}"`,
   });
 
-  revalidatePath("/settings/professional-systems");
+  revalidatePath("/professional-systems");
   revalidatePath("/");
 }
 
@@ -72,7 +72,7 @@ export async function updateProfessionalSystemAction(
     summary: `Updated professional system "${values.name}" (active: ${values.active ?? true})`,
   });
 
-  revalidatePath("/settings/professional-systems");
+  revalidatePath("/professional-systems");
   revalidatePath("/");
 }
 
@@ -92,7 +92,7 @@ export async function toggleProfessionalSystemActiveAction(
     summary: `Professional system ${active ? "enabled" : "disabled"}`,
   });
 
-  revalidatePath("/settings/professional-systems");
+  revalidatePath("/professional-systems");
   revalidatePath("/");
 }
 
@@ -124,6 +124,6 @@ export async function reorderProfessionalSystemAction(
       .where(eq(professionalSystems.id, swapWith.id)),
   ]);
 
-  revalidatePath("/settings/professional-systems");
+  revalidatePath("/professional-systems");
   revalidatePath("/");
 }

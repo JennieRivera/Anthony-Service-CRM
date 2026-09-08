@@ -57,6 +57,7 @@ export async function createAssociationChamberAction(
   });
 
   revalidatePath("/associations");
+  revalidatePath("/community");
   const locale = await getLocale();
   redirect({ href: `/associations/${created.id}`, locale });
 }
@@ -80,6 +81,7 @@ export async function updateAssociationChamberAction(
   });
 
   revalidatePath("/associations");
+  revalidatePath("/community");
   revalidatePath(`/associations/${id}`);
   const locale = await getLocale();
   redirect({ href: `/associations/${id}`, locale });
@@ -102,5 +104,6 @@ export async function toggleAssociationChamberActiveAction(
   });
 
   revalidatePath("/associations");
+  revalidatePath("/community");
   revalidatePath(`/associations/${id}`);
 }

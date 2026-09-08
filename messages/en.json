@@ -121,7 +121,7 @@
     "payments": "Payments",
     "referrals": "Referrals",
     "tasks": "Tasks",
-    "alliances": "Alliances",
+    "community": "Community & Strategic Alliances",
     "communications": "Communications",
     "templates": "Templates",
     "reports": "Reports",
@@ -138,10 +138,11 @@
     "irsResources": "IRS Resources",
     "immigrationForms": "Immigration Forms",
     "latinoBusinessMap": "Latino Business Map",
-    "associations": "Associations & Chambers",
     "marketingContent": "Marketing Content",
     "aiTeam": "AI Team",
-    "aiEscalations": "AI Escalations"
+    "aiEscalations": "AI Escalations",
+    "professionalSystems": "Professional Systems",
+    "websites": "Websites"
   },
   "ServiceType": {
     "online_notary": "Online Notary",
@@ -1779,6 +1780,11 @@
     "active_partner": "Active Partner",
     "paused": "Paused",
     "inactive": "Inactive"
+  },
+  "Community": {
+    "title": "Community & Strategic Alliances",
+    "tabAlliances": "Alliances",
+    "tabAssociations": "Associations & Chambers"
   },
   "Alliances": {
     "title": "Strategic Alliances",

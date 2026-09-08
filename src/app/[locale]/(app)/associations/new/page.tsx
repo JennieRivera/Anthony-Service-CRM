@@ -13,7 +13,7 @@ export default async function NewAssociationPage() {
           {t("newOrganization")}
         </h1>
         <Link
-          href="/associations"
+          href="/community?tab=associations"
           className="text-sm text-muted-foreground underline"
         >
           &larr; {t("backToAssociations")}

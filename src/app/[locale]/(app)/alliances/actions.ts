@@ -69,6 +69,7 @@ export async function createAllianceAction(rawValues: AllianceFormValues) {
   await recordStatusChange(created.id, null, values.status);
 
   revalidatePath("/alliances");
+  revalidatePath("/community");
   const locale = await getLocale();
   redirect({ href: `/alliances/${created.id}`, locale });
 }
@@ -96,6 +97,7 @@ export async function updateAllianceAction(
   }
 
   revalidatePath("/alliances");
+  revalidatePath("/community");
   revalidatePath(`/alliances/${id}`);
   const locale = await getLocale();
   redirect({ href: `/alliances/${id}`, locale });

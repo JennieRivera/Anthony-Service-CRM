@@ -11,7 +11,7 @@ import {
   updateWebsiteLinkAction,
   toggleWebsiteLinkActiveAction,
   reorderWebsiteLinkAction,
-} from "@/app/[locale]/(app)/settings/websites/actions";
+} from "@/app/[locale]/(app)/websites/actions";
 import type { WebsiteLink } from "@/lib/db/schema";
 
 export function WebsiteLinksManager({ websites }: { websites: WebsiteLink[] }) {

@@ -11,7 +11,7 @@ import {
   updateProfessionalSystemAction,
   toggleProfessionalSystemActiveAction,
   reorderProfessionalSystemAction,
-} from "@/app/[locale]/(app)/settings/professional-systems/actions";
+} from "@/app/[locale]/(app)/professional-systems/actions";
 import type { ProfessionalSystem } from "@/lib/db/schema";
 
 export function ProfessionalSystemsManager({

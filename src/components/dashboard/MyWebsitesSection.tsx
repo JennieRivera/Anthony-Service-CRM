@@ -18,7 +18,7 @@ export async function MyWebsitesSection({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{t("dashboardTitle")}</CardTitle>
-        <Button size="sm" variant="outline" render={<Link href="/settings/websites" />}>
+        <Button size="sm" variant="outline" render={<Link href="/websites" />}>
           <Settings className="h-3.5 w-3.5" />
           {t("manage")}
         </Button>
