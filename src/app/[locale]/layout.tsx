@@ -4,6 +4,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Playfair_Display, Public_Sans } from "next/font/google";
 import { routing } from "@/i18n/routing";
+import { Toaster } from "@/components/ui/sonner";
 import "../globals.css";
 
 const playfairDisplay = Playfair_Display({
@@ -48,6 +49,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
           {children}
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>

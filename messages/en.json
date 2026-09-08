@@ -1203,6 +1203,7 @@
     "noResultsForFilter": "Nothing in this service yet.",
     "download": "Download",
     "notConfigured": "File storage isn't connected yet.",
+    "uploadSuccess": "Uploaded — added to the library.",
     "uploadError": "Upload failed. Please try again.",
     "uploadErrorUnsupportedType": "That file type isn't supported. Please upload an image or a video.",
     "uploadErrorSensitiveSsn": "This appears to contain a full SSN or ITIN and can't be uploaded.",

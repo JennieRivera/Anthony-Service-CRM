@@ -1203,6 +1203,7 @@
     "noResultsForFilter": "Aún no hay nada en este servicio.",
     "download": "Descargar",
     "notConfigured": "El almacenamiento de archivos aún no está conectado.",
+    "uploadSuccess": "Subido — agregado al banco de contenido.",
     "uploadError": "Error al subir. Inténtalo de nuevo.",
     "uploadErrorUnsupportedType": "Ese tipo de archivo no es compatible. Sube una imagen o un video.",
     "uploadErrorSensitiveSsn": "Esto parece contener un SSN o ITIN completo y no se puede subir.",

@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Upload, Download, Video, Image as ImageIcon } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -200,6 +201,7 @@ function UploadDialog() {
       reset();
       setOpen(false);
       router.refresh();
+      toast.success(t("uploadSuccess"));
     } catch {
       setErrorKey("uploadError");
     } finally {
