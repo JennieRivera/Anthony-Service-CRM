@@ -10,10 +10,17 @@ import { appointments, tasks } from "@/lib/db/schema";
 // once per tier, deduped by checking for an existing open one first —
 // never sends anything itself, same "prepare, don't auto-send" rule
 // already applied to Communications/HighLevel/WhatsApp elsewhere in this
-// CRM. Runs hourly (see vercel.json) so a 2-hour-out window isn't missed
-// between checks; if the hosting plan only allows a daily cron, the 2h
-// tier will effectively fire once appointments are already inside that
-// window rather than exactly at the 2h mark.
+// CRM.
+//
+// Originally ran hourly with a second 2h-out tier, but Vercel's Hobby
+// plan rejects any cron more frequent than once/day at deploy time —
+// this silently failed every deployment from the moment this route
+// shipped until it was caught (see git history). Now a single once-daily
+// sweep (see vercel.json) with a wide-enough window that every
+// appointment still gets exactly one reminder task the day before it
+// happens; the 2h-before tier is dropped rather than kept as a tier that
+// could only ever fire for appointments landing in the same 2-hour
+// window as the cron's fixed daily run time.
 const NOT_APPLICABLE_STATUSES = ["cancelled", "completed", "no_show", "rescheduled"] as const;
 
 async function sweepTier(
@@ -84,10 +91,7 @@ export async function GET(request: NextRequest) {
   }
 
   const db = getDb();
-  const [tier24h, tier2h] = await Promise.all([
-    sweepTier(db, 24, "24h"),
-    sweepTier(db, 2, "2h"),
-  ]);
+  const tier24h = await sweepTier(db, 24, "24h");
 
-  return NextResponse.json({ tier24h, tier2h });
+  return NextResponse.json({ tier24h });
 }
