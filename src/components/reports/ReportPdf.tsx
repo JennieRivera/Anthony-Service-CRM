@@ -1,20 +1,20 @@
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
-  page: { padding: 40, fontSize: 10, fontFamily: "Helvetica", color: "#0F1A2B" },
+  page: { padding: 40, fontSize: 10, fontFamily: "Helvetica", color: "#3B4A42" },
   title: { fontSize: 16, marginBottom: 4 },
-  muted: { color: "#5B6472", marginBottom: 20 },
+  muted: { color: "#6C7771", marginBottom: 20 },
   section: { marginBottom: 20 },
   sectionTitle: { fontSize: 12, marginBottom: 8, fontWeight: 700 },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     borderBottomWidth: 1,
-    borderBottomColor: "#E4E0D6",
+    borderBottomColor: "#DDEAE1",
     paddingVertical: 4,
   },
   kpiRow: { flexDirection: "row", gap: 24, marginBottom: 20 },
-  kpiLabel: { color: "#5B6472" },
+  kpiLabel: { color: "#6C7771" },
   kpiValue: { fontSize: 14, fontWeight: 700 },
 });
 

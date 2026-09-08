@@ -46,46 +46,90 @@
 }
 
 /*
- * Anthony Multiservice CRM brand tokens — deep navy, warm cream, muted gold/brass.
- * Single light theme only; no dark mode.
- * Contrast checked: navy-on-cream ~16.4:1 (AAA), navy-on-gold ~6.2:1 (AA).
- * Gold-on-cream is ~2.6:1 and fails AA — never use --accent as a text color
- * on --background/--card; restrict it to fills, borders, chips, chart lines,
- * and as a background with --accent-foreground (navy) text on top.
+ * Anthony Multiservice CRM brand tokens — mint green, white, soft coral,
+ * dark green. Single light theme only; no dark mode.
+ *
+ * Only 4 hex values were given (mint #8FB89C, white #FFFFFF, coral
+ * #E8927A, dark green #3B4A42); every other token below is either one of
+ * those 4 directly, or a tint/blend derived from them (documented inline)
+ * where the token system needs more than 4 colors (muted/secondary
+ * surfaces, borders, 5 chart colors, sidebar hover/border states).
+ *
+ * Contrast checked (WCAG relative luminance):
+ *   dark green-on-white   9.36:1 (AAA) — foreground, primary button text
+ *   white-on-dark-green   9.36:1 (AAA) — primary button fill, sidebar
+ *   dark green-on-mint    4.24:1 — under the 4.5:1 body-text AA
+ *     threshold, but clears AA-large-text/UI-component (3:1). Mint is
+ *     therefore used as a background only for large/bold headings, KPI
+ *     numbers, chart fill, and short badge/pill labels — never as a
+ *     paragraph-text card background.
+ *   white-on-coral 2.38:1 / white-on-mint 2.21:1 — both fail outright;
+ *     white text never sits on coral or mint.
+ * This mirrors the old palette's own rule (kept below in spirit): never
+ * use --accent as a text color on --background/--card; restrict it to
+ * fills, borders, chips, and chart accents.
+ *
+ * --accent is intentionally NOT the literal coral hex: the literal coral
+ * (#E8927A) only reaches 3.93:1 with dark-green text, short of AA for the
+ * 12px badge/chip labels that are --accent's main real use across the app
+ * (every StatusBadge-style component). --accent is instead a 60% coral /
+ * 40% white tint (dark green on it: 5.67:1, comfortable AA), so every
+ * existing bg-accent/text-accent-foreground usage is safe with zero
+ * component changes. The literal, fully-saturated coral still appears at
+ * full strength as --chart-2 and in the calendar's "today" wash.
  */
 :root {
-  --background: #faf8f3;
-  --foreground: #0f1a2b;
+  --background: #ffffff;
+  --foreground: #3b4a42;
   --card: #ffffff;
-  --card-foreground: #0f1a2b;
+  --card-foreground: #3b4a42;
   --popover: #ffffff;
-  --popover-foreground: #0f1a2b;
-  --primary: #0f1a2b;
-  --primary-foreground: #faf8f3;
-  --secondary: #f1ede4;
-  --secondary-foreground: #0f1a2b;
-  --muted: #f1ede4;
-  --muted-foreground: #5b6472;
-  --accent: #b8964a;
-  --accent-foreground: #0f1a2b;
+  --popover-foreground: #3b4a42;
+  --primary: #3b4a42;
+  --primary-foreground: #ffffff;
+  /* Light mint wash (mint blended 20% into white) — subtle panel
+     background, safe for body text at 8.13:1. */
+  --secondary: #e9f1eb;
+  --secondary-foreground: #3b4a42;
+  --muted: #e9f1eb;
+  /* Dark green blended 75% into white — a softened text tone for
+     captions/labels that still clears AA (4.65:1) on white. */
+  --muted-foreground: #6c7771;
+  /* 60% coral / 40% white tint — see comment above. */
+  --accent: #f1beaf;
+  --accent-foreground: #3b4a42;
   --destructive: #a13b2c;
-  --border: #e4e0d6;
-  --input: #e4e0d6;
-  --ring: #b8964a;
-  --chart-1: #0f1a2b;
-  --chart-2: #b8964a;
-  --chart-3: #6b7a8f;
-  --chart-4: #8c6d46;
-  --chart-5: #3e5c76;
+  /* Mint blended 30% into white — a visible-but-quiet border, distinct
+     from the lighter --muted wash. */
+  --border: #ddeae1;
+  --input: #ddeae1;
+  --ring: #3b4a42;
+  --chart-1: #8fb89c;
+  --chart-2: #e8927a;
+  --chart-3: #3b4a42;
+  /* Mint + dark green, blended 50/50 — a 4th distinct hue (deep sage). */
+  --chart-4: #65816f;
+  /* Coral + white, blended 50/50 — a 5th distinct hue (light peach). */
+  --chart-5: #f3c8bc;
   --radius: 0.625rem;
-  --sidebar: #0f1a2b;
-  --sidebar-foreground: #faf8f3;
-  --sidebar-primary: #b8964a;
-  --sidebar-primary-foreground: #0f1a2b;
-  --sidebar-accent: #1b2a40;
-  --sidebar-accent-foreground: #faf8f3;
-  --sidebar-border: #24344a;
-  --sidebar-ring: #b8964a;
+  --sidebar: #3b4a42;
+  --sidebar-foreground: #ffffff;
+  /* Used only for the collapsed-sidebar "AMS" logo monogram (Logo.tsx) —
+     mint text/border on the dark green sidebar, 4.24:1. Logotypes are
+     exempt from WCAG text-contrast requirements, so the literal mint is
+     kept here even though it's below the general 4.5:1 bar; every actual
+     nav-link state (active/hover) uses --sidebar-accent instead, which is
+     a full AA pass (6.11:1). */
+  --sidebar-primary: #8fb89c;
+  --sidebar-primary-foreground: #3b4a42;
+  /* Dark green blended 15% lighter — hover background for non-active
+     sidebar items, 6.11:1 with white text. */
+  --sidebar-accent: #58655e;
+  --sidebar-accent-foreground: #ffffff;
+  /* Dark green blended 8% lighter — a subtle separator inside the dark
+     sidebar. */
+  --sidebar-border: #4b5851;
+  --sidebar-ring: #8fb89c;
 }
 
 @layer base {

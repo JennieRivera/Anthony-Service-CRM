@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     padding: 40,
     fontSize: 10,
     fontFamily: "Helvetica",
-    color: "#0F1A2B",
+    color: "#3B4A42",
   },
   header: {
     flexDirection: "row",
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   muted: {
-    color: "#5B6472",
+    color: "#6C7771",
   },
   invoiceTitle: {
     fontSize: 16,
@@ -41,19 +41,19 @@ const styles = StyleSheet.create({
   table: {
     marginTop: 8,
     borderTopWidth: 1,
-    borderTopColor: "#E4E0D6",
+    borderTopColor: "#DDEAE1",
   },
   tableHeader: {
     flexDirection: "row",
     borderBottomWidth: 1,
-    borderBottomColor: "#E4E0D6",
+    borderBottomColor: "#DDEAE1",
     paddingVertical: 6,
     fontWeight: 700,
   },
   tableRow: {
     flexDirection: "row",
     borderBottomWidth: 1,
-    borderBottomColor: "#E4E0D6",
+    borderBottomColor: "#DDEAE1",
     paddingVertical: 6,
   },
   colDescription: { width: "50%" },

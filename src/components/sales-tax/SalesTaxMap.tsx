@@ -101,7 +101,7 @@ export function SalesTaxMap({
 
       settings[abbr] = {
         fill: COLOR_HEX[color],
-        stroke: "#0F1A2B",
+        stroke: "#3B4A42",
         onClick: () => openStateDialog(abbr),
         tooltip: (
           <div style={{ fontSize: 12, padding: 2 }}>
@@ -133,7 +133,7 @@ export function SalesTaxMap({
     <div className="flex flex-col gap-4">
       <UsaStateMap
         states={states}
-        defaultState={{ fill: COLOR_HEX.gray, stroke: "#0F1A2B" }}
+        defaultState={{ fill: COLOR_HEX.gray, stroke: "#3B4A42" }}
       />
 
       <div className="flex flex-wrap items-center gap-4 text-sm">

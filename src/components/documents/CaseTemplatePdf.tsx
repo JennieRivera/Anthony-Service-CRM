@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     padding: 40,
     fontSize: 10,
     fontFamily: "Helvetica",
-    color: "#0F1A2B",
+    color: "#3B4A42",
   },
   header: {
     flexDirection: "row",
@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   muted: {
-    color: "#5B6472",
+    color: "#6C7771",
   },
   docTitleEn: {
     fontSize: 15,
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   docTitleEs: {
     fontSize: 11,
     textAlign: "center",
-    color: "#5B6472",
+    color: "#6C7771",
     marginBottom: 16,
   },
   intro: {
@@ -39,14 +39,14 @@ const styles = StyleSheet.create({
   introEs: {
     marginBottom: 16,
     lineHeight: 1.4,
-    color: "#5B6472",
+    color: "#6C7771",
     fontStyle: "italic",
   },
   caseBox: {
     marginBottom: 18,
     padding: 10,
     borderWidth: 1,
-    borderColor: "#E4E0D6",
+    borderColor: "#DDEAE1",
     borderRadius: 4,
   },
   caseRow: {
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   sectionHeadingEs: {
     fontSize: 9,
-    color: "#5B6472",
+    color: "#6C7771",
     marginBottom: 8,
   },
   bodyText: {
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   bodyTextEs: {
     marginBottom: 6,
     lineHeight: 1.4,
-    color: "#5B6472",
+    color: "#6C7771",
     fontStyle: "italic",
   },
   field: {
@@ -86,20 +86,20 @@ const styles = StyleSheet.create({
     width: "45%",
   },
   fieldLabelEs: {
-    color: "#5B6472",
+    color: "#6C7771",
     fontSize: 8,
   },
   fieldLine: {
     flex: 1,
     borderBottomWidth: 1,
-    borderBottomColor: "#0F1A2B",
+    borderBottomColor: "#3B4A42",
     marginLeft: 8,
   },
   notaryBlock: {
     marginTop: 24,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: "#E4E0D6",
+    borderTopColor: "#DDEAE1",
   },
   notaryTitle: {
     fontSize: 12,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   signatureBlock: {
     width: "45%",
     borderTopWidth: 1,
-    borderTopColor: "#0F1A2B",
+    borderTopColor: "#3B4A42",
     paddingTop: 4,
   },
 });

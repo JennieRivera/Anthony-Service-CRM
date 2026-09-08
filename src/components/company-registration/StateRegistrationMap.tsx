@@ -41,8 +41,8 @@ export function StateRegistrationMap() {
       if (!info) return;
 
       settings[abbr] = {
-        fill: "#E4E0D6",
-        stroke: "#0F1A2B",
+        fill: "#DDEAE1",
+        stroke: "#3B4A42",
         onClick: () => {
           setSelectedState(abbr);
           setSummary(null);

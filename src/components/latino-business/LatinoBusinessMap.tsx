@@ -194,7 +194,7 @@ export function LatinoBusinessMap({
 
       settings[abbr] = {
         fill: matches ? SCORE_COLOR[score] : DIMMED_FILL,
-        stroke: "#0F1A2B",
+        stroke: "#3B4A42",
         onClick: () => openStateDialog(abbr),
         tooltip: (
           <div style={{ fontSize: 12, padding: 2 }}>
@@ -310,7 +310,7 @@ export function LatinoBusinessMap({
         </div>
       </div>
 
-      <UsaStateMap states={states} defaultState={{ fill: DIMMED_FILL, stroke: "#0F1A2B" }} />
+      <UsaStateMap states={states} defaultState={{ fill: DIMMED_FILL, stroke: "#3B4A42" }} />
 
       <div className="flex flex-wrap items-center gap-4 text-sm">
         {latinoOpportunityScoreValues.map((score) => (
