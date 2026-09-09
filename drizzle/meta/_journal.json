@@ -281,6 +281,13 @@
       "when": 1788921625143,
       "tag": "0039_chilly_butterfly",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1788925367626,
+      "tag": "0040_tiny_lord_tyger",
+      "breakpoints": true
     }
   ]
 }

@@ -27,6 +27,7 @@ import {
   Globe,
   GraduationCap,
   Gem,
+  Share2,
 } from "lucide-react";
 
 export type NavItem = {
@@ -58,6 +59,7 @@ export type NavItem = {
     | "websites"
     | "academy"
     | "diamondCommunity"
+    | "socialMedia"
     | "settings";
   icon: LucideIcon;
   // Forces the icon to full-opacity sidebar-foreground instead of the
@@ -105,7 +107,13 @@ export const navItems: NavItem[] = [
     icon: Gem,
     highlightIcon: true,
   },
+  // "Media Library" per SIDEBAR-PLAN.md section 9 — same route/table as
+  // before (marketing_content_assets), just relabeled to match the plan's
+  // terminology now that Social Media exists as its own, separate module.
   { href: "/marketing-content", labelKey: "marketingContent", icon: Megaphone },
+  // Content planning/scheduling/publishing-prep, separate from the Media
+  // Library (raw file storage) it references.
+  { href: "/social-media", labelKey: "socialMedia", icon: Share2 },
   { href: "/company-registration", labelKey: "companyRegistration", icon: Map },
   { href: "/sales-tax-map", labelKey: "salesTaxMap", icon: Landmark },
   { href: "/irs-resources", labelKey: "irsResources", icon: Library },

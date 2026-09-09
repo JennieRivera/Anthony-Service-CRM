@@ -1054,6 +1054,124 @@ export const marketingContentAssets = pgTable("marketing_content_assets", {
   blobUrl: text("blob_url").notNull(),
 });
 
+// SIDEBAR-PLAN.md sections 4-7 — Social Media: planning, scheduling, and
+// publishing preparation, deliberately separate from marketingContentAssets
+// (the "Media Library" — raw file storage, kept as-is and referenced here
+// via mediaAssetId rather than duplicated) and from Communications (direct
+// 1:1 contact history, not public content).
+export const socialMediaPlatformEnum = pgEnum("social_media_platform", [
+  "facebook",
+  "instagram",
+  "youtube",
+  "tiktok",
+  "linkedin",
+  "website",
+  "google_business_profile",
+  "whatsapp_channel",
+  "other",
+]);
+
+export const socialContentTypeEnum = pgEnum("social_content_type", [
+  "image",
+  "video",
+  "reel",
+  "short",
+  "story",
+  "carousel",
+  "live",
+  "educational_post",
+  "promotion",
+  "testimonial",
+  "event",
+  "blog",
+  "other",
+]);
+
+// Section 4's status pipeline.
+export const socialContentStatusEnum = pgEnum("social_content_status", [
+  "idea",
+  "draft",
+  "in_review",
+  "approved",
+  "scheduled",
+  "published",
+  "archived",
+]);
+
+// Section 6 lists "Performance Status" as its own field on the content
+// record, separate from the actual view/reach/like counters (which live
+// on their own table below, added once real numbers exist to track).
+// This tracks only whether that measurement has happened yet.
+export const socialPerformanceStatusEnum = pgEnum(
+  "social_performance_status",
+  ["not_tracked", "tracking", "final"],
+);
+
+// Section 7 — Approval & Brand Control. No auto-detection of "does this
+// mention RRI/a partner/a testimonial" from free text (too unreliable to
+// gate a publish decision on) — approvalRequired is a manual flag staff
+// set themselves, with the category list shown as guidance in the UI.
+export const socialPartnerApprovalStatusEnum = pgEnum(
+  "social_partner_approval_status",
+  ["not_required", "pending", "approved", "denied"],
+);
+
+export const socialMediaContent = pgTable("social_media_content", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  // Friendly "SM-00001" id, same pattern as communicationSeq/referralSeq.
+  contentSeq: serial("content_seq").notNull().unique(),
+  title: text("title").notNull(),
+  platform: socialMediaPlatformEnum("platform").notNull(),
+  contentType: socialContentTypeEnum("content_type").notNull(),
+  campaign: text("campaign"),
+  // Anthony Multiservice LLC and "related approved brands" per section 4 —
+  // free text rather than an enum since the approved-brand list isn't
+  // modeled anywhere else in this CRM yet.
+  brand: text("brand"),
+  // Null = general content not tied to one service line, same convention
+  // as marketingContentAssets.serviceType.
+  serviceType: serviceTypeEnum("service_type"),
+  audience: text("audience"),
+  language: text("language", { enum: ["en", "es"] }),
+  caption: text("caption"),
+  hashtags: text("hashtags"),
+  callToAction: text("call_to_action"),
+  // References the existing Media Library rather than storing another
+  // copy of the file.
+  mediaAssetId: uuid("media_asset_id").references(
+    () => marketingContentAssets.id,
+    { onDelete: "set null" },
+  ),
+  status: socialContentStatusEnum("status").notNull().default("idea"),
+  scheduledDate: date("scheduled_date"),
+  publishedDate: date("published_date"),
+  postUrl: text("post_url"),
+  performanceStatus: socialPerformanceStatusEnum("performance_status")
+    .notNull()
+    .default("not_tracked"),
+  approvalRequired: boolean("approval_required").notNull().default(false),
+  approvedBy: text("approved_by"),
+  approvalDate: date("approval_date"),
+  partnerApprovalRequired: boolean("partner_approval_required")
+    .notNull()
+    .default(false),
+  partnerApprovalStatus: socialPartnerApprovalStatusEnum(
+    "partner_approval_status",
+  )
+    .notNull()
+    .default("not_required"),
+  // Snapshot of the acting session's email, same reasoning as
+  // caseStatusHistory.changedByEmail — there's no populated users table yet.
+  createdByEmail: text("created_by_email"),
+  notes: text("notes"),
+});
+
 export const appointments = pgTable("appointments", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -2749,6 +2867,7 @@ export type RriReferralDetails = typeof rriReferralDetails.$inferSelect;
 export type AcademyEnrollmentDetails =
   typeof academyEnrollmentDetails.$inferSelect;
 export type AcademyDiamondMember = typeof academyDiamondMembers.$inferSelect;
+export type SocialMediaContent = typeof socialMediaContent.$inferSelect;
 export type StrategicAlliance = typeof strategicAlliances.$inferSelect;
 export type AllianceStatusHistory =
   typeof allianceStatusHistory.$inferSelect;
