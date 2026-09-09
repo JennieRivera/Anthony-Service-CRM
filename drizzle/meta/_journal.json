@@ -267,6 +267,13 @@
       "when": 1788916246772,
       "tag": "0037_illegal_the_renegades",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1788919296772,
+      "tag": "0038_flat_ironclad",
+      "breakpoints": true
     }
   ]
 }

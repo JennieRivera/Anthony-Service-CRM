@@ -10,6 +10,16 @@ export async function listAssociationsChambers(state?: string) {
     .orderBy(desc(associationsChambers.createdAt));
 }
 
+export async function listAssociationsChambersForSelect() {
+  return getDb()
+    .select({
+      id: associationsChambers.id,
+      organizationName: associationsChambers.organizationName,
+    })
+    .from(associationsChambers)
+    .orderBy(associationsChambers.organizationName);
+}
+
 export async function getAssociationChamberById(id: string) {
   const [row] = await getDb()
     .select()

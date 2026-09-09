@@ -1,6 +1,15 @@
 import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
-import { conversationMessages, clients, cases, referrals, tasks } from "@/lib/db/schema";
+import {
+  conversationMessages,
+  clients,
+  cases,
+  referrals,
+  tasks,
+  appointments,
+  strategicAlliances,
+  associationsChambers,
+} from "@/lib/db/schema";
 
 export type CommunicationListFilters = {
   channel?: string;
@@ -66,12 +75,24 @@ export async function getCommunicationById(id: string) {
       referralSeq: referrals.referralSeq,
       taskTitle: tasks.title,
       taskStatus: tasks.status,
+      appointmentTitle: appointments.title,
+      allianceName: strategicAlliances.organizationName,
+      associationName: associationsChambers.organizationName,
     })
     .from(conversationMessages)
     .innerJoin(clients, eq(conversationMessages.clientId, clients.id))
     .leftJoin(cases, eq(conversationMessages.caseId, cases.id))
     .leftJoin(referrals, eq(conversationMessages.referralId, referrals.id))
     .leftJoin(tasks, eq(conversationMessages.taskId, tasks.id))
+    .leftJoin(appointments, eq(conversationMessages.appointmentId, appointments.id))
+    .leftJoin(
+      strategicAlliances,
+      eq(conversationMessages.allianceId, strategicAlliances.id),
+    )
+    .leftJoin(
+      associationsChambers,
+      eq(conversationMessages.associationId, associationsChambers.id),
+    )
     .where(eq(conversationMessages.id, id))
     .limit(1);
 

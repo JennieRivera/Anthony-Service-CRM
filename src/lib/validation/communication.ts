@@ -36,6 +36,14 @@ export const communicationFormSchema = z.object({
   clientId: z.string().min(1, "Client is required"),
   caseId: optionalString,
   referralId: optionalString,
+  // SIDEBAR-PLAN.md section 2 — completing Communications' "connects to"
+  // list. Two separate optional FKs for alliances/associations rather
+  // than one generic "partner" field, since those are two deliberately
+  // separate tables (see the comment on associationsChambers in
+  // schema.ts) — a communication links to at most one of either.
+  appointmentId: optionalString,
+  allianceId: optionalString,
+  associationId: optionalString,
   businessName: optionalString,
   channel: z.enum(communicationChannelValues),
   direction: z.enum(communicationDirectionValues),

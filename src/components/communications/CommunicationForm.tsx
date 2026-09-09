@@ -46,6 +46,9 @@ export function CommunicationForm({
   clients,
   cases,
   referrals,
+  appointments,
+  alliances,
+  associations,
   defaultClientId,
   defaultCaseId,
   template,
@@ -55,6 +58,9 @@ export function CommunicationForm({
   clients: { id: string; fullName: string }[];
   cases: { id: string; title: string }[];
   referrals: { id: string; referralSeq: number }[];
+  appointments: { id: string; title: string }[];
+  alliances: { id: string; organizationName: string }[];
+  associations: { id: string; organizationName: string }[];
   defaultClientId?: string;
   defaultCaseId?: string;
   template?: MessageTemplate | null;
@@ -80,6 +86,9 @@ export function CommunicationForm({
       clientId: communication?.clientId ?? defaultClientId ?? "",
       caseId: communication?.caseId ?? defaultCaseId ?? "",
       referralId: communication?.referralId ?? "",
+      appointmentId: communication?.appointmentId ?? "",
+      allianceId: communication?.allianceId ?? "",
+      associationId: communication?.associationId ?? "",
       businessName: communication?.businessName ?? "",
       channel: communication?.channel ?? template?.channel ?? "email",
       direction: communication?.direction ?? "outbound",
@@ -213,6 +222,90 @@ export function CommunicationForm({
                   {referrals.map((r) => (
                     <SelectItem key={r.id} value={r.id}>
                       REF-{String(r.referralSeq).padStart(5, "0")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("appointment")}</Label>
+          <Controller
+            control={control}
+            name="appointmentId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(value) =>
+                  field.onChange(value === "none" ? "" : value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noAppointment")}</SelectItem>
+                  {appointments.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("alliance")}</Label>
+          <Controller
+            control={control}
+            name="allianceId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(value) =>
+                  field.onChange(value === "none" ? "" : value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noAlliance")}</SelectItem>
+                  {alliances.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.organizationName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("association")}</Label>
+          <Controller
+            control={control}
+            name="associationId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(value) =>
+                  field.onChange(value === "none" ? "" : value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noAssociation")}</SelectItem>
+                  {associations.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.organizationName}
                     </SelectItem>
                   ))}
                 </SelectContent>

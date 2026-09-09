@@ -1,0 +1,6 @@
+ALTER TABLE "conversation_messages" ADD COLUMN "appointment_id" uuid;--> statement-breakpoint
+ALTER TABLE "conversation_messages" ADD COLUMN "alliance_id" uuid;--> statement-breakpoint
+ALTER TABLE "conversation_messages" ADD COLUMN "association_id" uuid;--> statement-breakpoint
+ALTER TABLE "conversation_messages" ADD CONSTRAINT "conversation_messages_appointment_id_appointments_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."appointments"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "conversation_messages" ADD CONSTRAINT "conversation_messages_alliance_id_strategic_alliances_id_fk" FOREIGN KEY ("alliance_id") REFERENCES "public"."strategic_alliances"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "conversation_messages" ADD CONSTRAINT "conversation_messages_association_id_associations_chambers_id_fk" FOREIGN KEY ("association_id") REFERENCES "public"."associations_chambers"("id") ON DELETE set null ON UPDATE no action;

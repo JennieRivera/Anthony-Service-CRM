@@ -2099,6 +2099,21 @@ export const conversationMessages = pgTable("conversation_messages", {
   referralId: uuid("referral_id").references(() => referrals.id, {
     onDelete: "set null",
   }),
+  // SIDEBAR-PLAN.md section 2 — completing Communications' "connects to"
+  // list (Client, Company, Service, Referral, Task, Appointment, Partner,
+  // Assigned User). Two separate nullable FKs for alliances/associations
+  // rather than one generic "partner" column, mirroring why those are two
+  // separate tables in the first place (see associationsChambers above).
+  appointmentId: uuid("appointment_id").references(() => appointments.id, {
+    onDelete: "set null",
+  }),
+  allianceId: uuid("alliance_id").references(() => strategicAlliances.id, {
+    onDelete: "set null",
+  }),
+  associationId: uuid("association_id").references(
+    () => associationsChambers.id,
+    { onDelete: "set null" },
+  ),
   taskId: uuid("task_id").references(() => tasks.id, { onDelete: "set null" }),
   // Reserved for the future staff/role system — same unpopulated-until-
   // multi-user-login pattern as cases.assignedUserId; no picker UI yet.

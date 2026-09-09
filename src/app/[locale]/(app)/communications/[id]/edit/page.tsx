@@ -5,6 +5,9 @@ import { CommunicationForm } from "@/components/communications/CommunicationForm
 import { getCommunicationById } from "@/lib/queries/communications";
 import { listClientsForSelect } from "@/lib/queries/cases";
 import { listCasesForSelect, listReferralsForSelect } from "@/lib/queries/referrals";
+import { listAppointmentsForSelect } from "@/lib/queries/appointments";
+import { listAlliancesForSelect } from "@/lib/queries/alliances";
+import { listAssociationsChambersForSelect } from "@/lib/queries/associationsChambers";
 import { updateCommunicationAction } from "../../actions";
 import type { CommunicationFormValues } from "@/lib/validation/communication";
 
@@ -15,12 +18,16 @@ export default async function EditCommunicationPage({
 }) {
   const { id } = await params;
   const t = await getTranslations("Communications");
-  const [result, clients, cases, referrals] = await Promise.all([
-    getCommunicationById(id),
-    listClientsForSelect(),
-    listCasesForSelect(),
-    listReferralsForSelect(),
-  ]);
+  const [result, clients, cases, referrals, appointments, alliances, associations] =
+    await Promise.all([
+      getCommunicationById(id),
+      listClientsForSelect(),
+      listCasesForSelect(),
+      listReferralsForSelect(),
+      listAppointmentsForSelect(),
+      listAlliancesForSelect(),
+      listAssociationsChambersForSelect(),
+    ]);
 
   if (!result) notFound();
 
@@ -48,6 +55,9 @@ export default async function EditCommunicationPage({
         clients={clients}
         cases={cases}
         referrals={referrals}
+        appointments={appointments}
+        alliances={alliances}
+        associations={associations}
         onSubmit={submit}
       />
     </div>

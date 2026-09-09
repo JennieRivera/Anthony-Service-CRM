@@ -20,7 +20,16 @@ export default async function CommunicationDetailPage({
   const result = await getCommunicationById(id);
   if (!result) notFound();
 
-  const { communication, client, caseTitle, referralSeq, taskTitle } = result;
+  const {
+    communication,
+    client,
+    caseTitle,
+    referralSeq,
+    taskTitle,
+    appointmentTitle,
+    allianceName,
+    associationName,
+  } = result;
   const communicationNumber = `COM-${String(communication.communicationSeq).padStart(5, "0")}`;
 
   return (
@@ -81,6 +90,39 @@ export default async function CommunicationDetailPage({
                 className="text-foreground hover:underline"
               >
                 REF-{String(referralSeq).padStart(5, "0")}
+              </Link>
+            </div>
+          )}
+          {appointmentTitle && (
+            <div>
+              <p className="text-muted-foreground">{t("form.appointment")}</p>
+              <Link
+                href={`/appointments/${communication.appointmentId}`}
+                className="text-foreground hover:underline"
+              >
+                {appointmentTitle}
+              </Link>
+            </div>
+          )}
+          {allianceName && (
+            <div>
+              <p className="text-muted-foreground">{t("form.alliance")}</p>
+              <Link
+                href={`/alliances/${communication.allianceId}`}
+                className="text-foreground hover:underline"
+              >
+                {allianceName}
+              </Link>
+            </div>
+          )}
+          {associationName && (
+            <div>
+              <p className="text-muted-foreground">{t("form.association")}</p>
+              <Link
+                href={`/associations/${communication.associationId}`}
+                className="text-foreground hover:underline"
+              >
+                {associationName}
               </Link>
             </div>
           )}

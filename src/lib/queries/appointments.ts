@@ -94,6 +94,16 @@ export async function listUpcomingAppointments(limit = 5) {
     .limit(limit);
 }
 
+// Feeds the Communications form's appointment picker — same unscoped
+// "fetch everything, let staff pick" pattern already used there for
+// cases/referrals (listCasesForSelect/listReferralsForSelect).
+export async function listAppointmentsForSelect() {
+  return getDb()
+    .select({ id: appointments.id, title: appointments.title, startAt: appointments.startAt })
+    .from(appointments)
+    .orderBy(desc(appointments.startAt));
+}
+
 export async function getAppointmentById(id: string) {
   const db = getDb();
   const [row] = await db

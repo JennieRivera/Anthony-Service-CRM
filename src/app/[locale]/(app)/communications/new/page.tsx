@@ -3,6 +3,9 @@ import { Link } from "@/i18n/navigation";
 import { CommunicationForm } from "@/components/communications/CommunicationForm";
 import { listClientsForSelect } from "@/lib/queries/cases";
 import { listCasesForSelect, listReferralsForSelect } from "@/lib/queries/referrals";
+import { listAppointmentsForSelect } from "@/lib/queries/appointments";
+import { listAlliancesForSelect } from "@/lib/queries/alliances";
+import { listAssociationsChambersForSelect } from "@/lib/queries/associationsChambers";
 import { getMessageTemplateById } from "@/lib/queries/messageTemplates";
 import { createCommunicationAction } from "../actions";
 
@@ -13,12 +16,16 @@ export default async function NewCommunicationPage({
 }) {
   const t = await getTranslations("Communications");
   const { clientId, caseId, templateId } = await searchParams;
-  const [clients, cases, referrals, template] = await Promise.all([
-    listClientsForSelect(),
-    listCasesForSelect(),
-    listReferralsForSelect(),
-    templateId ? getMessageTemplateById(templateId) : Promise.resolve(null),
-  ]);
+  const [clients, cases, referrals, appointments, alliances, associations, template] =
+    await Promise.all([
+      listClientsForSelect(),
+      listCasesForSelect(),
+      listReferralsForSelect(),
+      listAppointmentsForSelect(),
+      listAlliancesForSelect(),
+      listAssociationsChambersForSelect(),
+      templateId ? getMessageTemplateById(templateId) : Promise.resolve(null),
+    ]);
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -38,6 +45,9 @@ export default async function NewCommunicationPage({
         clients={clients}
         cases={cases}
         referrals={referrals}
+        appointments={appointments}
+        alliances={alliances}
+        associations={associations}
         defaultClientId={clientId}
         defaultCaseId={caseId}
         template={template}
