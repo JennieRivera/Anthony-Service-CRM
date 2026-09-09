@@ -2320,6 +2320,15 @@ export const organizationTypeEnum = pgEnum("organization_type", [
   "community_organization",
   "professional_association",
   "other",
+  // SIDEBAR-PLAN.md section 3 — added when the Community & Strategic
+  // Alliances module was completed; the original 12 values above predate
+  // this and are kept as-is for existing rows.
+  "business_association",
+  "latino_association",
+  "referral_partner",
+  "training_partner",
+  "university",
+  "business_organization",
 ]);
 
 export const allianceStatusEnum = pgEnum("alliance_status", [
@@ -2331,6 +2340,9 @@ export const allianceStatusEnum = pgEnum("alliance_status", [
   "active_partner",
   "paused",
   "inactive",
+  // SIDEBAR-PLAN.md section 3 — associationsChambers' own pipeline
+  // already had "member"; alliances' pipeline didn't.
+  "member",
 ]);
 
 export const strategicAlliances = pgTable("strategic_alliances", {
@@ -2347,6 +2359,7 @@ export const strategicAlliances = pgTable("strategic_alliances", {
   phone: text("phone"),
   email: text("email"),
   website: text("website"),
+  city: text("city"),
   state: text("state"),
   country: text("country"),
   relationshipOwner: text("relationship_owner"),

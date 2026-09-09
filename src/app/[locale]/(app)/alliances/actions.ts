@@ -40,6 +40,7 @@ function normalize(values: AllianceFormValues) {
     phone: values.phone || null,
     email: values.email || null,
     website: values.website || null,
+    city: values.city || null,
     state: values.state || null,
     country: values.country || null,
     relationshipOwner: values.relationshipOwner || null,

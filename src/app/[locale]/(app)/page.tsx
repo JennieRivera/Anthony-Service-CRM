@@ -192,11 +192,36 @@ export default async function Home() {
 
       {/* 9. Community */}
       <DashboardSection title={t("sectionCommunity")} viewAllHref="/community" viewAllLabel={t("viewAll")}>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <KpiCard
-            label={t("activeAlliances")}
-            value={String(data.communitySummary.activeAlliances)}
+            label={t("activeStrategicPartners")}
+            value={String(data.communitySummary.activeStrategicPartners)}
             icon={Network}
+          />
+          <KpiCard
+            label={t("newPartnersThisMonth")}
+            value={String(data.communitySummary.newPartnersThisMonth)}
+            icon={UsersRound}
+          />
+          <KpiCard
+            label={t("meetingsScheduled")}
+            value={String(data.communitySummary.meetingsScheduled)}
+            icon={Handshake}
+          />
+          <KpiCard
+            label={t("referralsFromPartners")}
+            value={String(data.communitySummary.referralsFromPartners)}
+            icon={TrendingUp}
+          />
+          <KpiCard
+            label={t("revenueFromPartners")}
+            value={formatMoney(data.communitySummary.revenueFromPartners)}
+            icon={CircleDollarSign}
+          />
+          <KpiCard
+            label={t("partnerFollowUpsDue")}
+            value={String(data.communitySummary.partnerFollowUpsDue)}
+            icon={ClockAlert}
           />
         </div>
       </DashboardSection>

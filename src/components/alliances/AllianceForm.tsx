@@ -52,6 +52,7 @@ export function AllianceForm({
       phone: alliance?.phone ?? "",
       email: alliance?.email ?? "",
       website: alliance?.website ?? "",
+      city: alliance?.city ?? "",
       state: alliance?.state ?? "",
       country: alliance?.country ?? "",
       relationshipOwner: alliance?.relationshipOwner ?? "",
@@ -168,6 +169,11 @@ export function AllianceForm({
             {t("relationshipOwner")}
           </Label>
           <Input id="relationshipOwner" {...register("relationshipOwner")} />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="city">{t("city")}</Label>
+          <Input id="city" {...register("city")} />
         </div>
 
         <div className="flex flex-col gap-1.5">

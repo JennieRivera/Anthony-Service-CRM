@@ -9,6 +9,7 @@ const statusClasses: Record<string, string> = {
   under_discussion: "border-transparent bg-accent/20 text-foreground",
   agreement_review: "border-transparent bg-accent/20 text-foreground",
   active_partner: "border-transparent bg-primary text-primary-foreground",
+  member: "border-transparent bg-primary text-primary-foreground",
   paused: "border-border text-muted-foreground bg-transparent",
   inactive: "border-border text-muted-foreground bg-transparent",
 };

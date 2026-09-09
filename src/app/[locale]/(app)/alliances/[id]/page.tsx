@@ -82,6 +82,14 @@ export default async function AllianceDetailPage({
             <p className="text-foreground">{alliance.website ?? "—"}</p>
           </div>
           <div>
+            <p className="text-muted-foreground">{t("form.city")}</p>
+            <p className="text-foreground">{alliance.city ?? "—"}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.state")}</p>
+            <p className="text-foreground">{alliance.state ?? "—"}</p>
+          </div>
+          <div>
             <p className="text-muted-foreground">
               {t("form.relationshipOwner")}
             </p>

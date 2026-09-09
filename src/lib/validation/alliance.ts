@@ -13,6 +13,12 @@ export const organizationTypeValues = [
   "community_organization",
   "professional_association",
   "other",
+  "business_association",
+  "latino_association",
+  "referral_partner",
+  "training_partner",
+  "university",
+  "business_organization",
 ] as const;
 
 export const allianceStatusValues = [
@@ -22,6 +28,7 @@ export const allianceStatusValues = [
   "under_discussion",
   "agreement_review",
   "active_partner",
+  "member",
   "paused",
   "inactive",
 ] as const;
@@ -38,6 +45,7 @@ export const allianceFormSchema = z.object({
   phone: optionalString,
   email: optionalString,
   website: optionalString,
+  city: optionalString,
   state: optionalString,
   country: optionalString,
   relationshipOwner: optionalString,

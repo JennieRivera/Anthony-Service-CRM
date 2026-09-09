@@ -7,6 +7,7 @@ import {
   referrals,
   conversationMessages,
   strategicAlliances,
+  associationsChambers,
 } from "@/lib/db/schema";
 import { listUpcomingAppointments } from "./appointments";
 import { listOpenTasks } from "./tasks";
@@ -36,6 +37,7 @@ export async function getDashboardData() {
     allReferrals,
     allCommunications,
     allAlliances,
+    allAssociations,
   ] = await Promise.all([
     db.select().from(clients),
     db.select().from(cases),
@@ -46,6 +48,7 @@ export async function getDashboardData() {
     db.select().from(referrals),
     db.select().from(conversationMessages),
     db.select().from(strategicAlliances),
+    db.select().from(associationsChambers),
   ]);
 
   const now = new Date();
@@ -251,9 +254,48 @@ export async function getDashboardData() {
       !["completed", "cancelled"].includes(c.status),
   ).length;
 
+  // SIDEBAR-PLAN.md section 3 — dashboard metrics for Community &
+  // Strategic Alliances. "Associations by State"/"Chambers by State"
+  // deliberately aren't duplicated here: that breakdown already lives on
+  // the Latino Business Map (schema.ts's own comment on
+  // latinoBusinessOpportunityData says those counts are computed live
+  // from these same two tables, grouped by state). "Community Events"
+  // has no data source anywhere in this CRM yet — no events table
+  // exists — so it's intentionally left out rather than faked.
   const activeAlliances = allAlliances.filter(
     (a) => a.status === "active_partner",
   ).length;
+  const activeStrategicPartners =
+    activeAlliances +
+    allAssociations.filter((a) =>
+      ["member", "strategic_partner"].includes(a.amsRelationshipStatus),
+    ).length;
+
+  const newPartnersThisMonth =
+    allAlliances.filter((a) => new Date(a.createdAt) >= startOfThisMonth)
+      .length +
+    allAssociations.filter((a) => new Date(a.createdAt) >= startOfThisMonth)
+      .length;
+
+  const meetingsScheduled =
+    allAlliances.filter((a) => a.status === "meeting_scheduled").length +
+    allAssociations.filter((a) => a.amsRelationshipStatus === "meeting_scheduled")
+      .length;
+
+  const referralsFromPartners = allReferrals.filter(
+    (r) => r.allianceId,
+  ).length;
+  const revenueFromPartners = allReferrals
+    .filter((r) => r.allianceId)
+    .reduce((sum, r) => sum + Number(r.grossRevenue ?? 0), 0);
+
+  const partnerFollowUpsDue =
+    allAlliances.filter(
+      (a) => a.nextFollowUp && new Date(a.nextFollowUp) <= now,
+    ).length +
+    allAssociations.filter(
+      (a) => a.nextFollowUp && new Date(a.nextFollowUp) <= now,
+    ).length;
 
   return {
     kpis: {
@@ -288,6 +330,12 @@ export async function getDashboardData() {
     },
     communitySummary: {
       activeAlliances,
+      activeStrategicPartners,
+      newPartnersThisMonth,
+      meetingsScheduled,
+      referralsFromPartners,
+      revenueFromPartners,
+      partnerFollowUpsDue,
     },
   };
 }
