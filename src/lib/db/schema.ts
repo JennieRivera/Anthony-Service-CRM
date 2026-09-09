@@ -1578,12 +1578,23 @@ export const highlevelSyncStatusEnum = pgEnum("highlevel_sync_status", [
   "error",
 ]);
 
+// Added when Academy became its own sidebar module — "course" itself
+// stays free text (no separate course catalog exists or is needed yet),
+// but the delivery format is now a structured field so the Academy list
+// can show/filter it.
+export const courseFormatEnum = pgEnum("course_format", [
+  "live",
+  "in_person",
+  "recorded",
+]);
+
 export const academyEnrollmentDetails = pgTable("academy_enrollment_details", {
   caseId: uuid("case_id")
     .primaryKey()
     .references(() => cases.id, { onDelete: "cascade" }),
   program: text("program"),
   course: text("course"),
+  courseFormat: courseFormatEnum("course_format"),
   enrollmentDate: date("enrollment_date"),
   modulesCompleted: integer("modules_completed"),
   progressPercentage: integer("progress_percentage"),
@@ -1596,6 +1607,51 @@ export const academyEnrollmentDetails = pgTable("academy_enrollment_details", {
     .notNull()
     .default("not_synced"),
   status: academyCaseStatusEnum("status").notNull().default("lead"),
+});
+
+// Academy's Diamond Community — a VIP WhatsApp space (admin + students +
+// teachers) that exists entirely outside the CRM; this table is only a
+// membership roster (who's in it, since when, what status), never a
+// message log. Deliberately not built on conversationMessages: that
+// table is a 1:1 client<->business log, and a group with several
+// simultaneous participants doesn't fit a single clientId per row.
+// Students link to their existing client/case (no duplicated contact
+// info); teachers aren't clients or staff accounts, so they get their
+// own name/phone/email here, same pattern as strategicAlliances'
+// free-text relationshipOwner/contactPerson.
+export const diamondMemberTypeEnum = pgEnum("diamond_member_type", [
+  "student",
+  "teacher",
+]);
+
+export const diamondMemberStatusEnum = pgEnum("diamond_member_status", [
+  "active",
+  "paused",
+  "removed",
+]);
+
+export const academyDiamondMembers = pgTable("academy_diamond_members", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  memberType: diamondMemberTypeEnum("member_type").notNull(),
+  // Set for memberType "student" — the roster joins clients/cases for
+  // name and program instead of duplicating them.
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  // Set for memberType "teacher", who has no client or staff record.
+  name: text("name"),
+  phone: text("phone"),
+  email: text("email"),
+  joinedDate: date("joined_date").notNull().defaultNow(),
+  status: diamondMemberStatusEnum("status").notNull().default("active"),
+  notes: text("notes"),
 });
 
 // Phase 2, Session 6 — Marketing / Branding / AI / Automation category.
@@ -2664,6 +2720,7 @@ export type ReferralStatusHistory = typeof referralStatusHistory.$inferSelect;
 export type RriReferralDetails = typeof rriReferralDetails.$inferSelect;
 export type AcademyEnrollmentDetails =
   typeof academyEnrollmentDetails.$inferSelect;
+export type AcademyDiamondMember = typeof academyDiamondMembers.$inferSelect;
 export type StrategicAlliance = typeof strategicAlliances.$inferSelect;
 export type AllianceStatusHistory =
   typeof allianceStatusHistory.$inferSelect;

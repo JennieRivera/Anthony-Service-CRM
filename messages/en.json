@@ -142,7 +142,9 @@
     "aiTeam": "AI Team",
     "aiEscalations": "AI Escalations",
     "professionalSystems": "Professional Systems",
-    "websites": "Websites"
+    "websites": "Websites",
+    "academy": "Academy",
+    "diamondCommunity": "Diamond Community"
   },
   "ServiceType": {
     "online_notary": "Online Notary",
@@ -393,6 +395,7 @@
       "formationCaseStatus": "Status",
       "program": "Program",
       "course": "Course",
+      "courseFormat": "Format",
       "enrollmentDate": "Enrollment Date",
       "modulesCompleted": "Modules Completed",
       "progressPercentage": "Progress Percentage",
@@ -1756,6 +1759,57 @@
     "not_synced": "Not Synced",
     "synced": "Synced",
     "error": "Error"
+  },
+  "CourseFormat": {
+    "live": "Live",
+    "in_person": "In Person",
+    "recorded": "Recorded"
+  },
+  "Academy": {
+    "title": "Academy",
+    "newStudent": "New Student",
+    "backToAcademy": "Back to Academy",
+    "empty": "No students enrolled yet.",
+    "columnStudent": "Student",
+    "columnProgramCourse": "Program / Course",
+    "columnFormat": "Format",
+    "columnStartDate": "Start Date",
+    "columnEndDate": "End Date",
+    "columnProgress": "Progress",
+    "columnStatus": "Status"
+  },
+  "DiamondCommunity": {
+    "title": "Diamond Community",
+    "subtitle": "VIP WhatsApp space for Academy — admin, students, and teachers. This roster tracks membership only; the conversation itself happens on WhatsApp.",
+    "addMember": "Add Member",
+    "memberType": "Member Type",
+    "student": "Student",
+    "selectStudent": "Select a student",
+    "teacherName": "Teacher Name",
+    "phone": "Phone",
+    "email": "Email",
+    "joinedDate": "Joined Date",
+    "save": "Save",
+    "saving": "Saving...",
+    "saveError": "Could not save. Please try again.",
+    "memberAdded": "Added to Diamond Community.",
+    "statusUpdated": "Status updated.",
+    "empty": "No members yet. Add the first student or teacher to the Diamond Community.",
+    "columnName": "Name",
+    "columnType": "Type",
+    "columnProgram": "Program",
+    "columnContact": "Contact",
+    "columnJoined": "Joined",
+    "columnStatus": "Status"
+  },
+  "DiamondMemberType": {
+    "student": "Student",
+    "teacher": "Teacher"
+  },
+  "DiamondMemberStatus": {
+    "active": "Active",
+    "paused": "Paused",
+    "removed": "Removed"
   },
   "OrganizationType": {
     "church": "Church",

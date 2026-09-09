@@ -48,6 +48,7 @@ import {
   academyServiceTypes,
   academyCaseStatusValues,
   highlevelSyncStatusValues,
+  courseFormatValues,
   marketingServiceTypes,
   projectTypeValues,
   marketingCaseStatusValues,
@@ -102,6 +103,7 @@ export function CaseForm({
   clients,
   companies,
   defaultClientId,
+  defaultServiceType,
   onSubmit,
 }: {
   caseRecord?: Case;
@@ -121,6 +123,7 @@ export function CaseForm({
   clients: { id: string; fullName: string }[];
   companies: { id: string; legalBusinessName: string }[];
   defaultClientId?: string;
+  defaultServiceType?: (typeof serviceTypeValues)[number];
   onSubmit: (values: CaseFormValues) => Promise<void>;
 }) {
   const t = useTranslations("Cases.form");
@@ -148,6 +151,7 @@ export function CaseForm({
   const tFormationCaseStatus = useTranslations("FormationCaseStatus");
   const tAcademyCaseStatus = useTranslations("AcademyCaseStatus");
   const tHighlevelSyncStatus = useTranslations("HighlevelSyncStatus");
+  const tCourseFormat = useTranslations("CourseFormat");
   const tProjectType = useTranslations("ProjectType");
   const tMarketingCaseStatus = useTranslations("MarketingCaseStatus");
   const tSalesTaxCaseStatus = useTranslations("SalesTaxCaseStatus");
@@ -172,7 +176,7 @@ export function CaseForm({
     resolver: zodResolver(caseFormSchema),
     defaultValues: {
       clientId: caseRecord?.clientId ?? defaultClientId ?? "",
-      serviceType: caseRecord?.serviceType ?? "online_notary",
+      serviceType: caseRecord?.serviceType ?? defaultServiceType ?? "online_notary",
       status: caseRecord?.status ?? "new",
       title: caseRecord?.title ?? "",
       dueDate: caseRecord?.dueDate ?? "",
@@ -300,6 +304,7 @@ export function CaseForm({
       formationCaseStatus: formationDetails?.status ?? "new_inquiry",
       program: academyDetails?.program ?? "",
       course: academyDetails?.course ?? "",
+      courseFormat: academyDetails?.courseFormat ?? "",
       enrollmentDate: academyDetails?.enrollmentDate ?? "",
       modulesCompleted: academyDetails?.modulesCompleted?.toString() ?? "",
       progressPercentage:
@@ -2002,6 +2007,27 @@ export function CaseForm({
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="course">{t("course")}</Label>
               <Input id="course" {...register("course")} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("courseFormat")}</Label>
+              <Controller
+                control={control}
+                name="courseFormat"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {courseFormatValues.map((format) => (
+                        <SelectItem key={format} value={format}>
+                          {tCourseFormat(format)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label>{t("academyCaseStatus")}</Label>

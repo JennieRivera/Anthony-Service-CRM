@@ -42,6 +42,8 @@ export default async function CaseDetailPage({
   const tFormationType = await getTranslations("FormationType");
   const tFormationCaseStatus = await getTranslations("FormationCaseStatus");
   const tAcademyCaseStatus = await getTranslations("AcademyCaseStatus");
+  const tCourseFormat = await getTranslations("CourseFormat");
+  const tAcademy = await getTranslations("Academy");
   const tHighlevelSyncStatus = await getTranslations("HighlevelSyncStatus");
   const tProjectType = await getTranslations("ProjectType");
   const tMarketingCaseStatus = await getTranslations("MarketingCaseStatus");
@@ -113,8 +115,11 @@ export default async function CaseDetailPage({
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
       <div className="flex items-center justify-between">
-        <Link href="/cases" className="text-sm text-muted-foreground underline">
-          &larr; {t("backToCases")}
+        <Link
+          href={c.serviceType === "academy" ? "/academy" : "/cases"}
+          className="text-sm text-muted-foreground underline"
+        >
+          &larr; {c.serviceType === "academy" ? tAcademy("backToAcademy") : t("backToCases")}
         </Link>
         <div className="flex gap-2">
           <Button
@@ -987,6 +992,14 @@ export default async function CaseDetailPage({
               <p className="text-muted-foreground">{t("form.course")}</p>
               <p className="text-foreground">
                 {academyDetails.course ?? "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t("form.courseFormat")}</p>
+              <p className="text-foreground">
+                {academyDetails.courseFormat
+                  ? tCourseFormat(academyDetails.courseFormat)
+                  : "—"}
               </p>
             </div>
             <div>

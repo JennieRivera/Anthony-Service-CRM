@@ -180,6 +180,8 @@ export const highlevelSyncStatusValues = [
   "synced",
   "error",
 ] as const;
+// Added when Academy became its own sidebar module (section 1)
+export const courseFormatValues = ["live", "in_person", "recorded"] as const;
 
 // Phase 2, Session 6
 export const projectTypeValues = [
@@ -457,6 +459,7 @@ export const caseFormSchema = z.object({
   // Academy enrollment details (relevant when serviceType is Academy)
   program: optionalString,
   course: optionalString,
+  courseFormat: z.enum(courseFormatValues).optional().or(z.literal("")),
   enrollmentDate: optionalString,
   modulesCompleted: optionalString,
   progressPercentage: optionalString,

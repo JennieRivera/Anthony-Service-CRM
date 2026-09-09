@@ -180,7 +180,7 @@ export default async function Home() {
       <MyWebsitesSection websites={websites} />
 
       {/* 8. Academy */}
-      <DashboardSection title={t("sectionAcademy")} viewAllHref="/cases" viewAllLabel={t("viewAll")}>
+      <DashboardSection title={t("sectionAcademy")} viewAllHref="/academy" viewAllLabel={t("viewAll")}>
         <div className="grid gap-4 sm:grid-cols-2">
           <KpiCard
             label={t("activeAcademyStudents")}

@@ -51,7 +51,12 @@ export function Sidebar() {
               )}
               title={collapsed ? t(item.labelKey) : undefined}
             >
-              <Icon className="h-4.5 w-4.5 shrink-0" />
+              <Icon
+                className={cn(
+                  "h-4.5 w-4.5 shrink-0",
+                  item.highlightIcon && "text-[var(--sidebar-foreground)]",
+                )}
+              />
               {!collapsed && <span>{t(item.labelKey)}</span>}
             </Link>
           );

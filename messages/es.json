@@ -142,7 +142,9 @@
     "aiTeam": "Equipo IA",
     "aiEscalations": "Escalaciones de IA",
     "professionalSystems": "Sistemas Profesionales",
-    "websites": "Sitios Web"
+    "websites": "Sitios Web",
+    "academy": "Academia",
+    "diamondCommunity": "Diamond Community"
   },
   "ServiceType": {
     "online_notary": "Notaría en Línea",
@@ -393,6 +395,7 @@
       "formationCaseStatus": "Estado",
       "program": "Programa",
       "course": "Curso",
+      "courseFormat": "Modalidad",
       "enrollmentDate": "Fecha de Inscripción",
       "modulesCompleted": "Módulos Completados",
       "progressPercentage": "Porcentaje de Progreso",
@@ -1756,6 +1759,57 @@
     "not_synced": "No Sincronizado",
     "synced": "Sincronizado",
     "error": "Error"
+  },
+  "CourseFormat": {
+    "live": "En Vivo",
+    "in_person": "Presencial",
+    "recorded": "Grabado"
+  },
+  "Academy": {
+    "title": "Academia",
+    "newStudent": "Nuevo Estudiante",
+    "backToAcademy": "Volver a Academia",
+    "empty": "Aún no hay estudiantes inscritos.",
+    "columnStudent": "Estudiante",
+    "columnProgramCourse": "Programa / Curso",
+    "columnFormat": "Modalidad",
+    "columnStartDate": "Fecha de Inicio",
+    "columnEndDate": "Fecha de Término",
+    "columnProgress": "Progreso",
+    "columnStatus": "Estado"
+  },
+  "DiamondCommunity": {
+    "title": "Diamond Community",
+    "subtitle": "Espacio VIP de WhatsApp para Academia — administradora, estudiantes y profesores. Este directorio solo lleva el control de membresía; la conversación ocurre en WhatsApp.",
+    "addMember": "Agregar Miembro",
+    "memberType": "Tipo de Miembro",
+    "student": "Estudiante",
+    "selectStudent": "Selecciona un estudiante",
+    "teacherName": "Nombre del Profesor",
+    "phone": "Teléfono",
+    "email": "Correo",
+    "joinedDate": "Fecha de Ingreso",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "saveError": "No se pudo guardar. Inténtalo de nuevo.",
+    "memberAdded": "Agregado a Diamond Community.",
+    "statusUpdated": "Estado actualizado.",
+    "empty": "Aún no hay miembros. Agrega el primer estudiante o profesor a Diamond Community.",
+    "columnName": "Nombre",
+    "columnType": "Tipo",
+    "columnProgram": "Programa",
+    "columnContact": "Contacto",
+    "columnJoined": "Ingreso",
+    "columnStatus": "Estado"
+  },
+  "DiamondMemberType": {
+    "student": "Estudiante",
+    "teacher": "Profesor"
+  },
+  "DiamondMemberStatus": {
+    "active": "Activo",
+    "paused": "Pausado",
+    "removed": "Removido"
   },
   "OrganizationType": {
     "church": "Iglesia",

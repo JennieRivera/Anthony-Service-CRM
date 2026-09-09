@@ -665,6 +665,7 @@ async function upsertServiceDetails(
     const detail = {
       program: values.program || null,
       course: values.course || null,
+      courseFormat: values.courseFormat || null,
       enrollmentDate: values.enrollmentDate || null,
       modulesCompleted: values.modulesCompleted
         ? Number(values.modulesCompleted)

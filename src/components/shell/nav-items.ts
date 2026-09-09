@@ -25,6 +25,8 @@ import {
   ShieldAlert,
   LayoutGrid,
   Globe,
+  GraduationCap,
+  Gem,
 } from "lucide-react";
 
 export type NavItem = {
@@ -54,8 +56,14 @@ export type NavItem = {
     | "aiEscalations"
     | "professionalSystems"
     | "websites"
+    | "academy"
+    | "diamondCommunity"
     | "settings";
   icon: LucideIcon;
+  // Forces the icon to full-opacity sidebar-foreground instead of the
+  // usual dimmed /70 resting state — used for Diamond Community so it
+  // reads as a deliberately-VIP highlight, not just another nav row.
+  highlightIcon?: boolean;
 };
 
 // SIDEBAR-PLAN.md section 8 — order follows the plan's list wherever an
@@ -83,6 +91,20 @@ export const navItems: NavItem[] = [
   { href: "/tasks", labelKey: "tasks", icon: ListChecks },
   { href: "/appointments", labelKey: "appointments", icon: CalendarDays },
   { href: "/documents", labelKey: "documents", icon: FileText },
+  // Academy's own module — was previously reachable only through the
+  // Dashboard's Academy "View All", which used to send staff to the
+  // unfiltered /cases list mixed with every other service.
+  { href: "/academy", labelKey: "academy", icon: GraduationCap },
+  // VIP WhatsApp membership roster (admin + students + teachers),
+  // deliberately distinct from /community (the Alliances/Associations
+  // module) and from /communications. Icon stays at full brightness
+  // rather than the usual dimmed resting state, per the user's request.
+  {
+    href: "/diamond-community",
+    labelKey: "diamondCommunity",
+    icon: Gem,
+    highlightIcon: true,
+  },
   { href: "/marketing-content", labelKey: "marketingContent", icon: Megaphone },
   { href: "/company-registration", labelKey: "companyRegistration", icon: Map },
   { href: "/sales-tax-map", labelKey: "salesTaxMap", icon: Landmark },
