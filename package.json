@@ -13,7 +13,9 @@
     "db:seed": "tsx scripts/seed.ts",
     "db:unseed": "tsx scripts/unseed.ts",
     "db:seed-ai-agents": "tsx scripts/seed-ai-agents.ts",
-    "db:seed-service-colors": "tsx scripts/seed-service-colors.ts"
+    "db:seed-service-colors": "tsx scripts/seed-service-colors.ts",
+    "db:seed-notary-state-guide": "tsx scripts/seed-notary-state-guide.ts",
+    "db:seed-sales-tax-state-info": "tsx scripts/seed-sales-tax-state-info.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

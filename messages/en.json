@@ -1,4 +1,9 @@
 {
+  "Login": {
+    "title": "Sign in to Anthony Multiservice CRM",
+    "error": "There was a problem signing in. Please try again.",
+    "googleCta": "Sign in with Google"
+  },
   "Dashboard": {
     "title": "Dashboard",
     "activeClients": "Active Clients",
@@ -113,7 +118,10 @@
     "manageWebsites": "Manage Websites",
     "serviceColorsCard": "Calendar Service Colors",
     "serviceColorsCardDescription": "Set the color each service uses on the appointment calendar — changes apply everywhere immediately, nothing is hardcoded.",
-    "manageServiceColors": "Manage Service Colors"
+    "manageServiceColors": "Manage Service Colors",
+    "notaryGuideCard": "National Notary State Guide",
+    "notaryGuideCardDescription": "Edit each state's official agency, registration, exam and requirements links shown on the National Notary State Guide.",
+    "manageNotaryGuide": "Manage Notary State Guide"
   },
   "Nav": {
     "dashboard": "Dashboard",
@@ -150,6 +158,7 @@
     "professionalSystems": "Professional Systems",
     "websites": "Websites",
     "academy": "Academy",
+    "notaryStateGuide": "National Notary State Guide",
     "diamondCommunity": "Diamond Community"
   },
   "ServiceType": {
@@ -1522,6 +1531,8 @@
     "title": "Company Registration by State",
     "instructions": "Click a state to open its official business registration portal (Secretary of State) in a new tab.",
     "clickToOpen": "Click to open the official site",
+    "searchPlaceholder": "Search your state",
+    "selectPlaceholder": "Select your state",
     "businessSummary": "Business Summary",
     "loadingSummary": "Loading...",
     "companiesByState": "Companies",
@@ -2077,6 +2088,7 @@
   "SalesTaxMap": {
     "title": "Interactive Sales Tax Map",
     "instructions": "Click a state to view or update its sales tax agency links and notes.",
+    "searchPlaceholder": "Search your state",
     "legend": {
       "green": "Active client cases",
       "blue": "Info available, no active cases",
@@ -2086,6 +2098,8 @@
     },
     "disclaimer": "State sales tax requirements vary by business activity, nexus, products, services and jurisdiction. Review official state guidance before filing.",
     "editTitle": "{state} — Sales Tax Reference Info",
+    "openOfficialWebsite": "Open Official Website",
+    "notFound": "Not found",
     "stateTaxAgency": "State Tax Agency",
     "officialWebsite": "Official Website",
     "registrationLink": "Sales Tax Registration Link",
@@ -2097,6 +2111,45 @@
     "saving": "Saving...",
     "activeCases": "{count, plural, one {# active case} other {# active cases}} in this state.",
     "verifiedBy": "Verified By"
+  },
+  "NotaryStateGuide": {
+    "eyebrow": "Anthony Multiservice Academy",
+    "title": "🇺🇸 National Notary State Guide",
+    "subhead": "Find your state's official Notary Public requirements, registration information and examination resources.",
+    "searchPlaceholder": "Search your state",
+    "selectPlaceholder": "Select your state",
+    "resourcesLabel": "Notary Public Resources",
+    "officialAgency": "State Agency",
+    "officialWebsite": "Official Website",
+    "commissionLink": "Commission / Registration",
+    "examLink": "Exam",
+    "requirementsLink": "Requirements",
+    "notFound": "Not found",
+    "openOfficialWebsite": "Open Official State Website",
+    "verifyNote": "Always verify current requirements with your state.",
+    "disclaimer": "Anthony Multiservice Academy provides this guide as an educational and informational resource. We are not a government agency and do not issue Notary Public commissions. State requirements, fees, examinations and procedures may change. Always verify current requirements directly with the official state government website."
+  },
+  "NotaryStateGuideSettings": {
+    "title": "National Notary State Guide",
+    "description": "Edit each state's official agency, links and verification status. Every save updates the Last Verified date automatically.",
+    "backToSettings": "Back to Settings",
+    "officialAgency": "State Agency",
+    "officialWebsite": "Official Website",
+    "commissionLink": "Commission / Registration Link",
+    "examLink": "Exam Link (or the exact \"no separate exam\" text)",
+    "requirementsLink": "Requirements Link",
+    "sourceUrl": "Source URL (where this was verified)",
+    "status": "Status",
+    "status_verified": "Verified",
+    "status_needs_review": "Needs Review",
+    "status_unavailable": "Unavailable",
+    "lastVerified": "Last verified",
+    "neverVerified": "Not yet verified",
+    "noAgencyYet": "No agency on file yet",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving..."
   },
   "IrsCaseType": {
     "ein_assistance": "EIN Assistance",

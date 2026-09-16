@@ -28,6 +28,7 @@ import {
   GraduationCap,
   Gem,
   Share2,
+  Stamp,
 } from "lucide-react";
 
 export type NavItem = {
@@ -58,6 +59,7 @@ export type NavItem = {
     | "professionalSystems"
     | "websites"
     | "academy"
+    | "notaryStateGuide"
     | "diamondCommunity"
     | "socialMedia"
     | "settings";
@@ -97,6 +99,10 @@ export const navItems: NavItem[] = [
   // Dashboard's Academy "View All", which used to send staff to the
   // unfiltered /cases list mixed with every other service.
   { href: "/academy", labelKey: "academy", icon: GraduationCap },
+  // Anthony Multiservice Academy's National Notary State Guide — bilingual
+  // 50-state reference tool, deliberately its own module (not merged into
+  // Academy) since it's a public lookup tool, not a course/roster page.
+  { href: "/notary-state-guide", labelKey: "notaryStateGuide", icon: Stamp },
   // VIP WhatsApp membership roster (admin + students + teachers),
   // deliberately distinct from /community (the Alliances/Associations
   // module) and from /communications. Icon stays at full brightness

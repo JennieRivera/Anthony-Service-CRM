@@ -1,0 +1,15 @@
+/* National Notary State Guide — module-scoped "educational" palette.
+   Scoped entirely under .notary-guide-scope so these custom properties
+   never leak into src/app/globals.css's shared design tokens; every other
+   page keeps its navy/cream/gold look untouched. Only color tokens are
+   scoped here — typography stays on the app's global font-heading
+   (Playfair Display) / font-sans (Public Sans). */
+.notary-guide-scope {
+  --ng-sky: #eaf6fb;
+  --ng-sky-deep: #7ec8e3;
+  --ng-white: #ffffff;
+  --ng-green: #dcefe0;
+  --ng-gold: #c9a961;
+  --ng-silver: #c7ccd1;
+  --ng-ink: #234;
+}

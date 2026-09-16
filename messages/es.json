@@ -1,4 +1,9 @@
 {
+  "Login": {
+    "title": "Iniciar sesión en Anthony Multiservice CRM",
+    "error": "Hubo un problema al iniciar sesión. Por favor, inténtalo de nuevo.",
+    "googleCta": "Iniciar sesión con Google"
+  },
   "Dashboard": {
     "title": "Panel",
     "activeClients": "Clientes Activos",
@@ -113,7 +118,10 @@
     "manageWebsites": "Administrar Sitios Web",
     "serviceColorsCard": "Colores de Servicio del Calendario",
     "serviceColorsCardDescription": "Define el color que usa cada servicio en el calendario de citas — los cambios se aplican de inmediato en todas partes, nada está fijo en el código.",
-    "manageServiceColors": "Administrar Colores de Servicio"
+    "manageServiceColors": "Administrar Colores de Servicio",
+    "notaryGuideCard": "Guía Nacional de Notarios por Estado",
+    "notaryGuideCardDescription": "Edita la agencia oficial, el registro, el examen y los enlaces de requisitos de cada estado que se muestran en la Guía Nacional de Notarios por Estado.",
+    "manageNotaryGuide": "Administrar Guía de Notarios"
   },
   "Nav": {
     "dashboard": "Panel",
@@ -150,6 +158,7 @@
     "professionalSystems": "Sistemas Profesionales",
     "websites": "Sitios Web",
     "academy": "Academia",
+    "notaryStateGuide": "Guía Nacional de Notarios por Estado",
     "diamondCommunity": "Diamond Community"
   },
   "ServiceType": {
@@ -1522,6 +1531,8 @@
     "title": "Registro de Compañía por Estado",
     "instructions": "Haz clic en un estado para abrir su portal oficial de registro de negocios (Secretaría de Estado) en una pestaña nueva.",
     "clickToOpen": "Clic para abrir el sitio oficial",
+    "searchPlaceholder": "Busca tu estado",
+    "selectPlaceholder": "Selecciona tu estado",
     "businessSummary": "Resumen de Negocios",
     "loadingSummary": "Cargando...",
     "companiesByState": "Compañías",
@@ -2077,6 +2088,7 @@
   "SalesTaxMap": {
     "title": "Mapa Interactivo de Sales Tax",
     "instructions": "Haga clic en un estado para ver o actualizar los enlaces y notas de su agencia de sales tax.",
+    "searchPlaceholder": "Busca tu estado",
     "legend": {
       "green": "Casos activos de clientes",
       "blue": "Información disponible, sin casos activos",
@@ -2086,6 +2098,8 @@
     },
     "disclaimer": "Los requisitos de sales tax estatal varían según la actividad comercial, el nexo, los productos, los servicios y la jurisdicción. Revise la guía oficial del estado antes de declarar.",
     "editTitle": "{state} — Información de Referencia de Sales Tax",
+    "openOfficialWebsite": "Abrir Sitio Web Oficial",
+    "notFound": "No disponible",
     "stateTaxAgency": "Agencia Tributaria Estatal",
     "officialWebsite": "Sitio Web Oficial",
     "registrationLink": "Enlace de Registro de Sales Tax",
@@ -2097,6 +2111,45 @@
     "saving": "Guardando...",
     "activeCases": "{count, plural, one {# caso activo} other {# casos activos}} en este estado.",
     "verifiedBy": "Verificado Por"
+  },
+  "NotaryStateGuide": {
+    "eyebrow": "Anthony Multiservice Academy",
+    "title": "🇺🇸 Guía Nacional de Notarios por Estado",
+    "subhead": "Encuentra los requisitos oficiales de tu estado, información de registro y recursos para el examen de Notario Público.",
+    "searchPlaceholder": "Busca tu estado",
+    "selectPlaceholder": "Selecciona tu estado",
+    "resourcesLabel": "Recursos para Notario Público",
+    "officialAgency": "Agencia Estatal",
+    "officialWebsite": "Sitio Web Oficial",
+    "commissionLink": "Comisión / Registro",
+    "examLink": "Examen",
+    "requirementsLink": "Requisitos",
+    "notFound": "No disponible",
+    "openOfficialWebsite": "Abrir Sitio Web Oficial del Estado",
+    "verifyNote": "Verifique siempre los requisitos actuales con su estado.",
+    "disclaimer": "Anthony Multiservice Academy ofrece esta guía únicamente como recurso educativo e informativo. No somos una agencia gubernamental y no emitimos comisiones de Notario Público. Los requisitos, tarifas, exámenes y procedimientos pueden cambiar. Verifique siempre los requisitos actuales directamente con el sitio web oficial del gobierno de su estado."
+  },
+  "NotaryStateGuideSettings": {
+    "title": "Guía Nacional de Notarios por Estado",
+    "description": "Edita la agencia oficial, los enlaces y el estado de verificación de cada estado. Cada guardado actualiza automáticamente la fecha de última verificación.",
+    "backToSettings": "Volver a Configuración",
+    "officialAgency": "Agencia Estatal",
+    "officialWebsite": "Sitio Web Oficial",
+    "commissionLink": "Enlace de Comisión / Registro",
+    "examLink": "Enlace de Examen (o el texto exacto de \"sin examen separado\")",
+    "requirementsLink": "Enlace de Requisitos",
+    "sourceUrl": "URL de Origen (donde se verificó)",
+    "status": "Estado",
+    "status_verified": "Verificado",
+    "status_needs_review": "Necesita Revisión",
+    "status_unavailable": "No Disponible",
+    "lastVerified": "Última verificación",
+    "neverVerified": "Aún no verificado",
+    "noAgencyYet": "Aún no hay agencia registrada",
+    "edit": "Editar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando..."
   },
   "IrsCaseType": {
     "ein_assistance": "Asistencia con EIN",

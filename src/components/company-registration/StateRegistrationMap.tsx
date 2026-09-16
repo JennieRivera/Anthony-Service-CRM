@@ -7,6 +7,14 @@ import { USStateFlags } from "us-state-flags";
 import { UsaStateMap, type UsaStateMapStateConfig } from "@/components/maps/UsaStateMap";
 import { stateBusinessLinks } from "@/lib/data/stateBusinessLinks";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
 import {
   Dialog,
@@ -16,6 +24,11 @@ import {
 } from "@/components/ui/dialog";
 import { getStateBusinessSummaryAction } from "@/app/[locale]/(app)/company-registration/actions";
 import type { StateBusinessSummary } from "@/lib/queries/stateBusinessSummary";
+
+// All keys in stateBusinessLinks that the map can actually open (50 states +
+// DC) — deliberately not @mirawision's StateAbbreviations, which has no DC
+// entry and would let the search/dropdown offer a state with no data.
+const SEARCHABLE_STATES = Object.keys(stateBusinessLinks);
 
 function formatMoney(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -32,6 +45,28 @@ export function StateRegistrationMap() {
   const [selectedState, setSelectedState] = useState<string | null>(null);
   const [summary, setSummary] = useState<StateBusinessSummary | null>(null);
   const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState("");
+
+  function openState(abbr: string) {
+    setSelectedState(abbr);
+    setSummary(null);
+    setLoading(true);
+    setQuery("");
+    getStateBusinessSummaryAction(abbr).then((result) => {
+      setSummary(result);
+      setLoading(false);
+    });
+  }
+
+  const suggestions = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return SEARCHABLE_STATES.filter(
+      (abbr) =>
+        stateBusinessLinks[abbr].name[locale].toLowerCase().includes(q) ||
+        abbr.toLowerCase().includes(q),
+    ).slice(0, 8);
+  }, [query, locale]);
 
   const states = useMemo(() => {
     const settings: Record<string, UsaStateMapStateConfig> = {};
@@ -43,15 +78,7 @@ export function StateRegistrationMap() {
       settings[abbr] = {
         fill: "#DDEAE1",
         stroke: "#3B4A42",
-        onClick: () => {
-          setSelectedState(abbr);
-          setSummary(null);
-          setLoading(true);
-          getStateBusinessSummaryAction(abbr).then((result) => {
-            setSummary(result);
-            setLoading(false);
-          });
-        },
+        onClick: () => openState(abbr),
         tooltip: (
           <div
             style={{
@@ -80,6 +107,44 @@ export function StateRegistrationMap() {
 
   return (
     <>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("searchPlaceholder")}
+          />
+          {suggestions.length > 0 && (
+            <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-md">
+              {suggestions.map((abbr) => (
+                <button
+                  key={abbr}
+                  type="button"
+                  onClick={() => openState(abbr)}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-muted"
+                >
+                  <USStateFlags state={abbr} showFlag flagSize="xs" />
+                  {stateBusinessLinks[abbr].name[locale]} ({abbr})
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <Select value={selectedState ?? undefined} onValueChange={(value) => value && openState(value)}>
+          <SelectTrigger className="w-full sm:w-56">
+            <SelectValue placeholder={t("selectPlaceholder")} />
+          </SelectTrigger>
+          <SelectContent>
+            {SEARCHABLE_STATES.map((abbr) => (
+              <SelectItem key={abbr} value={abbr}>
+                {stateBusinessLinks[abbr].name[locale]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <UsaStateMap
         states={states}
         defaultState={{ fill: "#F5F3EC", stroke: "#C9C3B4" }}

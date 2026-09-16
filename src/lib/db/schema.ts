@@ -1882,6 +1882,34 @@ export const salesTaxStateInfo = pgTable("sales_tax_state_info", {
     .defaultNow(),
 });
 
+// Reference data backing the National Notary State Guide (Academy module).
+// Real, verified 50-state data sourced only from official .gov/state-agency
+// domains — see scripts/seed-notary-state-guide.ts. A missing link field
+// renders as "Not found" in the UI and a missing examLink renders the
+// literal "No separate state notary examination listed by the state."
+// string; neither is ever backfilled with a private/commercial source.
+export const notaryStateGuideStatusEnum = pgEnum("notary_state_guide_status", [
+  "verified",
+  "needs_review",
+  "unavailable",
+]);
+
+export const notaryStateGuide = pgTable("notary_state_guide", {
+  state: text("state").primaryKey(), // 2-letter USPS abbreviation
+  officialAgency: text("official_agency"),
+  officialWebsite: text("official_website"),
+  commissionLink: text("commission_link"),
+  examLink: text("exam_link"),
+  requirementsLink: text("requirements_link"),
+  sourceUrl: text("source_url"),
+  status: notaryStateGuideStatusEnum("status").notNull().default("needs_review"),
+  lastVerifiedDate: date("last_verified_date"),
+  verifiedBy: text("verified_by"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 // Phase 5, Session 5 — IRS / EIN / ITIN Case Management. Links to the
 // Company Master Registry via companyId instead of duplicating business
 // name/entity type, same principle as salesTaxCaseDetails above. EIN/ITIN
@@ -2836,6 +2864,7 @@ export type CompanyDocumentChecklistItem =
   typeof companyDocumentChecklistItems.$inferSelect;
 export type SalesTaxCaseDetails = typeof salesTaxCaseDetails.$inferSelect;
 export type SalesTaxStateInfo = typeof salesTaxStateInfo.$inferSelect;
+export type NotaryStateGuide = typeof notaryStateGuide.$inferSelect;
 export type IrsCaseDetails = typeof irsCaseDetails.$inferSelect;
 export type InsuranceComplianceDetails =
   typeof insuranceComplianceDetails.$inferSelect;

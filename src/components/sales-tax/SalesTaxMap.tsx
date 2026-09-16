@@ -4,7 +4,8 @@ import { useCallback, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { StateAbbreviations } from "@mirawision/usa-map-react";
+import { StateAbbreviations, StateNames } from "@mirawision/usa-map-react";
+import { USStateFlags } from "us-state-flags";
 import { UsaStateMap, type UsaStateMapStateConfig } from "@/components/maps/UsaStateMap";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,13 +24,21 @@ import {
 } from "@/lib/validation/salesTaxMap";
 import type { SalesTaxMapStateData } from "@/lib/queries/salesTaxMap";
 
+// Aqua/turquoise ("verde agua") recolor, softened to a pale baby-blue
+// feel per feedback (the first pass was too saturated). The 5 colors are
+// a status legend, not just decoration (green = active cases, blue = info
+// available, gold = pending, red = past due, gray = no records) — red and
+// gold are kept as unambiguous alert colors on purpose so a past-due or
+// pending state still pops against the pale aqua theme instead of
+// blending into it.
 const COLOR_HEX: Record<SalesTaxMapStateData["color"], string> = {
-  green: "#16a34a",
-  blue: "#2563eb",
-  gold: "#b8964a",
+  green: "#7CBCB2",
+  blue: "#BFE9E4",
+  gold: "#C9A15B",
   red: "#dc2626",
-  gray: "#c9c3b4",
+  gray: "#EAF6F4",
 };
+const MAP_STROKE = "#3F7A72";
 
 export function SalesTaxMap({
   data,
@@ -59,6 +68,7 @@ export function SalesTaxMap({
 
   const [selectedState, setSelectedState] = useState<string | null>(initialStateAbbr);
   const [isPending, startTransition] = useTransition();
+  const [query, setQuery] = useState("");
 
   const { register, handleSubmit, reset } = useForm<SalesTaxStateInfoFormValues>({
     resolver: zodResolver(salesTaxStateInfoFormSchema),
@@ -78,6 +88,7 @@ export function SalesTaxMap({
     (abbr: string) => {
       const stateData = data[abbr];
       setSelectedState(abbr);
+      setQuery("");
       reset({
         stateTaxAgency: stateData?.info?.stateTaxAgency ?? "",
         officialWebsite: stateData?.info?.officialWebsite ?? "",
@@ -92,6 +103,15 @@ export function SalesTaxMap({
     [data, reset],
   );
 
+  const suggestions = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return StateAbbreviations.filter(
+      (abbr) =>
+        StateNames[abbr].toLowerCase().includes(q) || abbr.toLowerCase().includes(q),
+    ).slice(0, 8);
+  }, [query]);
+
   const states = useMemo(() => {
     const settings: Record<string, UsaStateMapStateConfig> = {};
 
@@ -101,16 +121,19 @@ export function SalesTaxMap({
 
       settings[abbr] = {
         fill: COLOR_HEX[color],
-        stroke: "#3B4A42",
+        stroke: MAP_STROKE,
         onClick: () => openStateDialog(abbr),
         tooltip: (
-          <div style={{ fontSize: 12, padding: 2 }}>
-            <strong>{abbr}</strong>
-            <br />
-            {t(`legend.${color}`)}
-            {stateData && stateData.activeCaseCount > 0
-              ? ` (${stateData.activeCaseCount})`
-              : ""}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, padding: 2 }}>
+            <USStateFlags state={abbr} showFlag flagSize="sm" />
+            <div>
+              <strong>{abbr}</strong>
+              <br />
+              {t(`legend.${color}`)}
+              {stateData && stateData.activeCaseCount > 0
+                ? ` (${stateData.activeCaseCount})`
+                : ""}
+            </div>
           </div>
         ),
       };
@@ -131,10 +154,36 @@ export function SalesTaxMap({
 
   return (
     <div className="flex flex-col gap-4">
-      <UsaStateMap
-        states={states}
-        defaultState={{ fill: COLOR_HEX.gray, stroke: "#3B4A42" }}
-      />
+      <div className="relative sm:max-w-sm">
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("searchPlaceholder")}
+        />
+        {suggestions.length > 0 && (
+          <div className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-border bg-popover shadow-md">
+            {suggestions.map((abbr) => (
+              <button
+                key={abbr}
+                type="button"
+                onClick={() => openStateDialog(abbr)}
+                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-muted"
+              >
+                <USStateFlags state={abbr} showFlag flagSize="xs" />
+                {StateNames[abbr]} ({abbr})
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-xl border border-[#BFE3DD] bg-gradient-to-b from-[#EAF6FB] to-white p-4">
+        <UsaStateMap
+          states={states}
+          defaultState={{ fill: COLOR_HEX.gray, stroke: MAP_STROKE }}
+          showFlags
+        />
+      </div>
 
       <div className="flex flex-wrap items-center gap-4 text-sm">
         {(Object.keys(COLOR_HEX) as (keyof typeof COLOR_HEX)[]).map((color) => (
@@ -155,12 +204,44 @@ export function SalesTaxMap({
         open={selectedState !== null}
         onOpenChange={(open) => !open && setSelectedState(null)}
       >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {t("editTitle", { state: selectedState ?? "" })}
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md">
+          {selectedState && (
+            <DialogHeader className="items-center text-center">
+              <div className="overflow-hidden rounded-xl border-2 border-[#3F7A72]/40 shadow-lg">
+                <USStateFlags state={selectedState} showFlag flagSize="lg" />
+              </div>
+              <DialogTitle className="mt-2">
+                {t("editTitle", { state: selectedState ?? "" })}
+              </DialogTitle>
+            </DialogHeader>
+          )}
+
+          {/* Read-only display of the current official links — rendered
+              straight from `selectedData`, independent of the edit form's
+              react-hook-form state below, so the info is always visible
+              the instant the dialog opens regardless of form timing. */}
+          <dl className="flex flex-col gap-2 rounded-lg border border-border bg-muted/30 p-3 text-sm">
+            <InfoRow label={t("stateTaxAgency")} value={selectedData?.info?.stateTaxAgency} notFoundLabel={t("notFound")} />
+            <InfoRow label={t("officialWebsite")} value={selectedData?.info?.officialWebsite} notFoundLabel={t("notFound")} />
+            <InfoRow label={t("registrationLink")} value={selectedData?.info?.registrationLink} notFoundLabel={t("notFound")} />
+            <InfoRow label={t("filingPortalLink")} value={selectedData?.info?.filingPortalLink} notFoundLabel={t("notFound")} />
+          </dl>
+
+          {selectedData?.info?.officialWebsite && (
+            <Button
+              render={
+                <a
+                  href={selectedData.info.officialWebsite}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+              className="w-full"
+            >
+              {t("openOfficialWebsite")}
+            </Button>
+          )}
+
           <form onSubmit={handleSubmit(submit)} className="flex flex-col gap-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
@@ -231,6 +312,44 @@ export function SalesTaxMap({
           </form>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function isUrl(value: string | null | undefined): value is string {
+  return !!value && /^https?:\/\//i.test(value);
+}
+
+function InfoRow({
+  label,
+  value,
+  notFoundLabel,
+}: {
+  label: string;
+  value: string | null | undefined;
+  notFoundLabel: string;
+}) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <dt className="text-xs font-medium text-muted-foreground uppercase">
+        {label}
+      </dt>
+      <dd>
+        {!value ? (
+          notFoundLabel
+        ) : isUrl(value) ? (
+          <a
+            href={value}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="break-all text-[#2C7A70] underline"
+          >
+            {value}
+          </a>
+        ) : (
+          value
+        )}
+      </dd>
     </div>
   );
 }
