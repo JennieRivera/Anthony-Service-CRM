@@ -4,6 +4,11 @@
     "error": "Hubo un problema al iniciar sesión. Por favor, inténtalo de nuevo.",
     "googleCta": "Iniciar sesión con Google"
   },
+  "Calculator": {
+    "title": "Calculadora",
+    "open": "Abrir calculadora",
+    "close": "Cerrar calculadora"
+  },
   "Dashboard": {
     "title": "Panel",
     "activeClients": "Clientes Activos",

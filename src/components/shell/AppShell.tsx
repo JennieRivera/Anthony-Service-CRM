@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
+import { FloatingCalculator } from "./FloatingCalculator";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -10,6 +11,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Topbar />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+      <FloatingCalculator />
     </div>
   );
 }

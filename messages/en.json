@@ -4,6 +4,11 @@
     "error": "There was a problem signing in. Please try again.",
     "googleCta": "Sign in with Google"
   },
+  "Calculator": {
+    "title": "Calculator",
+    "open": "Open calculator",
+    "close": "Close calculator"
+  },
   "Dashboard": {
     "title": "Dashboard",
     "activeClients": "Active Clients",
