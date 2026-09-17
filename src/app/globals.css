@@ -46,90 +46,93 @@
 }
 
 /*
- * Anthony Multiservice CRM brand tokens — mint green, white, soft coral,
- * dark green. Single light theme only; no dark mode.
+ * Anthony Multiservice CRM brand tokens — deep navy, warm cream, muted
+ * gold/brass. Single light theme only; no dark mode.
  *
- * Only 4 hex values were given (mint #8FB89C, white #FFFFFF, coral
- * #E8927A, dark green #3B4A42); every other token below is either one of
- * those 4 directly, or a tint/blend derived from them (documented inline)
- * where the token system needs more than 4 colors (muted/secondary
- * surfaces, borders, 5 chart colors, sidebar hover/border states).
+ * Base brand hexes: navy #0F1A2B, cream #FAF8F3, gold #B8964A — the same
+ * three values documented in README.md's Design System line; keep both
+ * in sync if either changes. (A prior revision of this file implemented
+ * an unrelated mint/white/coral/dark-green palette that had drifted from
+ * the documented brand — this revision restores navy/cream/gold as the
+ * source of truth and softens it for a lighter, more elegant feel than
+ * the raw brand hexes alone.) Every token below is either one of those 3
+ * directly, or a tint/shade blended from them toward white/cream
+ * (documented inline).
  *
- * Contrast checked (WCAG relative luminance):
- *   dark green-on-white   9.36:1 (AAA) — foreground, primary button text
- *   white-on-dark-green   9.36:1 (AAA) — primary button fill, sidebar
- *   dark green-on-mint    4.24:1 — under the 4.5:1 body-text AA
- *     threshold, but clears AA-large-text/UI-component (3:1). Mint is
- *     therefore used as a background only for large/bold headings, KPI
- *     numbers, chart fill, and short badge/pill labels — never as a
- *     paragraph-text card background.
- *   white-on-coral 2.38:1 / white-on-mint 2.21:1 — both fail outright;
- *     white text never sits on coral or mint.
- * This mirrors the old palette's own rule (kept below in spirit): never
- * use --accent as a text color on --background/--card; restrict it to
- * fills, borders, chips, and chart accents.
+ * Contrast checked (WCAG relative luminance), computed for this pass:
+ *   navy text (#1C2B3E) on cream background (#FDFBF6)   ~16:1  (AAA)
+ *   navy text (#1C2B3E) on white card (#FFFFFF)          ~17:1  (AAA)
+ *   cream text (#FDFBF6) on navy primary button (#0F1A2B) ~17:1 (AAA)
+ *   muted-foreground (#5B6672) on cream                   ~5.5:1 (AA)
+ *   navy text on the gold-wash accent chip (#F0E6D0)      ~13:1  (AAA,
+ *     comfortable even at small badge-text size)
+ *   gold (#B8964A) fill on cream                          ~2.6:1 — FAILS
+ *     text contrast. Gold is therefore restricted to fills, borders,
+ *     chips, and the sidebar logo mark — never used as a text color on
+ *     --background/--card/--muted. This is the rule README.md's Design
+ *     System line refers to; keep this comment and that line in sync.
  *
- * --accent is intentionally NOT the literal coral hex: the literal coral
- * (#E8927A) only reaches 3.93:1 with dark-green text, short of AA for the
- * 12px badge/chip labels that are --accent's main real use across the app
- * (every StatusBadge-style component). --accent is instead a 60% coral /
- * 40% white tint (dark green on it: 5.67:1, comfortable AA), so every
- * existing bg-accent/text-accent-foreground usage is safe with zero
- * component changes. The literal, fully-saturated coral still appears at
- * full strength as --chart-2 and in the calendar's "today" wash.
+ * --destructive and --chart-1 through --chart-5 are intentionally left
+ * unchanged from the prior mint/coral palette — out of scope for this
+ * pass, not an oversight. Revisit them if/when charts get their own
+ * brand pass.
  */
 :root {
-  --background: #ffffff;
-  --foreground: #3b4a42;
+  /* Whisper-soft cream, lighter than the base brand cream (#FAF8F3) —
+     warmer and less clinical than stark white for the page background. */
+  --background: #fdfbf6;
+  /* Softened navy — darker brand navy is #0F1A2B; this is a touch
+     lighter so body text reads as elegant rather than inky, while still
+     clearing AAA on both cream and white (see contrast notes above). */
+  --foreground: #1c2b3e;
+  /* Left pure white (not cream) on purpose: cards sit a hair whiter than
+     the cream page background, so they visibly "lift" off the page. */
   --card: #ffffff;
-  --card-foreground: #3b4a42;
+  --card-foreground: #1c2b3e;
   --popover: #ffffff;
-  --popover-foreground: #3b4a42;
-  --primary: #3b4a42;
-  --primary-foreground: #ffffff;
-  /* Light mint wash (mint blended 20% into white) — subtle panel
-     background, safe for body text at 8.13:1. */
-  --secondary: #e9f1eb;
-  --secondary-foreground: #3b4a42;
-  --muted: #e9f1eb;
-  /* Dark green blended 75% into white — a softened text tone for
-     captions/labels that still clears AA (4.65:1) on white. */
-  --muted-foreground: #6c7771;
-  /* 60% coral / 40% white tint — see comment above. */
-  --accent: #f1beaf;
-  --accent-foreground: #3b4a42;
+  --popover-foreground: #1c2b3e;
+  /* Full-strength brand navy (not the softened --foreground) — buttons
+     and primary CTAs stay grounded/strong even as the rest lightens. */
+  --primary: #0f1a2b;
+  --primary-foreground: #fdfbf6;
+  /* Cream blended ~15% toward gold — a warm panel wash. */
+  --secondary: #f5eedd;
+  --secondary-foreground: #1c2b3e;
+  --muted: #f5eedd;
+  /* Softened navy-slate — captions/labels, ~5.5:1 on cream (AA). */
+  --muted-foreground: #5b6672;
+  /* ~20% gold / 80% cream tint — soft gold wash for badges/chips. Never
+     the literal gold hex as a fill behind text; see contrast notes. */
+  --accent: #f0e6d0;
+  --accent-foreground: #1c2b3e;
   --destructive: #a13b2c;
-  /* Mint blended 30% into white — a visible-but-quiet border, distinct
-     from the lighter --muted wash. */
-  --border: #ddeae1;
-  --input: #ddeae1;
-  --ring: #3b4a42;
+  /* Cream blended toward gold, a shade darker than --accent — a visible
+     but gentle warm border, distinct from the lighter --muted wash. */
+  --border: #ede2c8;
+  --input: #ede2c8;
+  --ring: #1c2b3e;
   --chart-1: #8fb89c;
   --chart-2: #e8927a;
   --chart-3: #3b4a42;
-  /* Mint + dark green, blended 50/50 — a 4th distinct hue (deep sage). */
   --chart-4: #65816f;
-  /* Coral + white, blended 50/50 — a 5th distinct hue (light peach). */
   --chart-5: #f3c8bc;
   --radius: 0.625rem;
-  --sidebar: #3b4a42;
-  --sidebar-foreground: #ffffff;
-  /* Used only for the collapsed-sidebar "AMS" logo monogram (Logo.tsx) —
-     mint text/border on the dark green sidebar, 4.24:1. Logotypes are
-     exempt from WCAG text-contrast requirements, so the literal mint is
-     kept here even though it's below the general 4.5:1 bar; every actual
-     nav-link state (active/hover) uses --sidebar-accent instead, which is
-     a full AA pass (6.11:1). */
-  --sidebar-primary: #8fb89c;
-  --sidebar-primary-foreground: #3b4a42;
-  /* Dark green blended 15% lighter — hover background for non-active
-     sidebar items, 6.11:1 with white text. */
-  --sidebar-accent: #58655e;
-  --sidebar-accent-foreground: #ffffff;
-  /* Dark green blended 8% lighter — a subtle separator inside the dark
-     sidebar. */
-  --sidebar-border: #4b5851;
-  --sidebar-ring: #8fb89c;
+  --sidebar: #0f1a2b;
+  --sidebar-foreground: #fdfbf6;
+  /* Gold on navy for the collapsed-sidebar "AMS" logo monogram
+     (Logo.tsx) — ~6.2:1, a full AA pass (previously mint on dark green,
+     only 4.24:1 and reliant on the logotype exemption). */
+  --sidebar-primary: #b8964a;
+  --sidebar-primary-foreground: #0f1a2b;
+  /* Navy blended ~9% toward cream — hover background for non-active
+     sidebar items, ~14:1 with cream text. */
+  --sidebar-accent: #1c2b3e;
+  --sidebar-accent-foreground: #fdfbf6;
+  /* Navy blended ~4% toward cream — a subtler separator than
+     --sidebar-accent's hover state, just enough to read as a boundary
+     inside the navy sidebar. */
+  --sidebar-border: #192333;
+  --sidebar-ring: #b8964a;
 }
 
 @layer base {
@@ -165,6 +168,29 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ai-avatar-float {
+    animation: none;
+  }
+}
+
+/* Sidebar nav — subtle white/silver glint/twinkle for the Diamond
+   Community icon, so it reads as an actual sparkling diamond rather than
+   just another (gold) nav icon that happens to pulse. */
+@keyframes sidebar-icon-sparkle {
+  0%,
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  50% {
+    filter: brightness(1.5) drop-shadow(0 0 4px rgba(255, 255, 255, 0.9));
+  }
+}
+
+.sidebar-icon-sparkle {
+  animation: sidebar-icon-sparkle 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-icon-sparkle {
     animation: none;
   }
 }

@@ -30,7 +30,10 @@ export default async function AcademyPage() {
     <div className="flex w-full flex-col gap-6 px-8 py-10">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
-        <Button render={<Link href="/cases/new?serviceType=academy" />}>
+        <Button
+          nativeButton={false}
+          render={<Link href="/cases/new?serviceType=academy" />}
+        >
           <Plus className="h-4 w-4" />
           {t("newStudent")}
         </Button>

@@ -54,7 +54,9 @@ export function Sidebar() {
               <Icon
                 className={cn(
                   "h-4.5 w-4.5 shrink-0",
-                  item.highlightIcon && "text-[var(--sidebar-foreground)]",
+                  item.sparkleIcon
+                    ? "text-[#E7ECEF] sidebar-icon-sparkle"
+                    : "text-[var(--sidebar-primary)]",
                 )}
               />
               {!collapsed && <span>{t(item.labelKey)}</span>}

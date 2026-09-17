@@ -28,7 +28,7 @@ A premium client-management platform for [Anthony Multiservice, LLC](https://ant
 
 ## Design system
 
-Deep navy (`#0F1A2B`) and warm cream (`#FAF8F3`) with a muted gold/brass accent (`#B8964A`), Playfair Display for headings and Public Sans for body/UI. Tokens live in `src/app/globals.css`. Single light theme (no dark mode). Gold is restricted to fills/borders/chips/chart accents — never used as a text color on the cream background (fails contrast; see the comment in `globals.css` for the full rule).
+Deep navy (`#0F1A2B`) and warm cream (`#FAF8F3`) with a muted gold/brass accent (`#B8964A`), Playfair Display for headings and Public Sans for body/UI. Tokens live in `src/app/globals.css`, softened slightly from those three raw brand hexes for a lighter, more elegant feel: page background is a whisper-soft cream (`#FDFBF6`) with white cards lifting off it, body text is a softened navy (`#1C2B3E`), and gold appears only as a light wash (`#F0E6D0`) or on the sidebar logo mark — never as a background behind text or as a text color itself, since gold-on-cream fails contrast outright (see the comment in `globals.css` for the full rule and the current contrast numbers). Single light theme (no dark mode). `--destructive` and the 5 chart colors are a separate, older mint/coral palette left unchanged for now.
 
 ## Data model
 

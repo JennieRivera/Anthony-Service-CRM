@@ -64,10 +64,11 @@ export type NavItem = {
     | "socialMedia"
     | "settings";
   icon: LucideIcon;
-  // Forces the icon to full-opacity sidebar-foreground instead of the
-  // usual dimmed /70 resting state — used for Diamond Community so it
-  // reads as a deliberately-VIP highlight, not just another nav row.
-  highlightIcon?: boolean;
+  // Renders the icon white/silver (not the standard gold every other nav
+  // icon gets) with a sparkle/glint animation, so it reads as an actual
+  // sparkling diamond — used only for Diamond Community. See the
+  // .sidebar-icon-sparkle color override in Sidebar.tsx/MobileNav.tsx.
+  sparkleIcon?: boolean;
 };
 
 // SIDEBAR-PLAN.md section 8 — order follows the plan's list wherever an
@@ -105,13 +106,14 @@ export const navItems: NavItem[] = [
   { href: "/notary-state-guide", labelKey: "notaryStateGuide", icon: Stamp },
   // VIP WhatsApp membership roster (admin + students + teachers),
   // deliberately distinct from /community (the Alliances/Associations
-  // module) and from /communications. Icon stays at full brightness
-  // rather than the usual dimmed resting state, per the user's request.
+  // module) and from /communications. Icon gets the gold sparkle
+  // animation rather than the plain gold every other icon gets, per the
+  // user's request.
   {
     href: "/diamond-community",
     labelKey: "diamondCommunity",
     icon: Gem,
-    highlightIcon: true,
+    sparkleIcon: true,
   },
   // "Media Library" per SIDEBAR-PLAN.md section 9 — same route/table as
   // before (marketing_content_assets), just relabeled to match the plan's

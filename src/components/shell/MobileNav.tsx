@@ -54,7 +54,14 @@ export function MobileNav() {
                     : "text-[var(--sidebar-foreground)]/70 hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]",
                 )}
               >
-                <Icon className="h-4.5 w-4.5 shrink-0" />
+                <Icon
+                  className={cn(
+                    "h-4.5 w-4.5 shrink-0",
+                    item.sparkleIcon
+                      ? "text-[#E7ECEF] sidebar-icon-sparkle"
+                      : "text-[var(--sidebar-primary)]",
+                  )}
+                />
                 <span>{t(item.labelKey)}</span>
               </Link>
             );

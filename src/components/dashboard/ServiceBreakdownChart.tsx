@@ -12,12 +12,15 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
+// Local to this chart only — deliberately not the shared --chart-1..5
+// tokens, which src/components/reports/SeasonalityChart.tsx also reads
+// directly; changing those would have silently recolored that chart too.
 const COLORS = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-  "var(--chart-5)",
+  "#3B6E91", // blue
+  "#B8964A", // gold (brand gold, same as --sidebar-primary)
+  "#4C7A5D", // green
+  "#0F1A2B", // dark navy (brand navy, same as --primary)
+  "#7CBCB2", // light aqua blue
   "#8C6D46",
   "#4A5A3A",
   "#6E4A6E",
