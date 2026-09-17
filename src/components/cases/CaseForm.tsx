@@ -83,6 +83,7 @@ import type {
   IrsCaseDetails,
   InsuranceComplianceDetails,
   ApostilleDetails,
+  ServiceCatalogItem,
 } from "@/lib/db/schema";
 
 export function CaseForm({
@@ -102,6 +103,7 @@ export function CaseForm({
   apostille,
   clients,
   companies,
+  serviceCatalogItems = [],
   defaultClientId,
   defaultServiceType,
   onSubmit,
@@ -122,6 +124,7 @@ export function CaseForm({
   apostille?: ApostilleDetails | null;
   clients: { id: string; fullName: string }[];
   companies: { id: string; legalBusinessName: string }[];
+  serviceCatalogItems?: ServiceCatalogItem[];
   defaultClientId?: string;
   defaultServiceType?: (typeof serviceTypeValues)[number];
   onSubmit: (values: CaseFormValues) => Promise<void>;
@@ -163,6 +166,7 @@ export function CaseForm({
   const tInsuranceComplianceType = useTranslations("InsuranceComplianceType");
   const tInsuranceComplianceStatus = useTranslations("InsuranceComplianceStatus");
   const tDocumentPrepCaseStatus = useTranslations("DocumentPrepCaseStatus");
+  const tServiceCatalog = useTranslations("ServiceCatalog");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -171,6 +175,7 @@ export function CaseForm({
     handleSubmit,
     control,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<CaseFormValues>({
     resolver: zodResolver(caseFormSchema),
@@ -372,6 +377,9 @@ export function CaseForm({
   });
 
   const serviceType = watch("serviceType");
+  const matchingCatalogItems = serviceCatalogItems.filter(
+    (item) => item.serviceType === serviceType,
+  );
   const isNotary = notaryServiceTypes.includes(serviceType);
   const isTax = taxServiceTypes.includes(serviceType);
   const isBookkeeping = bookkeepingServiceTypes.includes(serviceType);
@@ -502,6 +510,26 @@ export function CaseForm({
         {!isNotary && (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="fee">{t("fee")}</Label>
+            {matchingCatalogItems.length > 0 && (
+              <Select
+                value=""
+                onValueChange={(itemId) => {
+                  const item = matchingCatalogItems.find((i) => i.id === itemId);
+                  if (item) setValue("fee", item.price, { shouldDirty: true });
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={tServiceCatalog("chooseFromCatalogPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {matchingCatalogItems.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.name} — ${item.price}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <Input id="fee" type="number" step="0.01" {...register("fee")} />
           </div>
         )}

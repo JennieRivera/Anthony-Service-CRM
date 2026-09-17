@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCaseById, listClientsForSelect } from "@/lib/queries/cases";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
+import { listActiveServiceCatalogItems } from "@/lib/queries/serviceCatalog";
 import { Link } from "@/i18n/navigation";
 import { CaseForm } from "@/components/cases/CaseForm";
 import { updateCaseAction } from "../../actions";
@@ -15,10 +16,11 @@ export default async function EditCasePage({
   const { id } = await params;
   const t = await getTranslations("Cases");
 
-  const [result, clients, companies] = await Promise.all([
+  const [result, clients, companies, serviceCatalogItems] = await Promise.all([
     getCaseById(id),
     listClientsForSelect(),
     listCompaniesForSelect(),
+    listActiveServiceCatalogItems(),
   ]);
 
   if (!result) notFound();
@@ -59,6 +61,7 @@ export default async function EditCasePage({
         apostille={result.apostille}
         clients={clients}
         companies={companies}
+        serviceCatalogItems={serviceCatalogItems}
         onSubmit={submit}
       />
     </div>

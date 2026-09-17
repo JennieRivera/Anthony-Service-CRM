@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { CaseForm } from "@/components/cases/CaseForm";
 import { listClientsForSelect } from "@/lib/queries/cases";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
+import { listActiveServiceCatalogItems } from "@/lib/queries/serviceCatalog";
 import { serviceTypeValues } from "@/lib/validation/client";
 import { createCaseAction } from "../actions";
 
@@ -20,9 +21,10 @@ export default async function NewCasePage({
   )
     ? (serviceType as (typeof serviceTypeValues)[number])
     : undefined;
-  const [clients, companies] = await Promise.all([
+  const [clients, companies, serviceCatalogItems] = await Promise.all([
     listClientsForSelect(),
     listCompaniesForSelect(),
+    listActiveServiceCatalogItems(),
   ]);
 
   return (
@@ -42,6 +44,7 @@ export default async function NewCasePage({
       <CaseForm
         clients={clients}
         companies={companies}
+        serviceCatalogItems={serviceCatalogItems}
         defaultClientId={clientId}
         defaultServiceType={validServiceType}
         onSubmit={createCaseAction}

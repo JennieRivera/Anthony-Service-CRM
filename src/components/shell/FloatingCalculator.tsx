@@ -171,11 +171,18 @@ export function FloatingCalculator() {
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         aria-label={open ? t("close") : t("open")}
-        style={position ? { left: position.x, top: position.y } : { right: DEFAULT_MARGIN, bottom: DEFAULT_MARGIN }}
+        style={{
+          ...(position ? { left: position.x, top: position.y } : { right: DEFAULT_MARGIN, bottom: DEFAULT_MARGIN }),
+          // The .ai-avatar-float class alone only exists as a hook for the
+          // prefers-reduced-motion override in globals.css — the actual
+          // animation is applied inline, same as its original use in
+          // AiAgentAvatar.tsx.
+          animation: !dragging && !open ? "ai-avatar-float 3s ease-in-out infinite" : undefined,
+        }}
         className={cn(
           "fixed z-50 flex h-14 w-14 touch-none items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105",
           dragging ? "cursor-grabbing" : "cursor-grab",
-          !dragging && !open && "ai-avatar-float",
+          "ai-avatar-float",
         )}
       >
         {open ? <X className="h-6 w-6" /> : <CalculatorIcon className="h-6 w-6" />}

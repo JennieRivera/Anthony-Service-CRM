@@ -1254,6 +1254,27 @@ export const serviceColorSettings = pgTable("service_color_settings", {
   sortOrder: integer("sort_order").notNull().default(0),
 });
 
+// Standard price list for specific named services (e.g. "Poder notarial",
+// "Formulario I-130") — deliberately more granular than serviceType, since
+// price varies a lot within a single service_type category. Only prefills
+// cases.fee in CaseForm on selection; no FK from cases back to this table,
+// so editing/deleting a catalog entry never touches existing cases.
+export const serviceCatalogItems = pgTable("service_catalog_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  name: text("name").notNull(),
+  serviceType: serviceTypeEnum("service_type").notNull(),
+  price: numeric("price", { precision: 12, scale: 2 }).notNull(),
+  active: boolean("active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  notes: text("notes"),
+});
+
 export const invoices = pgTable("invoices", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -2908,3 +2929,4 @@ export type AiAgentKnowledgeBaseEntry =
 export type AiEscalation = typeof aiEscalations.$inferSelect;
 export type AiActivityLogEntry = typeof aiActivityLog.$inferSelect;
 export type ServiceColorSetting = typeof serviceColorSettings.$inferSelect;
+export type ServiceCatalogItem = typeof serviceCatalogItems.$inferSelect;
