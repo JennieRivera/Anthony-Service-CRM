@@ -15,6 +15,7 @@ import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { SignOutMenuItem } from "./SignOutMenuItem";
 import { GlobalSearch } from "./GlobalSearch";
 import { NotificationsMenu } from "./NotificationsMenu";
+import { QuickCreateMenu } from "./QuickCreateMenu";
 
 export async function Topbar() {
   const t = await getTranslations("Nav");
@@ -29,6 +30,8 @@ export async function Topbar() {
       <GlobalSearch />
 
       <div className="ml-auto flex items-center gap-2">
+        <QuickCreateMenu />
+
         <LocaleSwitcher />
 
         <NotificationsMenu />

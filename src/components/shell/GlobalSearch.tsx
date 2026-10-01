@@ -16,6 +16,9 @@ const EMPTY_RESULTS: GlobalSearchResults = {
   cases: [],
   companies: [],
   appointments: [],
+  referrals: [],
+  invoices: [],
+  documents: [],
 };
 
 export function GlobalSearch() {
@@ -60,6 +63,9 @@ export function GlobalSearch() {
     { label: t("searchCases"), items: results.cases },
     { label: t("searchCompanies"), items: results.companies },
     { label: t("searchAppointments"), items: results.appointments },
+    { label: t("searchReferrals"), items: results.referrals },
+    { label: t("searchInvoices"), items: results.invoices },
+    { label: t("searchDocuments"), items: results.documents },
   ].filter((group) => group.items.length > 0);
 
   const hasQuery = query.trim().length >= MIN_QUERY_LENGTH;

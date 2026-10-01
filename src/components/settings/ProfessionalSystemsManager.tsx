@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConnectionStatusBadge } from "./ConnectionStatusBadge";
 import { ProfessionalSystemFormDialog } from "./ProfessionalSystemFormDialog";
 import {
   createProfessionalSystemAction,
@@ -69,6 +70,10 @@ export function ProfessionalSystemsManager({
                   {system.name}
                 </span>
                 <Badge variant="outline">{system.category}</Badge>
+                <ConnectionStatusBadge
+                  connectionStatus={system.connectionStatus}
+                  integrationType={system.integrationType}
+                />
                 {!system.active && (
                   <Badge variant="outline" className="text-muted-foreground">
                     {t("inactive")}

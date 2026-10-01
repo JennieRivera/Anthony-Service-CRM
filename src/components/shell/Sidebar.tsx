@@ -5,8 +5,10 @@ import { useTranslations } from "next-intl";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { navItems } from "./nav-items";
+import { navGroups, navDrawerTriggers } from "./nav-items";
 import { Logo } from "./Logo";
+import { ServicesDrawer } from "./ServicesDrawer";
+import { EcosystemDrawer } from "./EcosystemDrawer";
 
 export function Sidebar() {
   const t = useTranslations("Nav");
@@ -30,39 +32,56 @@ export function Sidebar() {
         )}
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 px-3 py-2">
-        {navItems.map((item) => {
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive ? "page" : undefined}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)]"
-                  : "text-[var(--sidebar-foreground)]/70 hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]",
-              )}
-              title={collapsed ? t(item.labelKey) : undefined}
-            >
-              <Icon
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-2">
+        {navGroups.map((group, groupIndex) => (
+          <div key={group.labelKey} className="flex flex-col gap-1">
+            {!collapsed && (
+              <p
                 className={cn(
-                  "h-4.5 w-4.5 shrink-0",
-                  item.sparkleIcon
-                    ? "text-[#E7ECEF] sidebar-icon-sparkle"
-                    : "text-[var(--sidebar-primary)]",
+                  "px-3 pt-2 text-xs font-semibold tracking-wide text-[var(--sidebar-foreground)]/50 uppercase",
+                  groupIndex === 0 && "pt-0",
                 )}
-              />
-              {!collapsed && <span>{t(item.labelKey)}</span>}
-            </Link>
-          );
-        })}
+              >
+                {t(group.labelKey)}
+              </p>
+            )}
+            {group.items.map((item) => {
+              const isActive =
+                item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)]"
+                      : "text-[var(--sidebar-foreground)]/70 hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]",
+                  )}
+                  title={collapsed ? t(item.labelKey) : undefined}
+                >
+                  <Icon className="h-4.5 w-4.5 shrink-0 text-[var(--sidebar-primary)]" />
+                  {!collapsed && <span>{t(item.labelKey)}</span>}
+                </Link>
+              );
+            })}
+
+            {/* The two slide-out drawers render right after FINANCE
+                (navGroups[3]) and before REPORTING, matching the master
+                prompt's literal sidebar order. */}
+            {groupIndex === 3 &&
+              navDrawerTriggers.map((trigger) =>
+                trigger.drawer === "services" ? (
+                  <ServicesDrawer key="services" collapsedTrigger={collapsed} />
+                ) : (
+                  <EcosystemDrawer key="ecosystem" collapsedTrigger={collapsed} />
+                ),
+              )}
+          </div>
+        ))}
       </nav>
 
       <div className="border-t border-[var(--sidebar-border)] p-3">

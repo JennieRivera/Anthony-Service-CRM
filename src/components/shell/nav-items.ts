@@ -9,29 +9,17 @@ import {
   Handshake,
   Wallet,
   ListChecks,
-  Network,
   BarChart3,
   Settings,
-  Map,
   MessagesSquare,
   NotepadText,
   Building2,
-  Landmark,
-  Library,
-  FileStack,
-  MapPinned,
-  Megaphone,
-  Bot,
-  ShieldAlert,
-  LayoutGrid,
-  Globe,
-  GraduationCap,
-  Gem,
-  Share2,
-  Stamp,
+  Layers,
+  Sparkles,
 } from "lucide-react";
 
 export type NavItem = {
+  kind: "link";
   href: string;
   labelKey:
     | "dashboard"
@@ -39,99 +27,102 @@ export type NavItem = {
     | "companies"
     | "cases"
     | "documents"
-    | "appointments"
+    | "calendar"
     | "invoices"
     | "referrals"
     | "payments"
     | "tasks"
-    | "community"
     | "communications"
     | "templates"
     | "reports"
-    | "companyRegistration"
-    | "salesTaxMap"
-    | "irsResources"
-    | "immigrationForms"
-    | "latinoBusinessMap"
-    | "marketingContent"
-    | "aiTeam"
-    | "aiEscalations"
-    | "professionalSystems"
-    | "websites"
-    | "academy"
-    | "notaryStateGuide"
-    | "diamondCommunity"
-    | "socialMedia"
     | "settings";
   icon: LucideIcon;
-  // Renders the icon white/silver (not the standard gold every other nav
-  // icon gets) with a sparkle/glint animation, so it reads as an actual
-  // sparkling diamond — used only for Diamond Community. See the
-  // .sidebar-icon-sparkle color override in Sidebar.tsx/MobileNav.tsx.
-  sparkleIcon?: boolean;
 };
 
-// SIDEBAR-PLAN.md section 8 — order follows the plan's list wherever an
-// item maps 1:1 to something that exists today. Items the plan lists but
-// that don't exist yet as their own module (Services, Finance, Social
-// Media, Calendar as distinct from Appointments, Academy, a separate
-// Media Library, "Government & Compliance"/"Business Intelligence" as
-// umbrella groupings) are deliberately left alone — that's new-module or
-// grouping-decision work for a later session, not a menu reorder.
-export const navItems: NavItem[] = [
-  { href: "/", labelKey: "dashboard", icon: LayoutDashboard },
-  { href: "/clients", labelKey: "clients", icon: Users },
-  { href: "/companies", labelKey: "companies", icon: Building2 },
-  { href: "/cases", labelKey: "cases", icon: Briefcase },
-  { href: "/referrals", labelKey: "referrals", icon: Handshake },
-  { href: "/payments", labelKey: "payments", icon: Wallet },
-  { href: "/invoices", labelKey: "invoices", icon: Receipt },
-  { href: "/communications", labelKey: "communications", icon: MessagesSquare },
-  { href: "/templates", labelKey: "templates", icon: NotepadText },
-  // SIDEBAR-PLAN.md section 3 — one sidebar item over the two existing,
-  // deliberately-separate strategicAlliances/associationsChambers tables
-  // (see the comment on /community/page.tsx and on associationsChambers
-  // in schema.ts). Not a data merge, just a shared tabbed page.
-  { href: "/community", labelKey: "community", icon: Network },
-  { href: "/tasks", labelKey: "tasks", icon: ListChecks },
-  { href: "/appointments", labelKey: "appointments", icon: CalendarDays },
-  { href: "/documents", labelKey: "documents", icon: FileText },
-  // Academy's own module — was previously reachable only through the
-  // Dashboard's Academy "View All", which used to send staff to the
-  // unfiltered /cases list mixed with every other service.
-  { href: "/academy", labelKey: "academy", icon: GraduationCap },
-  // Anthony Multiservice Academy's National Notary State Guide — bilingual
-  // 50-state reference tool, deliberately its own module (not merged into
-  // Academy) since it's a public lookup tool, not a course/roster page.
-  { href: "/notary-state-guide", labelKey: "notaryStateGuide", icon: Stamp },
-  // VIP WhatsApp membership roster (admin + students + teachers),
-  // deliberately distinct from /community (the Alliances/Associations
-  // module) and from /communications. Icon gets the gold sparkle
-  // animation rather than the plain gold every other icon gets, per the
-  // user's request.
+export type NavDrawerTrigger = {
+  kind: "drawer";
+  drawer: "services" | "ecosystem";
+  labelKey: "services" | "amsEcosystem";
+  icon: LucideIcon;
+};
+
+export type NavEntry = NavItem | NavDrawerTrigger;
+
+export type NavGroup = {
+  labelKey:
+    | "groupHome"
+    | "groupBusiness"
+    | "groupWorkspace"
+    | "groupFinance"
+    | "groupReporting"
+    | "groupAdministration";
+  items: NavItem[];
+};
+
+// SIDEBAR-REORG-PLAN (Phase 1, AMS CRM V2 master prompt section 3) — every
+// route below already existed under the old flat nav-items.ts list; this
+// file only changes how they're grouped/labeled, never adds or removes a
+// route. "calendar" reuses the existing /appointments route and data model
+// untouched — only the sidebar's own label changes (see AppointmentCalendar
+// and the Appointments module itself, neither of which this file touches).
+// Items that moved into the two slide-out drawers (Academy, Diamond
+// Community, Community & Strategic Alliances, Latino Business Map,
+// Marketing Content, Social Media, Company Registration, Sales Tax Map, IRS
+// Resources, Immigration Forms, National Notary State Guide, AI Team, AI
+// Escalations, Professional Systems, Websites) live in nav-drawers.ts
+// instead — still the same hrefs, just surfaced through ServicesDrawer /
+// EcosystemDrawer rather than a 29th flat sidebar row.
+export const navGroups: NavGroup[] = [
   {
-    href: "/diamond-community",
-    labelKey: "diamondCommunity",
-    icon: Gem,
-    sparkleIcon: true,
+    labelKey: "groupHome",
+    items: [{ kind: "link", href: "/", labelKey: "dashboard", icon: LayoutDashboard }],
   },
-  // "Media Library" per SIDEBAR-PLAN.md section 9 — same route/table as
-  // before (marketing_content_assets), just relabeled to match the plan's
-  // terminology now that Social Media exists as its own, separate module.
-  { href: "/marketing-content", labelKey: "marketingContent", icon: Megaphone },
-  // Content planning/scheduling/publishing-prep, separate from the Media
-  // Library (raw file storage) it references.
-  { href: "/social-media", labelKey: "socialMedia", icon: Share2 },
-  { href: "/company-registration", labelKey: "companyRegistration", icon: Map },
-  { href: "/sales-tax-map", labelKey: "salesTaxMap", icon: Landmark },
-  { href: "/irs-resources", labelKey: "irsResources", icon: Library },
-  { href: "/immigration-forms", labelKey: "immigrationForms", icon: FileStack },
-  { href: "/latino-business-map", labelKey: "latinoBusinessMap", icon: MapPinned },
-  { href: "/ai-team", labelKey: "aiTeam", icon: Bot },
-  { href: "/ai-escalations", labelKey: "aiEscalations", icon: ShieldAlert },
-  // Promoted from Settings sub-pages per section 8's final sidebar order.
-  { href: "/professional-systems", labelKey: "professionalSystems", icon: LayoutGrid },
-  { href: "/websites", labelKey: "websites", icon: Globe },
-  { href: "/reports", labelKey: "reports", icon: BarChart3 },
-  { href: "/settings", labelKey: "settings", icon: Settings },
+  {
+    labelKey: "groupBusiness",
+    items: [
+      { kind: "link", href: "/clients", labelKey: "clients", icon: Users },
+      { kind: "link", href: "/companies", labelKey: "companies", icon: Building2 },
+      { kind: "link", href: "/cases", labelKey: "cases", icon: Briefcase },
+      { kind: "link", href: "/referrals", labelKey: "referrals", icon: Handshake },
+    ],
+  },
+  {
+    labelKey: "groupWorkspace",
+    items: [
+      // Same /appointments route and AppointmentCalendar component as
+      // before — "calendar" only changes the sidebar's label (master
+      // prompt section 9 / approval item 9).
+      { kind: "link", href: "/appointments", labelKey: "calendar", icon: CalendarDays },
+      { kind: "link", href: "/tasks", labelKey: "tasks", icon: ListChecks },
+      { kind: "link", href: "/communications", labelKey: "communications", icon: MessagesSquare },
+      // Not explicitly placed by the master prompt's own group list —
+      // kept here since templates are message templates for the
+      // Communications module right above it, not an orphaned route.
+      { kind: "link", href: "/templates", labelKey: "templates", icon: NotepadText },
+      { kind: "link", href: "/documents", labelKey: "documents", icon: FileText },
+    ],
+  },
+  {
+    labelKey: "groupFinance",
+    items: [
+      { kind: "link", href: "/invoices", labelKey: "invoices", icon: Receipt },
+      { kind: "link", href: "/payments", labelKey: "payments", icon: Wallet },
+    ],
+  },
+  {
+    labelKey: "groupReporting",
+    items: [{ kind: "link", href: "/reports", labelKey: "reports", icon: BarChart3 }],
+  },
+  {
+    labelKey: "groupAdministration",
+    items: [{ kind: "link", href: "/settings", labelKey: "settings", icon: Settings }],
+  },
+];
+
+// Rendered between the FINANCE and REPORTING groups (master prompt section
+// 3's literal order). Each opens the matching slide-out drawer defined in
+// nav-drawers.ts instead of navigating directly.
+export const navDrawerTriggers: NavDrawerTrigger[] = [
+  { kind: "drawer", drawer: "services", labelKey: "services", icon: Layers },
+  { kind: "drawer", drawer: "ecosystem", labelKey: "amsEcosystem", icon: Sparkles },
 ];
