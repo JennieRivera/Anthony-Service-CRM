@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -129,7 +130,7 @@ export default async function CommunicationDetailPage({
           <div>
             <p className="text-muted-foreground">{t("columnDate")}</p>
             <p className="text-foreground">
-              {new Date(communication.occurredAt).toLocaleString()}
+              {formatDateTime(communication.occurredAt)}
             </p>
           </div>
           {communication.counterpart && (
@@ -185,7 +186,7 @@ export default async function CommunicationDetailPage({
           <div>
             <p className="text-muted-foreground">{t("form.followUpDate")}</p>
             <p className="text-foreground">
-              {new Date(communication.followUpDate).toLocaleDateString()}
+              {formatDate(communication.followUpDate)}
             </p>
           </div>
         )}
@@ -213,13 +214,13 @@ export default async function CommunicationDetailPage({
         <div>
           <p className="text-muted-foreground">{t("createdDate")}</p>
           <p className="text-foreground">
-            {new Date(communication.createdAt).toLocaleString()}
+            {formatDateTime(communication.createdAt)}
           </p>
         </div>
         <div>
           <p className="text-muted-foreground">{t("updatedDate")}</p>
           <p className="text-foreground">
-            {new Date(communication.updatedAt).toLocaleString()}
+            {formatDateTime(communication.updatedAt)}
           </p>
         </div>
       </div>

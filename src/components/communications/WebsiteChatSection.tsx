@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
@@ -83,7 +84,7 @@ export async function WebsiteChatSection() {
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {session.followUpDate
-                      ? new Date(session.followUpDate).toLocaleDateString()
+                      ? formatDate(session.followUpDate)
                       : "—"}
                   </TableCell>
                 </TableRow>

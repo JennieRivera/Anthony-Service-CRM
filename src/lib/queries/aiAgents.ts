@@ -10,6 +10,7 @@ import {
   referrals,
   tasks,
 } from "@/lib/db/schema";
+import { businessDateString } from "@/lib/dates";
 
 export async function listAiAgents() {
   return getDb().select().from(aiAgents).orderBy(aiAgents.sortOrder);
@@ -99,7 +100,7 @@ export async function getAiAgentWorkloadStats() {
       db.select().from(aiEscalations),
     ]);
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = businessDateString();
   const openTasks = allTasks.filter((t) => t.status === "open");
   const openCases = allCases.filter(
     (c) => !["completed", "cancelled"].includes(c.status),

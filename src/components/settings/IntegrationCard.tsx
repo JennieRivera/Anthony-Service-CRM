@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDateTime } from "@/lib/dates";
+
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { TriangleAlert } from "lucide-react";
@@ -104,7 +106,7 @@ export function IntegrationCard({ integration }: { integration: Integration }) {
           <p className="text-muted-foreground">{t("lastSync")}</p>
           <p className="text-foreground">
             {integration.lastSyncAt
-              ? new Date(integration.lastSyncAt).toLocaleString()
+              ? formatDateTime(integration.lastSyncAt)
               : "—"}
           </p>
         </div>

@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
@@ -51,13 +52,13 @@ export async function AcademyTable({
                 {s.courseFormat ? tCourseFormat(s.courseFormat) : "—"}
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {s.startDate ? new Date(s.startDate).toLocaleDateString() : "—"}
+                {s.startDate ? formatDate(s.startDate) : "—"}
               </TableCell>
               <TableCell className="text-muted-foreground">
                 {s.certificateDate
-                  ? new Date(s.certificateDate).toLocaleDateString()
+                  ? formatDate(s.certificateDate)
                   : s.dueDate
-                    ? new Date(s.dueDate).toLocaleDateString()
+                    ? formatDate(s.dueDate)
                     : "—"}
               </TableCell>
               <TableCell className="text-muted-foreground">

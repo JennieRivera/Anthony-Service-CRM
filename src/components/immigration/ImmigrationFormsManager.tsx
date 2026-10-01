@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate } from "@/lib/dates";
+
 import { useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
@@ -59,7 +61,7 @@ export function ImmigrationFormsManager({ forms }: { forms: ImmigrationForm[] })
                 <span className="text-xs text-muted-foreground">
                   {t("lastVerifiedDate")}:{" "}
                   {form.lastVerifiedDate
-                    ? new Date(form.lastVerifiedDate).toLocaleDateString()
+                    ? formatDate(form.lastVerifiedDate)
                     : "—"}
                 </span>
               </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate } from "@/lib/dates";
+
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -126,7 +128,7 @@ export function PaymentForm({
                 {tPayments("invoiceDate")}
               </span>
               <span className="text-foreground">
-                {new Date(selectedInvoice.issueDate).toLocaleDateString()}
+                {formatDate(selectedInvoice.issueDate)}
               </span>
             </div>
             <div className="flex flex-col">

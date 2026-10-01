@@ -1,11 +1,15 @@
 "use client";
 
+import { formatDate } from "@/lib/dates";
+
 import { useTranslations } from "next-intl";
-import { FileText, Download } from "lucide-react";
+import { FileText, Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { DocumentStatusPill } from "./StatusPill";
 import { viewHref, downloadHref } from "./downloadHref";
 import { MoveCategorySelect } from "./MoveCategorySelect";
+import { deleteDocumentAction } from "@/app/[locale]/(app)/documents/actions";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 import type { Document } from "@/lib/db/schema";
 
@@ -26,7 +30,7 @@ function DocumentRow({ doc }: { doc: Document }) {
       <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
         {doc.documentType && <span>{doc.documentType}</span>}
         <DocumentStatusPill status={doc.status} />
-        <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
+        <span>{formatDate(doc.createdAt)}</span>
         {/* A document with a fine immigration sub-folder stays tied to it —
             moving it to a general folder here would desync the two. */}
         {!doc.folder && <MoveCategorySelect documentId={doc.id} category={doc.category} />}
@@ -38,6 +42,20 @@ function DocumentRow({ doc }: { doc: Document }) {
           <Download className="h-4 w-4" />
           {t("download")}
         </Button>
+        <ConfirmDialog
+          trigger={
+            <Button variant="outline" size="sm">
+              <Trash2 className="h-4 w-4" />
+              {t("delete")}
+            </Button>
+          }
+          title={t("deleteConfirmTitle")}
+          description={t("deleteConfirmDescription")}
+          confirmLabel={t("delete")}
+          confirmingLabel={t("deleting")}
+          cancelLabel={t("deleteCancel")}
+          onConfirm={() => deleteDocumentAction(doc.id)}
+        />
       </div>
     </li>
   );

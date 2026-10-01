@@ -28,7 +28,7 @@ export default async function SettingsPage() {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">{t("phone")}</p>
-            <p className="text-foreground">(407) 802-7252</p>
+            <p className="text-foreground">(689) 342-6309</p>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">{t("address")}</p>

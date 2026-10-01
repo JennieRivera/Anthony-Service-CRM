@@ -12,12 +12,14 @@ import {
   ListPlus,
   CreditCard,
   StickyNote,
+  Trash2,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   Select,
   SelectContent,
@@ -40,6 +42,7 @@ import {
   addAppointmentNoteAction,
   createFollowUpTaskAction,
   rescheduleAppointmentAction,
+  deleteAppointmentAction,
 } from "@/app/[locale]/(app)/appointments/actions";
 import type { Appointment } from "@/lib/db/schema";
 
@@ -145,17 +148,35 @@ export function AppointmentDetailActions({
         </DialogContent>
       </Dialog>
 
-      <Button
-        size="sm"
-        variant="outline"
-        disabled={isPending}
-        onClick={() =>
-          startTransition(() => updateAppointmentStatusAction(appointment.id, "cancelled"))
+      <ConfirmDialog
+        trigger={
+          <Button size="sm" variant="outline" disabled={isPending}>
+            <Ban className="h-4 w-4" />
+            {t("cancel")}
+          </Button>
         }
-      >
-        <Ban className="h-4 w-4" />
-        {t("cancel")}
-      </Button>
+        title={t("cancelConfirmTitle")}
+        description={t("cancelConfirmDescription")}
+        confirmLabel={t("cancelConfirmAction")}
+        cancelLabel={t("cancelConfirmDismiss")}
+        variant="default"
+        onConfirm={() => updateAppointmentStatusAction(appointment.id, "cancelled")}
+      />
+
+      <ConfirmDialog
+        trigger={
+          <Button size="sm" variant="destructive" disabled={isPending}>
+            <Trash2 className="h-4 w-4" />
+            {t("delete")}
+          </Button>
+        }
+        title={t("deleteConfirmTitle")}
+        description={t("deleteConfirmDescription")}
+        confirmLabel={t("delete")}
+        confirmingLabel={t("deleting")}
+        cancelLabel={t("deleteConfirmDismiss")}
+        onConfirm={() => deleteAppointmentAction(appointment.id)}
+      />
 
       <Button
         size="sm"

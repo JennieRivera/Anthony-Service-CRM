@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate, formatDateTime } from "@/lib/dates";
+
 import { useState, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -147,7 +149,7 @@ export function HighLevelSyncPanel({
           <div>
             <p className="text-sm text-muted-foreground">{t("lastSyncDate")}</p>
             <p className="text-sm text-foreground">
-              {sync?.lastSyncAt ? new Date(sync.lastSyncAt).toLocaleString() : "—"}
+              {sync?.lastSyncAt ? formatDateTime(sync.lastSyncAt) : "—"}
             </p>
           </div>
           <div>
@@ -198,7 +200,7 @@ export function HighLevelSyncPanel({
             <dt className="text-muted-foreground">{t("previewAppointmentDate")}</dt>
             <dd className="text-foreground">
               {preview.appointmentDate
-                ? new Date(preview.appointmentDate).toLocaleDateString()
+                ? formatDate(preview.appointmentDate)
                 : "—"}
             </dd>
             <dt className="text-muted-foreground">{t("previewClientStatus")}</dt>

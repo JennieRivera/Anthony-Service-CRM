@@ -45,12 +45,14 @@ import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { getActiveAgentIdForServiceType, logAiActivity } from "@/lib/ai/agentActivity";
+import { businessDateString } from "@/lib/dates";
+import { logAuditEvent } from "@/lib/audit";
 
 const CLOSED_STATUSES = ["completed", "cancelled"] as const;
 
 function closedDateFor(status: (typeof caseStatusEnum.enumValues)[number]) {
   return (CLOSED_STATUSES as readonly string[]).includes(status)
-    ? new Date().toISOString().slice(0, 10)
+    ? businessDateString()
     : null;
 }
 
@@ -408,7 +410,7 @@ async function upsertServiceDetails(
         .limit(1);
 
       await db.insert(notaryLogEntries).values({
-        entryDate: new Date().toISOString().slice(0, 10),
+        entryDate: businessDateString(),
         clientId,
         caseId,
         clientNameSnapshot: client?.fullName ?? "Unknown",
@@ -965,4 +967,33 @@ export async function updateCaseStatusAction(
   revalidatePath("/cases");
   revalidatePath(`/cases/${id}`);
   revalidatePath("/tasks");
+}
+
+// Admin-only hard delete, added on explicit request. Cascades the case's
+// own service-detail tables and status history (schema.ts), and detaches
+// (never deletes) anything only loosely linked — documents, appointments,
+// tasks keep existing, and a notary journal entry keeps its frozen
+// clientNameSnapshot even once its caseId goes null.
+export async function deleteCaseAction(id: string) {
+  const db = getDb();
+  const [existing] = await db
+    .select({ title: cases.title, clientId: cases.clientId })
+    .from(cases)
+    .where(eq(cases.id, id))
+    .limit(1);
+  if (!existing) return;
+
+  await db.delete(cases).where(eq(cases.id, id));
+
+  await logAuditEvent({
+    action: "case.deleted",
+    entityType: "case",
+    entityId: id,
+    summary: `Deleted case: ${existing.title}`,
+  });
+
+  revalidatePath("/cases");
+  revalidatePath(`/clients/${existing.clientId}`);
+  const locale = await getLocale();
+  redirect({ href: "/cases", locale });
 }

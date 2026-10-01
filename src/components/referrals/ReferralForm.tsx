@@ -5,6 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { businessDateString } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,7 +64,7 @@ export function ReferralForm({
       clientId: referral?.clientId ?? defaultClientId ?? "",
       caseId: referral?.caseId ?? "",
       referralDate:
-        referral?.referralDate ?? new Date().toISOString().slice(0, 10),
+        referral?.referralDate ?? businessDateString(),
       category: referral?.category ?? "general",
       allianceId: referral?.allianceId ?? "",
       direction: referral?.direction ?? "",

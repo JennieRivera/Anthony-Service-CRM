@@ -6,6 +6,8 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 import type { Client, Invoice, InvoiceLineItem } from "@/lib/db/schema";
+import { businessInfo } from "@/lib/business-info";
+import { formatDate } from "@/lib/dates";
 
 const styles = StyleSheet.create({
   page: {
@@ -94,18 +96,18 @@ export function InvoicePdf({
       <Page size="LETTER" style={styles.page}>
         <View style={styles.header}>
           <View>
-            <Text style={styles.businessName}>Anthony Multiservice, LLC</Text>
-            <Text style={styles.muted}>2610 Orchid Ln, Kissimmee, FL</Text>
-            <Text style={styles.muted}>(407) 802-7252</Text>
+            <Text style={styles.businessName}>{businessInfo.name}</Text>
+            <Text style={styles.muted}>{businessInfo.address}</Text>
+            <Text style={styles.muted}>{businessInfo.phone}</Text>
           </View>
           <View>
             <Text style={styles.invoiceTitle}>{invoiceNumber}</Text>
             <Text style={styles.muted}>
-              Issued: {new Date(invoice.issueDate).toLocaleDateString()}
+              Issued: {formatDate(invoice.issueDate)}
             </Text>
             {invoice.dueDate && (
               <Text style={styles.muted}>
-                Due: {new Date(invoice.dueDate).toLocaleDateString()}
+                Due: {formatDate(invoice.dueDate)}
               </Text>
             )}
           </View>

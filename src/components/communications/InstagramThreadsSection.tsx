@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
@@ -74,7 +75,7 @@ export async function InstagramThreadsSection() {
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {thread.followUpDate
-                      ? new Date(thread.followUpDate).toLocaleDateString()
+                      ? formatDate(thread.followUpDate)
                       : "—"}
                   </TableCell>
                 </TableRow>

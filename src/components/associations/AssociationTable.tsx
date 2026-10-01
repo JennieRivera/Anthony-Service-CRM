@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
@@ -64,7 +65,7 @@ export async function AssociationTable({
               </TableCell>
               <TableCell className="text-muted-foreground">
                 {org.nextFollowUp
-                  ? new Date(org.nextFollowUp).toLocaleDateString()
+                  ? formatDate(org.nextFollowUp)
                   : "—"}
               </TableCell>
             </TableRow>

@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
+import { businessDateString } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,7 +51,7 @@ export function InvoiceForm({
       clientId: defaultClientId ?? "",
       caseId: "",
       status: "unpaid",
-      issueDate: new Date().toISOString().slice(0, 10),
+      issueDate: businessDateString(),
       dueDate: "",
       notes: "",
       items: [{ description: "", quantity: "1", unitPrice: "0" }],

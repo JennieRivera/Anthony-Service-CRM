@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -95,7 +96,7 @@ export default async function SocialMediaContentDetailPage({
             <p className="text-muted-foreground">{t("form.scheduledDate")}</p>
             <p className="text-foreground">
               {content.scheduledDate
-                ? new Date(content.scheduledDate).toLocaleDateString()
+                ? formatDate(content.scheduledDate)
                 : "—"}
             </p>
           </div>
@@ -103,7 +104,7 @@ export default async function SocialMediaContentDetailPage({
             <p className="text-muted-foreground">{t("form.publishedDate")}</p>
             <p className="text-foreground">
               {content.publishedDate
-                ? new Date(content.publishedDate).toLocaleDateString()
+                ? formatDate(content.publishedDate)
                 : "—"}
             </p>
           </div>
@@ -178,7 +179,7 @@ export default async function SocialMediaContentDetailPage({
               <p className="text-muted-foreground">{t("form.approvalDate")}</p>
               <p className="text-foreground">
                 {content.approvalDate
-                  ? new Date(content.approvalDate).toLocaleDateString()
+                  ? formatDate(content.approvalDate)
                   : "—"}
               </p>
             </div>
@@ -219,13 +220,13 @@ export default async function SocialMediaContentDetailPage({
         <div>
           <p className="text-muted-foreground">{t("createdDate")}</p>
           <p className="text-foreground">
-            {new Date(content.createdAt).toLocaleString()}
+            {formatDateTime(content.createdAt)}
           </p>
         </div>
         <div>
           <p className="text-muted-foreground">{t("updatedDate")}</p>
           <p className="text-foreground">
-            {new Date(content.updatedAt).toLocaleString()}
+            {formatDateTime(content.updatedAt)}
           </p>
         </div>
       </div>

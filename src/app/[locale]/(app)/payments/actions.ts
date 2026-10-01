@@ -11,6 +11,7 @@ import {
 import { getInvoiceForPayment } from "@/lib/queries/payments";
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
+import { businessDateString } from "@/lib/dates";
 
 function computeBalance(amountTotal: number, amountPaid: number) {
   return Math.max(amountTotal - amountPaid, 0).toFixed(2);
@@ -109,7 +110,7 @@ export async function recordStripePaymentAction({
     amountPaid: amountTotal.toFixed(2),
     balanceDue: "0.00",
     status: "paid",
-    paymentDate: new Date().toISOString().slice(0, 10),
+    paymentDate: businessDateString(),
     paymentMethod: "Stripe",
     transactionConfirmation,
     refundStatus: "none",

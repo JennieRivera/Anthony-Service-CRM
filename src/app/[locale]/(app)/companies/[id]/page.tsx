@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -72,7 +73,7 @@ export default async function CompanyDetailPage({
             <p className="text-muted-foreground">{t("form.formationDate")}</p>
             <p className="text-foreground">
               {company.formationDate
-                ? new Date(company.formationDate).toLocaleDateString()
+                ? formatDate(company.formationDate)
                 : "—"}
             </p>
           </div>

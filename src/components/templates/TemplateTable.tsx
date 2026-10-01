@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
@@ -65,7 +66,7 @@ export async function TemplateTable({
                 </Badge>
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {new Date(template.updatedAt).toLocaleDateString()}
+                {formatDate(template.updatedAt)}
               </TableCell>
             </TableRow>
           ))}

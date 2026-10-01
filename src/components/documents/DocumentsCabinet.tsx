@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate } from "@/lib/dates";
+
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
@@ -545,14 +547,14 @@ function StudentEnrollments({ enrollments }: { enrollments: AcademyEnrollmentRow
               <Badge variant="outline">{tStatus(e.status)}</Badge>
               <span>
                 {t("startDate")}:{" "}
-                {e.enrollmentDate ? new Date(e.enrollmentDate).toLocaleDateString() : "—"}
+                {e.enrollmentDate ? formatDate(e.enrollmentDate) : "—"}
               </span>
               <span>
                 {t("endDate")}:{" "}
                 {e.certificateDate
-                  ? new Date(e.certificateDate).toLocaleDateString()
+                  ? formatDate(e.certificateDate)
                   : e.dueDate
-                    ? `${t("targetDate")} ${new Date(e.dueDate).toLocaleDateString()}`
+                    ? `${t("targetDate")} ${formatDate(e.dueDate)}`
                     : "—"}
               </span>
             </span>
@@ -642,7 +644,7 @@ function CabinetDocumentList({
           {doc.documentType && <span>{doc.documentType}</span>}
           {doc.category && <span className="text-xs">{tCategory(doc.category)}</span>}
           <DocumentStatusPill status={doc.status} />
-          <span>{new Date(doc.createdAt).toLocaleDateString()}</span>
+          <span>{formatDate(doc.createdAt)}</span>
           {!doc.folder && <MoveCategorySelect documentId={doc.id} category={doc.category} />}
           <Button
             variant="ghost"

@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -57,7 +58,7 @@ export async function SocialMediaContentTable({
               </TableCell>
               <TableCell className="text-muted-foreground">
                 {content.scheduledDate
-                  ? new Date(content.scheduledDate).toLocaleDateString()
+                  ? formatDate(content.scheduledDate)
                   : "—"}
               </TableCell>
               <TableCell>

@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate } from "@/lib/dates";
+
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowUpDown, Search } from "lucide-react";
@@ -38,6 +40,11 @@ export function ClientTable({ clients }: { clients: Client[] }) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    // Phone numbers are stored formatted ("(407) 555-0108"), so a search
+    // typed as digits only or with different punctuation ("407-555-0108",
+    // "4075550108") needs a digits-only comparison, not a literal substring
+    // match against the formatted string.
+    const qDigits = q.replace(/\D/g, "");
 
     let rows = clients.filter((client) => {
       if (statusFilter !== "all" && client.status !== statusFilter) {
@@ -47,7 +54,8 @@ export function ClientTable({ clients }: { clients: Client[] }) {
       return (
         client.fullName.toLowerCase().includes(q) ||
         (client.email ?? "").toLowerCase().includes(q) ||
-        (client.phone ?? "").toLowerCase().includes(q)
+        (client.phone ?? "").toLowerCase().includes(q) ||
+        (qDigits.length > 0 && (client.phone ?? "").replace(/\D/g, "").includes(qDigits))
       );
     });
 
@@ -160,25 +168,32 @@ export function ClientTable({ clients }: { clients: Client[] }) {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {(client.interestedServices ?? []).length === 0 && (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                      {(client.interestedServices ?? [])
-                        .slice(0, 2)
-                        .map((service) => (
-                          <Badge key={service} variant="outline">
-                            {tService(service)}
-                          </Badge>
-                        ))}
-                      {(client.interestedServices ?? []).length > 2 && (
-                        <Badge variant="outline">
-                          +{(client.interestedServices ?? []).length - 2}
-                        </Badge>
-                      )}
+                      {(() => {
+                        const services = Array.from(
+                          new Set(client.interestedServices ?? []),
+                        );
+                        return (
+                          <>
+                            {services.length === 0 && (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                            {services.slice(0, 2).map((service) => (
+                              <Badge key={service} variant="outline">
+                                {tService(service)}
+                              </Badge>
+                            ))}
+                            {services.length > 2 && (
+                              <Badge variant="outline">
+                                +{services.length - 2}
+                              </Badge>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {new Date(client.createdAt).toLocaleDateString()}
+                    {formatDate(client.createdAt)}
                   </TableCell>
                 </TableRow>
               ))}

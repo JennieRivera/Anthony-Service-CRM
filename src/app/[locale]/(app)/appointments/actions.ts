@@ -13,6 +13,8 @@ import { searchClientsForMatch } from "@/lib/queries/clients";
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
+import { businessDateString, businessLocalToUtc, formatDateTime } from "@/lib/dates";
+import { logAuditEvent } from "@/lib/audit";
 
 export async function searchClientMatchesAction(query: {
   phone?: string;
@@ -71,8 +73,8 @@ function normalize(
     title: values.title,
     serviceType: values.serviceType,
     appointmentType: values.appointmentType,
-    startAt: new Date(values.startAt),
-    endAt: new Date(values.endAt),
+    startAt: businessLocalToUtc(values.startAt),
+    endAt: businessLocalToUtc(values.endAt),
     location: values.location || null,
     status: values.status,
     referralSource: values.referralSource || null,
@@ -235,6 +237,35 @@ export async function updateAppointmentStatusAction(
   revalidatePath(`/appointments/${id}`);
 }
 
+// Added on explicit request: an admin-only hard delete for mistaken or test
+// appointments. The normal lifecycle (section 8: "Cancelada -> preservar el
+// registro, NO eliminar") still applies everywhere else — Cancel above only
+// ever changes status. This is the one deliberate exception, confirmed
+// through a dialog in the UI before it ever runs.
+export async function deleteAppointmentAction(id: string) {
+  const db = getDb();
+  const [appt] = await db
+    .select({ title: appointments.title, clientId: appointments.clientId })
+    .from(appointments)
+    .where(eq(appointments.id, id))
+    .limit(1);
+  if (!appt) return;
+
+  await db.delete(appointments).where(eq(appointments.id, id));
+
+  await logAuditEvent({
+    action: "appointment.deleted",
+    entityType: "appointment",
+    entityId: id,
+    summary: `Deleted appointment: ${appt.title}`,
+  });
+
+  revalidatePath("/appointments");
+  revalidatePath(`/clients/${appt.clientId}`);
+  const locale = await getLocale();
+  redirect({ href: "/appointments", locale });
+}
+
 // Section 6's "Record Payment" button. Appointments carry their own
 // paymentStatus (Session 1) independent of the Invoices/Payments module —
 // this is a quick status flip, not a full invoice/payment record.
@@ -265,7 +296,7 @@ export async function addAppointmentNoteAction(id: string, note: string) {
     .where(eq(appointments.id, id))
     .limit(1);
 
-  const timestamp = new Date().toLocaleString();
+  const timestamp = formatDateTime(new Date());
   const appended = existing?.notes
     ? `${existing.notes}\n\n[${timestamp}] ${trimmed}`
     : `[${timestamp}] ${trimmed}`;
@@ -320,7 +351,7 @@ export async function createFollowUpTaskAction(id: string) {
     appointmentId: id,
     type: "follow_up",
     title: `Follow up: ${appt.title}`,
-    dueDate: dueDate.toISOString().slice(0, 10),
+    dueDate: businessDateString(dueDate),
   });
 
   revalidatePath("/tasks");
@@ -351,8 +382,8 @@ export async function rescheduleAppointmentAction(
       title: original.title,
       serviceType: original.serviceType,
       appointmentType: original.appointmentType,
-      startAt: new Date(values.startAt),
-      endAt: new Date(values.endAt),
+      startAt: businessLocalToUtc(values.startAt),
+      endAt: businessLocalToUtc(values.endAt),
       location: original.location,
       status: "scheduled",
       referralSource: original.referralSource,

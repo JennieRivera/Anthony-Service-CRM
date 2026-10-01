@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { ClientStatusBadge } from "@/components/clients/StatusBadge";
 import { ClientProfileTabs } from "@/components/clients/ClientProfileTabs";
+import { ClientDeleteButton } from "@/components/clients/ClientDeleteButton";
 
 export default async function ClientProfilePage({
   params,
@@ -59,6 +60,7 @@ export default async function ClientProfilePage({
             <Pencil className="h-4 w-4" />
             {t("editClient")}
           </Button>
+          <ClientDeleteButton clientId={id} />
         </div>
       </div>
 

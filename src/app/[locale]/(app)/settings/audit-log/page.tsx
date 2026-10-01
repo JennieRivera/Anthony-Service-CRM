@@ -1,3 +1,4 @@
+import { formatDateTime } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { isDatabaseConfigured } from "@/lib/db/config";
@@ -53,7 +54,7 @@ export default async function AuditLogPage() {
                 {entries.map((entry) => (
                   <TableRow key={entry.id}>
                     <TableCell className="text-muted-foreground">
-                      {new Date(entry.createdAt).toLocaleString()}
+                      {formatDateTime(entry.createdAt)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {entry.actorEmail ?? "—"}

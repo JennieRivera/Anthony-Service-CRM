@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil, FileText, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { CaseStatusBadge } from "@/components/clients/StatusBadge";
 import { DocumentList } from "@/components/documents/DocumentList";
 import { DocumentUploader } from "@/components/documents/DocumentUploader";
+import { CaseDeleteButton } from "@/components/cases/CaseDeleteButton";
 import { Badge } from "@/components/ui/badge";
 
 export default async function CaseDetailPage({
@@ -133,6 +135,7 @@ export default async function CaseDetailPage({
             <Pencil className="h-4 w-4" />
             {t("editCase")}
           </Button>
+          <CaseDeleteButton caseId={id} />
           {escalationAgent && (
             <Button
               variant="outline"
@@ -171,7 +174,7 @@ export default async function CaseDetailPage({
           <div>
             <p className="text-muted-foreground">{t("columnDue")}</p>
             <p className="text-foreground">
-              {c.dueDate ? new Date(c.dueDate).toLocaleDateString() : "—"}
+              {c.dueDate ? formatDate(c.dueDate) : "—"}
             </p>
           </div>
           <div>
@@ -197,7 +200,7 @@ export default async function CaseDetailPage({
           <div>
             <p className="text-muted-foreground">{t("form.startDate")}</p>
             <p className="text-foreground">
-              {new Date(c.startDate).toLocaleDateString()}
+              {formatDate(c.startDate)}
             </p>
           </div>
           <div>
@@ -206,7 +209,7 @@ export default async function CaseDetailPage({
             </p>
             <p className="text-foreground">
               {c.nextFollowUpDate
-                ? new Date(c.nextFollowUpDate).toLocaleDateString()
+                ? formatDate(c.nextFollowUpDate)
                 : "—"}
             </p>
           </div>
@@ -240,7 +243,7 @@ export default async function CaseDetailPage({
             <p className="text-muted-foreground">{t("closedDate")}</p>
             <p className="text-foreground">
               {c.closedDate
-                ? new Date(c.closedDate).toLocaleDateString()
+                ? formatDate(c.closedDate)
                 : "—"}
             </p>
           </div>
@@ -260,7 +263,7 @@ export default async function CaseDetailPage({
               <div>
                 <p className="text-muted-foreground">{t("form.dueDate")}</p>
                 <p className="text-foreground">
-                  {new Date(entry.entryDate).toLocaleDateString()}
+                  {formatDate(entry.entryDate)}
                 </p>
               </div>
               <div>
@@ -319,7 +322,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {apostille.submissionDate
-                  ? new Date(apostille.submissionDate).toLocaleDateString()
+                  ? formatDate(apostille.submissionDate)
                   : "—"}
               </p>
             </div>
@@ -329,7 +332,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {apostille.expectedReturnDate
-                  ? new Date(apostille.expectedReturnDate).toLocaleDateString()
+                  ? formatDate(apostille.expectedReturnDate)
                   : "—"}
               </p>
             </div>
@@ -339,7 +342,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {apostille.actualReturnDate
-                  ? new Date(apostille.actualReturnDate).toLocaleDateString()
+                  ? formatDate(apostille.actualReturnDate)
                   : "—"}
               </p>
             </div>
@@ -370,7 +373,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {notaryDetails.appointmentDate
-                  ? new Date(notaryDetails.appointmentDate).toLocaleDateString()
+                  ? formatDate(notaryDetails.appointmentDate)
                   : "—"}
                 {notaryDetails.appointmentTime
                   ? ` ${notaryDetails.appointmentTime}`
@@ -598,9 +601,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {bookkeepingDetails.lastMonthReconciled
-                  ? new Date(
-                      bookkeepingDetails.lastMonthReconciled,
-                    ).toLocaleDateString()
+                  ? formatDate(bookkeepingDetails.lastMonthReconciled)
                   : "—"}
               </p>
             </div>
@@ -610,9 +611,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {bookkeepingDetails.nextBillingDate
-                  ? new Date(
-                      bookkeepingDetails.nextBillingDate,
-                    ).toLocaleDateString()
+                  ? formatDate(bookkeepingDetails.nextBillingDate)
                   : "—"}
               </p>
             </div>
@@ -754,9 +753,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {creditDetails.initialConsultationDate
-                  ? new Date(
-                      creditDetails.initialConsultationDate,
-                    ).toLocaleDateString()
+                  ? formatDate(creditDetails.initialConsultationDate)
                   : "—"}
               </p>
             </div>
@@ -766,9 +763,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {creditDetails.creditReportReviewDate
-                  ? new Date(
-                      creditDetails.creditReportReviewDate,
-                    ).toLocaleDateString()
+                  ? formatDate(creditDetails.creditReportReviewDate)
                   : "—"}
               </p>
             </div>
@@ -931,7 +926,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {formationDetails.stateFilingDate
-                  ? new Date(formationDetails.stateFilingDate).toLocaleDateString()
+                  ? formatDate(formationDetails.stateFilingDate)
                   : "—"}
               </p>
             </div>
@@ -941,9 +936,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {formationDetails.stateApprovalDate
-                  ? new Date(
-                      formationDetails.stateApprovalDate,
-                    ).toLocaleDateString()
+                  ? formatDate(formationDetails.stateApprovalDate)
                   : "—"}
               </p>
             </div>
@@ -1008,7 +1001,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {academyDetails.enrollmentDate
-                  ? new Date(academyDetails.enrollmentDate).toLocaleDateString()
+                  ? formatDate(academyDetails.enrollmentDate)
                   : "—"}
               </p>
             </div>
@@ -1054,7 +1047,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {academyDetails.certificateDate
-                  ? new Date(academyDetails.certificateDate).toLocaleDateString()
+                  ? formatDate(academyDetails.certificateDate)
                   : "—"}
               </p>
             </div>
@@ -1196,7 +1189,7 @@ export default async function CaseDetailPage({
               <p className="text-muted-foreground">{t("form.registrationDate")}</p>
               <p className="text-foreground">
                 {salesTaxDetails.registrationDate
-                  ? new Date(salesTaxDetails.registrationDate).toLocaleDateString()
+                  ? formatDate(salesTaxDetails.registrationDate)
                   : "—"}
               </p>
             </div>
@@ -1214,7 +1207,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {salesTaxDetails.nextFilingDueDate
-                  ? new Date(salesTaxDetails.nextFilingDueDate).toLocaleDateString()
+                  ? formatDate(salesTaxDetails.nextFilingDueDate)
                   : "—"}
               </p>
             </div>
@@ -1324,7 +1317,7 @@ export default async function CaseDetailPage({
               <p className="text-muted-foreground">{t("form.submissionDate")}</p>
               <p className="text-foreground">
                 {irsDetails.submissionDate
-                  ? new Date(irsDetails.submissionDate).toLocaleDateString()
+                  ? formatDate(irsDetails.submissionDate)
                   : "—"}
               </p>
             </div>
@@ -1341,7 +1334,7 @@ export default async function CaseDetailPage({
               <p className="text-foreground">
                 {irsDetails.irsLetterReceived
                   ? irsDetails.irsLetterDate
-                    ? new Date(irsDetails.irsLetterDate).toLocaleDateString()
+                    ? formatDate(irsDetails.irsLetterDate)
                     : "✓"
                   : "—"}
               </p>
@@ -1422,7 +1415,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {insuranceDetails.effectiveDate
-                  ? new Date(insuranceDetails.effectiveDate).toLocaleDateString()
+                  ? formatDate(insuranceDetails.effectiveDate)
                   : "—"}
               </p>
             </div>
@@ -1432,7 +1425,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {insuranceDetails.expirationDate
-                  ? new Date(insuranceDetails.expirationDate).toLocaleDateString()
+                  ? formatDate(insuranceDetails.expirationDate)
                   : "—"}
               </p>
             </div>
@@ -1442,7 +1435,7 @@ export default async function CaseDetailPage({
               </p>
               <p className="text-foreground">
                 {insuranceDetails.lastRenewedDate
-                  ? new Date(insuranceDetails.lastRenewedDate).toLocaleDateString()
+                  ? formatDate(insuranceDetails.lastRenewedDate)
                   : "—"}
               </p>
             </div>
@@ -1498,7 +1491,7 @@ export default async function CaseDetailPage({
                 )}
                 <CaseStatusBadge status={entry.newStatus} />
                 <span className="text-muted-foreground">
-                  {new Date(entry.changedAt).toLocaleString()}
+                  {formatDateTime(entry.changedAt)}
                 </span>
                 {entry.changedByEmail && (
                   <Badge variant="outline">{entry.changedByEmail}</Badge>

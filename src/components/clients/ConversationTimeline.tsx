@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDateTime } from "@/lib/dates";
+
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
@@ -224,7 +226,7 @@ export function ConversationTimeline({
                   <div className="flex items-center gap-2">
                     <CommunicationStatusBadge status={entry.status} />
                     <span className="text-sm text-muted-foreground">
-                      {new Date(entry.occurredAt).toLocaleString()}
+                      {formatDateTime(entry.occurredAt)}
                     </span>
                   </div>
                 </div>

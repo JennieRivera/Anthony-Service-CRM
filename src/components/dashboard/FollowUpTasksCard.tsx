@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Bell } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,7 +38,7 @@ export async function FollowUpTasksCard({
               <span className="text-xs text-muted-foreground">
                 {task.clientName} · {tTaskType(task.type)}
                 {task.dueDate
-                  ? ` · ${new Date(task.dueDate).toLocaleDateString()}`
+                  ? ` · ${formatDate(task.dueDate)}`
                   : ""}
               </span>
             </div>

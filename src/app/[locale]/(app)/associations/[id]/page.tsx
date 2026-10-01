@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -104,7 +105,7 @@ export default async function AssociationDetailPage({
             <p className="text-muted-foreground">{t("form.dateContacted")}</p>
             <p className="text-foreground">
               {org.dateContacted
-                ? new Date(org.dateContacted).toLocaleDateString()
+                ? formatDate(org.dateContacted)
                 : "—"}
             </p>
           </div>
@@ -112,7 +113,7 @@ export default async function AssociationDetailPage({
             <p className="text-muted-foreground">{t("form.lastContact")}</p>
             <p className="text-foreground">
               {org.lastContact
-                ? new Date(org.lastContact).toLocaleDateString()
+                ? formatDate(org.lastContact)
                 : "—"}
             </p>
           </div>
@@ -120,7 +121,7 @@ export default async function AssociationDetailPage({
             <p className="text-muted-foreground">{t("form.nextFollowUp")}</p>
             <p className="text-foreground">
               {org.nextFollowUp
-                ? new Date(org.nextFollowUp).toLocaleDateString()
+                ? formatDate(org.nextFollowUp)
                 : "—"}
             </p>
           </div>
@@ -128,7 +129,7 @@ export default async function AssociationDetailPage({
             <p className="text-muted-foreground">{t("form.lastVerifiedDate")}</p>
             <p className="text-foreground">
               {org.lastVerifiedDate
-                ? new Date(org.lastVerifiedDate).toLocaleDateString()
+                ? formatDate(org.lastVerifiedDate)
                 : "—"}
             </p>
           </div>

@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
@@ -51,11 +52,11 @@ export async function InvoiceTable({
                 </Link>
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {new Date(invoice.issueDate).toLocaleDateString()}
+                {formatDate(invoice.issueDate)}
               </TableCell>
               <TableCell className="text-muted-foreground">
                 {invoice.dueDate
-                  ? new Date(invoice.dueDate).toLocaleDateString()
+                  ? formatDate(invoice.dueDate)
                   : "—"}
               </TableCell>
               <TableCell className="font-medium text-foreground">

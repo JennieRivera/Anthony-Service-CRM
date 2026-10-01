@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -65,7 +66,7 @@ export default async function ReferralDetailPage({
           <div>
             <p className="text-muted-foreground">{t("columnDate")}</p>
             <p className="text-foreground">
-              {new Date(referral.referralDate).toLocaleDateString()}
+              {formatDate(referral.referralDate)}
             </p>
           </div>
           <div>
@@ -84,7 +85,7 @@ export default async function ReferralDetailPage({
             <div>
               <p className="text-muted-foreground">{t("form.closedDate")}</p>
               <p className="text-foreground">
-                {new Date(referral.closedDate).toLocaleDateString()}
+                {formatDate(referral.closedDate)}
               </p>
             </div>
           )}
@@ -161,7 +162,7 @@ export default async function ReferralDetailPage({
           </p>
           <p className="text-foreground">
             {referral.commissionDueDate
-              ? new Date(referral.commissionDueDate).toLocaleDateString()
+              ? formatDate(referral.commissionDueDate)
               : "—"}
           </p>
         </div>
@@ -171,7 +172,7 @@ export default async function ReferralDetailPage({
           </p>
           <p className="text-foreground">
             {referral.commissionPaidDate
-              ? new Date(referral.commissionPaidDate).toLocaleDateString()
+              ? formatDate(referral.commissionPaidDate)
               : "—"}
           </p>
         </div>
@@ -291,7 +292,7 @@ export default async function ReferralDetailPage({
                 )}
                 <ReferralStatusBadge status={entry.newStatus} />
                 <span className="text-muted-foreground">
-                  {new Date(entry.changedAt).toLocaleString()}
+                  {formatDateTime(entry.changedAt)}
                 </span>
                 {entry.changedByEmail && (
                   <Badge variant="outline">{entry.changedByEmail}</Badge>

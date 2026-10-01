@@ -26,11 +26,7 @@ import {
 } from "@/lib/validation/communicationPreferences";
 import { upsertCommunicationPreferencesAction } from "@/app/[locale]/(app)/clients/communication-preferences-actions";
 import type { ClientCommunicationPreferences } from "@/lib/db/schema";
-
-function formatDateTime(value: Date | string | null | undefined) {
-  if (!value) return "—";
-  return new Date(value).toLocaleString();
-}
+import { formatDateTime } from "@/lib/dates";
 
 export function CommunicationPreferencesPanel({
   clientId,

@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
@@ -48,7 +49,7 @@ export async function CommunicationTable({
                 </Link>
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {new Date(comm.occurredAt).toLocaleString()}
+                {formatDateTime(comm.occurredAt)}
               </TableCell>
               <TableCell>
                 <Link
@@ -73,7 +74,7 @@ export async function CommunicationTable({
               <TableCell className="text-muted-foreground">
                 {comm.followUpRequired
                   ? comm.followUpDate
-                    ? new Date(comm.followUpDate).toLocaleDateString()
+                    ? formatDate(comm.followUpDate)
                     : t("followUpYes")
                   : "—"}
               </TableCell>

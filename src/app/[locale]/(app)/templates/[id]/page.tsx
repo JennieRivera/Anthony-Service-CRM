@@ -1,3 +1,4 @@
+import { formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -62,7 +63,7 @@ export default async function TemplateDetailPage({
           <div>
             <p className="text-muted-foreground">{t("columnUpdated")}</p>
             <p className="text-foreground">
-              {new Date(template.updatedAt).toLocaleString()}
+              {formatDateTime(template.updatedAt)}
             </p>
           </div>
         </div>

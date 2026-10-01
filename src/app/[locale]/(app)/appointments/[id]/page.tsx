@@ -1,3 +1,4 @@
+import { formatDate, formatTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -85,14 +86,14 @@ export default async function AppointmentDetailPage({
           </div>
           <div>
             <p className="text-muted-foreground">{td("date")}</p>
-            <p className="text-foreground">{startAt.toLocaleDateString()}</p>
+            <p className="text-foreground">{formatDate(startAt)}</p>
           </div>
           <div>
             <p className="text-muted-foreground">{td("time")}</p>
             <p className="text-foreground">
-              {startAt.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
+              {formatTime(startAt)}
               {" – "}
-              {endAt.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
+              {formatTime(endAt)}
             </p>
           </div>
           <div>

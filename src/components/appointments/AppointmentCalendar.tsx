@@ -7,6 +7,7 @@ import { enUS, es } from "date-fns/locale";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { getContrastTextColor } from "@/lib/color";
+import { formatTime } from "@/lib/dates";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./calendar.css";
 
@@ -33,7 +34,6 @@ export type AppointmentEvent = {
 function CalendarEventCard({ event }: EventProps<Event & AppointmentEvent>) {
   const tService = useTranslations("ServiceType");
   const tStatus = useTranslations("AppointmentStatus");
-  const start = new Date(event.startAt);
 
   return (
     <div className="flex flex-col overflow-hidden leading-tight">
@@ -42,7 +42,7 @@ function CalendarEventCard({ event }: EventProps<Event & AppointmentEvent>) {
         {tService(event.serviceType)}
       </span>
       <span className="truncate text-[0.8em] opacity-80">
-        {start.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
+        {formatTime(event.startAt)}
         {" · "}
         {tStatus(event.status)}
       </span>
@@ -99,8 +99,11 @@ export function AppointmentCalendar({
           router.push(`/appointments/${(event as unknown as AppointmentEvent).id}`)
         }
         onSelectSlot={(slotInfo) => {
-          const iso = slotInfo.start.toISOString().slice(0, 16);
-          router.push(`/appointments/new?start=${iso}`);
+          // Keep the slot's own local wall-clock components (not UTC) so the
+          // prefilled time on the New Appointment form matches what was
+          // clicked, regardless of the viewer's or server's timezone.
+          const local = format(slotInfo.start, "yyyy-MM-dd'T'HH:mm");
+          router.push(`/appointments/new?start=${local}`);
         }}
         selectable
       />

@@ -5,6 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { businessDateString } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -187,7 +188,7 @@ export function CaseForm({
       dueDate: caseRecord?.dueDate ?? "",
       fee: caseRecord?.fee ?? "",
       notes: caseRecord?.notes ?? "",
-      startDate: caseRecord?.startDate ?? new Date().toISOString().slice(0, 10),
+      startDate: caseRecord?.startDate ?? businessDateString(),
       nextFollowUpDate: caseRecord?.nextFollowUpDate ?? "",
       documentsRequested: caseRecord?.documentsRequested ?? "",
       documentsReceived: caseRecord?.documentsReceived ?? "",

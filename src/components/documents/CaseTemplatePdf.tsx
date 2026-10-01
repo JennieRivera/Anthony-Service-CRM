@@ -1,6 +1,8 @@
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
 import type { Case, Client, NotaryLogEntry } from "@/lib/db/schema";
 import { getServiceTemplate } from "@/lib/templates/serviceTemplates";
+import { businessInfo } from "@/lib/business-info";
+import { formatDate } from "@/lib/dates";
 
 const styles = StyleSheet.create({
   page: {
@@ -171,13 +173,13 @@ export function CaseTemplatePdf({
       <Page size="LETTER" style={styles.page}>
         <View style={styles.header}>
           <View>
-            <Text style={styles.businessName}>Anthony Multiservice, LLC</Text>
-            <Text style={styles.muted}>2610 Orchid Ln, Kissimmee, FL</Text>
-            <Text style={styles.muted}>(407) 802-7252</Text>
+            <Text style={styles.businessName}>{businessInfo.name}</Text>
+            <Text style={styles.muted}>{businessInfo.address}</Text>
+            <Text style={styles.muted}>{businessInfo.phone}</Text>
           </View>
           <View>
             <Text style={styles.muted}>
-              Generated: {new Date().toLocaleDateString()}
+              Generated: {formatDate()}
             </Text>
           </View>
         </View>
@@ -213,7 +215,7 @@ export function CaseTemplatePdf({
             <View style={styles.caseRow}>
               <Text>Due Date / Vencimiento:</Text>
               <Text>
-                {new Date(caseRecord.dueDate).toLocaleDateString()}
+                {formatDate(caseRecord.dueDate)}
               </Text>
             </View>
           )}

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { businessDateString, formatDate } from "@/lib/dates";
 import {
   Select,
   SelectContent,
@@ -113,7 +114,7 @@ export function DiamondCommunityManager({
                     {[m.phone, m.email].filter(Boolean).join(" · ") || "—"}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {new Date(m.joinedDate).toLocaleDateString()}
+                    {formatDate(m.joinedDate)}
                   </TableCell>
                   <TableCell>
                     <Select
@@ -160,7 +161,7 @@ function AddMemberDialog({ students }: { students: StudentOption[] }) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [joinedDate, setJoinedDate] = useState(
-    () => new Date().toISOString().slice(0, 10),
+    () => businessDateString(),
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -172,7 +173,7 @@ function AddMemberDialog({ students }: { students: StudentOption[] }) {
     setName("");
     setPhone("");
     setEmail("");
-    setJoinedDate(new Date().toISOString().slice(0, 10));
+    setJoinedDate(businessDateString());
     setError(null);
   }
 

@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { isDatabaseConfigured } from "@/lib/db/config";
@@ -112,7 +113,7 @@ export default async function AiEscalationsPage() {
                       <AiEscalationRiskBadge riskLevel={esc.riskLevel} />
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {new Date(esc.createdAt).toLocaleDateString()}
+                      {formatDate(esc.createdAt)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {esc.assignedHumanEmail ?? "—"}

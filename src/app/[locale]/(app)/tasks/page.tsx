@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { CheckCircle2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { isDatabaseConfigured } from "@/lib/db/config";
@@ -104,7 +105,7 @@ export default async function TasksPage() {
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {task.dueDate
-                            ? new Date(task.dueDate).toLocaleDateString()
+                            ? formatDate(task.dueDate)
                             : "—"}
                         </TableCell>
                         <TableCell>

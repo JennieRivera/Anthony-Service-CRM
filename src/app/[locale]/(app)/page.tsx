@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import {
   Users,
   DollarSign,
@@ -312,7 +313,7 @@ export default async function Home() {
                   </div>
                   <span className="text-xs text-muted-foreground">
                     {alert.lastVerifiedDate
-                      ? new Date(alert.lastVerifiedDate).toLocaleDateString()
+                      ? formatDate(alert.lastVerifiedDate)
                       : t("neverVerified")}
                   </span>
                 </Link>

@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate } from "@/lib/dates";
+
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
@@ -49,7 +51,7 @@ export function CaseList({ cases }: { cases: CaseCardData[] }) {
                 <CaseStatusBadge status={c.status} />
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {c.dueDate ? new Date(c.dueDate).toLocaleDateString() : "—"}
+                {c.dueDate ? formatDate(c.dueDate) : "—"}
               </TableCell>
               <TableCell className="text-muted-foreground">
                 {c.fee ? `$${Number(c.fee).toFixed(2)}` : "—"}

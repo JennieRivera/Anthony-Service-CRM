@@ -6,7 +6,51 @@ import { Select as SelectPrimitive } from "@base-ui/react/select"
 import { cn } from "@/lib/utils"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
-const Select = SelectPrimitive.Root
+// Walks the manually-composed <SelectContent><SelectItem>…</SelectItem></SelectContent>
+// tree to build a value->label map, so <SelectValue> (below) can show the
+// translated option text instead of the raw enum value it falls back to
+// when Select.Root has no `items`/`itemToStringLabel` of its own. Only
+// plain-string SelectItem children are collected; anything else (icons,
+// badges) is left alone and keeps today's fallback behavior.
+function collectItemLabels(
+  children: React.ReactNode,
+  map: Record<string, React.ReactNode>
+) {
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) return
+    if (child.type === SelectItem) {
+      const { value, children: itemChildren } =
+        child.props as SelectPrimitive.Item.Props
+      if (value != null && typeof itemChildren === "string") {
+        map[String(value)] = itemChildren
+      }
+      return
+    }
+    const nestedChildren = (
+      child.props as { children?: React.ReactNode } | null | undefined
+    )?.children
+    if (nestedChildren != null) {
+      collectItemLabels(nestedChildren, map)
+    }
+  })
+}
+
+function Select<Value, Multiple extends boolean | undefined = false>({
+  children,
+  ...props
+}: SelectPrimitive.Root.Props<Value, Multiple>) {
+  const items = React.useMemo(() => {
+    const map: Record<string, React.ReactNode> = {}
+    collectItemLabels(children, map)
+    return Object.keys(map).length > 0 ? map : undefined
+  }, [children])
+
+  return (
+    <SelectPrimitive.Root items={items} {...props}>
+      {children}
+    </SelectPrimitive.Root>
+  )
+}
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (

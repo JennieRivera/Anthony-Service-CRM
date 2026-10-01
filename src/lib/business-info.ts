@@ -3,7 +3,7 @@
 export const businessInfo = {
   name: "Anthony Multiservice, LLC",
   address: "2610 Orchid Ln, Kissimmee, FL",
-  phone: "(407) 802-7252",
+  phone: "(689) 342-6309",
   /** Email/phone registered with Zelle for receiving manual transfers. */
   zelleContact: "anthonyservice4@gmail.com",
   /**

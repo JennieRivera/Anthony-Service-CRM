@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Upload, Download, Video, Image as ImageIcon } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
+import { businessDateString, formatDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -133,7 +134,7 @@ function AssetCard({ asset }: { asset: Asset }) {
             </span>
           )}
           {asset.publishedDate && (
-            <span>{new Date(asset.publishedDate).toLocaleDateString()}</span>
+            <span>{formatDate(asset.publishedDate)}</span>
           )}
         </div>
         <Button
@@ -158,7 +159,7 @@ function UploadDialog() {
   const [open, setOpen] = useState(false);
   const [service, setService] = useState("general");
   const [publishedDate, setPublishedDate] = useState(
-    () => new Date().toISOString().slice(0, 10),
+    () => businessDateString(),
   );
   const [channel, setChannel] = useState("");
   const [caption, setCaption] = useState("");
@@ -167,7 +168,7 @@ function UploadDialog() {
 
   function reset() {
     setService("general");
-    setPublishedDate(new Date().toISOString().slice(0, 10));
+    setPublishedDate(businessDateString());
     setChannel("");
     setCaption("");
     setErrorKey(null);

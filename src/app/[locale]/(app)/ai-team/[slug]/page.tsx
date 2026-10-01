@@ -1,3 +1,4 @@
+import { formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -181,7 +182,7 @@ export default async function AiAgentDetailPage({
                       </span>
                     )}
                     <span className="ml-auto text-xs text-muted-foreground">
-                      {new Date(entry.occurredAt).toLocaleString()}
+                      {formatDateTime(entry.occurredAt)}
                     </span>
                   </div>
                 ))}

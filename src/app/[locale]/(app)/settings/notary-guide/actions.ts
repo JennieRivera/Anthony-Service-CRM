@@ -8,6 +8,7 @@ import {
   type NotaryStateGuideFormValues,
 } from "@/lib/validation/notaryStateGuide";
 import { logAuditEvent } from "@/lib/audit";
+import { businessDateString } from "@/lib/dates";
 
 export async function updateNotaryStateGuideAction(
   state: string,
@@ -23,7 +24,7 @@ export async function updateNotaryStateGuideAction(
     sourceUrl: values.sourceUrl || null,
     status: values.status,
     // Every save re-stamps today's date, regardless of what changed.
-    lastVerifiedDate: new Date().toISOString().slice(0, 10),
+    lastVerifiedDate: businessDateString(),
     updatedAt: new Date(),
   };
 

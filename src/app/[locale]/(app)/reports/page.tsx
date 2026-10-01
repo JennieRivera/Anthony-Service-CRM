@@ -6,6 +6,7 @@ import { DateRangeForm } from "@/components/reports/DateRangeForm";
 import { ExportButtons } from "@/components/reports/ExportButtons";
 import { SeasonalityChart } from "@/components/reports/SeasonalityChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { businessDateString } from "@/lib/dates";
 import {
   Table,
   TableBody,
@@ -27,8 +28,8 @@ function defaultRange() {
   const from = new Date();
   from.setFullYear(from.getFullYear() - 1);
   return {
-    from: from.toISOString().slice(0, 10),
-    to: to.toISOString().slice(0, 10),
+    from: businessDateString(from),
+    to: businessDateString(to),
   };
 }
 

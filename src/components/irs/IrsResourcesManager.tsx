@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate } from "@/lib/dates";
+
 import { useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
@@ -59,7 +61,7 @@ export function IrsResourcesManager({ resources }: { resources: IrsResource[] })
                 <span className="text-xs text-muted-foreground">
                   {t("lastVerifiedDate")}:{" "}
                   {resource.lastVerifiedDate
-                    ? new Date(resource.lastVerifiedDate).toLocaleDateString()
+                    ? formatDate(resource.lastVerifiedDate)
                     : "—"}
                 </span>
               </div>

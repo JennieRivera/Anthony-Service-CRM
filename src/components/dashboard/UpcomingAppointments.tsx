@@ -1,3 +1,4 @@
+import { formatDateTime } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { CalendarClock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +37,7 @@ export async function UpcomingAppointments({
                 {appt.clientName} · {tService(appt.serviceType)}
               </span>
               <span className="text-xs text-muted-foreground">
-                {new Date(appt.startAt).toLocaleString()}
+                {formatDateTime(appt.startAt)}
               </span>
             </div>
           </Link>

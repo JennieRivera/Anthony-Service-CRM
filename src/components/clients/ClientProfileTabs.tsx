@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate, formatDateTime } from "@/lib/dates";
+
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
@@ -177,7 +179,7 @@ export function ClientProfileTabs({
                 <span className="text-sm text-foreground">{entry.label}</span>
               </div>
               <span className="text-xs text-muted-foreground">
-                {new Date(entry.date).toLocaleString()}
+                {formatDateTime(entry.date)}
               </span>
             </div>
           );
@@ -261,7 +263,7 @@ export function ClientProfileTabs({
                 INV-{String(invoice.invoiceSeq).padStart(5, "0")}
               </span>
               <span className="text-sm text-muted-foreground">
-                {new Date(invoice.issueDate).toLocaleDateString()}
+                {formatDate(invoice.issueDate)}
               </span>
             </div>
             <div className="flex items-center gap-3">
@@ -291,7 +293,7 @@ export function ClientProfileTabs({
               </span>
               <span className="text-sm text-muted-foreground">
                 {payment.paymentDate
-                  ? new Date(payment.paymentDate).toLocaleDateString()
+                  ? formatDate(payment.paymentDate)
                   : "—"}
               </span>
             </div>
@@ -325,7 +327,7 @@ export function ClientProfileTabs({
                 REF-{String(referral.referralSeq).padStart(5, "0")}
               </span>
               <span className="text-sm text-muted-foreground">
-                {new Date(referral.referralDate).toLocaleDateString()}
+                {formatDate(referral.referralDate)}
               </span>
             </div>
             <ReferralStatusBadge status={referral.status} />
@@ -366,7 +368,7 @@ export function ClientProfileTabs({
                       </span>
                       <span className="text-sm text-muted-foreground">
                         {tService(appt.serviceType)} ·{" "}
-                        {new Date(appt.startAt).toLocaleString()}
+                        {formatDateTime(appt.startAt)}
                       </span>
                     </div>
                     <AppointmentStatusBadge status={appt.status} />
@@ -393,7 +395,7 @@ export function ClientProfileTabs({
               <span className="text-sm text-muted-foreground">
                 {tTaskType(task.type)}
                 {task.dueDate
-                  ? ` — ${new Date(task.dueDate).toLocaleDateString()}`
+                  ? ` — ${formatDate(task.dueDate)}`
                   : ""}
               </span>
             </div>

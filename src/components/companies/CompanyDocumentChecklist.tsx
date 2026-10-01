@@ -1,5 +1,7 @@
 "use client";
 
+import { formatDate } from "@/lib/dates";
+
 import { useState, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -195,7 +197,7 @@ export function CompanyDocumentChecklist({
                 </span>
                 <span className="text-xs text-muted-foreground">
                   {item.dueDate
-                    ? `${t("dueDate")}: ${new Date(item.dueDate).toLocaleDateString()}`
+                    ? `${t("dueDate")}: ${formatDate(item.dueDate)}`
                     : "—"}
                 </span>
               </div>

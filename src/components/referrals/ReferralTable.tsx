@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import {
@@ -62,7 +63,7 @@ export async function ReferralTable({
                 {referral.direction ? tDirection(referral.direction) : "—"}
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {new Date(referral.referralDate).toLocaleDateString()}
+                {formatDate(referral.referralDate)}
               </TableCell>
               <TableCell>
                 <ReferralPipelineStatusBadge status={referral.pipelineStatus} />
@@ -74,7 +75,7 @@ export async function ReferralTable({
               </TableCell>
               <TableCell className="text-muted-foreground">
                 {referral.commissionPaidDate
-                  ? new Date(referral.commissionPaidDate).toLocaleDateString()
+                  ? formatDate(referral.commissionPaidDate)
                   : "—"}
               </TableCell>
             </TableRow>

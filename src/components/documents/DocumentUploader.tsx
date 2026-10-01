@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Upload } from "lucide-react";
+import { Upload, Paperclip } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +44,7 @@ export function DocumentUploader({
   const [category, setCategory] = useState(defaultCategory ?? "other");
   const [uploading, setUploading] = useState(false);
   const [errorKey, setErrorKey] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   async function handleUpload() {
     const file = fileInputRef.current?.files?.[0];
@@ -76,6 +77,7 @@ export function DocumentUploader({
       }
 
       if (fileInputRef.current) fileInputRef.current.value = "";
+      setFileName(null);
       setDocumentType("");
       setFolder("");
       setCategory(defaultCategory ?? "other");
@@ -90,12 +92,27 @@ export function DocumentUploader({
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <Input
-          ref={fileInputRef}
-          type="file"
-          accept={DOCUMENT_ACCEPT}
-          className="sm:max-w-xs"
-        />
+        <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={DOCUMENT_ACCEPT}
+            className="sr-only"
+            onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Paperclip className="h-4 w-4" />
+            {t("chooseFile")}
+          </Button>
+          <span className="max-w-[10rem] truncate text-sm text-muted-foreground">
+            {fileName ?? t("noFileChosen")}
+          </span>
+        </div>
         <Input
           value={documentType}
           onChange={(e) => setDocumentType(e.target.value)}

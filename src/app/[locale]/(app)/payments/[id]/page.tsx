@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -57,7 +58,7 @@ export default async function PaymentDetailPage({
           <div>
             <p className="text-muted-foreground">{t("invoiceDate")}</p>
             <p className="text-foreground">
-              {new Date(invoiceIssueDate).toLocaleDateString()}
+              {formatDate(invoiceIssueDate)}
             </p>
           </div>
           <div>
@@ -97,7 +98,7 @@ export default async function PaymentDetailPage({
           <p className="text-muted-foreground">{t("form.paymentDate")}</p>
           <p className="text-foreground">
             {payment.paymentDate
-              ? new Date(payment.paymentDate).toLocaleDateString()
+              ? formatDate(payment.paymentDate)
               : "—"}
           </p>
         </div>

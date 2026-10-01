@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getAiEscalationById } from "@/lib/queries/aiEscalations";
@@ -86,7 +87,7 @@ export default async function AiEscalationDetailPage({
           <div>
             <p className="text-muted-foreground">{t("columnDate")}</p>
             <p className="text-foreground">
-              {new Date(escalation.createdAt).toLocaleString()}
+              {formatDateTime(escalation.createdAt)}
             </p>
           </div>
         </div>
@@ -108,7 +109,7 @@ export default async function AiEscalationDetailPage({
           {escalation.resolutionDate && (
             <p className="mt-2 text-xs text-muted-foreground">
               {t("form.resolutionDate")}:{" "}
-              {new Date(escalation.resolutionDate).toLocaleDateString()}
+              {formatDate(escalation.resolutionDate)}
             </p>
           )}
         </div>

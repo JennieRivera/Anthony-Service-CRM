@@ -1,3 +1,4 @@
+import { formatDateTime } from "@/lib/dates";
 import { getTranslations } from "next-intl/server";
 import { UserPlus, Briefcase, Receipt, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,7 +46,7 @@ export async function RecentActivity({ items }: { items: ActivityItem[] }) {
                   {labels[item.type]}: {item.label}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {item.timestamp.toLocaleString()}
+                  {formatDateTime(item.timestamp)}
                 </span>
               </div>
             </div>

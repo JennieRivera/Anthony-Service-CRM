@@ -1,3 +1,4 @@
+import { formatDate, formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil, Download } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -103,7 +104,7 @@ export default async function AllianceDetailPage({
             </p>
             <p className="text-foreground">
               {alliance.dateIntroduced
-                ? new Date(alliance.dateIntroduced).toLocaleDateString()
+                ? formatDate(alliance.dateIntroduced)
                 : "—"}
             </p>
           </div>
@@ -119,7 +120,7 @@ export default async function AllianceDetailPage({
             <p className="text-muted-foreground">{t("form.lastContact")}</p>
             <p className="text-foreground">
               {alliance.lastContact
-                ? new Date(alliance.lastContact).toLocaleDateString()
+                ? formatDate(alliance.lastContact)
                 : "—"}
             </p>
           </div>
@@ -127,7 +128,7 @@ export default async function AllianceDetailPage({
             <p className="text-muted-foreground">{t("form.nextFollowUp")}</p>
             <p className="text-foreground">
               {alliance.nextFollowUp
-                ? new Date(alliance.nextFollowUp).toLocaleDateString()
+                ? formatDate(alliance.nextFollowUp)
                 : "—"}
             </p>
           </div>
@@ -251,7 +252,7 @@ export default async function AllianceDetailPage({
                 )}
                 <AllianceStatusBadge status={entry.newStatus} />
                 <span className="text-muted-foreground">
-                  {new Date(entry.changedAt).toLocaleString()}
+                  {formatDateTime(entry.changedAt)}
                 </span>
                 {entry.changedByEmail && (
                   <Badge variant="outline">{entry.changedByEmail}</Badge>
