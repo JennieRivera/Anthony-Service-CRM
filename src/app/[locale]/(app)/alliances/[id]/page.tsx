@@ -65,11 +65,11 @@ export default async function AllianceDetailPage({
 
       {/* Alliance information */}
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-heading text-2xl text-foreground">
             {alliance.organizationName}
           </h1>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Badge variant={contractSigned ? "default" : "destructive"}>
               {t("contractStatus")}: {contractSigned ? t("signed") : t("pending")}
             </Badge>
