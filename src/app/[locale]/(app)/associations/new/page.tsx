@@ -1,10 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { AssociationChamberForm } from "@/components/associations/AssociationChamberForm";
+import { listClientsForSelect } from "@/lib/queries/clients";
+import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { createAssociationChamberAction } from "../actions";
 
 export default async function NewAssociationPage() {
   const t = await getTranslations("Associations");
+  const [clients, companies] = await Promise.all([
+    listClientsForSelect(),
+    listCompaniesForSelect(),
+  ]);
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -20,7 +26,11 @@ export default async function NewAssociationPage() {
         </Link>
       </div>
 
-      <AssociationChamberForm onSubmit={createAssociationChamberAction} />
+      <AssociationChamberForm
+        clients={clients}
+        companies={companies}
+        onSubmit={createAssociationChamberAction}
+      />
     </div>
   );
 }

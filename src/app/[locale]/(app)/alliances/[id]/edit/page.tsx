@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getAllianceById } from "@/lib/queries/alliances";
+import { listClientsForSelect } from "@/lib/queries/clients";
+import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { Link } from "@/i18n/navigation";
 import { AllianceForm } from "@/components/alliances/AllianceForm";
 import { updateAllianceAction } from "../../actions";
@@ -14,7 +16,11 @@ export default async function EditAlliancePage({
   const { id } = await params;
   const t = await getTranslations("Alliances");
 
-  const result = await getAllianceById(id);
+  const [result, clients, companies] = await Promise.all([
+    getAllianceById(id),
+    listClientsForSelect(),
+    listCompaniesForSelect(),
+  ]);
   if (!result) notFound();
 
   async function submit(values: AllianceFormValues) {
@@ -36,7 +42,12 @@ export default async function EditAlliancePage({
         </Link>
       </div>
 
-      <AllianceForm alliance={result.alliance} onSubmit={submit} />
+      <AllianceForm
+        alliance={result.alliance}
+        clients={clients}
+        companies={companies}
+        onSubmit={submit}
+      />
     </div>
   );
 }

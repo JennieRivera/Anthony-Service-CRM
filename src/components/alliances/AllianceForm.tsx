@@ -27,9 +27,13 @@ import type { StrategicAlliance } from "@/lib/db/schema";
 
 export function AllianceForm({
   alliance,
+  clients = [],
+  companies = [],
   onSubmit,
 }: {
   alliance?: StrategicAlliance;
+  clients?: { id: string; fullName: string }[];
+  companies?: { id: string; legalBusinessName: string }[];
   onSubmit: (values: AllianceFormValues) => Promise<void>;
 }) {
   const t = useTranslations("Alliances.form");
@@ -48,6 +52,8 @@ export function AllianceForm({
     defaultValues: {
       organizationName: alliance?.organizationName ?? "",
       contactPerson: alliance?.contactPerson ?? "",
+      contactClientId: alliance?.contactClientId ?? "",
+      companyId: alliance?.companyId ?? "",
       organizationType: alliance?.organizationType ?? "",
       phone: alliance?.phone ?? "",
       email: alliance?.email ?? "",
@@ -57,6 +63,8 @@ export function AllianceForm({
       country: alliance?.country ?? "",
       relationshipOwner: alliance?.relationshipOwner ?? "",
       dateIntroduced: alliance?.dateIntroduced ?? "",
+      agreementStartDate: alliance?.agreementStartDate ?? "",
+      agreementRenewalDate: alliance?.agreementRenewalDate ?? "",
       servicesConnected: alliance?.servicesConnected ?? "",
       referralAgreement: alliance?.referralAgreement ?? false,
       commissionAgreement: alliance?.commissionAgreement ?? false,
@@ -66,6 +74,8 @@ export function AllianceForm({
       nextFollowUp: alliance?.nextFollowUp ?? "",
       status: alliance?.status ?? "prospect",
       notes: alliance?.notes ?? "",
+      amsResponsibilities: alliance?.amsResponsibilities ?? "",
+      partnerResponsibilities: alliance?.partnerResponsibilities ?? "",
     },
   });
 
@@ -125,6 +135,58 @@ export function AllianceForm({
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="contactPerson">{t("contactPerson")}</Label>
           <Input id="contactPerson" {...register("contactPerson")} />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("linkedClient")}</Label>
+          <Controller
+            control={control}
+            name="contactClientId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noLinkedClient")}</SelectItem>
+                  {clients.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.fullName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("linkedCompany")}</Label>
+          <Controller
+            control={control}
+            name="companyId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noLinkedCompany")}</SelectItem>
+                  {companies.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.legalBusinessName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -192,6 +254,24 @@ export function AllianceForm({
             id="dateIntroduced"
             type="date"
             {...register("dateIntroduced")}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="agreementStartDate">{t("agreementStartDate")}</Label>
+          <Input
+            id="agreementStartDate"
+            type="date"
+            {...register("agreementStartDate")}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="agreementRenewalDate">{t("agreementRenewalDate")}</Label>
+          <Input
+            id="agreementRenewalDate"
+            type="date"
+            {...register("agreementRenewalDate")}
           />
         </div>
 
@@ -269,6 +349,17 @@ export function AllianceForm({
             )}
           />
           <Label>{t("logoPermission")}</Label>
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="amsResponsibilities">{t("amsResponsibilities")}</Label>
+          <Textarea id="amsResponsibilities" rows={3} {...register("amsResponsibilities")} />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="partnerResponsibilities">{t("partnerResponsibilities")}</Label>
+          <Textarea id="partnerResponsibilities" rows={3} {...register("partnerResponsibilities")} />
         </div>
       </div>
 

@@ -38,6 +38,8 @@ const optionalString = z.string().trim().optional().or(z.literal(""));
 export const allianceFormSchema = z.object({
   organizationName: z.string().trim().min(1, "Organization name is required"),
   contactPerson: optionalString,
+  contactClientId: optionalString,
+  companyId: optionalString,
   organizationType: z
     .enum(organizationTypeValues)
     .optional()
@@ -50,6 +52,8 @@ export const allianceFormSchema = z.object({
   country: optionalString,
   relationshipOwner: optionalString,
   dateIntroduced: optionalString,
+  agreementStartDate: optionalString,
+  agreementRenewalDate: optionalString,
   servicesConnected: optionalString,
   referralAgreement: z.boolean().optional(),
   commissionAgreement: z.boolean().optional(),
@@ -59,6 +63,8 @@ export const allianceFormSchema = z.object({
   nextFollowUp: optionalString,
   status: z.enum(allianceStatusValues),
   notes: optionalString,
+  amsResponsibilities: optionalString,
+  partnerResponsibilities: optionalString,
 });
 
 export type AllianceFormValues = z.infer<typeof allianceFormSchema>;

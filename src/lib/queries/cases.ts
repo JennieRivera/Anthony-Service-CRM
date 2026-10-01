@@ -186,6 +186,17 @@ export async function getCaseById(id: string) {
       )[0] ?? null
     : null;
 
+  const formationCompanyId = formationDetails[0]?.companyId;
+  const formationCompany = formationCompanyId
+    ? (
+        await db
+          .select({ id: companies.id, legalBusinessName: companies.legalBusinessName })
+          .from(companies)
+          .where(eq(companies.id, formationCompanyId))
+          .limit(1)
+      )[0] ?? null
+    : null;
+
   const irsCompanyId = irsDetails[0]?.companyId;
   const irsCompany = irsCompanyId
     ? (
@@ -220,6 +231,7 @@ export async function getCaseById(id: string) {
     creditDetails: creditDetails[0] ?? null,
     consultingDetails: consultingDetails[0] ?? null,
     formationDetails: formationDetails[0] ?? null,
+    formationCompany,
     academyDetails: academyDetails[0] ?? null,
     marketingDetails: marketingDetails[0] ?? null,
     salesTaxDetails: salesTaxDetails[0] ?? null,

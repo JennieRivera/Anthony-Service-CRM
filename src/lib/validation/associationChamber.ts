@@ -32,6 +32,8 @@ export const associationChamberFormSchema = z.object({
   phone: optionalString,
   email: optionalString,
   contactPerson: optionalString,
+  contactClientId: optionalString,
+  companyId: optionalString,
   industryFocus: optionalString,
   latinoFocus: z.boolean().optional(),
   membershipStatus: optionalString,

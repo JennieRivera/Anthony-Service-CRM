@@ -1184,6 +1184,13 @@ export const appointments = pgTable("appointments", {
     .notNull()
     .references(() => clients.id, { onDelete: "cascade" }),
   caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+  // Phase 1.5B — B2B Alliances enhancement (closes the gap flagged on
+  // serviceColorSettings above: "ahead of whichever future session wires
+  // an appointment to a referral/alliance"). Nullable — most
+  // appointments are still plain client meetings with no alliance tie.
+  allianceId: uuid("alliance_id").references(() => strategicAlliances.id, {
+    onDelete: "set null",
+  }),
   title: text("title").notNull(),
   serviceType: serviceTypeEnum("service_type").notNull(),
   startAt: timestamp("start_at", { withTimezone: true }).notNull(),
@@ -1675,6 +1682,15 @@ export const businessFormationDetails = pgTable("business_formation_details", {
   caseId: uuid("case_id")
     .primaryKey()
     .references(() => cases.id, { onDelete: "cascade" }),
+  // Phase 1.5B — Master Registry architecture. Nullable, same pattern
+  // already used by salesTaxCaseDetails/irsCaseDetails/
+  // insuranceComplianceDetails: set only through an explicit staff
+  // "Create / Link Company" action (never automatically on status
+  // change), so the LLC/corp this case forms can become a real
+  // Master Organization Registry row without duplicating it as free text.
+  companyId: uuid("company_id").references(() => companies.id, {
+    onDelete: "set null",
+  }),
   formationType: formationTypeEnum("formation_type"),
   stateOfFormation: text("state_of_formation"),
   businessName: text("business_name"),
@@ -1758,9 +1774,17 @@ export const academyEnrollmentDetails = pgTable("academy_enrollment_details", {
 // info); teachers aren't clients or staff accounts, so they get their
 // own name/phone/email here, same pattern as strategicAlliances'
 // free-text relationshipOwner/contactPerson.
+// Phase 1.5B — Master Registry architecture additively extends this
+// with "instructor"/"mentor"/"mentee" alongside the original
+// "student"/"teacher" (never renamed, existing rows untouched) so
+// Diamond's roles can reflect the Academy's actual vocabulary without
+// overloading "teacher" for every non-student participant.
 export const diamondMemberTypeEnum = pgEnum("diamond_member_type", [
   "student",
   "teacher",
+  "instructor",
+  "mentor",
+  "mentee",
 ]);
 
 export const diamondMemberStatusEnum = pgEnum("diamond_member_status", [
@@ -1784,10 +1808,19 @@ export const academyDiamondMembers = pgTable("academy_diamond_members", {
     onDelete: "set null",
   }),
   caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
-  // Set for memberType "teacher", who has no client or staff record.
+  // Set for the non-student member types (teacher/instructor/mentor/
+  // mentee), who usually have no client or staff record — name/phone/
+  // email stay the free-text fallback.
   name: text("name"),
   phone: text("phone"),
   email: text("email"),
+  // Phase 1.5B — optional link for the case where a non-student member
+  // (e.g. a graduate who becomes a mentor) already has a clients row —
+  // lets staff reuse that identity instead of retyping it as free text.
+  // Nullable; the free-text fields above remain the fallback when unset.
+  teacherClientId: uuid("teacher_client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
   joinedDate: date("joined_date").notNull().defaultNow(),
   status: diamondMemberStatusEnum("status").notNull().default("active"),
   notes: text("notes"),
@@ -2166,6 +2199,17 @@ export const associationsChambers = pgTable("associations_chambers", {
   phone: text("phone"),
   email: text("email"),
   contactPerson: text("contact_person"),
+  // Phase 1.5B — same optional linking pattern added to strategicAlliances:
+  // contactPerson stays the free-text fallback; contactClientId is set
+  // only when staff explicitly link to an existing clients row.
+  contactClientId: uuid("contact_client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  // Phase 1.5B — optional link to the Master Organization Registry
+  // (companies), same reasoning as strategicAlliances.companyId.
+  companyId: uuid("company_id").references(() => companies.id, {
+    onDelete: "set null",
+  }),
   industryFocus: text("industry_focus"),
   latinoFocus: boolean("latino_focus").notNull().default(false),
   membershipStatus: text("membership_status"),
@@ -2522,6 +2566,22 @@ export const strategicAlliances = pgTable("strategic_alliances", {
     .defaultNow(),
   organizationName: text("organization_name").notNull(),
   contactPerson: text("contact_person"),
+  // Phase 1.5B — Master Registry architecture. Nullable; contactPerson
+  // (free text) stays as the display fallback for alliances with no
+  // matching CRM contact on file yet. Set only when staff explicitly
+  // link this alliance's contact to an existing clients row (no
+  // dedupe/backfill performed automatically).
+  contactClientId: uuid("contact_client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  // Phase 1.5B — optional link to the Master Organization Registry
+  // (companies) when this alliance partner is also a formally
+  // registered business AMS has a company record for. Null for
+  // alliances with no formal company on file (a church, an individual
+  // professional, etc.) — exactly as today.
+  companyId: uuid("company_id").references(() => companies.id, {
+    onDelete: "set null",
+  }),
   organizationType: organizationTypeEnum("organization_type"),
   phone: text("phone"),
   email: text("email"),
@@ -2531,6 +2591,13 @@ export const strategicAlliances = pgTable("strategic_alliances", {
   country: text("country"),
   relationshipOwner: text("relationship_owner"),
   dateIntroduced: date("date_introduced"),
+  // Phase 1.5B — B2B Alliances enhancement. agreementStartDate/
+  // agreementRenewalDate are deliberately separate from dateIntroduced
+  // above: "introduced" is first contact, these two track the actual
+  // agreement's lifecycle. Neither reinterprets nor is backfilled from
+  // dateIntroduced on existing rows.
+  agreementStartDate: date("agreement_start_date"),
+  agreementRenewalDate: date("agreement_renewal_date"),
   servicesConnected: text("services_connected"),
   referralAgreement: boolean("referral_agreement").notNull().default(false),
   commissionAgreement: boolean("commission_agreement")
@@ -2544,7 +2611,54 @@ export const strategicAlliances = pgTable("strategic_alliances", {
   nextFollowUp: date("next_follow_up"),
   status: allianceStatusEnum("status").notNull().default("prospect"),
   notes: text("notes"),
+  // Phase 1.5B — B2B Alliances enhancement. Kept as two separate fields
+  // on purpose, never merged into one "responsibilities" blob: staff
+  // need to see at a glance what AMS committed to vs. what the partner
+  // committed to.
+  amsResponsibilities: text("ams_responsibilities"),
+  partnerResponsibilities: text("partner_responsibilities"),
 });
+
+// Phase 1.5B — B2B Alliances enhancement. One alliance can have several
+// contacts (Primary Contact, Owner, Billing Contact, Referral Contact,
+// or a custom role) — this was previously flattened onto a single
+// contactPerson/contactClientId pair on strategicAlliances itself,
+// which both remain untouched as a backward-compatible display
+// fallback for alliances that predate this table. Same shape/reasoning
+// as company_contacts: clientId is optional (a B2B contact is not
+// automatically a service client), name is always required so a
+// contact with no clients row still displays correctly.
+export const allianceContacts = pgTable("alliance_contacts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  allianceId: uuid("alliance_id")
+    .notNull()
+    .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  name: text("name").notNull(),
+  role: text("role"),
+  phone: text("phone"),
+  email: text("email"),
+  notes: text("notes"),
+});
+
+// Phase 1.5B — B2B Alliances enhancement. Nullable on purpose: existing
+// uploaded documents (e.g. RRI Financial Group's signed addendum) have
+// no type until staff manually classify them — never auto-assigned to
+// "other" just to have a value.
+export const allianceDocumentTypeEnum = pgEnum("alliance_document_type", [
+  "contract",
+  "addendum",
+  "supporting_document",
+  "other",
+]);
 
 // Phase 1 follow-up — files tied to the partnership itself (the signed
 // referral/commission agreement, etc.), not to any one client. Kept
@@ -2560,6 +2674,7 @@ export const allianceDocuments = pgTable("alliance_documents", {
     .references(() => strategicAlliances.id, { onDelete: "cascade" }),
   fileName: text("file_name").notNull(),
   blobUrl: text("blob_url").notNull(),
+  documentType: allianceDocumentTypeEnum("document_type"),
 });
 
 export const allianceStatusHistory = pgTable("alliance_status_history", {
@@ -2921,6 +3036,8 @@ export type SocialMediaContent = typeof socialMediaContent.$inferSelect;
 export type StrategicAlliance = typeof strategicAlliances.$inferSelect;
 export type AllianceStatusHistory =
   typeof allianceStatusHistory.$inferSelect;
+export type AllianceContact = typeof allianceContacts.$inferSelect;
+export type AllianceDocument = typeof allianceDocuments.$inferSelect;
 export type MarketingProjectDetails =
   typeof marketingProjectDetails.$inferSelect;
 export type AiAgent = typeof aiAgents.$inferSelect;

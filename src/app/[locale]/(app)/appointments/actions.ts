@@ -70,6 +70,7 @@ function normalize(
   return {
     clientId,
     caseId: values.caseId || null,
+    allianceId: values.allianceId || null,
     title: values.title,
     serviceType: values.serviceType,
     appointmentType: values.appointmentType,

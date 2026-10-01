@@ -1,14 +1,21 @@
 import { formatDate, formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
-import { Pencil, Download } from "lucide-react";
+import { Pencil, Download, Calendar } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getAllianceById } from "@/lib/queries/alliances";
+import { listClientsForSelect } from "@/lib/queries/clients";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AllianceStatusBadge } from "@/components/alliances/AllianceStatusBadge";
 import { AllianceDocumentUploader } from "@/components/alliances/AllianceDocumentUploader";
+import { AllianceDocumentTypeSelect } from "@/components/alliances/AllianceDocumentTypeSelect";
+import { AllianceContactsSection } from "@/components/alliances/AllianceContactsSection";
+import {
+  createAllianceContactAction,
+  deleteAllianceContactAction,
+} from "../actions";
 
 export default async function AllianceDetailPage({
   params,
@@ -18,12 +25,27 @@ export default async function AllianceDetailPage({
   const { id } = await params;
   const t = await getTranslations("Alliances");
   const tOrgType = await getTranslations("OrganizationType");
+  const tChannel = await getTranslations("ConversationChannel");
+  const tAppointmentStatus = await getTranslations("AppointmentStatus");
   const blobConfigured = isBlobConfigured();
 
-  const result = await getAllianceById(id);
+  const [result, clients] = await Promise.all([
+    getAllianceById(id),
+    listClientsForSelect(),
+  ]);
   if (!result) notFound();
 
-  const { alliance, statusHistory, linkedReferrals, documents } = result;
+  const {
+    alliance,
+    statusHistory,
+    linkedReferrals,
+    documents,
+    linkedClient,
+    linkedCompany,
+    contacts,
+    communications,
+    linkedAppointments,
+  } = result;
   const contractSigned = alliance.referralAgreement || alliance.commissionAgreement;
 
   return (
@@ -41,6 +63,7 @@ export default async function AllianceDetailPage({
         </Button>
       </div>
 
+      {/* Alliance information */}
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
         <div className="flex items-center justify-between">
           <h1 className="font-heading text-2xl text-foreground">
@@ -135,37 +158,110 @@ export default async function AllianceDetailPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-card p-6 text-sm sm:grid-cols-4">
-        <div>
-          <p className="text-muted-foreground">{t("form.referralAgreement")}</p>
-          <p className="text-foreground">
-            {alliance.referralAgreement ? "✓" : "—"}
-          </p>
-        </div>
-        <div>
-          <p className="text-muted-foreground">
-            {t("form.commissionAgreement")}
-          </p>
-          <p className="text-foreground">
-            {alliance.commissionAgreement ? "✓" : "—"}
-          </p>
-        </div>
-        <div>
-          <p className="text-muted-foreground">
-            {t("form.marketingPermission")}
-          </p>
-          <p className="text-foreground">
-            {alliance.marketingPermission ? "✓" : "—"}
-          </p>
-        </div>
-        <div>
-          <p className="text-muted-foreground">{t("form.logoPermission")}</p>
-          <p className="text-foreground">
-            {alliance.logoPermission ? "✓" : "—"}
-          </p>
+      {/* Organization/company */}
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+        <h2 className="font-heading text-lg text-foreground">
+          {t("sections.organization")}
+        </h2>
+        <div className="grid gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <p className="text-muted-foreground">{t("form.linkedCompany")}</p>
+            <p className="text-foreground">
+              {linkedCompany ? (
+                <Link href={`/companies/${linkedCompany.id}`} className="hover:underline">
+                  {linkedCompany.legalBusinessName}
+                </Link>
+              ) : (
+                "—"
+              )}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.linkedClient")}</p>
+            <p className="text-foreground">
+              {linkedClient ? (
+                <Link href={`/clients/${linkedClient.id}`} className="hover:underline">
+                  {linkedClient.fullName}
+                </Link>
+              ) : (
+                "—"
+              )}
+            </p>
+          </div>
         </div>
       </div>
 
+      {/* Contacts */}
+      <AllianceContactsSection
+        allianceId={id}
+        contacts={contacts}
+        clients={clients}
+        onCreate={createAllianceContactAction}
+        onDelete={deleteAllianceContactAction}
+      />
+
+      {/* Agreement dates */}
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+        <h2 className="font-heading text-lg text-foreground">
+          {t("sections.agreementDates")}
+        </h2>
+        <div className="grid gap-3 text-sm sm:grid-cols-3">
+          <div>
+            <p className="text-muted-foreground">{t("form.agreementStartDate")}</p>
+            <p className="text-foreground">
+              {alliance.agreementStartDate ? formatDate(alliance.agreementStartDate) : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.agreementRenewalDate")}</p>
+            <p className="text-foreground">
+              {alliance.agreementRenewalDate ? formatDate(alliance.agreementRenewalDate) : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("contractStatus")}</p>
+            <p className="text-foreground">{contractSigned ? t("signed") : t("pending")}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 border-t border-border pt-3 sm:grid-cols-4">
+          <div>
+            <p className="text-muted-foreground">{t("form.referralAgreement")}</p>
+            <p className="text-foreground">{alliance.referralAgreement ? "✓" : "—"}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.commissionAgreement")}</p>
+            <p className="text-foreground">{alliance.commissionAgreement ? "✓" : "—"}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.marketingPermission")}</p>
+            <p className="text-foreground">{alliance.marketingPermission ? "✓" : "—"}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.logoPermission")}</p>
+            <p className="text-foreground">{alliance.logoPermission ? "✓" : "—"}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Responsibilities */}
+      {(alliance.amsResponsibilities || alliance.partnerResponsibilities) && (
+        <div className="grid gap-3 rounded-lg border border-border bg-card p-6 text-sm sm:grid-cols-2">
+          <div>
+            <p className="text-muted-foreground">{t("form.amsResponsibilities")}</p>
+            <p className="whitespace-pre-wrap text-foreground">
+              {alliance.amsResponsibilities ?? "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.partnerResponsibilities")}</p>
+            <p className="whitespace-pre-wrap text-foreground">
+              {alliance.partnerResponsibilities ?? "—"}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Notes */}
       {alliance.notes && (
         <div className="rounded-lg border border-border bg-card p-6 text-sm">
           <p className="text-muted-foreground">{t("form.notes")}</p>
@@ -175,6 +271,7 @@ export default async function AllianceDetailPage({
         </div>
       )}
 
+      {/* Referrals */}
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
         <h2 className="font-heading text-lg text-foreground">
           {t("linkedReferrals")}
@@ -207,6 +304,67 @@ export default async function AllianceDetailPage({
         )}
       </div>
 
+      {/* Communications */}
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+        <h2 className="font-heading text-lg text-foreground">
+          {t("sections.communications")}
+        </h2>
+        {communications.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("noCommunications")}</p>
+        ) : (
+          <ul className="flex flex-col divide-y divide-border">
+            {communications.map((comm) => (
+              <li
+                key={comm.id}
+                className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm"
+              >
+                <Link
+                  href={`/communications/${comm.id}`}
+                  className="font-medium text-foreground hover:underline"
+                >
+                  COM-{String(comm.communicationSeq).padStart(5, "0")} —{" "}
+                  {comm.subject || tChannel(comm.channel)}
+                </Link>
+                <span className="text-muted-foreground">
+                  {formatDateTime(comm.occurredAt)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Appointments */}
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+        <h2 className="font-heading text-lg text-foreground">
+          {t("sections.appointments")}
+        </h2>
+        {linkedAppointments.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("noAppointments")}</p>
+        ) : (
+          <ul className="flex flex-col divide-y divide-border">
+            {linkedAppointments.map((appt) => (
+              <li
+                key={appt.id}
+                className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm"
+              >
+                <Link
+                  href={`/appointments/${appt.id}`}
+                  className="flex items-center gap-2 font-medium text-foreground hover:underline"
+                >
+                  <Calendar className="h-3.5 w-3.5" />
+                  {appt.title} — {appt.clientName}
+                </Link>
+                <span className="text-muted-foreground">
+                  {formatDateTime(appt.startAt)} · {tAppointmentStatus(appt.status)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Contracts/documents */}
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
         <h2 className="font-heading text-lg text-foreground">
           {t("documentsTitle")}
@@ -217,22 +375,26 @@ export default async function AllianceDetailPage({
         ) : (
           <ul className="flex flex-col divide-y divide-border">
             {documents.map((doc) => (
-              <li key={doc.id} className="flex items-center justify-between gap-2 py-2 text-sm">
+              <li key={doc.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
                 <span className="truncate font-medium text-foreground">{doc.fileName}</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  render={<a href={`/api/alliance-documents/${doc.id}/file?download=1`} />}
-                >
-                  <Download className="h-4 w-4" />
-                  {t("documents.download")}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <AllianceDocumentTypeSelect allianceId={id} document={doc} />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    render={<a href={`/api/alliance-documents/${doc.id}/file?download=1`} />}
+                  >
+                    <Download className="h-4 w-4" />
+                    {t("documents.download")}
+                  </Button>
+                </div>
               </li>
             ))}
           </ul>
         )}
       </div>
 
+      {/* Relationship/status history */}
       {statusHistory.length > 0 && (
         <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
           <h2 className="font-heading text-lg text-foreground">

@@ -66,6 +66,30 @@ export default async function AssociationDetailPage({
             <p className="text-foreground">{org.contactPerson ?? "—"}</p>
           </div>
           <div>
+            <p className="text-muted-foreground">{t("form.linkedClient")}</p>
+            <p className="text-foreground">
+              {org.linkedClient ? (
+                <Link href={`/clients/${org.linkedClient.id}`} className="hover:underline">
+                  {org.linkedClient.fullName}
+                </Link>
+              ) : (
+                "—"
+              )}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("form.linkedCompany")}</p>
+            <p className="text-foreground">
+              {org.linkedCompany ? (
+                <Link href={`/companies/${org.linkedCompany.id}`} className="hover:underline">
+                  {org.linkedCompany.legalBusinessName}
+                </Link>
+              ) : (
+                "—"
+              )}
+            </p>
+          </div>
+          <div>
             <p className="text-muted-foreground">{t("form.phone")}</p>
             <p className="text-foreground">{org.phone ?? "—"}</p>
           </div>

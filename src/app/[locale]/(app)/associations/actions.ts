@@ -23,6 +23,8 @@ function normalize(values: AssociationChamberFormValues) {
     phone: values.phone || null,
     email: values.email || null,
     contactPerson: values.contactPerson || null,
+    contactClientId: values.contactClientId || null,
+    companyId: values.companyId || null,
     industryFocus: values.industryFocus || null,
     latinoFocus: values.latinoFocus ?? false,
     membershipStatus: values.membershipStatus || null,

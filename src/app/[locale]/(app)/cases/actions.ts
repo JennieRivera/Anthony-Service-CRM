@@ -24,6 +24,8 @@ import {
   caseStatusHistory,
   tasks,
   taskTypeEnum,
+  companies,
+  companyEntityTypeEnum,
 } from "@/lib/db/schema";
 import {
   caseFormSchema,
@@ -47,6 +49,7 @@ import { auth } from "@/auth";
 import { getActiveAgentIdForServiceType, logAiActivity } from "@/lib/ai/agentActivity";
 import { businessDateString } from "@/lib/dates";
 import { logAuditEvent } from "@/lib/audit";
+import { z } from "zod";
 
 const CLOSED_STATUSES = ["completed", "cancelled"] as const;
 
@@ -996,4 +999,87 @@ export async function deleteCaseAction(id: string) {
   revalidatePath(`/clients/${existing.clientId}`);
   const locale = await getLocale();
   redirect({ href: "/cases", locale });
+}
+
+// Phase 1.5B — Master Registry architecture (Business Formation →
+// Company workflow). Deliberately manual only: nothing here is ever
+// called from upsertServiceDetails or triggered by a status change —
+// staff must explicitly link or create a company from the case detail
+// page. This mirrors the existing salesTax/irs/insurance
+// "select an existing company" pattern, plus a "create new" half that
+// pre-fills from the case's own formation fields rather than making
+// staff retype them.
+
+export async function linkFormationCompanyAction(caseId: string, companyId: string) {
+  await getDb()
+    .update(businessFormationDetails)
+    .set({ companyId })
+    .where(eq(businessFormationDetails.caseId, caseId));
+
+  await logAuditEvent({
+    action: "case.updated",
+    entityType: "case",
+    entityId: caseId,
+    summary: `Linked Business Formation case to an existing company`,
+  });
+
+  revalidatePath(`/cases/${caseId}`);
+}
+
+export async function unlinkFormationCompanyAction(caseId: string) {
+  await getDb()
+    .update(businessFormationDetails)
+    .set({ companyId: null })
+    .where(eq(businessFormationDetails.caseId, caseId));
+
+  await logAuditEvent({
+    action: "case.updated",
+    entityType: "case",
+    entityId: caseId,
+    summary: `Unlinked Business Formation case from its company`,
+  });
+
+  revalidatePath(`/cases/${caseId}`);
+}
+
+const createCompanyFromFormationSchema = z.object({
+  legalBusinessName: z.string().trim().min(1, "Legal business name is required"),
+  entityType: z.enum(companyEntityTypeEnum.enumValues).optional().or(z.literal("")),
+  stateOfFormation: z.string().trim().optional().or(z.literal("")),
+});
+export type CreateCompanyFromFormationValues = z.infer<
+  typeof createCompanyFromFormationSchema
+>;
+
+export async function createCompanyFromFormationAction(
+  caseId: string,
+  rawValues: CreateCompanyFromFormationValues,
+) {
+  const values = createCompanyFromFormationSchema.parse(rawValues);
+  const db = getDb();
+
+  const [created] = await db
+    .insert(companies)
+    .values({
+      legalBusinessName: values.legalBusinessName,
+      entityType: values.entityType || null,
+      stateOfFormation: values.stateOfFormation || null,
+    })
+    .returning({ id: companies.id });
+
+  await db
+    .update(businessFormationDetails)
+    .set({ companyId: created.id })
+    .where(eq(businessFormationDetails.caseId, caseId));
+
+  await logAuditEvent({
+    action: "company.created",
+    entityType: "company",
+    entityId: created.id,
+    summary: `Created company "${values.legalBusinessName}" from Business Formation case`,
+  });
+
+  revalidatePath(`/cases/${caseId}`);
+  revalidatePath("/companies");
+  return created.id;
 }

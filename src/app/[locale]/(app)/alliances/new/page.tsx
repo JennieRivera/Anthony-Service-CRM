@@ -1,10 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { AllianceForm } from "@/components/alliances/AllianceForm";
+import { listClientsForSelect } from "@/lib/queries/clients";
+import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { createAllianceAction } from "../actions";
 
 export default async function NewAlliancePage() {
   const t = await getTranslations("Alliances");
+  const [clients, companies] = await Promise.all([
+    listClientsForSelect(),
+    listCompaniesForSelect(),
+  ]);
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -20,7 +26,7 @@ export default async function NewAlliancePage() {
         </Link>
       </div>
 
-      <AllianceForm onSubmit={createAllianceAction} />
+      <AllianceForm clients={clients} companies={companies} onSubmit={createAllianceAction} />
     </div>
   );
 }

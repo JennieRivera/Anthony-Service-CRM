@@ -4,6 +4,7 @@ import { Pencil, FileText, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getCaseById } from "@/lib/queries/cases";
 import { findActiveTemplate } from "@/lib/queries/messageTemplates";
+import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { getActiveAgentIdForServiceType } from "@/lib/ai/agentActivity";
 import { getAiAgentById } from "@/lib/queries/aiAgents";
@@ -13,6 +14,7 @@ import { CaseStatusBadge } from "@/components/clients/StatusBadge";
 import { DocumentList } from "@/components/documents/DocumentList";
 import { DocumentUploader } from "@/components/documents/DocumentUploader";
 import { CaseDeleteButton } from "@/components/cases/CaseDeleteButton";
+import { BusinessFormationCompanyLink } from "@/components/cases/BusinessFormationCompanyLink";
 import { Badge } from "@/components/ui/badge";
 
 export default async function CaseDetailPage({
@@ -62,6 +64,7 @@ export default async function CaseDetailPage({
 
   const result = await getCaseById(id);
   if (!result) notFound();
+  const companiesForSelect = await listCompaniesForSelect();
 
   const {
     case: c,
@@ -75,6 +78,7 @@ export default async function CaseDetailPage({
     creditDetails,
     consultingDetails,
     formationDetails,
+    formationCompany,
     academyDetails,
     marketingDetails,
     salesTaxDetails,
@@ -885,6 +889,16 @@ export default async function CaseDetailPage({
               {tFormationCaseStatus(formationDetails.status)}
             </Badge>
           </div>
+          <BusinessFormationCompanyLink
+            caseId={id}
+            currentCompany={formationCompany}
+            companies={companiesForSelect}
+            prefill={{
+              businessName: formationDetails.businessName,
+              formationType: formationDetails.formationType,
+              stateOfFormation: formationDetails.stateOfFormation,
+            }}
+          />
           <div className="grid gap-3 text-sm sm:grid-cols-4">
             <div>
               <p className="text-muted-foreground">

@@ -4,6 +4,7 @@ import {
   listDiamondMembers,
   listAcademyStudentsForSelect,
 } from "@/lib/queries/academyDiamond";
+import { listClientsForSelect } from "@/lib/queries/clients";
 import { DiamondCommunityManager } from "@/components/academy/DiamondCommunityManager";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
@@ -18,13 +19,15 @@ export default async function DiamondCommunityPage() {
 
   let members: Awaited<ReturnType<typeof listDiamondMembers>> = [];
   let students: Awaited<ReturnType<typeof listAcademyStudentsForSelect>> = [];
+  let clients: Awaited<ReturnType<typeof listClientsForSelect>> = [];
   let error: string | null = null;
 
   if (configured) {
     try {
-      [members, students] = await Promise.all([
+      [members, students, clients] = await Promise.all([
         listDiamondMembers(),
         listAcademyStudentsForSelect(),
+        listClientsForSelect(),
       ]);
     } catch (err) {
       error = err instanceof Error ? err.message : "Unknown error";
@@ -44,7 +47,7 @@ export default async function DiamondCommunityPage() {
       )}
 
       {configured && !error && (
-        <DiamondCommunityManager members={members} students={students} />
+        <DiamondCommunityManager members={members} students={students} clients={clients} />
       )}
     </div>
   );

@@ -46,6 +46,7 @@ export const appointmentFormSchema = z
     newClientEmail: optionalString,
     newClientBusinessName: optionalString,
     caseId: optionalString,
+    allianceId: optionalString,
     title: z.string().trim().min(1, "Title is required"),
     serviceType: z.enum(serviceTypeValues),
     appointmentType: z.enum(appointmentTypeValues),

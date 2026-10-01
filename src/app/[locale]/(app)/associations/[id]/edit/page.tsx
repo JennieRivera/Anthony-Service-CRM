@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getAssociationChamberById } from "@/lib/queries/associationsChambers";
+import { listClientsForSelect } from "@/lib/queries/clients";
+import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { Link } from "@/i18n/navigation";
 import { AssociationChamberForm } from "@/components/associations/AssociationChamberForm";
 import { updateAssociationChamberAction } from "../../actions";
@@ -14,7 +16,11 @@ export default async function EditAssociationPage({
   const { id } = await params;
   const t = await getTranslations("Associations");
 
-  const org = await getAssociationChamberById(id);
+  const [org, clients, companies] = await Promise.all([
+    getAssociationChamberById(id),
+    listClientsForSelect(),
+    listCompaniesForSelect(),
+  ]);
   if (!org) notFound();
 
   async function submit(values: AssociationChamberFormValues) {
@@ -36,7 +42,12 @@ export default async function EditAssociationPage({
         </Link>
       </div>
 
-      <AssociationChamberForm organization={org} onSubmit={submit} />
+      <AssociationChamberForm
+        organization={org}
+        clients={clients}
+        companies={companies}
+        onSubmit={submit}
+      />
     </div>
   );
 }

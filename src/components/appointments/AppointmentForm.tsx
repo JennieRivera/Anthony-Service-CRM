@@ -40,6 +40,7 @@ export function AppointmentForm({
   appointment,
   clients,
   cases,
+  alliances = [],
   defaultClientId,
   defaultStart,
   onSubmit,
@@ -47,6 +48,7 @@ export function AppointmentForm({
   appointment?: Appointment;
   clients: { id: string; fullName: string }[];
   cases: { id: string; title: string; clientId: string }[];
+  alliances?: { id: string; organizationName: string }[];
   defaultClientId?: string;
   defaultStart?: string;
   onSubmit: (values: AppointmentFormValues) => Promise<void>;
@@ -84,6 +86,7 @@ export function AppointmentForm({
       newClientEmail: "",
       newClientBusinessName: "",
       caseId: appointment?.caseId ?? "",
+      allianceId: appointment?.allianceId ?? "",
       title: appointment?.title ?? "",
       serviceType: appointment?.serviceType ?? "online_notary",
       appointmentType: appointment?.appointmentType ?? "in_person",
@@ -159,6 +162,32 @@ export function AppointmentForm({
                   {clientCases.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       {c.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("alliance")}</Label>
+          <Controller
+            control={control}
+            name="allianceId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t("noAlliance")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noAlliance")}</SelectItem>
+                  {alliances.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.organizationName}
                     </SelectItem>
                   ))}
                 </SelectContent>

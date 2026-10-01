@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
-import { allianceDocuments } from "@/lib/db/schema";
+import { allianceDocuments, allianceDocumentTypeEnum } from "@/lib/db/schema";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import {
@@ -26,6 +26,7 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file");
   const allianceId = formData.get("allianceId");
+  const rawDocumentType = formData.get("documentType");
 
   if (!(file instanceof File) || typeof allianceId !== "string" || !allianceId) {
     return NextResponse.json(
@@ -33,6 +34,12 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  const documentType =
+    typeof rawDocumentType === "string" &&
+    (allianceDocumentTypeEnum.enumValues as readonly string[]).includes(rawDocumentType)
+      ? (rawDocumentType as (typeof allianceDocumentTypeEnum.enumValues)[number])
+      : null;
 
   if (!isAllowedDocumentFile(file.name)) {
     return NextResponse.json(
@@ -60,6 +67,7 @@ export async function POST(request: Request) {
       allianceId,
       fileName: file.name,
       blobUrl: blob.url,
+      documentType,
     })
     .returning();
 

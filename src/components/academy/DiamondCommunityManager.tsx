@@ -55,9 +55,11 @@ const statusClasses: Record<string, string> = {
 export function DiamondCommunityManager({
   members,
   students,
+  clients,
 }: {
   members: Member[];
   students: StudentOption[];
+  clients: { id: string; fullName: string }[];
 }) {
   const t = useTranslations("DiamondCommunity");
   const tStatus = useTranslations("DiamondMemberStatus");
@@ -78,7 +80,7 @@ export function DiamondCommunityManager({
           <Gem className="h-4 w-4" />
           {t("subtitle")}
         </div>
-        <AddMemberDialog students={students} />
+        <AddMemberDialog students={students} clients={clients} />
       </div>
 
       {members.length === 0 ? (
@@ -102,7 +104,9 @@ export function DiamondCommunityManager({
               {members.map((m) => (
                 <TableRow key={m.id}>
                   <TableCell className="font-medium text-foreground">
-                    {m.memberType === "student" ? m.studentName : m.name}
+                    {m.memberType === "student"
+                      ? m.studentName
+                      : m.teacherClientName ?? m.name}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {tType(m.memberType)}
@@ -149,7 +153,13 @@ export function DiamondCommunityManager({
   );
 }
 
-function AddMemberDialog({ students }: { students: StudentOption[] }) {
+function AddMemberDialog({
+  students,
+  clients,
+}: {
+  students: StudentOption[];
+  clients: { id: string; fullName: string }[];
+}) {
   const t = useTranslations("DiamondCommunity");
   const tType = useTranslations("DiamondMemberType");
   const [open, setOpen] = useState(false);
@@ -157,6 +167,7 @@ function AddMemberDialog({ students }: { students: StudentOption[] }) {
     "student",
   );
   const [caseId, setCaseId] = useState("");
+  const [teacherClientId, setTeacherClientId] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -170,6 +181,7 @@ function AddMemberDialog({ students }: { students: StudentOption[] }) {
   function reset() {
     setMemberType("student");
     setCaseId("");
+    setTeacherClientId("");
     setName("");
     setPhone("");
     setEmail("");
@@ -186,6 +198,7 @@ function AddMemberDialog({ students }: { students: StudentOption[] }) {
         memberType,
         clientId: selectedStudent?.clientId ?? "",
         caseId: selectedStudent?.caseId ?? "",
+        teacherClientId,
         name,
         phone,
         email,
@@ -257,9 +270,30 @@ function AddMemberDialog({ students }: { students: StudentOption[] }) {
               </Select>
             </div>
           ) : (
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="teacherName">{t("teacherName")}</Label>
-              <Input id="teacherName" value={name} onChange={(e) => setName(e.target.value)} />
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5">
+                <Label>{t("linkedClient")}</Label>
+                <Select
+                  value={teacherClientId || "none"}
+                  onValueChange={(v) => setTeacherClientId(!v || v === "none" ? "" : v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t("noLinkedClient")}</SelectItem>
+                    {clients.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.fullName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="teacherName">{t("teacherName")}</Label>
+                <Input id="teacherName" value={name} onChange={(e) => setName(e.target.value)} />
+              </div>
             </div>
           )}
 

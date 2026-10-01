@@ -27,9 +27,13 @@ import type { AssociationChamber } from "@/lib/db/schema";
 
 export function AssociationChamberForm({
   organization,
+  clients = [],
+  companies = [],
   onSubmit,
 }: {
   organization?: AssociationChamber;
+  clients?: { id: string; fullName: string }[];
+  companies?: { id: string; legalBusinessName: string }[];
   onSubmit: (values: AssociationChamberFormValues) => Promise<void>;
 }) {
   const t = useTranslations("Associations.form");
@@ -55,6 +59,8 @@ export function AssociationChamberForm({
       phone: organization?.phone ?? "",
       email: organization?.email ?? "",
       contactPerson: organization?.contactPerson ?? "",
+      contactClientId: organization?.contactClientId ?? "",
+      companyId: organization?.companyId ?? "",
       industryFocus: organization?.industryFocus ?? "",
       latinoFocus: organization?.latinoFocus ?? false,
       membershipStatus: organization?.membershipStatus ?? "",
@@ -143,6 +149,58 @@ export function AssociationChamberForm({
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="contactPerson">{t("contactPerson")}</Label>
           <Input id="contactPerson" {...register("contactPerson")} />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("linkedClient")}</Label>
+          <Controller
+            control={control}
+            name="contactClientId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noLinkedClient")}</SelectItem>
+                  {clients.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.fullName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("linkedCompany")}</Label>
+          <Controller
+            control={control}
+            name="companyId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noLinkedCompany")}</SelectItem>
+                  {companies.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.legalBusinessName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </div>
 
         <div className="flex flex-col gap-1.5">

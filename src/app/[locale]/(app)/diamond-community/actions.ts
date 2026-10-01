@@ -21,7 +21,9 @@ export async function createDiamondMemberAction(
       memberType: values.memberType,
       clientId: values.memberType === "student" ? values.clientId || null : null,
       caseId: values.memberType === "student" ? values.caseId || null : null,
-      name: values.memberType === "teacher" ? values.name || null : null,
+      name: values.memberType === "student" ? null : values.name || null,
+      teacherClientId:
+        values.memberType === "student" ? null : values.teacherClientId || null,
       phone: values.phone || null,
       email: values.email || null,
       joinedDate: values.joinedDate,

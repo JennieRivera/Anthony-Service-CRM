@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { AppointmentForm } from "@/components/appointments/AppointmentForm";
 import { listClientsForSelect, listCasesForAppointmentSelect } from "@/lib/queries/cases";
+import { listAlliancesForSelect } from "@/lib/queries/alliances";
 import { createAppointmentAction } from "../actions";
 
 export default async function NewAppointmentPage({
@@ -11,9 +12,10 @@ export default async function NewAppointmentPage({
 }) {
   const t = await getTranslations("Appointments");
   const { clientId, start } = await searchParams;
-  const [clients, cases] = await Promise.all([
+  const [clients, cases, alliances] = await Promise.all([
     listClientsForSelect(),
     listCasesForAppointmentSelect(),
+    listAlliancesForSelect(),
   ]);
 
   return (
@@ -33,6 +35,7 @@ export default async function NewAppointmentPage({
       <AppointmentForm
         clients={clients}
         cases={cases}
+        alliances={alliances}
         defaultClientId={clientId}
         defaultStart={start}
         onSubmit={createAppointmentAction}

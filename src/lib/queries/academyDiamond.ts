@@ -1,6 +1,9 @@
 import { asc, eq } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { getDb } from "@/lib/db";
 import { academyDiamondMembers, clients, cases } from "@/lib/db/schema";
+
+const teacherClients = alias(clients, "teacher_clients");
 
 // Diamond Community roster — membership only, never a message log (see
 // the comment on academyDiamondMembers in schema.ts). Students join to
@@ -14,6 +17,8 @@ export async function listDiamondMembers() {
       clientId: academyDiamondMembers.clientId,
       caseId: academyDiamondMembers.caseId,
       name: academyDiamondMembers.name,
+      teacherClientId: academyDiamondMembers.teacherClientId,
+      teacherClientName: teacherClients.fullName,
       phone: academyDiamondMembers.phone,
       email: academyDiamondMembers.email,
       joinedDate: academyDiamondMembers.joinedDate,
@@ -25,6 +30,7 @@ export async function listDiamondMembers() {
     .from(academyDiamondMembers)
     .leftJoin(clients, eq(academyDiamondMembers.clientId, clients.id))
     .leftJoin(cases, eq(academyDiamondMembers.caseId, cases.id))
+    .leftJoin(teacherClients, eq(academyDiamondMembers.teacherClientId, teacherClients.id))
     .orderBy(asc(academyDiamondMembers.joinedDate));
 }
 

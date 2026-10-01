@@ -302,6 +302,20 @@
       "when": 1789615620533,
       "tag": "0042_bent_changeling",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1790891429349,
+      "tag": "0043_common_energizer",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1790894643926,
+      "tag": "0044_jittery_gorgon",
+      "breakpoints": true
     }
   ]
 }

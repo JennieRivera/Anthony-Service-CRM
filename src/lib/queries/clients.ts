@@ -95,6 +95,17 @@ export async function listClients() {
   return getDb().select().from(clients).orderBy(desc(clients.createdAt));
 }
 
+// Lightweight select-list helper, same shape/purpose as
+// listCompaniesForSelect() — for pickers that link an existing client
+// (alliance/association contact, Diamond Community member) without
+// loading every column.
+export async function listClientsForSelect() {
+  return getDb()
+    .select({ id: clients.id, fullName: clients.fullName })
+    .from(clients)
+    .orderBy(clients.fullName);
+}
+
 export async function getClientById(id: string) {
   const db = getDb();
 
