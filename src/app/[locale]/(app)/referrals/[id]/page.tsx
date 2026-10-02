@@ -8,6 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ReferralStatusBadge } from "@/components/referrals/ReferralStatusBadge";
 import { ReferralPipelineStatusBadge } from "@/components/referrals/ReferralPipelineStatusBadge";
+import { ReferralCompensationSection } from "@/components/referrals/ReferralCompensationSection";
+import AccessDenied from "@/components/AccessDenied";
+import { getCurrentRole, hasAccessArea, hasReferralViewAccess } from "@/lib/permissions";
+import {
+  setCompensationTermsAction,
+  markCompensationEarnedAction,
+  approveCompensationAction,
+  recordCompensationPaymentAction,
+  reverseCompensationPaymentAction,
+} from "../actions";
 
 export default async function ReferralDetailPage({
   params,
@@ -19,10 +29,27 @@ export default async function ReferralDetailPage({
   const tCategory = await getTranslations("ReferralCategory");
   const tDirection = await getTranslations("ReferralDirection");
 
+  const role = await getCurrentRole();
+  if (!role || !hasReferralViewAccess(role)) {
+    return (
+      <div className="flex w-full flex-col gap-6 px-8 py-10">
+        <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
+        <AccessDenied />
+      </div>
+    );
+  }
+  // RBAC correction — three independently least-privileged compensation
+  // permissions (see the AccessArea comment block in permissions.ts) plus
+  // "referrals" itself, which still gates editing the referral record.
+  const canEditReferral = hasAccessArea(role, "referrals");
+  const canEditCompensationTerms = hasAccessArea(role, "referral_compensation_terms");
+  const canApproveCompensation = hasAccessArea(role, "referral_compensation_approval");
+  const canRecordCompensationPayment = hasAccessArea(role, "referral_compensation_payment");
+
   const result = await getReferralById(id);
   if (!result) notFound();
 
-  const { referral, client, caseTitle, rriDetails, statusHistory } = result;
+  const { referral, client, caseTitle, allianceName, referrerClient, rriDetails, statusHistory, compensation } = result;
   const referralNumber = `REF-${String(referral.referralSeq).padStart(5, "0")}`;
 
   return (
@@ -34,10 +61,12 @@ export default async function ReferralDetailPage({
         >
           &larr; {t("backToReferrals")}
         </Link>
-        <Button render={<Link href={`/referrals/${id}/edit`} />}>
-          <Pencil className="h-4 w-4" />
-          {t("editReferral")}
-        </Button>
+        {canEditReferral && (
+          <Button render={<Link href={`/referrals/${id}/edit`} />}>
+            <Pencil className="h-4 w-4" />
+            {t("editReferral")}
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
@@ -94,6 +123,28 @@ export default async function ReferralDetailPage({
 
       <div className="grid gap-3 rounded-lg border border-border bg-card p-6 text-sm sm:grid-cols-2">
         <div>
+          <p className="text-muted-foreground">{t("referrerType")}</p>
+          <p className="text-foreground">
+            {allianceName ? (
+              <>
+                {t("referrerTypeAlliance")}:{" "}
+                <Link href={`/alliances/${referral.allianceId}`} className="hover:underline">
+                  {allianceName}
+                </Link>
+              </>
+            ) : referrerClient ? (
+              <>
+                {t("referrerTypeClient")}:{" "}
+                <Link href={`/clients/${referrerClient.id}`} className="hover:underline">
+                  {referrerClient.fullName}
+                </Link>
+              </>
+            ) : (
+              t("referrerTypeOther")
+            )}
+          </p>
+        </div>
+        <div>
           <p className="text-muted-foreground">
             {t("form.originatingBusiness")}
           </p>
@@ -111,7 +162,15 @@ export default async function ReferralDetailPage({
         </div>
       </div>
 
-      <div className="grid gap-4 rounded-lg border border-border bg-card p-6 text-sm sm:grid-cols-3">
+      {(referral.grossRevenue ||
+        referral.commissionPercentage ||
+        referral.commissionDue ||
+        referral.paymentMethod ||
+        referral.paymentConfirmation) && (
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+        <h2 className="font-heading text-lg text-foreground">{t("legacyCommissionFields")}</h2>
+        <p className="text-xs text-muted-foreground">{t("legacyCommissionFieldsHint")}</p>
+        <div className="grid gap-4 text-sm sm:grid-cols-3">
         <div>
           <p className="text-muted-foreground">{t("form.grossRevenue")}</p>
           <p className="text-foreground">
@@ -188,7 +247,23 @@ export default async function ReferralDetailPage({
             {referral.paymentConfirmation ?? "—"}
           </p>
         </div>
+        </div>
       </div>
+      )}
+
+      <ReferralCompensationSection
+        referralId={id}
+        compensation={compensation?.compensation ?? null}
+        payments={compensation?.payments ?? []}
+        canEditTerms={canEditCompensationTerms}
+        canApprove={canApproveCompensation}
+        canRecordPayment={canRecordCompensationPayment}
+        onSetTerms={setCompensationTermsAction}
+        onMarkEarned={markCompensationEarnedAction}
+        onApprove={approveCompensationAction}
+        onRecordPayment={recordCompensationPaymentAction}
+        onReversePayment={reverseCompensationPaymentAction}
+      />
 
       {referral.notes && (
         <div className="rounded-lg border border-border bg-card p-6 text-sm">

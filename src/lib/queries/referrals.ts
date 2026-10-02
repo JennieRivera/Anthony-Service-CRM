@@ -6,7 +6,9 @@ import {
   cases,
   rriReferralDetails,
   referralStatusHistory,
+  strategicAlliances,
 } from "@/lib/db/schema";
+import { getCompensationForReferral } from "@/lib/queries/referralCompensations";
 
 export async function listCasesForSelect() {
   return getDb()
@@ -34,6 +36,7 @@ export async function listReferralsWithClient() {
       pipelineStatus: referrals.pipelineStatus,
       commissionDue: referrals.commissionDue,
       commissionPaidDate: referrals.commissionPaidDate,
+      allianceId: referrals.allianceId,
       clientId: clients.id,
       clientName: clients.fullName,
     })
@@ -50,16 +53,32 @@ export async function getReferralById(id: string) {
       referral: referrals,
       client: clients,
       caseTitle: cases.title,
+      allianceName: strategicAlliances.organizationName,
     })
     .from(referrals)
     .innerJoin(clients, eq(referrals.clientId, clients.id))
     .leftJoin(cases, eq(referrals.caseId, cases.id))
+    .leftJoin(strategicAlliances, eq(referrals.allianceId, strategicAlliances.id))
     .where(eq(referrals.id, id))
     .limit(1);
 
   if (!row) return null;
 
-  const [rriDetails, statusHistory] = await Promise.all([
+  // Referrals & Commissions Foundation — referrerClientId is a second,
+  // separate link to `clients` on the same row (the REFERRER, never the
+  // same join as `client` above which is always the REFERRED client) —
+  // queried on its own since Drizzle can't alias the same table twice in
+  // one declarative select without a second table reference.
+  const referrerClient = row.referral.referrerClientId
+    ? await db
+        .select({ id: clients.id, fullName: clients.fullName })
+        .from(clients)
+        .where(eq(clients.id, row.referral.referrerClientId))
+        .limit(1)
+        .then((r) => r[0] ?? null)
+    : null;
+
+  const [rriDetails, statusHistory, compensation] = await Promise.all([
     db
       .select()
       .from(rriReferralDetails)
@@ -70,13 +89,17 @@ export async function getReferralById(id: string) {
       .from(referralStatusHistory)
       .where(eq(referralStatusHistory.referralId, id))
       .orderBy(desc(referralStatusHistory.changedAt)),
+    getCompensationForReferral(id),
   ]);
 
   return {
     referral: row.referral,
     client: row.client,
     caseTitle: row.caseTitle,
+    allianceName: row.allianceName,
+    referrerClient,
     rriDetails: rriDetails[0] ?? null,
     statusHistory,
+    compensation,
   };
 }

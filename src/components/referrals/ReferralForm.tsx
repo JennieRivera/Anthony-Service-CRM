@@ -57,6 +57,7 @@ export function ReferralForm({
     handleSubmit,
     control,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<ReferralFormValues>({
     resolver: zodResolver(referralFormSchema),
@@ -67,6 +68,7 @@ export function ReferralForm({
         referral?.referralDate ?? businessDateString(),
       category: referral?.category ?? "general",
       allianceId: referral?.allianceId ?? "",
+      referrerClientId: referral?.referrerClientId ?? "",
       direction: referral?.direction ?? "",
       originatingBusiness: referral?.originatingBusiness ?? "",
       referredBy: referral?.referredBy ?? "",
@@ -99,6 +101,8 @@ export function ReferralForm({
 
   const category = watch("category");
   const isCommercialFinance = category === "commercial_finance";
+  const watchedAllianceId = watch("allianceId");
+  const watchedReferrerClientId = watch("referrerClientId");
 
   const grossRevenue = Number(watch("grossRevenue")) || 0;
   const allowedDeductions = Number(watch("allowedDeductions")) || 0;
@@ -264,7 +268,12 @@ export function ReferralForm({
             render={({ field }) => (
               <Select
                 value={field.value || "none"}
-                onValueChange={(v) => field.onChange(!v || v === "none" ? "" : v)}
+                disabled={Boolean(watchedReferrerClientId)}
+                onValueChange={(v) => {
+                  const next = !v || v === "none" ? "" : v;
+                  field.onChange(next);
+                  if (next) setValue("referrerClientId", "");
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder={t("noAlliance")} />
@@ -280,6 +289,41 @@ export function ReferralForm({
               </Select>
             )}
           />
+          <p className="text-xs text-muted-foreground">{t("referrerTypeHint")}</p>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("referrerClient")}</Label>
+          <Controller
+            control={control}
+            name="referrerClientId"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                disabled={Boolean(watchedAllianceId)}
+                onValueChange={(v) => {
+                  const next = !v || v === "none" ? "" : v;
+                  field.onChange(next);
+                  if (next) setValue("allianceId", "");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t("noReferrerClient")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("noReferrerClient")}</SelectItem>
+                  {clients.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.fullName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.referrerClientId && (
+            <p className="text-sm text-destructive">{errors.referrerClientId.message}</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">

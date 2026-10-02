@@ -2942,6 +2942,18 @@ export const referrals = pgTable("referrals", {
   allianceId: uuid("alliance_id").references(() => strategicAlliances.id, {
     onDelete: "set null",
   }),
+  // Referrals & Commissions Foundation — the second of three referrer-type
+  // signals (alongside allianceId above and referredBy below), for the
+  // "Existing Client/Member" referrer type (spec section 3). Nullable and
+  // independent of clientId above, which is always the REFERRED client,
+  // never the referrer — a person can be both on different referrals, but
+  // never conflated on the same one. When neither allianceId nor
+  // referrerClientId is set, referredBy (free text) is the "Other
+  // Authorized Referrer" — the referrer type is inferred from which of
+  // these is populated, not stored as a separate redundant enum.
+  referrerClientId: uuid("referrer_client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
   originatingBusiness: text("originating_business"),
   referredBy: text("referred_by").notNull(),
   receivingParty: text("receiving_party").notNull(),
@@ -2951,6 +2963,19 @@ export const referrals = pgTable("referrals", {
     .default("new_referral"),
   status: referralStatusEnum("status").notNull().default("submitted"),
   closedDate: date("closed_date"),
+  // Referrals & Commissions Foundation, audit section C — these 9 legacy
+  // fields (through paymentConfirmation below) predate this phase and are
+  // preserved EXACTLY as-is, including their original behavior: staff
+  // still type a gross revenue and percentage by hand here and the
+  // commission is still auto-computed on save (see actions.ts
+  // computeRevenue) with no earning trigger, no approval step, and no
+  // link to real Invoice/Payment data — this was always a manual
+  // calculator, never a reconciled figure. New referrals should prefer
+  // the structured referralCompensations/referralCompensationPayments
+  // model below (explicit terms, earning trigger, approval, and
+  // multi-payment history) instead of these fields, but nothing here was
+  // renamed, dropped, or silently reinterpreted — existing data (e.g.
+  // RRI referrals) keeps displaying exactly as it always has.
   grossRevenue: numeric("gross_revenue", { precision: 12, scale: 2 }),
   allowedDeductions: numeric("allowed_deductions", { precision: 12, scale: 2 }),
   netServiceRevenue: numeric("net_service_revenue", {
@@ -2982,6 +3007,149 @@ export const referralStatusHistory = pgTable("referral_status_history", {
     .defaultNow(),
   note: text("note"),
 });
+
+// ===================================================================
+// Referrals & Commissions Foundation — the structured compensation
+// model, additive alongside (never replacing) the legacy
+// grossRevenue/commissionPercentage/commissionDue/etc. fields on
+// referrals above. Deliberately separate from referralStatusHistory
+// (referral lifecycle) and from the legacy fields (a flat, no-workflow
+// manual calculator) — see spec section 10: referral status and
+// compensation status are different concepts and must not be collapsed.
+//
+// "Compensation exists only when an explicit human-confirmed
+// compensation arrangement applies" — so no row here is auto-created
+// for a referral; staff explicitly set terms via "Set Compensation
+// Terms" on the referral detail page. A referral with no row here has
+// no structured compensation arrangement (which is the default/normal
+// case — most referrals carry no commission at all).
+export const compensationTypeEnum = pgEnum("compensation_type", [
+  "none",
+  "percentage",
+  "fixed",
+  "custom",
+]);
+
+// Spec section 8 — compensation must not become "Earned" merely because
+// a referral record exists. The configured trigger is always explicit;
+// "manual_confirmation" exists precisely for when no other reliable
+// automatic event exists, rather than the CRM pretending to know money
+// was collected.
+export const compensationEarningTriggerEnum = pgEnum(
+  "compensation_earning_trigger",
+  [
+    "client_signed",
+    "deposit_received",
+    "full_payment_received",
+    "manual_confirmation",
+    "other",
+  ],
+);
+
+// Spec section 9 — partial-payment behavior is explicit per arrangement,
+// never a universal rule the CRM invents.
+export const compensationPartialPaymentRuleEnum = pgEnum(
+  "compensation_partial_payment_rule",
+  ["proportional", "full_payment_only", "manual"],
+);
+
+// Spec section 10 — Earned does not mean Approved; Approved does not
+// mean Paid. "paid" is reached only once recorded, non-reversed
+// payments (referralCompensationPayments below) sum to at least
+// approvedAmount — derived from human-entered payment records, never
+// claimed as bank-reconciled (spec section AB/12).
+export const compensationStatusEnum = pgEnum("compensation_status", [
+  "not_earned",
+  "earned",
+  "approved",
+  "paid",
+]);
+
+export const referralCompensations = pgTable("referral_compensations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  // One compensation arrangement per referral in this phase — a referral
+  // being renegotiated gets its existing row updated (which is itself
+  // audited via audit_log), not a second competing row.
+  referralId: uuid("referral_id")
+    .notNull()
+    .unique()
+    .references(() => referrals.id, { onDelete: "cascade" }),
+  compensationType: compensationTypeEnum("compensation_type")
+    .notNull()
+    .default("none"),
+  percentageRate: numeric("percentage_rate", { precision: 5, scale: 2 }),
+  fixedAmount: numeric("fixed_amount", { precision: 12, scale: 2 }),
+  // Spec section 6 — always human-confirmed, never auto-summed from
+  // Invoices/Payments. baseDescription is the human-readable explanation
+  // of what this dollar figure represents (e.g. "AMS service fee only,
+  // excludes the $85 apostille pass-through cost").
+  eligibleBaseAmount: numeric("eligible_base_amount", {
+    precision: 12,
+    scale: 2,
+  }),
+  baseDescription: text("base_description"),
+  earningTrigger: compensationEarningTriggerEnum("earning_trigger"),
+  earningTriggerNotes: text("earning_trigger_notes"),
+  partialPaymentRule: compensationPartialPaymentRuleEnum(
+    "partial_payment_rule",
+  ),
+  // Optional human-selected reference to the alliance's existing
+  // agreement/addendum — never a duplicate copy, never auto-parsed (spec
+  // section 21).
+  agreementDocumentId: uuid("agreement_document_id").references(
+    () => allianceDocuments.id,
+    { onDelete: "set null" },
+  ),
+  status: compensationStatusEnum("status").notNull().default("not_earned"),
+  earnedAt: timestamp("earned_at", { withTimezone: true }),
+  earnedByEmail: text("earned_by_email"),
+  earnedNotes: text("earned_notes"),
+  // approvedAmount is independent of eligibleBaseAmount/percentageRate/
+  // fixedAmount — a human approves an actual dollar figure, which may
+  // differ from the computed suggestion (spec section 11).
+  approvedAmount: numeric("approved_amount", { precision: 12, scale: 2 }),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+  approvedByEmail: text("approved_by_email"),
+  approvalNotes: text("approval_notes"),
+  notes: text("notes"),
+  createdByEmail: text("created_by_email"),
+});
+
+// Spec sections 9/12/31 — one-to-many so partial payments are each their
+// own record (summed to derive "paid" status above) and so a mistaken
+// entry can be reversed (traceable correction) rather than deleted,
+// preserving financial history per spec section 30/31.
+export const referralCompensationPayments = pgTable(
+  "referral_compensation_payments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    referralCompensationId: uuid("referral_compensation_id")
+      .notNull()
+      .references(() => referralCompensations.id, { onDelete: "cascade" }),
+    amountPaid: numeric("amount_paid", { precision: 12, scale: 2 }).notNull(),
+    paymentDate: date("payment_date").notNull(),
+    paymentMethod: text("payment_method"),
+    paymentReference: text("payment_reference"),
+    notes: text("notes"),
+    recordedByEmail: text("recorded_by_email"),
+    // Spec section 31 — a correction never deletes the row; it marks the
+    // row reversed and keeps why/when/who, so the record that something
+    // was entered (and then corrected) is never lost.
+    reversed: boolean("reversed").notNull().default(false),
+    reversedAt: timestamp("reversed_at", { withTimezone: true }),
+    reversedByEmail: text("reversed_by_email"),
+    reversalReason: text("reversal_reason"),
+  },
+);
 
 // Commercial Finance / RRI Referrals category — a 1:1 extension of a
 // referral row rather than a cases row, since this tracks a business we
@@ -3666,6 +3834,9 @@ export type BusinessFormationDetails =
   typeof businessFormationDetails.$inferSelect;
 export type ReferralStatusHistory = typeof referralStatusHistory.$inferSelect;
 export type RriReferralDetails = typeof rriReferralDetails.$inferSelect;
+export type ReferralCompensation = typeof referralCompensations.$inferSelect;
+export type ReferralCompensationPayment =
+  typeof referralCompensationPayments.$inferSelect;
 export type AcademyEnrollmentDetails =
   typeof academyEnrollmentDetails.$inferSelect;
 export type AcademyDiamondMember = typeof academyDiamondMembers.$inferSelect;

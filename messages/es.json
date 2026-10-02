@@ -1790,6 +1790,45 @@
     "commissionDue": "Comisión Debida",
     "rriDetails": "Detalles de Finanzas Comerciales / RRI",
     "statusHistory": "Historial de Estado",
+    "referrerType": "Referente",
+    "referrerTypeAlliance": "Alianza B2B",
+    "referrerTypeClient": "Cliente Existente",
+    "referrerTypeOther": "Otro Referente Autorizado",
+    "legacyCommissionFields": "Campos de Comisión Heredados",
+    "legacyCommissionFieldsHint": "Cifras ingresadas manualmente antes del modelo estructurado de Compensación de abajo — se conservan tal cual, sin recalcularse ni conciliarse con pagos reales.",
+    "compensation": {
+      "title": "Compensación",
+      "setTerms": "Establecer Términos de Compensación",
+      "editTerms": "Editar Términos",
+      "noCompensation": "No se ha establecido ningún acuerdo de compensación para este referido.",
+      "compensationType": "Tipo de Compensación",
+      "percentageRate": "Tasa de Porcentaje",
+      "fixedAmount": "Monto Fijo",
+      "eligibleBaseAmount": "Monto Base Elegible",
+      "baseDescription": "Qué Representa Esta Base",
+      "earningTrigger": "Evento que Genera la Compensación",
+      "selectTrigger": "Selecciona un evento",
+      "partialPaymentRule": "Regla de Pago Parcial",
+      "selectPartialRule": "Selecciona una regla",
+      "notes": "Notas",
+      "save": "Guardar Términos",
+      "saving": "Guardando...",
+      "confirm": "Confirmar",
+      "markEarned": "Marcar como Generada",
+      "approve": "Aprobar",
+      "approvedAmount": "Monto Aprobado",
+      "recordPayment": "Registrar Pago",
+      "amountPaid": "Monto Pagado",
+      "paymentDate": "Fecha de Pago",
+      "paymentMethod": "Método de Pago",
+      "paymentReference": "Referencia de Pago",
+      "paymentHistory": "Historial de Pagos",
+      "reverse": "Revertir",
+      "reversalReason": "Motivo de Reversión",
+      "reversed": "Revertido",
+      "earnedAt": "Generada el",
+      "totalPaid": "Total Pagado"
+    },
     "form": {
       "client": "Cliente",
       "selectClient": "Selecciona un cliente",
@@ -1799,6 +1838,9 @@
       "category": "Categoría",
       "alliance": "Alianza / Socio",
       "noAlliance": "Sin alianza registrada",
+      "referrerClient": "Referente: Cliente Existente",
+      "noReferrerClient": "Sin referente de cliente existente",
+      "referrerTypeHint": "Elige una Alianza B2B O un cliente existente como referente — no ambos. Deja ambos sin definir y usa \"Referido Por\" abajo para cualquier otro referente autorizado.",
       "originatingBusiness": "Negocio/Parte de Origen del Cliente",
       "referredBy": "Referido Por",
       "receivingParty": "Parte Receptora",
@@ -2040,6 +2082,30 @@
   "ReferralCategory": {
     "general": "Referido General",
     "commercial_finance": "Finanzas Comerciales / RRI"
+  },
+  "CompensationType": {
+    "none": "Sin Compensación",
+    "percentage": "Comisión por Porcentaje",
+    "fixed": "Tarifa Fija de Referido",
+    "custom": "Personalizado / Otro"
+  },
+  "CompensationEarningTrigger": {
+    "client_signed": "Cliente Firma / Acepta el Servicio",
+    "deposit_received": "Depósito Recibido",
+    "full_payment_received": "Pago Completo Recibido",
+    "manual_confirmation": "Confirmación Manual",
+    "other": "Otro"
+  },
+  "CompensationPartialPaymentRule": {
+    "proportional": "Generada Proporcionalmente según lo Cobrado",
+    "full_payment_only": "Solo Después del Pago Elegible Completo",
+    "manual": "Regla Personalizada / Manual"
+  },
+  "CompensationStatus": {
+    "not_earned": "No Generada",
+    "earned": "Generada",
+    "approved": "Aprobada",
+    "paid": "Pagada"
   },
   "RriStatus": {
     "new_referral": "Nuevo Referido",

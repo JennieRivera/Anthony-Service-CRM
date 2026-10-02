@@ -68,6 +68,7 @@ export const referralFormSchema = z.object({
   referralDate: z.string().min(1, "Referral date is required"),
   category: z.enum(referralCategoryValues),
   allianceId: optionalString,
+  referrerClientId: optionalString,
   direction: z.enum(referralDirectionValues).optional().or(z.literal("")),
   originatingBusiness: optionalString,
   referredBy: z.string().trim().min(1, "Referred by is required"),
@@ -96,6 +97,12 @@ export const referralFormSchema = z.object({
   rriDocumentsReceived: optionalString,
   consentToShareInformation: z.boolean().optional(),
   rriStatus: z.enum(rriStatusValues).optional().or(z.literal("")),
-});
+}).refine(
+  (v) => !(v.allianceId && v.referrerClientId),
+  {
+    message: "A referral can have a B2B Alliance referrer or an existing-client referrer, not both",
+    path: ["referrerClientId"],
+  },
+);
 
 export type ReferralFormValues = z.infer<typeof referralFormSchema>;

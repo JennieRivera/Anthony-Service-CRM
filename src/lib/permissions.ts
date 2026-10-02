@@ -109,7 +109,45 @@ export type AccessArea =
   | "student360_finance"
   | "student360_documents"
   | "student360_communications"
-  | "student360_calendar";
+  | "student360_calendar"
+  // Referrals & Commissions Foundation — deliberately separate from
+  // "referrals" (viewing/creating/editing a referral and its legacy
+  // commission fields, unchanged from before this phase) and from
+  // "invoices"/"payments" (customer-facing finance): approving a
+  // compensation amount or recording a payout to a referrer is its own
+  // sensitive financial action, and referral_manager having "referrals"
+  // or bookkeeping_staff having "invoices"/"payments" must never imply
+  // any of the three areas below.
+  //
+  // RBAC correction (post-report section AG) — the original single
+  // "referral_compensation" wildcard-only area has been split into three,
+  // matching the three business-distinct actions the brief's correction
+  // named explicitly, each independently least-privileged:
+  //   - referral_compensation_terms    — describing/editing the
+  //     arrangement (compensation type, rate/amount, base, earning
+  //     trigger, partial-payment rule) and marking it Earned once that
+  //     trigger is actually satisfied. Granted to referral_manager: this
+  //     is the compensation half of running a referral day to day, the
+  //     same way "referrals" already covers the rest of it.
+  //   - referral_compensation_approval — approving an Earned compensation
+  //     and setting the Approved amount. Deliberately granted to NO
+  //     narrow role (same "report the gap, minimum necessary" judgment
+  //     call as before) — only super_admin/admin/manager have it, via
+  //     "*". A referral_manager being able to both configure terms AND
+  //     approve the amount they configured would collapse an intended
+  //     separation of duties; bookkeeping_staff approving its own payout
+  //     authorization would do the same from the other side.
+  //   - referral_compensation_payment  — recording and reversing a
+  //     payment against an already-Approved compensation. Granted to
+  //     bookkeeping_staff: this is the payout half of their existing
+  //     invoices/payments finance work, scoped narrowly so it implies
+  //     nothing about editing terms, marking Earned, or approving.
+  // hasReferralViewAccess() below is what lets a role reach the existing
+  // referral list/detail pages on the strength of any one of these three
+  // (or "referrals") without duplicating that UI into a second page.
+  | "referral_compensation_terms"
+  | "referral_compensation_approval"
+  | "referral_compensation_payment";
 
 // "*" = every area, used only by the two roles with no narrower business
 // meaning. Every other role is an explicit array — "default deny when a
@@ -138,6 +176,10 @@ export const ROLE_PERMISSIONS: Record<Role, AccessArea[] | "*"> = {
     "payments",
     "financial_reports",
     "student360_finance",
+    // RBAC correction — payout half of referral compensation only; see
+    // the AccessArea comment above for why terms/earned/approval are
+    // deliberately excluded.
+    "referral_compensation_payment",
   ],
   notary_staff: ["notary", "online_notary"],
   // "Consulting Staff: business and company strategy"
@@ -154,7 +196,10 @@ export const ROLE_PERMISSIONS: Record<Role, AccessArea[] | "*"> = {
     "student360_communications",
     "student360_calendar",
   ],
-  referral_manager: ["referrals"],
+  // RBAC correction — terms/earning half of referral compensation; see
+  // the AccessArea comment above for why approval/payment are deliberately
+  // excluded.
+  referral_manager: ["referrals", "referral_compensation_terms"],
   // "Community Manager: associations and chambers"
   community_manager: ["alliances", "associations"],
   // "Immigration Staff: immigration administrative cases only" — cases,
@@ -193,6 +238,23 @@ export function canAccessArea(role: Role, area: AccessArea): boolean {
 // Alias kept for readability at call sites that are checking (not
 // enforcing) — identical behavior to canAccessArea.
 export const hasAccessArea = canAccessArea;
+
+// RBAC correction — a role may reach the existing referral list/detail
+// pages on the strength of ANY ONE of the four referral-related areas,
+// even though only "referrals" itself authorizes creating/editing the
+// referral record (createReferralAction/updateReferralAction still check
+// "referrals" alone). This is what lets Bookkeeping Staff, who holds only
+// referral_compensation_payment, view a referral to find and pay an
+// Approved compensation without a second, duplicate referrals page or
+// view — "do not duplicate the referral UI" from the correction brief.
+export function hasReferralViewAccess(role: Role): boolean {
+  return (
+    canAccessArea(role, "referrals") ||
+    canAccessArea(role, "referral_compensation_terms") ||
+    canAccessArea(role, "referral_compensation_approval") ||
+    canAccessArea(role, "referral_compensation_payment")
+  );
+}
 
 // Phase 2H — the owner branch (report section H, "Owner Safety").
 // Deliberately NOT a database lookup: the owner's access can never

@@ -13,9 +13,31 @@ import {
   referralFormSchema,
   type ReferralFormValues,
 } from "@/lib/validation/referral";
+import {
+  compensationTermsFormSchema,
+  markCompensationEarnedFormSchema,
+  approveCompensationFormSchema,
+  recordCompensationPaymentFormSchema,
+  reverseCompensationPaymentFormSchema,
+  type CompensationTermsFormValues,
+  type MarkCompensationEarnedFormValues,
+  type ApproveCompensationFormValues,
+  type RecordCompensationPaymentFormValues,
+  type ReverseCompensationPaymentFormValues,
+} from "@/lib/validation/referralCompensation";
+import {
+  upsertCompensationTerms,
+  markCompensationEarned,
+  approveCompensation,
+  recordCompensationPayment,
+  reverseCompensationPayment,
+  getCompensationForReferral,
+} from "@/lib/queries/referralCompensations";
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
+import { requireAccessArea } from "@/lib/permissions";
+import { logAuditEvent } from "@/lib/audit";
 
 function computeRevenue(values: ReferralFormValues) {
   const gross = Number(values.grossRevenue) || 0;
@@ -100,6 +122,7 @@ function normalize(values: ReferralFormValues, effectiveStatus: string) {
     referralDate: values.referralDate,
     category: values.category,
     allianceId: values.allianceId || null,
+    referrerClientId: values.referrerClientId || null,
     direction: values.direction || null,
     originatingBusiness: values.originatingBusiness || null,
     referredBy: values.referredBy,
@@ -126,6 +149,12 @@ function normalize(values: ReferralFormValues, effectiveStatus: string) {
 }
 
 export async function createReferralAction(rawValues: ReferralFormValues) {
+  // Referrals & Commissions Foundation, section 22 — this (and every
+  // other referral/compensation action in this file) previously had NO
+  // server-side check at all, same gap already closed for Alliances in
+  // the B2B Network Foundation phase. "referrals" is the pre-existing
+  // Phase 2H area (today only referral_manager + the admin-tier roles).
+  await requireAccessArea("referrals");
   const values = referralFormSchema.parse(rawValues);
   const db = getDb();
   const effectiveStatus = deriveEffectiveStatus(values);
@@ -137,6 +166,12 @@ export async function createReferralAction(rawValues: ReferralFormValues) {
 
   await upsertRriDetails(created.id, values);
   await recordStatusChange(created.id, null, effectiveStatus);
+  await logAuditEvent({
+    action: "referral.created",
+    entityType: "referral",
+    entityId: created.id,
+    summary: `Created referral REF-${String(created.id).slice(0, 8)} (referred by "${values.referredBy}")`,
+  });
 
   revalidatePath("/referrals");
   revalidatePath(`/clients/${values.clientId}`);
@@ -148,6 +183,7 @@ export async function updateReferralAction(
   id: string,
   rawValues: ReferralFormValues,
 ) {
+  await requireAccessArea("referrals");
   const values = referralFormSchema.parse(rawValues);
   const db = getDb();
   const effectiveStatus = deriveEffectiveStatus(values);
@@ -164,6 +200,12 @@ export async function updateReferralAction(
     .where(eq(referrals.id, id));
 
   await upsertRriDetails(id, values);
+  await logAuditEvent({
+    action: "referral.updated",
+    entityType: "referral",
+    entityId: id,
+    summary: `Updated referral (referred by "${values.referredBy}")`,
+  });
 
   if (existing && existing.status !== effectiveStatus) {
     await recordStatusChange(id, existing.status, effectiveStatus);
@@ -174,4 +216,164 @@ export async function updateReferralAction(
   revalidatePath(`/clients/${values.clientId}`);
   const locale = await getLocale();
   redirect({ href: `/referrals/${id}`, locale });
+}
+
+// ===================================================================
+// Referrals & Commissions Foundation — structured compensation actions.
+// RBAC correction — terms/earned use "referral_compensation_terms",
+// approval uses "referral_compensation_approval" (granted to no narrow
+// role), and payment/reversal use "referral_compensation_payment" — see
+// the AccessArea comment block in permissions.ts for the full rationale.
+
+export async function setCompensationTermsAction(
+  referralId: string,
+  rawValues: CompensationTermsFormValues,
+) {
+  await requireAccessArea("referral_compensation_terms");
+  const values = compensationTermsFormSchema.parse(rawValues);
+  const session = await auth();
+
+  const { row, created } = await upsertCompensationTerms(
+    referralId,
+    values,
+    session?.user?.email ?? null,
+  );
+
+  await logAuditEvent({
+    action: created ? "referral.compensation_terms_set" : "referral.compensation_terms_updated",
+    entityType: "referral",
+    entityId: referralId,
+    summary: `${created ? "Set" : "Updated"} compensation terms (${values.compensationType})`,
+  });
+
+  revalidatePath(`/referrals/${referralId}`);
+  return row;
+}
+
+export async function markCompensationEarnedAction(
+  referralId: string,
+  compensationId: string,
+  rawValues: MarkCompensationEarnedFormValues,
+) {
+  await requireAccessArea("referral_compensation_terms");
+  const values = markCompensationEarnedFormSchema.parse(rawValues);
+  const session = await auth();
+
+  const existing = await getCompensationForReferral(referralId);
+  if (!existing || existing.compensation.id !== compensationId) {
+    throw new Error("Compensation record not found");
+  }
+  if (existing.compensation.status !== "not_earned") {
+    throw new Error("This compensation has already been marked earned.");
+  }
+
+  await markCompensationEarned(compensationId, values.earnedNotes || null, session?.user?.email ?? null);
+
+  await logAuditEvent({
+    action: "referral.compensation_earned",
+    entityType: "referral",
+    entityId: referralId,
+    summary: "Marked referral compensation as Earned",
+  });
+
+  revalidatePath(`/referrals/${referralId}`);
+}
+
+export async function approveCompensationAction(
+  referralId: string,
+  compensationId: string,
+  rawValues: ApproveCompensationFormValues,
+) {
+  await requireAccessArea("referral_compensation_approval");
+  const values = approveCompensationFormSchema.parse(rawValues);
+  const session = await auth();
+
+  const existing = await getCompensationForReferral(referralId);
+  if (!existing || existing.compensation.id !== compensationId) {
+    throw new Error("Compensation record not found");
+  }
+  if (existing.compensation.status !== "earned") {
+    throw new Error("Compensation must be Earned before it can be approved.");
+  }
+
+  await approveCompensation(
+    compensationId,
+    values.approvedAmount,
+    values.approvalNotes || null,
+    session?.user?.email ?? null,
+  );
+
+  await logAuditEvent({
+    action: "referral.compensation_approved",
+    entityType: "referral",
+    entityId: referralId,
+    summary: `Approved referral compensation: $${values.approvedAmount}`,
+  });
+
+  revalidatePath(`/referrals/${referralId}`);
+}
+
+export async function recordCompensationPaymentAction(
+  referralId: string,
+  compensationId: string,
+  rawValues: RecordCompensationPaymentFormValues,
+) {
+  await requireAccessArea("referral_compensation_payment");
+  const values = recordCompensationPaymentFormSchema.parse(rawValues);
+  const session = await auth();
+
+  const existing = await getCompensationForReferral(referralId);
+  if (!existing || existing.compensation.id !== compensationId) {
+    throw new Error("Compensation record not found");
+  }
+  if (existing.compensation.status !== "approved" && existing.compensation.status !== "paid") {
+    throw new Error("Compensation must be Approved before a payment can be recorded.");
+  }
+
+  await recordCompensationPayment(
+    compensationId,
+    {
+      amountPaid: values.amountPaid,
+      paymentDate: values.paymentDate,
+      paymentMethod: values.paymentMethod || null,
+      paymentReference: values.paymentReference || null,
+      notes: values.notes || null,
+    },
+    session?.user?.email ?? null,
+  );
+
+  await logAuditEvent({
+    action: "referral.compensation_payment_recorded",
+    entityType: "referral",
+    entityId: referralId,
+    summary: `Recorded referral compensation payment: $${values.amountPaid}`,
+  });
+
+  revalidatePath(`/referrals/${referralId}`);
+}
+
+export async function reverseCompensationPaymentAction(
+  referralId: string,
+  paymentId: string,
+  rawValues: ReverseCompensationPaymentFormValues,
+) {
+  await requireAccessArea("referral_compensation_payment");
+  const values = reverseCompensationPaymentFormSchema.parse(rawValues);
+  const session = await auth();
+
+  const reversed = await reverseCompensationPayment(
+    paymentId,
+    values.reversalReason,
+    session?.user?.email ?? null,
+  );
+  if (!reversed) throw new Error("Payment record not found");
+
+  await logAuditEvent({
+    action: "referral.compensation_payment_reversed",
+    entityType: "referral",
+    entityId: referralId,
+    summary: `Reversed a referral compensation payment of $${reversed.amountPaid}: ${values.reversalReason}`,
+  });
+
+  revalidatePath(`/referrals/${referralId}`);
 }

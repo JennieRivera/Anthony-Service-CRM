@@ -1790,6 +1790,45 @@
     "commissionDue": "Commission Due",
     "rriDetails": "Commercial Finance / RRI Details",
     "statusHistory": "Status History",
+    "referrerType": "Referrer",
+    "referrerTypeAlliance": "B2B Alliance",
+    "referrerTypeClient": "Existing Client",
+    "referrerTypeOther": "Other Authorized Referrer",
+    "legacyCommissionFields": "Legacy Commission Fields",
+    "legacyCommissionFieldsHint": "Manually entered figures from before the structured Compensation model below — preserved as-is, not recalculated or reconciled against real payments.",
+    "compensation": {
+      "title": "Compensation",
+      "setTerms": "Set Compensation Terms",
+      "editTerms": "Edit Terms",
+      "noCompensation": "No compensation arrangement has been set for this referral.",
+      "compensationType": "Compensation Type",
+      "percentageRate": "Percentage Rate",
+      "fixedAmount": "Fixed Amount",
+      "eligibleBaseAmount": "Eligible Base Amount",
+      "baseDescription": "What This Base Represents",
+      "earningTrigger": "Earning Trigger",
+      "selectTrigger": "Select a trigger",
+      "partialPaymentRule": "Partial Payment Rule",
+      "selectPartialRule": "Select a rule",
+      "notes": "Notes",
+      "save": "Save Terms",
+      "saving": "Saving...",
+      "confirm": "Confirm",
+      "markEarned": "Mark as Earned",
+      "approve": "Approve",
+      "approvedAmount": "Approved Amount",
+      "recordPayment": "Record Payment",
+      "amountPaid": "Amount Paid",
+      "paymentDate": "Payment Date",
+      "paymentMethod": "Payment Method",
+      "paymentReference": "Payment Reference",
+      "paymentHistory": "Payment History",
+      "reverse": "Reverse",
+      "reversalReason": "Reversal Reason",
+      "reversed": "Reversed",
+      "earnedAt": "Earned On",
+      "totalPaid": "Total Paid"
+    },
     "form": {
       "client": "Client",
       "selectClient": "Select a client",
@@ -1799,6 +1838,9 @@
       "category": "Category",
       "alliance": "Alliance / Partner",
       "noAlliance": "No alliance on file",
+      "referrerClient": "Existing Client Referrer",
+      "noReferrerClient": "No existing-client referrer",
+      "referrerTypeHint": "Choose a B2B Alliance OR an existing client as the referrer — not both. Leave both unset and use \"Referred By\" below for any other authorized referrer.",
       "originatingBusiness": "Client's Originating Business/Party",
       "referredBy": "Referred By",
       "receivingParty": "Receiving Party",
@@ -2040,6 +2082,30 @@
   "ReferralCategory": {
     "general": "General Referral",
     "commercial_finance": "Commercial Finance / RRI"
+  },
+  "CompensationType": {
+    "none": "No Compensation",
+    "percentage": "Percentage Commission",
+    "fixed": "Fixed Referral Fee",
+    "custom": "Custom / Other"
+  },
+  "CompensationEarningTrigger": {
+    "client_signed": "Client Signs / Accepts Service",
+    "deposit_received": "Deposit Received",
+    "full_payment_received": "Full Payment Received",
+    "manual_confirmation": "Manual Confirmation",
+    "other": "Other"
+  },
+  "CompensationPartialPaymentRule": {
+    "proportional": "Earned Proportionally as Collected",
+    "full_payment_only": "Only After Full Eligible Payment",
+    "manual": "Custom / Manual Rule"
+  },
+  "CompensationStatus": {
+    "not_earned": "Not Earned",
+    "earned": "Earned",
+    "approved": "Approved",
+    "paid": "Paid"
   },
   "RriStatus": {
     "new_referral": "New Referral",
