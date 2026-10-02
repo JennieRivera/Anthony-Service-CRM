@@ -55,7 +55,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: accentInitScript }} />
       </head>
       <body className="min-h-full flex flex-col">
-        <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem storageKey="ams-theme-mode">
+        <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem storageKey="ams-theme-mode">
           <AccentProvider>
             <NextIntlClientProvider messages={messages}>
               {children}

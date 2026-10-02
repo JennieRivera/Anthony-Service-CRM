@@ -21,7 +21,7 @@ import {
 const chartConfig: ChartConfig = {
   revenue: {
     label: "Revenue",
-    color: "var(--accent)",
+    color: "var(--info)",
   },
 };
 
@@ -62,8 +62,8 @@ export function RevenueChart({
           <AreaChart data={series[range]}>
             <defs>
               <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
+                <stop offset="5%" stopColor="var(--info)" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="var(--info)" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
@@ -84,7 +84,7 @@ export function RevenueChart({
               dataKey="revenue"
               type="monotone"
               fill="url(#revenueFill)"
-              stroke="var(--accent)"
+              stroke="var(--info)"
               strokeWidth={2}
             />
           </AreaChart>

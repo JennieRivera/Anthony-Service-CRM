@@ -323,6 +323,13 @@
       "when": 1790907596203,
       "tag": "0045_first_star_brand",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1790910538254,
+      "tag": "0046_cold_doctor_octopus",
+      "breakpoints": true
     }
   ]
 }

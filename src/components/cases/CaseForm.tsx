@@ -105,6 +105,8 @@ export function CaseForm({
   clients,
   companies,
   serviceCatalogItems = [],
+  academyPrograms = [],
+  academyCourses = [],
   defaultClientId,
   defaultServiceType,
   onSubmit,
@@ -126,6 +128,10 @@ export function CaseForm({
   clients: { id: string; fullName: string }[];
   companies: { id: string; legalBusinessName: string }[];
   serviceCatalogItems?: ServiceCatalogItem[];
+  // Phase 2C — Academy catalog pickers. Optional/defaulted to [] so every
+  // other CaseForm caller (every non-Academy service type) is unaffected.
+  academyPrograms?: { id: string; name: string }[];
+  academyCourses?: { id: string; name: string; programId: string | null }[];
   defaultClientId?: string;
   defaultServiceType?: (typeof serviceTypeValues)[number];
   onSubmit: (values: CaseFormValues) => Promise<void>;
@@ -310,6 +316,8 @@ export function CaseForm({
       formationCaseStatus: formationDetails?.status ?? "new_inquiry",
       program: academyDetails?.program ?? "",
       course: academyDetails?.course ?? "",
+      programId: academyDetails?.programId ?? "",
+      courseId: academyDetails?.courseId ?? "",
       courseFormat: academyDetails?.courseFormat ?? "",
       enrollmentDate: academyDetails?.enrollmentDate ?? "",
       modulesCompleted: academyDetails?.modulesCompleted?.toString() ?? "",
@@ -2028,6 +2036,94 @@ export function CaseForm({
           <h3 className="font-heading text-base text-foreground">
             {tCases("academyEnrollmentDetails")}
           </h3>
+
+          {(academyPrograms.length > 0 || academyCourses.length > 0) && (
+            <div className="flex flex-col gap-3 rounded-md border border-border bg-muted/20 p-3">
+              <p className="text-xs text-muted-foreground">{t("academyCatalogHint")}</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex flex-col gap-1.5">
+                  <Label>{t("academyProgramCatalog")}</Label>
+                  <Controller
+                    control={control}
+                    name="programId"
+                    render={({ field }) => (
+                      <Select
+                        value={field.value || "none"}
+                        onValueChange={(v) => {
+                          const next = v === "none" ? "" : v;
+                          field.onChange(next);
+                          // Switching program invalidates a course picked
+                          // from the previous program's list.
+                          setValue("courseId", "");
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">{t("noCatalogProgram")}</SelectItem>
+                          {academyPrograms.map((p) => (
+                            <SelectItem key={p.id} value={p.id}>
+                              {p.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label>{t("academyCourseCatalog")}</Label>
+                  <Controller
+                    control={control}
+                    name="courseId"
+                    render={({ field }) => {
+                      const selectedProgramId = watch("programId");
+                      const options = selectedProgramId
+                        ? academyCourses.filter((c) => c.programId === selectedProgramId)
+                        : academyCourses;
+                      return (
+                        <Select
+                          value={field.value || "none"}
+                          onValueChange={(v) => {
+                            if (v === "none") {
+                              field.onChange("");
+                              return;
+                            }
+                            field.onChange(v);
+                            const selected = academyCourses.find((c) => c.id === v);
+                            if (selected) {
+                              setValue("course", selected.name);
+                              if (selected.programId) {
+                                setValue("programId", selected.programId);
+                                const program = academyPrograms.find(
+                                  (p) => p.id === selected.programId,
+                                );
+                                if (program) setValue("program", program.name);
+                              }
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">{t("noCatalogCourse")}</SelectItem>
+                            {options.map((c) => (
+                              <SelectItem key={c.id} value={c.id}>
+                                {c.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="program">{t("program")}</Label>

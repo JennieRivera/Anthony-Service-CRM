@@ -180,8 +180,11 @@ export const highlevelSyncStatusValues = [
   "synced",
   "error",
 ] as const;
-// Added when Academy became its own sidebar module (section 1)
-export const courseFormatValues = ["live", "in_person", "recorded"] as const;
+// Added when Academy became its own sidebar module (section 1).
+// Phase 2C — "hybrid" appended for academy_courses.format; shared as-is by
+// this enrollment-level field too (see the matching comment on
+// courseFormatEnum in schema.ts).
+export const courseFormatValues = ["live", "in_person", "recorded", "hybrid"] as const;
 
 // Phase 2, Session 6
 export const projectTypeValues = [
@@ -459,6 +462,11 @@ export const caseFormSchema = z.object({
   // Academy enrollment details (relevant when serviceType is Academy)
   program: optionalString,
   course: optionalString,
+  // Phase 2C — additive structured catalog links. Nullable/optional on
+  // purpose: historical enrollments have neither and keep displaying the
+  // free-text program/course above unchanged.
+  programId: optionalString,
+  courseId: optionalString,
   courseFormat: z.enum(courseFormatValues).optional().or(z.literal("")),
   enrollmentDate: optionalString,
   modulesCompleted: optionalString,

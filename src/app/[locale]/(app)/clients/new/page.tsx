@@ -45,11 +45,6 @@ export default async function NewClientPage({
         companies={companies}
         onSubmit={isAcademyIntent ? createClientAndContinueToEnrollmentAction : createClientAction}
         onCreateWithDocument={blobConfigured ? createClientForUploadAction : undefined}
-        postCreateRedirect={
-          isAcademyIntent
-            ? (id) => `/cases/new?serviceType=academy&clientId=${id}`
-            : undefined
-        }
         academyContext={isAcademyIntent}
       />
     </div>

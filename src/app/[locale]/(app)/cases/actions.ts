@@ -670,6 +670,11 @@ async function upsertServiceDetails(
     const detail = {
       program: values.program || null,
       course: values.course || null,
+      // Phase 2C — additive structured catalog links, nullable. Free-text
+      // program/course above are never overwritten by this insert when
+      // these are unset (historical/custom enrollments keep their text).
+      programId: values.programId || null,
+      courseId: values.courseId || null,
       courseFormat: values.courseFormat || null,
       enrollmentDate: values.enrollmentDate || null,
       modulesCompleted: values.modulesCompleted

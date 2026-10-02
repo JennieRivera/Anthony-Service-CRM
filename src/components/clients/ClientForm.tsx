@@ -42,7 +42,6 @@ export function ClientForm({
   companies,
   onSubmit,
   onCreateWithDocument,
-  postCreateRedirect,
   academyContext = false,
 }: {
   client?: Client;
@@ -53,13 +52,12 @@ export function ClientForm({
   // its id (no redirect) — the form then uploads the staged file itself
   // and navigates when both steps succeed.
   onCreateWithDocument?: (values: ClientFormValues) => Promise<string>;
-  // Phase 2A — Academy New Student flow. Only meaningful alongside
-  // onCreateWithDocument (the non-upload path's redirect is baked into
-  // its own server action, e.g. createClientAndContinueToEnrollmentAction).
-  // Overrides the default `/clients/{id}` destination after a successful
-  // create-with-document.
-  postCreateRedirect?: (id: string) => string;
-  // Phase 2A — shows a short banner explaining that saving continues
+  // Phase 2A — Academy New Student flow. Server Components can't pass a
+  // plain function prop across to a Client Component (RSC boundary —
+  // this used to be a postCreateRedirect(id) callback prop here, which
+  // threw at runtime the first time this path actually ran end-to-end),
+  // so the redirect target is computed inline below from this boolean
+  // instead. Also shows a short banner explaining that saving continues
   // straight into Academy enrollment rather than the plain client profile.
   academyContext?: boolean;
 }) {
@@ -161,7 +159,9 @@ export function ClientForm({
             return;
           }
         }
-        router.push(postCreateRedirect ? postCreateRedirect(id) : `/clients/${id}`);
+        router.push(
+          academyContext ? `/cases/new?serviceType=academy&clientId=${id}` : `/clients/${id}`,
+        );
       } else {
         await onSubmit(values);
       }

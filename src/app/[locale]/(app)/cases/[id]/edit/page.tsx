@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { getCaseById, listClientsForSelect } from "@/lib/queries/cases";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { listActiveServiceCatalogItems } from "@/lib/queries/serviceCatalog";
+import { listSelectableAcademyPrograms } from "@/lib/queries/academyPrograms";
+import { listSelectableAcademyCourses } from "@/lib/queries/academyCourses";
 import { Link } from "@/i18n/navigation";
 import { CaseForm } from "@/components/cases/CaseForm";
 import { updateCaseAction } from "../../actions";
@@ -16,12 +18,15 @@ export default async function EditCasePage({
   const { id } = await params;
   const t = await getTranslations("Cases");
 
-  const [result, clients, companies, serviceCatalogItems] = await Promise.all([
-    getCaseById(id),
-    listClientsForSelect(),
-    listCompaniesForSelect(),
-    listActiveServiceCatalogItems(),
-  ]);
+  const [result, clients, companies, serviceCatalogItems, academyPrograms, academyCourses] =
+    await Promise.all([
+      getCaseById(id),
+      listClientsForSelect(),
+      listCompaniesForSelect(),
+      listActiveServiceCatalogItems(),
+      listSelectableAcademyPrograms(),
+      listSelectableAcademyCourses(),
+    ]);
 
   if (!result) notFound();
 
@@ -62,6 +67,8 @@ export default async function EditCasePage({
         clients={clients}
         companies={companies}
         serviceCatalogItems={serviceCatalogItems}
+        academyPrograms={academyPrograms}
+        academyCourses={academyCourses}
         onSubmit={submit}
       />
     </div>

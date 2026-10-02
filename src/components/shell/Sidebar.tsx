@@ -63,10 +63,12 @@ export function Sidebar() {
                   )}
                   title={collapsed ? t(item.labelKey) : undefined}
                 >
-                  {/* Phase 1.5D — icons no longer tint gold (--sidebar-primary);
-                      they inherit the row's own currentColor, matching its
-                      text, so gold is restrained to the logo mark only. */}
-                  <Icon className="h-4.5 w-4.5 shrink-0" />
+                  {/* Final visual correction — nav icons now carry the
+                      Champagne Gold brand accent (--sidebar-primary) in
+                      both active and inactive states; only the row's text
+                      color still tracks active/hover, per instruction that
+                      gold applies to icons, not the full label. */}
+                  <Icon className="h-4.5 w-4.5 shrink-0 text-[var(--sidebar-primary)]" />
                   {!collapsed && <span>{t(item.labelKey)}</span>}
                 </Link>
               );

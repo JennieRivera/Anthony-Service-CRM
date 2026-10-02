@@ -4,6 +4,8 @@ import { CaseForm } from "@/components/cases/CaseForm";
 import { listClientsForSelect } from "@/lib/queries/cases";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { listActiveServiceCatalogItems } from "@/lib/queries/serviceCatalog";
+import { listSelectableAcademyPrograms } from "@/lib/queries/academyPrograms";
+import { listSelectableAcademyCourses } from "@/lib/queries/academyCourses";
 import { serviceTypeValues } from "@/lib/validation/client";
 import { createCaseAction } from "../actions";
 
@@ -21,11 +23,14 @@ export default async function NewCasePage({
   )
     ? (serviceType as (typeof serviceTypeValues)[number])
     : undefined;
-  const [clients, companies, serviceCatalogItems] = await Promise.all([
-    listClientsForSelect(),
-    listCompaniesForSelect(),
-    listActiveServiceCatalogItems(),
-  ]);
+  const [clients, companies, serviceCatalogItems, academyPrograms, academyCourses] =
+    await Promise.all([
+      listClientsForSelect(),
+      listCompaniesForSelect(),
+      listActiveServiceCatalogItems(),
+      isAcademy ? listSelectableAcademyPrograms() : Promise.resolve([]),
+      isAcademy ? listSelectableAcademyCourses() : Promise.resolve([]),
+    ]);
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -45,6 +50,8 @@ export default async function NewCasePage({
         clients={clients}
         companies={companies}
         serviceCatalogItems={serviceCatalogItems}
+        academyPrograms={academyPrograms}
+        academyCourses={academyCourses}
         defaultClientId={clientId}
         defaultServiceType={validServiceType}
         onSubmit={createCaseAction}

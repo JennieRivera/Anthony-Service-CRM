@@ -1737,18 +1737,128 @@ export const highlevelSyncStatusEnum = pgEnum("highlevel_sync_status", [
 // stays free text (no separate course catalog exists or is needed yet),
 // but the delivery format is now a structured field so the Academy list
 // can show/filter it.
+// Phase 2C — "hybrid" appended (Postgres enums only support adding
+// values, never renaming/removing — see AGENTS.md); the three original
+// values are untouched for existing rows. Shared as-is by the new
+// academy_courses.format column below, since it's the same underlying
+// concept (how a course/enrollment is delivered), not a second enum.
 export const courseFormatEnum = pgEnum("course_format", [
   "live",
   "in_person",
   "recorded",
+  "hybrid",
 ]);
+
+// Phase 2C — Academy Course & Program Catalog. Additive, backward-compatible
+// structured catalog sitting alongside academy_enrollment_details' existing
+// free-text program/course columns (which are kept, untouched, forever —
+// historical enrollments display them as-is). A program groups courses; a
+// course may stand alone (programId nullable) or belong to a program;
+// modules belong to exactly one course. None of these three tables are ever
+// hard-deleted through the UI — status (draft/active/archived) is how staff
+// retire a catalog entry while preserving history and any enrollments that
+// still reference it.
+export const academyCatalogStatusEnum = pgEnum("academy_catalog_status", [
+  "draft",
+  "active",
+  "archived",
+]);
+
+export const academyPrograms = pgTable("academy_programs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  name: text("name").notNull(),
+  description: text("description"),
+  status: academyCatalogStatusEnum("status").notNull().default("draft"),
+  startDate: date("start_date"),
+  endDate: date("end_date"),
+  durationText: text("duration_text"),
+  certificateEligible: boolean("certificate_eligible").notNull().default(false),
+  notes: text("notes"),
+});
+
+export const academyCourses = pgTable("academy_courses", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  // Nullable — a course may stand alone without belonging to any program
+  // (explicitly allowed per the Phase 2C spec).
+  programId: uuid("program_id").references(() => academyPrograms.id, {
+    onDelete: "set null",
+  }),
+  name: text("name").notNull(),
+  description: text("description"),
+  format: courseFormatEnum("format").notNull().default("live"),
+  status: academyCatalogStatusEnum("status").notNull().default("draft"),
+  durationText: text("duration_text"),
+  // Catalog/informational only in Phase 2C — never read by invoice or
+  // payment logic. See AGENTS.md: invoice totals are always recomputed
+  // server-side from line items, never from a field like this one.
+  price: numeric("price", { precision: 10, scale: 2 }),
+  certificateEligible: boolean("certificate_eligible").notNull().default(false),
+  // One optional primary instructor per course in this phase — see the
+  // comment on academy_instructors; this is a link to that identity-aware
+  // table, never a duplicated name/contact field.
+  primaryInstructorId: uuid("primary_instructor_id").references(
+    () => academyInstructors.id,
+    { onDelete: "set null" },
+  ),
+  notes: text("notes"),
+});
+
+export const academyCourseModules = pgTable("academy_course_modules", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  // Modules have no meaning independent of their course, so cascade here
+  // (unlike the "set null" used for optional cross-entity links above) —
+  // same reasoning as invoice_line_items -> invoices. Courses are never
+  // hard-deleted through the UI, so this only matters for direct DB
+  // administration, never a normal staff action.
+  courseId: uuid("course_id")
+    .notNull()
+    .references(() => academyCourses.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  moduleOrder: integer("module_order").notNull().default(0),
+  durationText: text("duration_text"),
+  status: academyCatalogStatusEnum("status").notNull().default("draft"),
+});
 
 export const academyEnrollmentDetails = pgTable("academy_enrollment_details", {
   caseId: uuid("case_id")
     .primaryKey()
     .references(() => cases.id, { onDelete: "cascade" }),
+  // Free-text originals — kept forever, never deleted or blanked by the
+  // catalog below. Historical enrollments with no programId/courseId
+  // continue to display these exactly as before.
   program: text("program"),
   course: text("course"),
+  // Phase 2C — additive structured links, nullable. When staff pick a
+  // catalog Program/Course on a new or edited enrollment, the form also
+  // mirrors the chosen names into the free-text program/course columns
+  // above (see CaseForm.tsx), so every existing read path (the Academy
+  // list, the case detail page) keeps working unchanged for both old and
+  // new enrollments without needing its own catalog join.
+  programId: uuid("program_id").references(() => academyPrograms.id, {
+    onDelete: "set null",
+  }),
+  courseId: uuid("course_id").references(() => academyCourses.id, {
+    onDelete: "set null",
+  }),
   courseFormat: courseFormatEnum("course_format"),
   enrollmentDate: date("enrollment_date"),
   modulesCompleted: integer("modules_completed"),
@@ -3095,6 +3205,9 @@ export type AcademyEnrollmentDetails =
 export type AcademyDiamondMember = typeof academyDiamondMembers.$inferSelect;
 export type AcademyInstructor = typeof academyInstructors.$inferSelect;
 export type AcademyMentor = typeof academyMentors.$inferSelect;
+export type AcademyProgram = typeof academyPrograms.$inferSelect;
+export type AcademyCourse = typeof academyCourses.$inferSelect;
+export type AcademyCourseModule = typeof academyCourseModules.$inferSelect;
 export type SocialMediaContent = typeof socialMediaContent.$inferSelect;
 export type StrategicAlliance = typeof strategicAlliances.$inferSelect;
 export type AllianceStatusHistory =

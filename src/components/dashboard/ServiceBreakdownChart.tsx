@@ -15,15 +15,18 @@ import {
 // Local to this chart only — deliberately not the shared --chart-1..5
 // tokens, which src/components/reports/SeasonalityChart.tsx also reads
 // directly; changing those would have silently recolored that chart too.
+// Final visual correction — replaced the pre-Phase-1.5D navy/gold palette
+// with the approved brand family (Soft Blue, Sky Blue, Sage, Champagne
+// Gold), largest-to-smallest slice bias toward the most "primary" tones.
 const COLORS = [
-  "#3B6E91", // blue
-  "#B8964A", // gold (brand gold, same as --sidebar-primary)
-  "#4C7A5D", // green
-  "#0F1A2B", // dark navy (brand navy, same as --primary)
-  "#7CBCB2", // light aqua blue
-  "#8C6D46",
-  "#4A5A3A",
-  "#6E4A6E",
+  "#477297", // Professional Soft Blue (deepened, matches --primary)
+  "#C8A96B", // Champagne Gold (literal brand gold)
+  "#5B7664", // Sage Green (deepened, matches --success)
+  "#78B7D0", // Elegant Sky Blue (literal)
+  "#847047", // Champagne Gold (deepened, matches --premium)
+  "#3E7A74", // supporting teal
+  "#4F7FA8", // Professional Soft Blue (literal)
+  "#8FB89C", // supporting soft green
 ];
 
 export function ServiceBreakdownChart({

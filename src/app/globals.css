@@ -343,3 +343,28 @@
     animation: none;
   }
 }
+
+/* Final visual correction — the Academy "Students" diamond badge sits on
+   the light (Pearl Cream/white) main workspace, not the dark sidebar, so
+   it needs its own icy-blue-tinted glow for definition: a pure white
+   drop-shadow (sidebar-icon-sparkle above) would be invisible against a
+   light background. */
+@keyframes diamond-badge-glow {
+  0%,
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0 rgba(120, 183, 208, 0));
+  }
+  50% {
+    filter: brightness(1.15) drop-shadow(0 0 3px rgba(120, 183, 208, 0.85));
+  }
+}
+
+.diamond-badge-glow {
+  animation: diamond-badge-glow 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diamond-badge-glow {
+    animation: none;
+  }
+}
