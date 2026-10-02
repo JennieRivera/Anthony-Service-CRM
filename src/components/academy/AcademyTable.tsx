@@ -39,7 +39,7 @@ export async function AcademyTable({
             <TableRow key={s.caseId}>
               <TableCell>
                 <Link
-                  href={`/cases/${s.caseId}`}
+                  href={`/academy/students/${s.clientId}`}
                   className="font-medium text-foreground hover:underline"
                 >
                   {s.studentName}
