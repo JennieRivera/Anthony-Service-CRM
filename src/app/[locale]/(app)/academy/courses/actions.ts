@@ -35,6 +35,28 @@ import {
   academyAttendanceRecordFormSchema,
   type AcademyAttendanceRecordFormValues,
 } from "@/lib/validation/academyAttendanceRecord";
+import {
+  createEvaluation,
+  updateEvaluation,
+  updateEvaluationStatus,
+} from "@/lib/queries/academyEvaluations";
+import {
+  academyEvaluationFormSchema,
+  type AcademyEvaluationFormValues,
+} from "@/lib/validation/academyEvaluation";
+import {
+  listResultsForEvaluation,
+  upsertEvaluationResult,
+} from "@/lib/queries/academyEvaluationResults";
+import {
+  academyEvaluationResultFormSchema,
+  type AcademyEvaluationResultFormValues,
+} from "@/lib/validation/academyEvaluationResult";
+import { updateAcademyCourseRequirements } from "@/lib/queries/academyCourses";
+import {
+  academyCourseRequirementsFormSchema,
+  type AcademyCourseRequirementsFormValues,
+} from "@/lib/validation/academyCourseRequirements";
 
 export async function createAcademyCourseAction(rawValues: AcademyCourseFormValues) {
   const values = academyCourseFormSchema.parse(rawValues);
@@ -133,4 +155,65 @@ export async function markAttendanceAction(
   await upsertAttendanceRecord(sessionId, enrollmentCaseId, values);
   revalidatePath(`/academy/courses/${courseId}`);
   revalidatePath(`/cases/${enrollmentCaseId}`);
+}
+
+// Phase 2E — Evaluations and grading, managed from the course detail page.
+// createEvaluation/updateEvaluation/updateEvaluationStatus each throw a
+// plain Error when the active-weight cap (100%) would be exceeded; these
+// actions let that propagate so the calling dialog's catch block can show
+// it as a save error, same pattern as every other dialog in this app.
+export async function createAcademyEvaluationAction(
+  courseId: string,
+  rawValues: AcademyEvaluationFormValues,
+) {
+  const values = academyEvaluationFormSchema.parse(rawValues);
+  await createEvaluation(courseId, values);
+  revalidatePath(`/academy/courses/${courseId}`);
+}
+
+export async function updateAcademyEvaluationAction(
+  courseId: string,
+  id: string,
+  rawValues: AcademyEvaluationFormValues,
+) {
+  const values = academyEvaluationFormSchema.parse(rawValues);
+  await updateEvaluation(id, courseId, values);
+  revalidatePath(`/academy/courses/${courseId}`);
+}
+
+export async function updateAcademyEvaluationStatusAction(
+  courseId: string,
+  id: string,
+  status: "draft" | "active" | "archived",
+) {
+  await updateEvaluationStatus(id, courseId, status);
+  revalidatePath(`/academy/courses/${courseId}`);
+}
+
+export async function getEvaluationRosterAction(evaluationId: string, courseId: string) {
+  return listResultsForEvaluation(evaluationId, courseId);
+}
+
+export async function gradeStudentAction(
+  courseId: string,
+  evaluationId: string,
+  enrollmentCaseId: string,
+  clientId: string,
+  maxPoints: number,
+  rawValues: AcademyEvaluationResultFormValues,
+) {
+  const values = academyEvaluationResultFormSchema.parse(rawValues);
+  await upsertEvaluationResult(evaluationId, enrollmentCaseId, clientId, maxPoints, values);
+  revalidatePath(`/academy/courses/${courseId}`);
+  revalidatePath(`/cases/${enrollmentCaseId}`);
+}
+
+// Phase 2E — optional course completion/readiness requirements.
+export async function updateAcademyCourseRequirementsAction(
+  courseId: string,
+  rawValues: AcademyCourseRequirementsFormValues,
+) {
+  const values = academyCourseRequirementsFormSchema.parse(rawValues);
+  await updateAcademyCourseRequirements(courseId, values);
+  revalidatePath(`/academy/courses/${courseId}`);
 }

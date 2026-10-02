@@ -1814,6 +1814,20 @@ export const academyCourses = pgTable("academy_courses", {
     { onDelete: "set null" },
   ),
   notes: text("notes"),
+  // Phase 2E — optional completion/readiness requirements, additive and
+  // nullable/false by default so existing courses keep working unchanged
+  // ("Defaults should not retroactively impose requirements"). Read only by
+  // the completion-readiness summary on the enrollment detail page — never
+  // enforced automatically and never used to auto-issue a certificate
+  // (that's a later phase). Null numeric fields display as "Not configured".
+  minimumAttendancePercentage: integer("minimum_attendance_percentage"),
+  minimumOverallGrade: integer("minimum_overall_grade"),
+  requireAllActiveModulesCompleted: boolean("require_all_active_modules_completed")
+    .notNull()
+    .default(false),
+  requireAllEvaluationsGraded: boolean("require_all_evaluations_graded")
+    .notNull()
+    .default(false),
 });
 
 export const academyCourseModules = pgTable("academy_course_modules", {
@@ -1999,6 +2013,100 @@ export const academyAttendanceRecords = pgTable(
     // updates the existing row instead of creating a duplicate.
     uniqueIndex("academy_attendance_records_session_enrollment_idx").on(
       table.sessionId,
+      table.enrollmentCaseId,
+    ),
+  ],
+);
+
+// Phase 2E — structured evaluations (quizzes, exams, assignments, etc.) and
+// per-student results. An evaluation belongs to a Course, and optionally to
+// one of that course's Modules; it never duplicates Course/Module data,
+// only references it. moduleId is "set null" (not cascade) specifically so
+// archiving/removing a module's reference never deletes the evaluation or
+// its historical results — see "MODULE ARCHIVING" in the Phase 2E spec.
+// status reuses academyCatalogStatusEnum (draft|active|archived) — same
+// lifecycle semantics as courses/modules, no hard-delete UI.
+//
+// percentageScore is deliberately never stored on results — always computed
+// live as pointsEarned / evaluation.maxPoints × 100, same "never store a
+// derived percentage" principle used throughout academyProgress.ts and
+// academyAttendance.ts in Phase 2D.
+export const academyEvaluationTypeEnum = pgEnum("academy_evaluation_type", [
+  "quiz",
+  "exam",
+  "assignment",
+  "practical",
+  "final_evaluation",
+  "other",
+]);
+
+export const academyEvaluationResultStatusEnum = pgEnum("academy_evaluation_result_status", [
+  "not_submitted",
+  "submitted",
+  "graded",
+  "excused",
+]);
+
+export const academyEvaluations = pgTable("academy_evaluations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  courseId: uuid("course_id")
+    .notNull()
+    .references(() => academyCourses.id, { onDelete: "cascade" }),
+  moduleId: uuid("module_id").references(() => academyCourseModules.id, {
+    onDelete: "set null",
+  }),
+  title: text("title").notNull(),
+  description: text("description"),
+  evaluationType: academyEvaluationTypeEnum("evaluation_type").notNull().default("other"),
+  maxPoints: integer("max_points").notNull(),
+  // Percentage threshold (0-100), not a raw point value — compared against
+  // the computed percentageScore to derive Passed/Not Passed.
+  passingScore: integer("passing_score"),
+  weightPercentage: integer("weight_percentage"),
+  status: academyCatalogStatusEnum("status").notNull().default("draft"),
+  dueDate: date("due_date"),
+  notes: text("notes"),
+});
+
+export const academyEvaluationResults = pgTable(
+  "academy_evaluation_results",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    evaluationId: uuid("evaluation_id")
+      .notNull()
+      .references(() => academyEvaluations.id, { onDelete: "cascade" }),
+    enrollmentCaseId: uuid("enrollment_case_id")
+      .notNull()
+      .references(() => academyEnrollmentDetails.caseId, { onDelete: "cascade" }),
+    clientId: uuid("client_id")
+      .notNull()
+      .references(() => clients.id, { onDelete: "cascade" }),
+    // Guarded at the application layer (never negative, never above the
+    // evaluation's maxPoints) — see academyEvaluationResult.ts validation.
+    pointsEarned: integer("points_earned"),
+    status: academyEvaluationResultStatusEnum("status").notNull().default("not_submitted"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    gradedAt: timestamp("graded_at", { withTimezone: true }),
+    notes: text("notes"),
+    feedback: text("feedback"),
+  },
+  (table) => [
+    // One result per (evaluation, enrollment) — grading again updates the
+    // existing row instead of creating a duplicate.
+    uniqueIndex("academy_evaluation_results_evaluation_enrollment_idx").on(
+      table.evaluationId,
       table.enrollmentCaseId,
     ),
   ],
@@ -3342,6 +3450,8 @@ export type AcademyStudentModuleProgress =
   typeof academyStudentModuleProgress.$inferSelect;
 export type AcademyAttendanceSession = typeof academyAttendanceSessions.$inferSelect;
 export type AcademyAttendanceRecord = typeof academyAttendanceRecords.$inferSelect;
+export type AcademyEvaluation = typeof academyEvaluations.$inferSelect;
+export type AcademyEvaluationResult = typeof academyEvaluationResults.$inferSelect;
 export type SocialMediaContent = typeof socialMediaContent.$inferSelect;
 export type StrategicAlliance = typeof strategicAlliances.$inferSelect;
 export type AllianceStatusHistory =

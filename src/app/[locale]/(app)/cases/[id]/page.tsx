@@ -8,8 +8,13 @@ import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { getAcademyCourseById } from "@/lib/queries/academyCourses";
 import { listCourseModuleProgress } from "@/lib/queries/academyProgress";
 import { getAttendanceSummaryForEnrollment } from "@/lib/queries/academyAttendance";
+import {
+  listEvaluationsWithResultForEnrollment,
+  getCourseReadinessSummary,
+} from "@/lib/queries/academyEvaluationResults";
 import { EnrollmentProgressSection } from "@/components/academy/EnrollmentProgressSection";
 import { EnrollmentAttendanceSummary } from "@/components/academy/EnrollmentAttendanceSummary";
+import { EnrollmentEvaluationsSection } from "@/components/academy/EnrollmentEvaluationsSection";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { getActiveAgentIdForServiceType } from "@/lib/ai/agentActivity";
 import { getAiAgentById } from "@/lib/queries/aiAgents";
@@ -136,6 +141,22 @@ export default async function CaseDetailPage({
   const attendanceSummary = academyDetails
     ? await getAttendanceSummaryForEnrollment(id)
     : null;
+  // Phase 2E — same courseId-gated pattern as Phase 2D above: structured
+  // evaluations only ever apply to catalog-linked enrollments; a historical
+  // enrollment keeps showing its legacy finalEvaluation text untouched.
+  const evaluationsWithResults = academyDetails?.courseId
+    ? await listEvaluationsWithResultForEnrollment(id, academyDetails.courseId)
+    : null;
+  const readiness =
+    academyDetails?.courseId && academyCourse
+      ? await getCourseReadinessSummary(id, {
+          id: academyDetails.courseId,
+          minimumAttendancePercentage: academyCourse.minimumAttendancePercentage,
+          minimumOverallGrade: academyCourse.minimumOverallGrade,
+          requireAllActiveModulesCompleted: academyCourse.requireAllActiveModulesCompleted,
+          requireAllEvaluationsGraded: academyCourse.requireAllEvaluationsGraded,
+        })
+      : null;
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -1104,7 +1125,9 @@ export default async function CaseDetailPage({
           {academyDetails.finalEvaluation && (
             <div className="text-sm">
               <p className="text-muted-foreground">
-                {t("form.finalEvaluation")}
+                {academyDetails.courseId
+                  ? t("form.legacyFinalEvaluation")
+                  : t("form.finalEvaluation")}
               </p>
               <p className="text-foreground">
                 {academyDetails.finalEvaluation}
@@ -1142,6 +1165,17 @@ export default async function CaseDetailPage({
             sessionTitle: s.sessionTitle,
             attendanceStatus: s.attendanceStatus,
           }))}
+        />
+      )}
+
+      {academyDetails && evaluationsWithResults && readiness && (
+        <EnrollmentEvaluationsSection
+          evaluations={evaluationsWithResults}
+          gradedCount={readiness.gradeInfo.gradedCount}
+          totalActive={readiness.gradeInfo.totalActive}
+          overallGrade={readiness.gradeInfo.grade}
+          provisional={readiness.gradeInfo.provisional}
+          requirements={readiness.requirements}
         />
       )}
 

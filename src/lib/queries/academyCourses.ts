@@ -107,6 +107,10 @@ export async function getAcademyCourseById(id: string) {
       primaryInstructorId: academyCourses.primaryInstructorId,
       instructorClientName: clients.fullName,
       instructorName: academyInstructors.name,
+      minimumAttendancePercentage: academyCourses.minimumAttendancePercentage,
+      minimumOverallGrade: academyCourses.minimumOverallGrade,
+      requireAllActiveModulesCompleted: academyCourses.requireAllActiveModulesCompleted,
+      requireAllEvaluationsGraded: academyCourses.requireAllEvaluationsGraded,
     })
     .from(academyCourses)
     .leftJoin(academyPrograms, eq(academyCourses.programId, academyPrograms.id))
@@ -115,4 +119,33 @@ export async function getAcademyCourseById(id: string) {
     .where(eq(academyCourses.id, id))
     .limit(1);
   return row ?? null;
+}
+
+// Phase 2E — optional completion/readiness requirements, edited separately
+// from the main create/edit Course dialog (see CourseRequirementsCard.tsx).
+export async function updateAcademyCourseRequirements(
+  id: string,
+  values: {
+    minimumAttendancePercentage?: number | "";
+    minimumOverallGrade?: number | "";
+    requireAllActiveModulesCompleted?: boolean;
+    requireAllEvaluationsGraded?: boolean;
+  },
+) {
+  await getDb()
+    .update(academyCourses)
+    .set({
+      minimumAttendancePercentage:
+        values.minimumAttendancePercentage === "" || values.minimumAttendancePercentage == null
+          ? null
+          : Number(values.minimumAttendancePercentage),
+      minimumOverallGrade:
+        values.minimumOverallGrade === "" || values.minimumOverallGrade == null
+          ? null
+          : Number(values.minimumOverallGrade),
+      requireAllActiveModulesCompleted: values.requireAllActiveModulesCompleted ?? false,
+      requireAllEvaluationsGraded: values.requireAllEvaluationsGraded ?? false,
+      updatedAt: new Date(),
+    })
+    .where(eq(academyCourses.id, id));
 }

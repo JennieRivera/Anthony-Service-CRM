@@ -5,8 +5,11 @@ import { isDatabaseConfigured } from "@/lib/db/config";
 import { getAcademyCourseById } from "@/lib/queries/academyCourses";
 import { listModulesForCourse } from "@/lib/queries/academyCourseModules";
 import { listAttendanceSessionsForCourse } from "@/lib/queries/academyAttendance";
+import { listEvaluationsForCourse } from "@/lib/queries/academyEvaluations";
 import { CourseModulesManager } from "@/components/academy/CourseModulesManager";
 import { CourseAttendanceManager } from "@/components/academy/CourseAttendanceManager";
+import { CourseEvaluationsManager } from "@/components/academy/CourseEvaluationsManager";
+import { CourseRequirementsCard } from "@/components/academy/CourseRequirementsCard";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
 export default async function AcademyCourseDetailPage({
@@ -32,6 +35,7 @@ export default async function AcademyCourseDetailPage({
 
   const modules = await listModulesForCourse(id);
   const attendanceSessions = await listAttendanceSessionsForCourse(id);
+  const evaluations = await listEvaluationsForCourse(id);
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -74,6 +78,20 @@ export default async function AcademyCourseDetailPage({
       <CourseModulesManager courseId={id} modules={modules} />
 
       <CourseAttendanceManager courseId={id} sessions={attendanceSessions} />
+
+      <CourseEvaluationsManager
+        courseId={id}
+        modules={modules.map((m) => ({ id: m.id, title: m.title }))}
+        evaluations={evaluations}
+      />
+
+      <CourseRequirementsCard
+        courseId={id}
+        minimumAttendancePercentage={course.minimumAttendancePercentage}
+        minimumOverallGrade={course.minimumOverallGrade}
+        requireAllActiveModulesCompleted={course.requireAllActiveModulesCompleted}
+        requireAllEvaluationsGraded={course.requireAllEvaluationsGraded}
+      />
     </div>
   );
 }
