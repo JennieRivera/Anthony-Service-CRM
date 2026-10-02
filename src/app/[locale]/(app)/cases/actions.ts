@@ -50,6 +50,11 @@ import { getActiveAgentIdForServiceType, logAiActivity } from "@/lib/ai/agentAct
 import { businessDateString } from "@/lib/dates";
 import { logAuditEvent } from "@/lib/audit";
 import { z } from "zod";
+import { upsertModuleProgress } from "@/lib/queries/academyProgress";
+import {
+  academyModuleProgressFormSchema,
+  type AcademyModuleProgressFormValues,
+} from "@/lib/validation/academyModuleProgress";
 
 const CLOSED_STATUSES = ["completed", "cancelled"] as const;
 
@@ -1087,4 +1092,19 @@ export async function createCompanyFromFormationAction(
   revalidatePath(`/cases/${caseId}`);
   revalidatePath("/companies");
   return created.id;
+}
+
+// Phase 2D — Academy module progress, marked from the student/enrollment
+// detail page (case detail). clientId is passed in rather than re-queried
+// here since the caller (the case detail page) already has it loaded.
+export async function markModuleProgressAction(
+  enrollmentCaseId: string,
+  courseId: string,
+  moduleId: string,
+  clientId: string,
+  rawValues: AcademyModuleProgressFormValues,
+) {
+  const values = academyModuleProgressFormSchema.parse(rawValues);
+  await upsertModuleProgress(enrollmentCaseId, courseId, moduleId, clientId, values);
+  revalidatePath(`/cases/${enrollmentCaseId}`);
 }

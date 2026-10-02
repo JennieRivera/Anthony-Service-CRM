@@ -2206,6 +2206,46 @@
     "duration": "Duration",
     "columnStatus": "Status"
   },
+  "AcademyProgress": {
+    "title": "Course Progress",
+    "instructor": "Instructor",
+    "modulesCompletedCount": "{completed} of {total} modules completed",
+    "noActiveModules": "This course has no active modules yet.",
+    "completedOn": "Completed {date}",
+    "progressUpdated": "Progress updated."
+  },
+  "AcademyModuleProgressStatus": {
+    "not_started": "Not Started",
+    "in_progress": "In Progress",
+    "completed": "Completed"
+  },
+  "AcademyAttendance": {
+    "title": "Attendance",
+    "addSession": "Add Session",
+    "editSession": "Edit Session",
+    "sessionDate": "Session Date",
+    "sessionTitle": "Session Title",
+    "notes": "Notes",
+    "save": "Save",
+    "saving": "Saving...",
+    "saveError": "Could not save. Please try again.",
+    "sessionAdded": "Session added.",
+    "sessionUpdated": "Session updated.",
+    "noSessions": "No sessions yet. Add the first one to get started.",
+    "markAttendance": "Mark Attendance",
+    "loading": "Loading...",
+    "noEnrolledStudents": "No students are enrolled in this course yet.",
+    "notMarked": "Not marked",
+    "attendanceMarked": "Attendance updated.",
+    "noSessionsRecorded": "No attendance sessions recorded yet.",
+    "recentSessions": "Recent Sessions"
+  },
+  "AcademyAttendanceStatus": {
+    "present": "Present",
+    "absent": "Absent",
+    "excused": "Excused",
+    "late": "Late"
+  },
   "DiamondCommunity": {
     "title": "Diamond Community",
     "subtitle": "VIP WhatsApp space for Academy — admin, students, and teachers. This roster tracks membership only; the conversation itself happens on WhatsApp.",

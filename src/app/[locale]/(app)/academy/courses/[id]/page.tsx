@@ -4,7 +4,9 @@ import { Link } from "@/i18n/navigation";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { getAcademyCourseById } from "@/lib/queries/academyCourses";
 import { listModulesForCourse } from "@/lib/queries/academyCourseModules";
+import { listAttendanceSessionsForCourse } from "@/lib/queries/academyAttendance";
 import { CourseModulesManager } from "@/components/academy/CourseModulesManager";
+import { CourseAttendanceManager } from "@/components/academy/CourseAttendanceManager";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
 export default async function AcademyCourseDetailPage({
@@ -29,6 +31,7 @@ export default async function AcademyCourseDetailPage({
   if (!course) notFound();
 
   const modules = await listModulesForCourse(id);
+  const attendanceSessions = await listAttendanceSessionsForCourse(id);
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -69,6 +72,8 @@ export default async function AcademyCourseDetailPage({
       </div>
 
       <CourseModulesManager courseId={id} modules={modules} />
+
+      <CourseAttendanceManager courseId={id} sessions={attendanceSessions} />
     </div>
   );
 }

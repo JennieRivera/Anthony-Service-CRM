@@ -330,6 +330,13 @@
       "when": 1790910538254,
       "tag": "0046_cold_doctor_octopus",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1790915487598,
+      "tag": "0047_brief_nighthawk",
+      "breakpoints": true
     }
   ]
 }

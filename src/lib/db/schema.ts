@@ -10,6 +10,7 @@ import {
   time,
   boolean,
   pgEnum,
+  uniqueIndex,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
@@ -1874,6 +1875,135 @@ export const academyEnrollmentDetails = pgTable("academy_enrollment_details", {
   status: academyCaseStatusEnum("status").notNull().default("lead"),
 });
 
+// Phase 2D — per-student, per-module progress tracking for catalog-linked
+// enrollments. Deliberately NOT a duplicate enrollment system: this just
+// attaches tracking rows to the existing academy_enrollment_details row via
+// its own primary key (caseId) — see "COURSE ENROLLMENT RELATIONSHIP" in the
+// Phase 2D spec. The module catalog (academy_course_modules) stays the only
+// source of truth for a course's module structure; this table only ever
+// records a status per (enrollment, module) pair, never a copy of the
+// module's own title/order/etc.
+//
+// Progress percentage is intentionally never stored here or on
+// academy_enrollment_details — it's always computed live from "how many of
+// the course's currently-ACTIVE modules have a completed row here", so a
+// later-added module changes the denominator automatically and a later-
+// archived module drops out of it automatically, with no invalidation logic
+// needed (see listCourseModuleProgress in academyProgress.ts queries). A
+// progress row for an since-archived module is never deleted — it just
+// stops counting toward the live percentage, per the "don't delete history"
+// instruction.
+//
+// courseId is denormalized from the module's own courseId (safe: a module
+// never moves between courses) purely so this table can be queried directly
+// by course without a join through academy_course_modules. clientId is
+// denormalized from the enrollment's case for the same reason — safe
+// cross-course querying of "this student's progress everywhere" without
+// joining through cases.
+export const academyModuleProgressStatusEnum = pgEnum("academy_module_progress_status", [
+  "not_started",
+  "in_progress",
+  "completed",
+]);
+
+export const academyStudentModuleProgress = pgTable(
+  "academy_student_module_progress",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    enrollmentCaseId: uuid("enrollment_case_id")
+      .notNull()
+      .references(() => academyEnrollmentDetails.caseId, { onDelete: "cascade" }),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => academyCourses.id, { onDelete: "cascade" }),
+    moduleId: uuid("module_id")
+      .notNull()
+      .references(() => academyCourseModules.id, { onDelete: "cascade" }),
+    clientId: uuid("client_id")
+      .notNull()
+      .references(() => clients.id, { onDelete: "cascade" }),
+    status: academyModuleProgressStatusEnum("status").notNull().default("not_started"),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    notes: text("notes"),
+  },
+  (table) => [
+    // One progress row per (enrollment, module) — the UI upserts into this,
+    // never inserts a second row for the same module.
+    uniqueIndex("academy_student_module_progress_enrollment_module_idx").on(
+      table.enrollmentCaseId,
+      table.moduleId,
+    ),
+  ],
+);
+
+// Phase 2D — a real attendance log (sessions + per-student records), not a
+// single percentage column. academy_attendance_sessions is one row per
+// class/live session held for a course; academy_attendance_records is one
+// row per (session, enrollment) marking that student's status for that
+// session. Attendance percentage is likewise never stored — always computed
+// live from these records (see getAttendanceSummary in academyProgress.ts
+// queries), using the rule documented there: Present and Late count as
+// attended, Absent counts as not attended, Excused is excluded from the
+// denominator entirely.
+export const academyAttendanceStatusEnum = pgEnum("academy_attendance_status", [
+  "present",
+  "absent",
+  "excused",
+  "late",
+]);
+
+export const academyAttendanceSessions = pgTable("academy_attendance_sessions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  courseId: uuid("course_id")
+    .notNull()
+    .references(() => academyCourses.id, { onDelete: "cascade" }),
+  sessionDate: date("session_date").notNull(),
+  title: text("title"),
+  notes: text("notes"),
+});
+
+export const academyAttendanceRecords = pgTable(
+  "academy_attendance_records",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => academyAttendanceSessions.id, { onDelete: "cascade" }),
+    enrollmentCaseId: uuid("enrollment_case_id")
+      .notNull()
+      .references(() => academyEnrollmentDetails.caseId, { onDelete: "cascade" }),
+    attendanceStatus: academyAttendanceStatusEnum("attendance_status").notNull(),
+    notes: text("notes"),
+    markedAt: timestamp("marked_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // One attendance record per (session, enrollment) — marking again
+    // updates the existing row instead of creating a duplicate.
+    uniqueIndex("academy_attendance_records_session_enrollment_idx").on(
+      table.sessionId,
+      table.enrollmentCaseId,
+    ),
+  ],
+);
+
 // Academy's Diamond Community — a VIP WhatsApp space (admin + students +
 // teachers) that exists entirely outside the CRM; this table is only a
 // membership roster (who's in it, since when, what status), never a
@@ -3208,6 +3338,10 @@ export type AcademyMentor = typeof academyMentors.$inferSelect;
 export type AcademyProgram = typeof academyPrograms.$inferSelect;
 export type AcademyCourse = typeof academyCourses.$inferSelect;
 export type AcademyCourseModule = typeof academyCourseModules.$inferSelect;
+export type AcademyStudentModuleProgress =
+  typeof academyStudentModuleProgress.$inferSelect;
+export type AcademyAttendanceSession = typeof academyAttendanceSessions.$inferSelect;
+export type AcademyAttendanceRecord = typeof academyAttendanceRecords.$inferSelect;
 export type SocialMediaContent = typeof socialMediaContent.$inferSelect;
 export type StrategicAlliance = typeof strategicAlliances.$inferSelect;
 export type AllianceStatusHistory =

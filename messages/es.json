@@ -2206,6 +2206,46 @@
     "duration": "Duración",
     "columnStatus": "Estado"
   },
+  "AcademyProgress": {
+    "title": "Progreso del Curso",
+    "instructor": "Instructor",
+    "modulesCompletedCount": "{completed} de {total} módulos completados",
+    "noActiveModules": "Este curso aún no tiene módulos activos.",
+    "completedOn": "Completado {date}",
+    "progressUpdated": "Progreso actualizado."
+  },
+  "AcademyModuleProgressStatus": {
+    "not_started": "No Comenzado",
+    "in_progress": "En Progreso",
+    "completed": "Completado"
+  },
+  "AcademyAttendance": {
+    "title": "Asistencia",
+    "addSession": "Agregar Sesión",
+    "editSession": "Editar Sesión",
+    "sessionDate": "Fecha de la Sesión",
+    "sessionTitle": "Título de la Sesión",
+    "notes": "Notas",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "saveError": "No se pudo guardar. Inténtalo de nuevo.",
+    "sessionAdded": "Sesión agregada.",
+    "sessionUpdated": "Sesión actualizada.",
+    "noSessions": "Aún no hay sesiones. Agrega la primera para comenzar.",
+    "markAttendance": "Marcar Asistencia",
+    "loading": "Cargando...",
+    "noEnrolledStudents": "Aún no hay estudiantes inscritos en este curso.",
+    "notMarked": "Sin marcar",
+    "attendanceMarked": "Asistencia actualizada.",
+    "noSessionsRecorded": "Aún no hay sesiones de asistencia registradas.",
+    "recentSessions": "Sesiones Recientes"
+  },
+  "AcademyAttendanceStatus": {
+    "present": "Presente",
+    "absent": "Ausente",
+    "excused": "Excusado",
+    "late": "Tarde"
+  },
   "DiamondCommunity": {
     "title": "Diamond Community",
     "subtitle": "Espacio VIP de WhatsApp para Academia — administradora, estudiantes y profesores. Este directorio solo lleva el control de membresía; la conversación ocurre en WhatsApp.",

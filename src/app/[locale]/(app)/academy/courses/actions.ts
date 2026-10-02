@@ -21,6 +21,20 @@ import {
   updateAcademyCourseModuleStatus,
   reorderAcademyCourseModule,
 } from "@/lib/queries/academyCourseModules";
+import {
+  createAttendanceSession,
+  updateAttendanceSession,
+  upsertAttendanceRecord,
+  listAttendanceForSession,
+} from "@/lib/queries/academyAttendance";
+import {
+  academyAttendanceSessionFormSchema,
+  type AcademyAttendanceSessionFormValues,
+} from "@/lib/validation/academyAttendanceSession";
+import {
+  academyAttendanceRecordFormSchema,
+  type AcademyAttendanceRecordFormValues,
+} from "@/lib/validation/academyAttendanceRecord";
 
 export async function createAcademyCourseAction(rawValues: AcademyCourseFormValues) {
   const values = academyCourseFormSchema.parse(rawValues);
@@ -82,4 +96,41 @@ export async function reorderAcademyCourseModuleAction(
 ) {
   await reorderAcademyCourseModule(courseId, id, direction);
   revalidatePath(`/academy/courses/${courseId}`);
+}
+
+// Phase 2D — Attendance sessions and per-student records, both marked from
+// the course detail page.
+export async function createAttendanceSessionAction(
+  courseId: string,
+  rawValues: AcademyAttendanceSessionFormValues,
+) {
+  const values = academyAttendanceSessionFormSchema.parse(rawValues);
+  await createAttendanceSession(courseId, values);
+  revalidatePath(`/academy/courses/${courseId}`);
+}
+
+export async function updateAttendanceSessionAction(
+  courseId: string,
+  sessionId: string,
+  rawValues: AcademyAttendanceSessionFormValues,
+) {
+  const values = academyAttendanceSessionFormSchema.parse(rawValues);
+  await updateAttendanceSession(sessionId, values);
+  revalidatePath(`/academy/courses/${courseId}`);
+}
+
+export async function getAttendanceRosterAction(courseId: string, sessionId: string) {
+  return listAttendanceForSession(sessionId, courseId);
+}
+
+export async function markAttendanceAction(
+  courseId: string,
+  sessionId: string,
+  enrollmentCaseId: string,
+  rawValues: AcademyAttendanceRecordFormValues,
+) {
+  const values = academyAttendanceRecordFormSchema.parse(rawValues);
+  await upsertAttendanceRecord(sessionId, enrollmentCaseId, values);
+  revalidatePath(`/academy/courses/${courseId}`);
+  revalidatePath(`/cases/${enrollmentCaseId}`);
 }

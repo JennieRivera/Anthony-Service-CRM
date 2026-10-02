@@ -5,6 +5,11 @@ import { getTranslations } from "next-intl/server";
 import { getCaseById } from "@/lib/queries/cases";
 import { findActiveTemplate } from "@/lib/queries/messageTemplates";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
+import { getAcademyCourseById } from "@/lib/queries/academyCourses";
+import { listCourseModuleProgress } from "@/lib/queries/academyProgress";
+import { getAttendanceSummaryForEnrollment } from "@/lib/queries/academyAttendance";
+import { EnrollmentProgressSection } from "@/components/academy/EnrollmentProgressSection";
+import { EnrollmentAttendanceSummary } from "@/components/academy/EnrollmentAttendanceSummary";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { getActiveAgentIdForServiceType } from "@/lib/ai/agentActivity";
 import { getAiAgentById } from "@/lib/queries/aiAgents";
@@ -116,6 +121,20 @@ export default async function CaseDetailPage({
         (new Date(insuranceDetails.expirationDate).getTime() - today.getTime()) /
           (1000 * 60 * 60 * 24),
       )
+    : null;
+
+  // Phase 2D — only fetched for catalog-linked Academy enrollments; a
+  // historical/free-text enrollment (courseId null) keeps showing its
+  // legacy progressPercentage/attendancePercentage fields untouched in the
+  // block below, with none of this additional data loaded or rendered.
+  const academyCourse = academyDetails?.courseId
+    ? await getAcademyCourseById(academyDetails.courseId)
+    : null;
+  const moduleProgress = academyDetails?.courseId
+    ? await listCourseModuleProgress(id, academyDetails.courseId)
+    : null;
+  const attendanceSummary = academyDetails
+    ? await getAttendanceSummaryForEnrollment(id)
     : null;
 
   return (
@@ -1093,6 +1112,37 @@ export default async function CaseDetailPage({
             </div>
           )}
         </div>
+      )}
+
+      {academyDetails && moduleProgress && academyCourse && (
+        <EnrollmentProgressSection
+          enrollmentCaseId={id}
+          courseId={academyDetails.courseId!}
+          clientId={client.id}
+          courseName={academyCourse.name}
+          programName={academyCourse.programName}
+          instructorName={academyCourse.instructorClientName ?? academyCourse.instructorName}
+          completedCount={moduleProgress.completedCount}
+          totalCount={moduleProgress.totalCount}
+          percentage={moduleProgress.percentage}
+          modules={moduleProgress.modules}
+        />
+      )}
+
+      {academyDetails && attendanceSummary && attendanceSummary.recentSessions.length > 0 && (
+        <EnrollmentAttendanceSummary
+          percentage={attendanceSummary.percentage}
+          present={attendanceSummary.present}
+          late={attendanceSummary.late}
+          absent={attendanceSummary.absent}
+          excused={attendanceSummary.excused}
+          recentSessions={attendanceSummary.recentSessions.map((s) => ({
+            sessionId: s.sessionId,
+            sessionDate: s.sessionDate,
+            sessionTitle: s.sessionTitle,
+            attendanceStatus: s.attendanceStatus,
+          }))}
+        />
       )}
 
       {marketingDetails && (
