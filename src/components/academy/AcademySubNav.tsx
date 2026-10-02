@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 export async function AcademySubNav({
   active,
 }: {
-  active: "students" | "instructors" | "mentors" | "programs" | "courses";
+  active: "students" | "instructors" | "mentors" | "programs" | "courses" | "certificates";
 }) {
   const t = await getTranslations("Academy");
 
@@ -22,6 +22,7 @@ export async function AcademySubNav({
     { key: "mentors" as const, href: "/academy/mentors", label: t("navMentors") },
     { key: "programs" as const, href: "/academy/programs", label: t("navPrograms") },
     { key: "courses" as const, href: "/academy/courses", label: t("navCourses") },
+    { key: "certificates" as const, href: "/academy/certificates", label: t("navCertificates") },
   ];
 
   return (

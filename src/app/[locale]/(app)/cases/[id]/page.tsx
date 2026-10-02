@@ -12,12 +12,19 @@ import {
   listEvaluationsWithResultForEnrollment,
   getCourseReadinessSummary,
 } from "@/lib/queries/academyEvaluationResults";
+import {
+  getCertificateEligibility,
+  getActiveCertificateForEnrollment,
+  listCertificatesForEnrollment,
+} from "@/lib/queries/academyCertificates";
 import { EnrollmentProgressSection } from "@/components/academy/EnrollmentProgressSection";
 import { EnrollmentAttendanceSummary } from "@/components/academy/EnrollmentAttendanceSummary";
 import { EnrollmentEvaluationsSection } from "@/components/academy/EnrollmentEvaluationsSection";
+import { EnrollmentCertificateSection } from "@/components/academy/EnrollmentCertificateSection";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { getActiveAgentIdForServiceType } from "@/lib/ai/agentActivity";
 import { getAiAgentById } from "@/lib/queries/aiAgents";
+import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { CaseStatusBadge } from "@/components/clients/StatusBadge";
@@ -157,6 +164,30 @@ export default async function CaseDetailPage({
           requireAllEvaluationsGraded: academyCourse.requireAllEvaluationsGraded,
         })
       : null;
+
+  // Phase 2F — Certificates. Unlike Progress/Attendance/Evaluations above,
+  // this is NOT courseId-gated: a historical/free-text enrollment still
+  // gets a Certificate section, just with eligibility always resolving to
+  // "Requirements Not Configured" (see getCertificateEligibility), so an
+  // override + reason is the only way to issue one for that enrollment.
+  const certificateEligibility = academyDetails
+    ? await getCertificateEligibility(
+        id,
+        academyDetails.courseId && academyCourse
+          ? {
+              id: academyDetails.courseId,
+              certificateEligible: academyCourse.certificateEligible,
+              minimumAttendancePercentage: academyCourse.minimumAttendancePercentage,
+              minimumOverallGrade: academyCourse.minimumOverallGrade,
+              requireAllActiveModulesCompleted: academyCourse.requireAllActiveModulesCompleted,
+              requireAllEvaluationsGraded: academyCourse.requireAllEvaluationsGraded,
+            }
+          : null,
+      )
+    : null;
+  const activeCertificate = academyDetails ? await getActiveCertificateForEnrollment(id) : null;
+  const certificateHistory = academyDetails ? await listCertificatesForEnrollment(id) : null;
+  const session = academyDetails ? await auth() : null;
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -1176,6 +1207,17 @@ export default async function CaseDetailPage({
           overallGrade={readiness.gradeInfo.grade}
           provisional={readiness.gradeInfo.provisional}
           requirements={readiness.requirements}
+        />
+      )}
+
+      {academyDetails && certificateEligibility && certificateHistory && (
+        <EnrollmentCertificateSection
+          enrollmentCaseId={id}
+          verdict={certificateEligibility.verdict}
+          requirements={certificateEligibility.requirements}
+          activeCertificate={activeCertificate}
+          history={certificateHistory}
+          defaultIssuedBy={session?.user?.name ?? session?.user?.email ?? ""}
         />
       )}
 

@@ -2112,6 +2112,81 @@ export const academyEvaluationResults = pgTable(
   ],
 );
 
+// Phase 2F — Academy Certificates. A certificate is a historical document,
+// never auto-issued: issuance is always one explicit admin action (see
+// issueCertificate in queries/academyCertificates.ts), gated by the Phase
+// 2E course requirements (minimumAttendancePercentage/minimumOverallGrade/
+// requireAllActiveModulesCompleted/requireAllEvaluationsGraded) and the
+// course's own certificateEligible flag — none of which this table
+// duplicates, only reads at issuance time.
+//
+// enrollmentCaseId anchors every certificate (same convention as progress/
+// attendance/evaluation results above); courseId/programId are nullable
+// because a certificate must also work for a historical free-text
+// enrollment that has no catalog course at all — see studentNameSnapshot/
+// courseNameSnapshot/programNameSnapshot below, which freeze the display
+// text at issuance time (same "frozen snapshot" pattern as
+// notaryLogEntries.clientNameSnapshot) so a certificate never changes
+// retroactively if the client is renamed or the catalog course is edited
+// or archived later.
+//
+// "draft" is a supported status (issuance could become a two-step flow in
+// a future session) but the current single-step issuance flow only ever
+// produces "issued" rows directly. Revoking never deletes the row — see
+// revokedAt/revokedReason below — so certificate history is permanent.
+export const academyCertificateStatusEnum = pgEnum("academy_certificate_status", [
+  "draft",
+  "issued",
+  "revoked",
+]);
+
+export const academyCertificates = pgTable("academy_certificates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  // Server-generated, race-condition-proof sequence — same convention as
+  // invoices.invoiceSeq / ai_escalations.escalationSeq: the display
+  // certificate number (e.g. "AMS-CERT-2026-00001") is formatted from this
+  // at read time (see formatCertificateNumber in queries/
+  // academyCertificates.ts), never stored as its own column, so it can
+  // never drift from the one true unique sequence value.
+  certificateSeq: serial("certificate_seq").notNull().unique(),
+  enrollmentCaseId: uuid("enrollment_case_id")
+    .notNull()
+    .references(() => academyEnrollmentDetails.caseId, { onDelete: "cascade" }),
+  clientId: uuid("client_id")
+    .notNull()
+    .references(() => clients.id, { onDelete: "cascade" }),
+  courseId: uuid("course_id").references(() => academyCourses.id, {
+    onDelete: "set null",
+  }),
+  programId: uuid("program_id").references(() => academyPrograms.id, {
+    onDelete: "set null",
+  }),
+  studentNameSnapshot: text("student_name_snapshot").notNull(),
+  courseNameSnapshot: text("course_name_snapshot").notNull(),
+  programNameSnapshot: text("program_name_snapshot"),
+  status: academyCertificateStatusEnum("status").notNull().default("issued"),
+  issueDate: date("issue_date").notNull(),
+  completionDate: date("completion_date"),
+  // Free text, not a FK to users — the authenticated admin's display name/
+  // email at issuance time, editable before confirming (see
+  // IssueCertificateDialog), never fabricated.
+  issuedBy: text("issued_by").notNull(),
+  notes: text("notes"),
+  // Section "ISSUANCE" — an explicit, recorded override when a certificate
+  // is issued despite Not Eligible / Requirements Not Configured. Never
+  // inferred; always a deliberate admin choice with a reason.
+  overrideUsed: boolean("override_used").notNull().default(false),
+  overrideReason: text("override_reason"),
+  revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  revokedReason: text("revoked_reason"),
+});
+
 // Academy's Diamond Community — a VIP WhatsApp space (admin + students +
 // teachers) that exists entirely outside the CRM; this table is only a
 // membership roster (who's in it, since when, what status), never a
@@ -3512,6 +3587,7 @@ export type AcademyAttendanceSession = typeof academyAttendanceSessions.$inferSe
 export type AcademyAttendanceRecord = typeof academyAttendanceRecords.$inferSelect;
 export type AcademyEvaluation = typeof academyEvaluations.$inferSelect;
 export type AcademyEvaluationResult = typeof academyEvaluationResults.$inferSelect;
+export type AcademyCertificate = typeof academyCertificates.$inferSelect;
 export type SocialMediaContent = typeof socialMediaContent.$inferSelect;
 export type StrategicAlliance = typeof strategicAlliances.$inferSelect;
 export type AllianceStatusHistory =

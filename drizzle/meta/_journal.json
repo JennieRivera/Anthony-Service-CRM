@@ -358,6 +358,20 @@
       "when": 1790926898102,
       "tag": "0050_talented_oracle",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1790955107142,
+      "tag": "0051_curved_payback",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1790955167863,
+      "tag": "0052_messy_roland_deschain",
+      "breakpoints": true
     }
   ]
 }
