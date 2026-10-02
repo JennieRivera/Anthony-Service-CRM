@@ -63,7 +63,10 @@ export function Sidebar() {
                   )}
                   title={collapsed ? t(item.labelKey) : undefined}
                 >
-                  <Icon className="h-4.5 w-4.5 shrink-0 text-[var(--sidebar-primary)]" />
+                  {/* Phase 1.5D — icons no longer tint gold (--sidebar-primary);
+                      they inherit the row's own currentColor, matching its
+                      text, so gold is restrained to the logo mark only. */}
+                  <Icon className="h-4.5 w-4.5 shrink-0" />
                   {!collapsed && <span>{t(item.labelKey)}</span>}
                 </Link>
               );

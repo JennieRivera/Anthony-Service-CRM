@@ -129,7 +129,32 @@
     "manageServiceCatalog": "Manage Service Catalog",
     "notaryGuideCard": "National Notary State Guide",
     "notaryGuideCardDescription": "Edit each state's official agency, registration, exam and requirements links shown on the National Notary State Guide.",
-    "manageNotaryGuide": "Manage Notary State Guide"
+    "manageNotaryGuide": "Manage Notary State Guide",
+    "appearanceCard": "Appearance",
+    "appearanceCardDescription": "Choose Light, Dark, or System mode and a CRM accent color. This is just for how the CRM looks to you — it never changes the Calendar Service Colors.",
+    "manageAppearance": "Manage Appearance"
+  },
+  "Appearance": {
+    "title": "Appearance",
+    "backToSettings": "Back to Settings",
+    "description": "Choose how the CRM looks for you. Saved only in this browser — it doesn't change anything for other devices or other sessions, and it never changes the Calendar Service Colors used on appointments.",
+    "modeTitle": "Mode",
+    "modeLight": "Light",
+    "modeDark": "Dark",
+    "modeSystem": "System",
+    "accentTitle": "CRM Accent Color",
+    "accentDescription": "Affects primary buttons, active navigation, selected states, and focus outlines throughout the CRM.",
+    "accentDefault": "Default (Professional Soft Blue)",
+    "accentSage": "Sage Green",
+    "accentTeal": "Teal",
+    "accentGold": "Gold",
+    "previewTitle": "Preview",
+    "previewButton": "Primary Button",
+    "previewLink": "Example Link",
+    "previewBadge": "Selected",
+    "previewSuccess": "Paid / Completed",
+    "previewPremium": "Premium / Diamond",
+    "previewInfo": "Informational"
   },
   "ServiceCatalog": {
     "title": "Service Catalog & Pricing",

@@ -129,7 +129,32 @@
     "manageServiceCatalog": "Administrar Catálogo de Servicios",
     "notaryGuideCard": "Guía Nacional de Notarios por Estado",
     "notaryGuideCardDescription": "Edita la agencia oficial, el registro, el examen y los enlaces de requisitos de cada estado que se muestran en la Guía Nacional de Notarios por Estado.",
-    "manageNotaryGuide": "Administrar Guía de Notarios"
+    "manageNotaryGuide": "Administrar Guía de Notarios",
+    "appearanceCard": "Apariencia",
+    "appearanceCardDescription": "Elige el modo Claro, Oscuro o del Sistema y un color de acento del CRM. Esto solo afecta cómo se ve el CRM para ti — nunca cambia los Colores de Servicio del Calendario.",
+    "manageAppearance": "Administrar Apariencia"
+  },
+  "Appearance": {
+    "title": "Apariencia",
+    "backToSettings": "Volver a Configuración",
+    "description": "Elige cómo se ve el CRM para ti. Se guarda solo en este navegador — no afecta otros dispositivos ni otras sesiones, y nunca cambia los Colores de Servicio del Calendario usados en las citas.",
+    "modeTitle": "Modo",
+    "modeLight": "Claro",
+    "modeDark": "Oscuro",
+    "modeSystem": "Sistema",
+    "accentTitle": "Color de Acento del CRM",
+    "accentDescription": "Afecta los botones principales, la navegación activa, los estados seleccionados y los contornos de enfoque en todo el CRM.",
+    "accentDefault": "Predeterminado (Azul Suave Profesional)",
+    "accentSage": "Verde Salvia",
+    "accentTeal": "Verde Azulado",
+    "accentGold": "Dorado",
+    "previewTitle": "Vista Previa",
+    "previewButton": "Botón Principal",
+    "previewLink": "Enlace de Ejemplo",
+    "previewBadge": "Seleccionado",
+    "previewSuccess": "Pagado / Completado",
+    "previewPremium": "Premium / Diamante",
+    "previewInfo": "Informativo"
   },
   "ServiceCatalog": {
     "title": "Catálogo de Servicios y Precios",

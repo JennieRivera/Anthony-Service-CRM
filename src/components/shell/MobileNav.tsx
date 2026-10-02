@@ -64,7 +64,9 @@ export function MobileNav() {
                         : "text-[var(--sidebar-foreground)]/70 hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]",
                     )}
                   >
-                    <Icon className="h-4.5 w-4.5 shrink-0 text-[var(--sidebar-primary)]" />
+                    {/* Phase 1.5D — icon inherits the row's own currentColor
+                        instead of tinting gold; see Sidebar.tsx. */}
+                    <Icon className="h-4.5 w-4.5 shrink-0" />
                     <span>{t(item.labelKey)}</span>
                   </Link>
                 );

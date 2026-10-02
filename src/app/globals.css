@@ -26,6 +26,12 @@
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
+  --color-success-foreground: var(--success-foreground);
+  --color-success: var(--success);
+  --color-premium-foreground: var(--premium-foreground);
+  --color-premium: var(--premium);
+  --color-info-foreground: var(--info-foreground);
+  --color-info: var(--info);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -46,93 +52,236 @@
 }
 
 /*
- * Anthony Multiservice CRM brand tokens — deep navy, warm cream, muted
- * gold/brass. Single light theme only; no dark mode.
+ * Anthony Multiservice CRM brand tokens — Phase 1.5D palette: Professional
+ * Soft Blue, Elegant Sky Blue, Sage Green, Champagne Gold, Pearl Cream.
  *
- * Base brand hexes: navy #0F1A2B, cream #FAF8F3, gold #B8964A — the same
- * three values documented in README.md's Design System line; keep both
- * in sync if either changes. (A prior revision of this file implemented
- * an unrelated mint/white/coral/dark-green palette that had drifted from
- * the documented brand — this revision restores navy/cream/gold as the
- * source of truth and softens it for a lighter, more elegant feel than
- * the raw brand hexes alone.) Every token below is either one of those 3
- * directly, or a tint/shade blended from them toward white/cream
- * (documented inline).
+ * Official brand hexes (as given, not yet darkened for any particular
+ * use): Soft Blue #4F7FA8, Sky Blue #78B7D0, Sage Green #82A98F,
+ * Champagne Gold #C8A96B, Pearl Cream #F6F5F0. Several of these fail
+ * WCAG AA as a white/cream-text fill at their literal value, so — per
+ * explicit instruction — each gets a derived, deeper "fill" shade for
+ * any text-bearing use, while the literal hex stays available for
+ * decorative/non-text use (icons, borders, washes paired with dark text).
  *
- * Contrast checked (WCAG relative luminance), computed for this pass:
- *   navy text (#1C2B3E) on cream background (#FDFBF6)   ~16:1  (AAA)
- *   navy text (#1C2B3E) on white card (#FFFFFF)          ~17:1  (AAA)
- *   cream text (#FDFBF6) on navy primary button (#0F1A2B) ~17:1 (AAA)
- *   muted-foreground (#5B6672) on cream                   ~5.5:1 (AA)
- *   navy text on the gold-wash accent chip (#F0E6D0)      ~13:1  (AAA,
- *     comfortable even at small badge-text size)
- *   gold (#B8964A) fill on cream                          ~2.6:1 — FAILS
- *     text contrast. Gold is therefore restricted to fills, borders,
- *     chips, and the sidebar logo mark — never used as a text color on
- *     --background/--card/--muted. This is the rule README.md's Design
- *     System line refers to; keep this comment and that line in sync.
+ * Contrast checked (WCAG relative luminance) for every value below:
+ *   navy text (#1C2B3E) on Pearl Cream background (#F6F5F0)     ~13.1:1 (AAA)
+ *   navy text (#1C2B3E) on white card (#FFFFFF)                  ~17:1  (AAA)
+ *   literal Soft Blue (#4F7FA8) vs cream text                    4.12:1 — FAILS AA
+ *   primary fill, deepened ~10% (#477297) vs cream text          4.93:1 (AA)
+ *   literal Sage Green (#82A98F) vs cream text                   2.53:1 — FAILS AA
+ *   success fill, deepened ~30% (#5B7664) vs cream text          4.81:1 (AA)
+ *   literal Champagne Gold (#C8A96B) vs cream text                2.17:1 — FAILS AA
+ *   premium fill, deepened ~34% (#847047) vs cream text           4.63:1 (AA)
+ *   literal Elegant Sky Blue (#78B7D0) vs navy text (wash, not fill) 6.48:1 (AAA)
+ *   literal Sky Blue vs cream/white text                          2.14:1 — FAILS, so
+ *     it is never used as a fill-behind-light-text or as link text;
+ *     link text reuses the deepened Soft Blue (#477297) instead.
  *
  * --destructive and --chart-1 through --chart-5 are intentionally left
- * unchanged from the prior mint/coral palette — out of scope for this
- * pass, not an oversight. Revisit them if/when charts get their own
- * brand pass.
+ * unchanged — out of scope for this pass, not an oversight.
  */
 :root {
-  /* Whisper-soft cream, lighter than the base brand cream (#FAF8F3) —
-     warmer and less clinical than stark white for the page background. */
-  --background: #fdfbf6;
-  /* Softened navy — darker brand navy is #0F1A2B; this is a touch
-     lighter so body text reads as elegant rather than inky, while still
-     clearing AAA on both cream and white (see contrast notes above). */
+  /* Pearl Cream — approved light-mode surface background. */
+  --background: #f6f5f0;
+  /* Navy body text kept as-is: still the most legible choice on the new
+     background (13:1, AAA) and was never "the primary brand color" in
+     the sense this rebrand targets — it's a text-legibility choice. */
   --foreground: #1c2b3e;
   /* Left pure white (not cream) on purpose: cards sit a hair whiter than
-     the cream page background, so they visibly "lift" off the page. */
+     the Pearl Cream page background, so they visibly "lift" off the page. */
   --card: #ffffff;
   --card-foreground: #1c2b3e;
   --popover: #ffffff;
   --popover-foreground: #1c2b3e;
-  /* Full-strength brand navy (not the softened --foreground) — buttons
-     and primary CTAs stay grounded/strong even as the rest lightens. */
-  --primary: #0f1a2b;
+  /* Professional Soft Blue, deepened ~10% for AA text contrast (see
+     notes above). The literal #4F7FA8 is reserved for decorative/
+     non-text use (e.g. a lighter accent swatch); this deepened value is
+     what actually fills buttons and drives the focus ring. */
+  --primary: #477297;
   --primary-foreground: #fdfbf6;
-  /* Cream blended ~15% toward gold — a warm panel wash. */
+  /* Cream blended ~15% toward gold — a warm panel wash. Unchanged. */
   --secondary: #f5eedd;
   --secondary-foreground: #1c2b3e;
   --muted: #f5eedd;
-  /* Softened navy-slate — captions/labels, ~5.5:1 on cream (AA). */
+  /* Softened navy-slate — captions/labels, ~5.5:1 on cream (AA). Unchanged. */
   --muted-foreground: #5b6672;
-  /* ~20% gold / 80% cream tint — soft gold wash for badges/chips. Never
-     the literal gold hex as a fill behind text; see contrast notes. */
+  /* Unchanged — badge/chip + dropdown "selected option" background,
+     deliberately NOT part of this rebrand (confirmed with the user). */
   --accent: #f0e6d0;
   --accent-foreground: #1c2b3e;
   --destructive: #a13b2c;
-  /* Cream blended toward gold, a shade darker than --accent — a visible
-     but gentle warm border, distinct from the lighter --muted wash. */
   --border: #ede2c8;
   --input: #ede2c8;
-  --ring: #1c2b3e;
+  /* Focus ring now follows the new primary brand color. */
+  --ring: #477297;
+  /* True semantic success token — Sage Green, deepened ~30% for AA text
+     contrast. Used ONLY for genuinely terminal/positive outcomes (Paid,
+     Completed, Approved, Certified, Resolved, Closed Won) — never for
+     ongoing/active operational states, which stay on --primary. See the
+     per-component classification in the status-badge files themselves. */
+  --success: #5b7664;
+  --success-foreground: #fdfbf6;
+  /* Premium/Diamond accent — Champagne Gold, deepened ~34% for any
+     text-bearing use. Reserved for premium/Diamond-specific visual
+     identity and the sidebar logo mark — never applied to ordinary CRM
+     statuses. */
+  --premium: #847047;
+  --premium-foreground: #fdfbf6;
+  /* Elegant Sky Blue — informational/selected-state wash. Used as a
+     light background paired with dark (navy) text, never as a fill
+     behind light text or as link text (both fail contrast at this
+     value — see notes above). */
+  --info: #78b7d0;
+  --info-foreground: #1c2b3e;
   --chart-1: #8fb89c;
   --chart-2: #e8927a;
   --chart-3: #3b4a42;
   --chart-4: #65816f;
   --chart-5: #f3c8bc;
   --radius: 0.625rem;
-  --sidebar: #0f1a2b;
+  /* Sidebar stays structurally dark in both Light and Dark mode (same
+     value either way — it never changes with --theme), but is now a
+     deep Soft-Blue-derived panel (58% darken of #4F7FA8) instead of the
+     old near-black navy (#0F1A2B), per explicit instruction that navy
+     must not remain as the hidden default. */
+  --sidebar: #213547;
   --sidebar-foreground: #fdfbf6;
-  /* Gold on navy for the collapsed-sidebar "AMS" logo monogram
-     (Logo.tsx) — ~6.2:1, a full AA pass (previously mint on dark green,
-     only 4.24:1 and reliant on the logotype exemption). */
-  --sidebar-primary: #b8964a;
+  /* Champagne Gold — deliberately held CONSTANT here (not preset-
+     varying, unlike --sidebar-accent below) and used in exactly one
+     place: the collapsed "AMS" logo monogram (Logo.tsx). This is the
+     "restrained premium accent" — ordinary nav icons no longer tint
+     gold at all (see Sidebar.tsx/MobileNav.tsx/NavDrawer.tsx), so gold
+     no longer appears throughout the sidebar, only at the brand mark.
+     ~5.6:1 against the new --sidebar background (AA pass). */
+  --sidebar-primary: #c8a96b;
   --sidebar-primary-foreground: #0f1a2b;
-  /* Navy blended ~9% toward cream — hover background for non-active
-     sidebar items, ~14:1 with cream text. */
-  --sidebar-accent: #1c2b3e;
+  /* Default (no accent preset) active/hover nav row background — a
+     blue-tinted wash of the new --sidebar value, ~8.8:1 with cream text. */
+  --sidebar-accent: #2f4b64;
   --sidebar-accent-foreground: #fdfbf6;
-  /* Navy blended ~4% toward cream — a subtler separator than
-     --sidebar-accent's hover state, just enough to read as a boundary
-     inside the navy sidebar. */
-  --sidebar-border: #192333;
-  --sidebar-ring: #b8964a;
+  /* Subtle separator, blended ~5% toward cream from the new --sidebar. */
+  --sidebar-border: #2c3f50;
+  /* Matches the new default --primary. */
+  --sidebar-ring: #477297;
+}
+
+/*
+ * Phase 1.5C/1.5D — Appearance / Theme.
+ *
+ * Dark mode: redefines only the main-surface tokens (background, card,
+ * primary, borders, etc.) under :root[data-theme="dark"]. Every
+ * component already reads these same custom properties indirectly via
+ * Tailwind classes (bg-background, text-foreground, bg-primary...), so
+ * this one block re-themes the whole app with zero component changes.
+ * Deliberately NOT redefining --sidebar-*: the sidebar is structurally
+ * dark in both Light and Dark mode by design (confirmed with the user),
+ * so it never changes with --theme, only with --accent. --destructive
+ * and --chart-1..5 are also left unchanged, matching the light-mode
+ * block's own existing precedent ("out of scope for this pass") and the
+ * explicit instruction not to recolor status meanings.
+ *
+ * Contrast checked (WCAG relative luminance) for every value below:
+ *   dark background (#141C28) vs foreground (#F3EFE6)          ~14.9:1 (AAA)
+ *   dark card (#1B2534) vs card-foreground (#F3EFE6)           ~13.5:1 (AAA)
+ *   dark muted-foreground (#A8B2BE) vs background                ~8.0:1 (AAA)
+ *   dark accent-foreground (#F3EFE6) vs accent fill (#3A2F1C)   ~11.4:1 (AAA)
+ *   dark default primary (#477297, same deepened fill as light mode)
+ *     vs cream text ~4.9:1 (AA); vs dark card ~3.0:1 (meets the 3:1 UI
+ *     component-boundary guideline so the button doesn't visually
+ *     disappear into the card)
+ *   dark success fill (#5B7664, same as light) vs cream ~4.8:1 (AA);
+ *     vs dark card ~3.1:1
+ *   dark premium fill (#847047, same as light) vs cream ~4.6:1 (AA);
+ *     vs dark card ~3.2:1
+ *   dark info wash (#304953) vs cream text ~9.2:1 (AAA) — a dark-mode-
+ *     appropriate wash since the light-mode wash (literal Sky Blue +
+ *     navy text) would invert awkwardly on a dark page; cream text
+ *     pairs with this dark wash instead.
+ */
+:root[data-theme="dark"] {
+  --background: #141c28;
+  --foreground: #f3efe6;
+  --card: #1b2534;
+  --card-foreground: #f3efe6;
+  --popover: #1b2534;
+  --popover-foreground: #f3efe6;
+  /* Same deepened Soft Blue fill as light mode — already verified above
+     to clear both the text-contrast and dark-card-separation checks, so
+     no separate dark-specific value is needed. */
+  --primary: #477297;
+  --primary-foreground: #fdfbf6;
+  --secondary: #232e40;
+  --secondary-foreground: #f3efe6;
+  --muted: #232e40;
+  --muted-foreground: #a8b2be;
+  --accent: #3a2f1c;
+  --accent-foreground: #f3efe6;
+  --border: #2a3545;
+  --input: #2a3545;
+  --ring: #477297;
+  --success: #5b7664;
+  --success-foreground: #fdfbf6;
+  --premium: #847047;
+  --premium-foreground: #fdfbf6;
+  --info: #304953;
+  --info-foreground: #fdfbf6;
+}
+
+/*
+ * Phase 1.5D — CRM Accent Color presets. Three selectable alternatives to
+ * the new default (Professional Soft Blue): Sage, Teal, Gold. "Soft Blue"
+ * was retired as a selectable preset — it's now simply what you get with
+ * no [data-accent] attribute at all, same reasoning as Navy's original
+ * exclusion. Teal isn't part of the official 5-color brand palette but
+ * was kept (nothing asked for its removal).
+ *
+ * Each preset sets:
+ *  - Main-surface tokens (--primary/-foreground, --ring): buttons + the
+ *    app-wide focus ring. Sage and Gold deliberately reuse the exact same
+ *    deepened values as --success/--premium above — they're the same
+ *    official brand color, just filling a different token role.
+ *  - --sidebar-accent/-ring (active/hover nav row background + sidebar
+ *    focus ring) — mode-independent, since the sidebar never changes
+ *    with dark mode, only with the chosen accent.
+ *
+ * --sidebar-primary is intentionally NOT part of any preset anymore —
+ * Champagne Gold stays constant there regardless of chosen accent (see
+ * the :root block above), since it's now a fixed "restrained premium
+ * accent" at the logo mark, not a general per-preset icon tint.
+ *
+ * --accent/--accent-foreground (badge/chip backgrounds and dropdown
+ * "selected option" highlighting) still deliberately do NOT vary by
+ * preset — confirmed with the user in Phase 1.5C.
+ */
+
+/* Sage Green / Verde Salvia. Same deepened fill as --success (#5b7664),
+   ~4.8:1 vs cream text (AA). */
+:root[data-accent="sage"] {
+  --primary: #5b7664;
+  --primary-foreground: #fdfbf6;
+  --ring: #5b7664;
+  --sidebar-accent: #3e585d;
+  --sidebar-accent-foreground: #fdfbf6;
+}
+
+/* Teal / Verde Azulado. Fill #3e7a74 vs cream text: ~4.8:1 (AA). */
+:root[data-accent="teal"] {
+  --primary: #3e7a74;
+  --primary-foreground: #fdfbf6;
+  --ring: #3e7a74;
+  --sidebar-accent: #2a4a55;
+  --sidebar-accent-foreground: #fdfbf6;
+}
+
+/* Gold / Dorado. Same deepened fill as --premium (#847047), ~4.6:1 vs
+   cream text (AA). The literal Champagne Gold fails text contrast at
+   2.17:1 — see the notes at the top of this file. */
+:root[data-accent="gold"] {
+  --primary: #847047;
+  --primary-foreground: #fdfbf6;
+  --ring: #847047;
+  --sidebar-accent: #535852;
+  --sidebar-accent-foreground: #fdfbf6;
 }
 
 @layer base {

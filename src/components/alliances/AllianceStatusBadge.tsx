@@ -2,6 +2,10 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
+// Phase 1.5D — deliberately NOT migrated to --success. "active_partner"
+// and "member" are ongoing/active operational states (an alliance that
+// is currently active, not a one-time completed transaction), which the
+// classification rule explicitly keeps on --primary rather than success.
 const statusClasses: Record<string, string> = {
   prospect: "border-border text-foreground bg-transparent",
   contacted: "border-transparent bg-accent/20 text-foreground",

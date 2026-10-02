@@ -46,7 +46,9 @@ export function NavDrawer({
           />
         }
       >
-        <Icon className="h-4.5 w-4.5 shrink-0 text-[var(--sidebar-primary)]" />
+        {/* Phase 1.5D — inherits the trigger's own currentColor instead of
+            tinting gold; gold stays restrained to the logo mark. */}
+        <Icon className="h-4.5 w-4.5 shrink-0" />
         {!collapsedTrigger && (
           <>
             <span className="flex-1 text-left">{t(labelKey)}</span>

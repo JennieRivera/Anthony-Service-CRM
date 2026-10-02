@@ -49,9 +49,17 @@ export function getEffectiveConnectionStatus(
   return "setup_required";
 }
 
+// Phase 1.5D — "external_link" now uses the new semantic --info token
+// (Elegant Sky Blue, the same color this hardcoded value already
+// approximated) instead of a raw Tailwind sky class, so it's theme/
+// dark-mode-aware. The other 4 states are a separate, already-distinct
+// 4-color health semaphore (not a binary positive/negative), left as-is
+// — "integrated" isn't migrated to --success since it was never on
+// --primary in the first place and this isn't a status-completion in
+// the same sense as the badges above.
 const STATUS_CLASSES: Record<EffectiveConnectionStatus, string> = {
   integrated: "border-transparent bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
-  external_link: "border-transparent bg-sky-100 text-sky-800 dark:bg-sky-500/15 dark:text-sky-300",
+  external_link: "border-transparent bg-info/20 text-info-foreground dark:bg-info",
   setup_required: "border-transparent bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
   disconnected: "border-transparent bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300",
   error: "border-transparent bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300",

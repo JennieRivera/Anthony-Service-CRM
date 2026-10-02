@@ -2,6 +2,9 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
+// Phase 1.5D — deliberately NOT migrated to --success, same reasoning as
+// AllianceStatusBadge: "member"/"strategic_partner" are ongoing
+// relationship states, not one-time completions.
 const statusClasses: Record<string, string> = {
   research: "border-border text-muted-foreground bg-transparent",
   prospect: "border-border text-foreground bg-transparent",
