@@ -52,6 +52,8 @@
     "partnerFollowUpsDue": "Seguimientos Pendientes",
     "aiAgentsTitle": "Agentes de IA",
     "aiAgentsComingSoon": "Aún no hay agentes de IA configurados. Esta sección está preparada para cuando los haya.",
+    "aiAgentsSummary": "{total} agentes de IA configurados — {ready} listos para conexión de IA, {preparing} aún en preparación.",
+    "aiAgentsHonestyHint": "Hoy funcionan mediante automatización basada en reglas del CRM, no un modelo de IA generativa real. Ningún proveedor de IA está conectado todavía.",
     "overdueInvoice": "Factura vencida",
     "stalledCase": "Esperando al cliente",
     "activityClient": "Nuevo cliente agregado",

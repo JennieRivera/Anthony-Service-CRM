@@ -52,6 +52,8 @@
     "partnerFollowUpsDue": "Follow-Ups Due",
     "aiAgentsTitle": "AI Agents",
     "aiAgentsComingSoon": "No AI agents are configured yet. This section is prepared for when they are.",
+    "aiAgentsSummary": "{total} AI agents configured — {ready} ready for AI connection, {preparing} still in preparation.",
+    "aiAgentsHonestyHint": "These run on rules-based CRM automation today, not a live generative-AI model. No AI provider is connected yet.",
     "overdueInvoice": "Overdue invoice",
     "stalledCase": "Waiting on client",
     "activityClient": "New client added",

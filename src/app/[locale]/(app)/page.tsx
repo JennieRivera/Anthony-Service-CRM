@@ -30,6 +30,7 @@ import { getPhase5DashboardData } from "@/lib/queries/phase5Dashboard";
 import { getDataFreshnessAlerts } from "@/lib/queries/dataFreshness";
 import { listActiveProfessionalSystems } from "@/lib/queries/professionalSystems";
 import { listActiveWebsiteLinks } from "@/lib/queries/websiteLinks";
+import { listAiAgents } from "@/lib/queries/aiAgents";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
@@ -64,13 +65,14 @@ export default async function Home() {
     );
   }
 
-  const [data, phase5, freshnessAlerts, professionalSystems, websites] =
+  const [data, phase5, freshnessAlerts, professionalSystems, websites, aiAgents] =
     await Promise.all([
       getDashboardData(),
       getPhase5DashboardData(),
       getDataFreshnessAlerts(),
       listActiveProfessionalSystems(),
       listActiveWebsiteLinks(),
+      listAiAgents(),
     ]);
   const { kpis } = data;
 
@@ -329,8 +331,12 @@ export default async function Home() {
       )}
 
       {/* 12. AI Agents */}
-      <DashboardSection title={t("sectionAiAgents")}>
-        <AiAgentsCard />
+      <DashboardSection
+        title={t("sectionAiAgents")}
+        viewAllHref="/ai-team"
+        viewAllLabel={t("viewAll")}
+      >
+        <AiAgentsCard agents={aiAgents} />
       </DashboardSection>
     </div>
   );
