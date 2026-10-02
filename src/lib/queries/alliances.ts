@@ -1,16 +1,64 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
   strategicAlliances,
   allianceStatusHistory,
   allianceDocuments,
   allianceContacts,
+  allianceNetworkRelationships,
   referrals,
   clients,
   companies,
   conversationMessages,
   appointments,
 } from "@/lib/db/schema";
+import { listAuditLogForEntity } from "@/lib/queries/auditLog";
+
+// B2B Network Foundation — both directions of this alliance's network
+// provenance: alliances THIS one introduced, and alliances that
+// introduced THIS one. Deliberately two separate lists (not one merged
+// "connections" list) so the UI can always show who introduced whom,
+// never just an undirected link.
+export async function listAllianceNetworkRelationships(allianceId: string) {
+  const db = getDb();
+  const [introduced, introducedBy] = await Promise.all([
+    db
+      .select({
+        id: allianceNetworkRelationships.id,
+        relationshipDate: allianceNetworkRelationships.relationshipDate,
+        notes: allianceNetworkRelationships.notes,
+        recordedByEmail: allianceNetworkRelationships.recordedByEmail,
+        createdAt: allianceNetworkRelationships.createdAt,
+        otherAllianceId: strategicAlliances.id,
+        otherAllianceName: strategicAlliances.organizationName,
+      })
+      .from(allianceNetworkRelationships)
+      .innerJoin(
+        strategicAlliances,
+        eq(allianceNetworkRelationships.introducedAllianceId, strategicAlliances.id),
+      )
+      .where(eq(allianceNetworkRelationships.referringAllianceId, allianceId))
+      .orderBy(desc(allianceNetworkRelationships.createdAt)),
+    db
+      .select({
+        id: allianceNetworkRelationships.id,
+        relationshipDate: allianceNetworkRelationships.relationshipDate,
+        notes: allianceNetworkRelationships.notes,
+        recordedByEmail: allianceNetworkRelationships.recordedByEmail,
+        createdAt: allianceNetworkRelationships.createdAt,
+        otherAllianceId: strategicAlliances.id,
+        otherAllianceName: strategicAlliances.organizationName,
+      })
+      .from(allianceNetworkRelationships)
+      .innerJoin(
+        strategicAlliances,
+        eq(allianceNetworkRelationships.referringAllianceId, strategicAlliances.id),
+      )
+      .where(eq(allianceNetworkRelationships.introducedAllianceId, allianceId))
+      .orderBy(desc(allianceNetworkRelationships.createdAt)),
+  ]);
+  return { introduced, introducedBy };
+}
 
 export async function listAllianceContacts(allianceId: string) {
   return getDb()
@@ -129,6 +177,11 @@ export async function getAllianceById(id: string) {
         .orderBy(desc(appointments.startAt)),
     ]);
 
+  const [network, activity] = await Promise.all([
+    listAllianceNetworkRelationships(id),
+    listAuditLogForEntity("alliance", id),
+  ]);
+
   return {
     alliance,
     statusHistory,
@@ -139,5 +192,59 @@ export async function getAllianceById(id: string) {
     contacts,
     communications,
     linkedAppointments,
+    network,
+    activity,
   };
+}
+
+// Pre-check used by the Server Action before inserting, same pattern as
+// createAuthorizedUser's email check (src/lib/queries/authorizedUsers.ts)
+// — a SELECT-then-INSERT is more portable and gives a reliable friendly
+// error than catching a driver-specific unique-constraint error shape.
+// The unique index on the table (schema.ts) remains the real guarantee
+// against a race between two concurrent requests; this is the normal-path
+// check.
+export async function allianceNetworkRelationshipExists(
+  referringAllianceId: string,
+  introducedAllianceId: string,
+) {
+  const [existing] = await getDb()
+    .select({ id: allianceNetworkRelationships.id })
+    .from(allianceNetworkRelationships)
+    .where(
+      and(
+        eq(allianceNetworkRelationships.referringAllianceId, referringAllianceId),
+        eq(allianceNetworkRelationships.introducedAllianceId, introducedAllianceId),
+      ),
+    )
+    .limit(1);
+  return Boolean(existing);
+}
+
+// B2B Network Foundation — creates one directional provenance row
+// (referringAllianceId introduced introducedAllianceId). Self-link and
+// duplicate-pair rejection both happen before this is called in the
+// Server Action (see allianceNetworkRelationshipExists above and
+// allianceNetworkRelationships in schema.ts for the unique index that
+// still guards against a race between two concurrent requests).
+export async function createAllianceNetworkRelationship(params: {
+  referringAllianceId: string;
+  introducedAllianceId: string;
+  relationshipDate: string | null;
+  notes: string | null;
+  recordedByEmail: string | null;
+}) {
+  const [row] = await getDb()
+    .insert(allianceNetworkRelationships)
+    .values(params)
+    .returning();
+  return row;
+}
+
+export async function deleteAllianceNetworkRelationship(id: string) {
+  const [row] = await getDb()
+    .delete(allianceNetworkRelationships)
+    .where(eq(allianceNetworkRelationships.id, id))
+    .returning();
+  return row ?? null;
 }

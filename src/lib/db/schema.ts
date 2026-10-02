@@ -3226,6 +3226,48 @@ export const allianceStatusHistory = pgTable("alliance_status_history", {
   note: text("note"),
 });
 
+// B2B Network Foundation — records that one B2B Alliance introduced/
+// recommended another. This is NETWORK PROVENANCE ONLY: it deliberately
+// has no amount, percentage, or payment field, and nothing anywhere reads
+// this table to calculate a commission, invoice, payment, membership, or
+// portal grant. Financial compensation always comes from an explicit
+// referral/agreement (the existing referrals.commission* fields on the
+// actual referral row, or a future compensation-agreement phase) — never
+// inferred from the mere fact that one alliance introduced another.
+// Cascade-deletes with either alliance (there is no reason to keep a
+// provenance row once one side of it no longer exists), unlike the
+// compliance-grade notary journal pattern elsewhere in this file.
+export const allianceNetworkRelationships = pgTable(
+  "alliance_network_relationships",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    referringAllianceId: uuid("referring_alliance_id")
+      .notNull()
+      .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+    introducedAllianceId: uuid("introduced_alliance_id")
+      .notNull()
+      .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+    relationshipDate: date("relationship_date"),
+    notes: text("notes"),
+    // Snapshot of the acting session's email at the time this was recorded
+    // — same pattern as allianceStatusHistory.changedByEmail — this is who
+    // recorded the relationship, not an external approval workflow.
+    recordedByEmail: text("recorded_by_email"),
+  },
+  (table) => [
+    // Prevents recording the exact same directional introduction twice.
+    // Self-links (referring === introduced) are rejected at the
+    // application layer (src/lib/validation/allianceNetwork.ts), not here.
+    uniqueIndex("alliance_network_relationships_unique_pair").on(
+      table.referringAllianceId,
+      table.introducedAllianceId,
+    ),
+  ],
+);
+
 // ===================================================================
 // Phase 6, Session 1 — AI Team / Equipo IA (foundation)
 //

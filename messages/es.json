@@ -2597,7 +2597,25 @@
       "organization": "Organización / Empresa",
       "agreementDates": "Fechas del Acuerdo",
       "communications": "Comunicaciones",
-      "appointments": "Citas"
+      "appointments": "Citas",
+      "activity": "Actividad"
+    },
+    "activity": {
+      "empty": "Aún no hay actividad registrada para esta alianza."
+    },
+    "network": {
+      "title": "Conexiones de Red",
+      "add": "Agregar Conexión",
+      "introducedAlliance": "Alianza Introducida",
+      "selectAlliance": "Selecciona una alianza",
+      "relationshipDate": "Fecha de la Relación",
+      "notes": "Notas",
+      "save": "Guardar Conexión",
+      "saving": "Guardando...",
+      "introducedHeading": "Esta alianza introdujo a",
+      "noIntroduced": "Esta alianza aún no ha introducido a ninguna otra alianza.",
+      "introducedByHeading": "Introducida por",
+      "noIntroducedBy": "Ninguna alianza ha introducido a esta todavía."
     },
     "noCommunications": "Aún no hay comunicaciones registradas con esta alianza.",
     "noAppointments": "Aún no hay citas vinculadas a esta alianza.",

@@ -5,6 +5,8 @@ import { getDb } from "@/lib/db";
 import { allianceDocuments, allianceDocumentTypeEnum } from "@/lib/db/schema";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { isDatabaseConfigured } from "@/lib/db/config";
+import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
+import { logAuditEvent } from "@/lib/audit";
 import {
   isAllowedDocumentFile,
   scanFileForSensitiveData,
@@ -14,6 +16,15 @@ export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // B2B Network Foundation, section 14 — this is an API route, not a
+  // Server Action, so it uses the same getCurrentRole/hasAccessArea
+  // primitives directly instead of the throwing requireAccessArea(),
+  // turning a denial into a clean 403 JSON response.
+  const role = await getCurrentRole();
+  if (!role || !hasAccessArea(role, "alliances")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   if (!isBlobConfigured() || !isDatabaseConfigured()) {
@@ -70,6 +81,13 @@ export async function POST(request: Request) {
       documentType,
     })
     .returning();
+
+  await logAuditEvent({
+    action: "alliance.document_uploaded",
+    entityType: "alliance",
+    entityId: allianceId,
+    summary: `Uploaded document "${file.name}"`,
+  });
 
   return NextResponse.json({ document });
 }

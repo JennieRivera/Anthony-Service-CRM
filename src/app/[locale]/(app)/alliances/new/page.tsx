@@ -4,9 +4,22 @@ import { AllianceForm } from "@/components/alliances/AllianceForm";
 import { listClientsForSelect } from "@/lib/queries/clients";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { createAllianceAction } from "../actions";
+import AccessDenied from "@/components/AccessDenied";
+import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
 
 export default async function NewAlliancePage() {
   const t = await getTranslations("Alliances");
+
+  const role = await getCurrentRole();
+  if (!role || !hasAccessArea(role, "alliances")) {
+    return (
+      <div className="flex w-full flex-col gap-6 px-8 py-10">
+        <h1 className="font-heading text-2xl text-foreground">{t("newAlliance")}</h1>
+        <AccessDenied />
+      </div>
+    );
+  }
+
   const [clients, companies] = await Promise.all([
     listClientsForSelect(),
     listCompaniesForSelect(),

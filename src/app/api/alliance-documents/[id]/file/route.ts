@@ -4,6 +4,7 @@ import { get } from "@vercel/blob";
 import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import { allianceDocuments } from "@/lib/db/schema";
+import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
 
 export async function GET(
   request: Request,
@@ -12,6 +13,11 @@ export async function GET(
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const role = await getCurrentRole();
+  if (!role || !hasAccessArea(role, "alliances")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const { id } = await params;

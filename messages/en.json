@@ -2597,7 +2597,25 @@
       "organization": "Organization / Company",
       "agreementDates": "Agreement Dates",
       "communications": "Communications",
-      "appointments": "Appointments"
+      "appointments": "Appointments",
+      "activity": "Activity"
+    },
+    "activity": {
+      "empty": "No activity recorded for this alliance yet."
+    },
+    "network": {
+      "title": "Network Connections",
+      "add": "Add Connection",
+      "introducedAlliance": "Alliance Introduced",
+      "selectAlliance": "Select an alliance",
+      "relationshipDate": "Relationship Date",
+      "notes": "Notes",
+      "save": "Save Connection",
+      "saving": "Saving...",
+      "introducedHeading": "This alliance introduced",
+      "noIntroduced": "This alliance has not introduced any other alliance yet.",
+      "introducedByHeading": "Introduced by",
+      "noIntroducedBy": "No alliance has introduced this one yet."
     },
     "noCommunications": "No communications logged with this alliance yet.",
     "noAppointments": "No appointments linked to this alliance yet.",

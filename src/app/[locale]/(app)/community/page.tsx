@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AllianceTable } from "@/components/alliances/AllianceTable";
 import { AssociationTable } from "@/components/associations/AssociationTable";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
+import AccessDenied from "@/components/AccessDenied";
+import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
 
 // SIDEBAR-PLAN.md section 3 — Community & Strategic Alliances is one
 // sidebar item, but deliberately does NOT merge the two underlying
@@ -27,6 +29,24 @@ export default async function CommunityPage({
   const t = await getTranslations("Community");
   const tAlliances = await getTranslations("Alliances");
   const tAssociations = await getTranslations("Associations");
+
+  // B2B Network Foundation, section 14 — this page serves both the
+  // "alliances" and "associations" areas under one nav entry (an
+  // existing, deliberate design — see the comment below), so it's gated
+  // on either one rather than requiring both. Today only community_manager
+  // and the admin-tier roles have either, and they always have both
+  // together — this gate doesn't change who can reach this page, it just
+  // makes the requirement real and server-enforced instead of implicit.
+  const role = await getCurrentRole();
+  if (!role || (!hasAccessArea(role, "alliances") && !hasAccessArea(role, "associations"))) {
+    return (
+      <div className="flex w-full flex-col gap-6 px-8 py-10">
+        <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
+        <AccessDenied />
+      </div>
+    );
+  }
+
   const configured = isDatabaseConfigured();
   const { state, tab } = await searchParams;
   const activeTab = tab === "associations" ? "associations" : "alliances";

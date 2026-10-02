@@ -379,6 +379,13 @@
       "when": 1790964692565,
       "tag": "0053_tiresome_thundra",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1790968763853,
+      "tag": "0054_hesitant_wendigo",
+      "breakpoints": true
     }
   ]
 }
