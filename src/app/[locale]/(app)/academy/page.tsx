@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { AcademyTable } from "@/components/academy/AcademyTable";
 import { AcademySubNav } from "@/components/academy/AcademySubNav";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
+import AccessDenied from "@/components/AccessDenied";
+import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
 
 // SIDEBAR-PLAN.md follow-up — Academy's own module, showing only
 // serviceType "academy" cases (see listAcademyEnrollments), unlike the
@@ -15,6 +17,17 @@ import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 export default async function AcademyPage() {
   const t = await getTranslations("Academy");
   const configured = isDatabaseConfigured();
+
+  // Phase 2H — page-level guard on the Academy module's main entry point.
+  const role = await getCurrentRole();
+  if (!role || !hasAccessArea(role, "academy")) {
+    return (
+      <div className="flex w-full flex-col gap-6 px-8 py-10">
+        <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
+        <AccessDenied />
+      </div>
+    );
+  }
 
   let students: Awaited<ReturnType<typeof listAcademyEnrollments>> = [];
   let error: string | null = null;

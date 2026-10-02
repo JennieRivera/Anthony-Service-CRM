@@ -15,6 +15,7 @@ import {
   type RevokeCertificateFormValues,
 } from "@/lib/validation/academyCertificate";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAccessArea } from "@/lib/permissions";
 
 // The dialog already disables its submit button until a required field is
 // filled, so this only ever fires if that client-side guard is somehow
@@ -37,6 +38,10 @@ export async function issueCertificateAction(
   enrollmentCaseId: string,
   rawValues: IssueCertificateFormValues,
 ) {
+  // Phase 2H — section 5/13: certificate issuance must be explicitly
+  // permission-protected, server-side, not just hidden in the UI.
+  await requireAccessArea("academy_certificates");
+
   let values: ReturnType<typeof issueCertificateFormSchema.parse>;
   try {
     values = issueCertificateFormSchema.parse(rawValues);
@@ -83,6 +88,8 @@ export async function revokeCertificateAction(
   enrollmentCaseId: string,
   rawValues: RevokeCertificateFormValues,
 ) {
+  await requireAccessArea("academy_certificates");
+
   let values: ReturnType<typeof revokeCertificateFormSchema.parse>;
   try {
     values = revokeCertificateFormSchema.parse(rawValues);

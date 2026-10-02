@@ -50,6 +50,7 @@ import { getActiveAgentForServiceType } from "@/lib/ai/agentActivity";
 import { authorizeAndLogAgentAction } from "@/lib/ai/auditLog";
 import { businessDateString } from "@/lib/dates";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAccessArea } from "@/lib/permissions";
 import { z } from "zod";
 import { upsertModuleProgress } from "@/lib/queries/academyProgress";
 import {
@@ -1115,6 +1116,9 @@ export async function markModuleProgressAction(
   clientId: string,
   rawValues: AcademyModuleProgressFormValues,
 ) {
+  // Phase 2H — section 5: progress/attendance/grade modification must be
+  // explicitly permission-protected, not just a hidden button.
+  await requireAccessArea("academy");
   const values = academyModuleProgressFormSchema.parse(rawValues);
   await upsertModuleProgress(enrollmentCaseId, courseId, moduleId, clientId, values);
   revalidatePath(`/cases/${enrollmentCaseId}`);

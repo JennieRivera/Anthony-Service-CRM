@@ -5,11 +5,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Plug, ShieldCheck, LayoutGrid, Globe, Palette, Stamp, DollarSign, SunMoon } from "lucide-react";
+import { Plug, ShieldCheck, LayoutGrid, Globe, Palette, Stamp, DollarSign, SunMoon, Users } from "lucide-react";
+import AccessDenied from "@/components/AccessDenied";
+import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
 
 export default async function SettingsPage() {
   const t = await getTranslations("Settings");
   const session = await auth();
+
+  // Phase 2H — section 4: Administration (Settings/Integrations/Security/
+  // user-role administration) is its own permission area.
+  const role = await getCurrentRole();
+  if (!role || !hasAccessArea(role, "settings")) {
+    return (
+      <div className="flex w-full max-w-3xl flex-col gap-6 px-8 py-10">
+        <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
+        <AccessDenied />
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6 px-8 py-10">
@@ -87,10 +101,16 @@ export default async function SettingsPage() {
         <CardHeader>
           <CardTitle>{t("staffAccounts")}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-4">
           <p className="text-sm text-muted-foreground">
-            {t("staffAccountsComingSoon")}
+            {t("staffAccountsDescription")}
           </p>
+          <div>
+            <Button variant="outline" render={<Link href="/settings/users" />}>
+              <Users className="h-4 w-4" />
+              {t("manageStaffAccounts")}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

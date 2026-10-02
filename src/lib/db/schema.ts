@@ -218,11 +218,18 @@ export const refundStatusEnum = pgEnum("refund_status", [
 ]);
 
 // Phase 2, Session 7 — RBAC roles are modeled here and mapped to module
-// access in src/lib/permissions.ts, but NOT yet enforced: sign-in stays
-// restricted to the single ADMIN_EMAIL (src/auth.ts) per an explicit
-// decision to keep single-tenant login for now. This column is reserved
-// for when multi-staff login is turned on, same pattern as
-// cases.assignedUserId and tasks.assignedUserId.
+// access in src/lib/permissions.ts. Phase 2H made that mapping the real
+// enforcement layer; Phase 2H-B made `users` the real internal-staff
+// identity table (see the comment on `users` below) — sign-in is no
+// longer restricted to only ADMIN_EMAIL, but to ADMIN_EMAIL plus any
+// email with an active row here. super_admin/instructor/general_staff
+// were added to the TypeScript Role union in Phase 2H without a matching
+// DB enum value (nothing wrote a role into a DB row yet); Phase 2H-B adds
+// them here too so the two vocabularies can't silently diverge now that
+// real rows exist. super_admin is still never written to any row — it is
+// derived purely from ADMIN_EMAIL (src/auth.ts / getCurrentRole) and is
+// deliberately excluded from the assignable-role list in
+// src/lib/validation/authorizedUser.ts.
 export const userRoleEnum = pgEnum("user_role", [
   "admin",
   "manager",
@@ -237,15 +244,59 @@ export const userRoleEnum = pgEnum("user_role", [
   // immigration administrative cases only, including the Immigration
   // Forms Library and the per-case document folders (Session 6).
   "immigration_staff",
+  // Phase 2H-B additions — kept in sync with roleValues in
+  // src/lib/permissions.ts. super_admin is never assigned to a row (see
+  // above); instructor and general_staff start with empty permission
+  // arrays until a real course-scoped relationship / explicit area grants
+  // exist (see the comment on users.instructorId below).
+  "super_admin",
+  "instructor",
+  "general_staff",
 ]);
 
+// Phase 2H-B — this is now the real internal-staff identity table: a row
+// here plus an active status is what lets a Google account other than
+// ADMIN_EMAIL sign in at all (src/auth.ts signIn callback), and `role`
+// drives what it can do (src/lib/permissions.ts getCurrentRole). The
+// owner (ADMIN_EMAIL) deliberately never needs a row here — see Phase
+// 2H-B report section E.
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
+  // Canonical identity key: the authenticated Google account's email,
+  // always normalized to lowercase before insert/lookup (never matched by
+  // name). Case-sensitive uniqueness at the DB level is acceptable only
+  // because every write path normalizes first — see
+  // src/lib/queries/authorizedUsers.ts.
   email: text("email").notNull().unique(),
-  passwordHash: text("password_hash").notNull(),
+  // Legacy column from an earlier Credentials-based design this project
+  // never shipped (see AGENTS.md: Google-only, no password flow). Made
+  // nullable rather than dropped (additive-only migration policy) —
+  // Google-authenticated internal users never have a password hash.
+  passwordHash: text("password_hash"),
   name: text("name"),
   role: userRoleEnum("role"),
+  // Phase 2H-B — lets an authorized row exist without yet granting
+  // access, and lets an admin revoke access without deleting history.
+  // Checked on every permission check (getCurrentRole), not just at
+  // sign-in, so deactivating someone takes effect on their very next
+  // action, not just their next login.
+  isActive: boolean("is_active").notNull().default(true),
+  // Phase 2H-B, section 8 — the minimal additive relationship audited and
+  // required before any future course-scoped Instructor authorization can
+  // be built. Nullable and onDelete "set null" (never cascade, same
+  // convention as notary_log_entries) so deleting an instructor record
+  // never deletes a login identity. Linking a user here today grants NO
+  // additional access by itself — ROLE_PERMISSIONS.instructor is still
+  // `[]` (empty) until a later phase implements real course-scoped
+  // checks against academyCourses.primaryInstructorId. There is
+  // deliberately no UI to set this yet (see report section L).
+  instructorId: uuid("instructor_id").references(() => academyInstructors.id, {
+    onDelete: "set null",
+  }),
   createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
 });

@@ -3,6 +3,8 @@ import { isDatabaseConfigured } from "@/lib/db/config";
 import { listAllCertificates, formatCertificateNumber } from "@/lib/queries/academyCertificates";
 import { AcademySubNav } from "@/components/academy/AcademySubNav";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
+import AccessDenied from "@/components/AccessDenied";
+import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/dates";
@@ -26,6 +28,18 @@ export default async function AcademyCertificatesPage() {
   const tCert = await getTranslations("AcademyCertificates");
   const tStatus = await getTranslations("AcademyCertificateStatus");
   const configured = isDatabaseConfigured();
+
+  // Phase 2H — section 5: certificate records are listed here too, so
+  // this entry point needs the same guard as issue/revoke itself.
+  const role = await getCurrentRole();
+  if (!role || !hasAccessArea(role, "academy_certificates")) {
+    return (
+      <div className="flex w-full flex-col gap-6 px-8 py-10">
+        <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
+        <AccessDenied />
+      </div>
+    );
+  }
 
   let rows: Awaited<ReturnType<typeof listAllCertificates>> = [];
   let error: string | null = null;
