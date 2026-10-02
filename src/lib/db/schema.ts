@@ -1826,6 +1826,67 @@ export const academyDiamondMembers = pgTable("academy_diamond_members", {
   notes: text("notes"),
 });
 
+// Phase 2B — Academy Instructors & Mentors. Deliberately NOT a second person
+// table: clientId is an optional link back to the one master identity
+// (clients), same "link if known, free-text fallback if not" pattern as
+// academyDiamondMembers.teacherClientId above. name/email/phone are always
+// stored on the row itself (never pulled from the linked client) since an
+// instructor's work contact details can differ from their personal client
+// record — same reasoning as academyDiamondMembers' own phone/email fields.
+// Deliberately separate from academyDiamondMembers: a person can be an
+// Academy Instructor, a Diamond Community member, or both — this table is
+// never read by or merged into the Diamond roster.
+export const academyRoleStatusEnum = pgEnum("academy_role_status", [
+  "active",
+  "paused",
+  "inactive",
+]);
+
+export const academyInstructors = pgTable("academy_instructors", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  // Optional link to the master person identity (clients). Nullable: a
+  // name-only fallback is used until/unless staff link an existing client.
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  // Free-text fallback display name — only required when clientId is unset
+  // (enforced in the Zod schema, not here, same as academyDiamondMembers).
+  name: text("name"),
+  email: text("email"),
+  phone: text("phone"),
+  title: text("title"),
+  specialty: text("specialty"),
+  bio: text("bio"),
+  startDate: date("start_date"),
+  status: academyRoleStatusEnum("status").notNull().default("active"),
+});
+
+export const academyMentors = pgTable("academy_mentors", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  clientId: uuid("client_id").references(() => clients.id, {
+    onDelete: "set null",
+  }),
+  name: text("name"),
+  email: text("email"),
+  phone: text("phone"),
+  focusArea: text("focus_area"),
+  notes: text("notes"),
+  startDate: date("start_date"),
+  status: academyRoleStatusEnum("status").notNull().default("active"),
+});
+
 // Phase 2, Session 6 — Marketing / Branding / AI / Automation category.
 // "Deadline" reuses cases.dueDate and "Responsible User" reuses the
 // already-reserved cases.assignedUserId (same not-yet-wired-into-UI
@@ -3032,6 +3093,8 @@ export type RriReferralDetails = typeof rriReferralDetails.$inferSelect;
 export type AcademyEnrollmentDetails =
   typeof academyEnrollmentDetails.$inferSelect;
 export type AcademyDiamondMember = typeof academyDiamondMembers.$inferSelect;
+export type AcademyInstructor = typeof academyInstructors.$inferSelect;
+export type AcademyMentor = typeof academyMentors.$inferSelect;
 export type SocialMediaContent = typeof socialMediaContent.$inferSelect;
 export type StrategicAlliance = typeof strategicAlliances.$inferSelect;
 export type AllianceStatusHistory =

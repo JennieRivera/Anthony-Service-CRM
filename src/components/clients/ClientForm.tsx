@@ -3,13 +3,20 @@
 import { useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -25,6 +32,9 @@ import {
 } from "@/lib/validation/client";
 import { selectableDocumentCategoryValues } from "@/lib/validation/documentCategory";
 import { DOCUMENT_ACCEPT, uploadErrorKey } from "@/components/documents/documentUploadShared";
+import { DuplicateMatchList } from "@/components/clients/DuplicateMatchList";
+import { findPossibleDuplicateClientsAction } from "@/app/[locale]/(app)/clients/actions";
+import type { ClientDuplicateMatch } from "@/lib/queries/clients";
 import type { Client } from "@/lib/db/schema";
 
 export function ClientForm({
@@ -32,6 +42,8 @@ export function ClientForm({
   companies,
   onSubmit,
   onCreateWithDocument,
+  postCreateRedirect,
+  academyContext = false,
 }: {
   client?: Client;
   companies: { id: string; legalBusinessName: string }[];
@@ -41,13 +53,24 @@ export function ClientForm({
   // its id (no redirect) — the form then uploads the staged file itself
   // and navigates when both steps succeed.
   onCreateWithDocument?: (values: ClientFormValues) => Promise<string>;
+  // Phase 2A — Academy New Student flow. Only meaningful alongside
+  // onCreateWithDocument (the non-upload path's redirect is baked into
+  // its own server action, e.g. createClientAndContinueToEnrollmentAction).
+  // Overrides the default `/clients/{id}` destination after a successful
+  // create-with-document.
+  postCreateRedirect?: (id: string) => string;
+  // Phase 2A — shows a short banner explaining that saving continues
+  // straight into Academy enrollment rather than the plain client profile.
+  academyContext?: boolean;
 }) {
   const t = useTranslations("Clients.form");
   const tStatus = useTranslations("ClientStatus");
   const tService = useTranslations("ServiceType");
   const tDocuments = useTranslations("Documents");
   const tCategory = useTranslations("DocumentCategory");
+  const tDup = useTranslations("DuplicateMatch");
   const router = useRouter();
+  const locale = useLocale();
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [category, setCategory] = useState("other");
@@ -55,6 +78,22 @@ export function ClientForm({
   // Set once the client has been created so a retry-after-upload-failure
   // doesn't create a second client.
   const [createdClientId, setCreatedClientId] = useState<string | null>(null);
+
+  // Phase 2A — Master Person Identity Safety Net. Soft duplicate check run
+  // once, right before a *new* client is actually inserted. Never runs in
+  // edit mode (an existing client being edited can't be "a duplicate of
+  // itself"). pendingValues holds the just-validated form values while
+  // staff decides what to do; "Create New Person Anyway" calls
+  // performCreate directly with them, bypassing submit()'s check entirely
+  // rather than re-running it — plain state (not a ref) so this never
+  // trips the "refs are render-only" compiler rule.
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false);
+  const [duplicateMatches, setDuplicateMatches] = useState<ClientDuplicateMatch[] | null>(
+    null,
+  );
+  const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [confirmCreateAnyway, setConfirmCreateAnyway] = useState(false);
+  const [pendingValues, setPendingValues] = useState<ClientFormValues | null>(null);
 
   const {
     register,
@@ -78,6 +117,27 @@ export function ClientForm({
   });
 
   async function submit(values: ClientFormValues) {
+    if (!client) {
+      setCheckingDuplicates(true);
+      const matches = await findPossibleDuplicateClientsAction({
+        fullName: values.fullName,
+        email: values.email,
+        phone: values.phone,
+      });
+      setCheckingDuplicates(false);
+
+      if (matches.length > 0) {
+        setPendingValues(values);
+        setDuplicateMatches(matches);
+        setConfirmCreateAnyway(false);
+        setDuplicateDialogOpen(true);
+        return;
+      }
+    }
+    await performCreate(values);
+  }
+
+  async function performCreate(values: ClientFormValues) {
     setSubmitting(true);
     setUploadErrorKeyState(null);
     try {
@@ -101,7 +161,7 @@ export function ClientForm({
             return;
           }
         }
-        router.push(`/clients/${id}`);
+        router.push(postCreateRedirect ? postCreateRedirect(id) : `/clients/${id}`);
       } else {
         await onSubmit(values);
       }
@@ -110,11 +170,36 @@ export function ClientForm({
     }
   }
 
+  function selectExistingPerson(matchId: string) {
+    setDuplicateDialogOpen(false);
+    router.push(`/clients/${matchId}`);
+  }
+
+  function reviewExistingPerson(matchId: string) {
+    window.open(`/${locale}/clients/${matchId}`, "_blank", "noopener,noreferrer");
+  }
+
+  async function createAnyway() {
+    if (!pendingValues) return;
+    setDuplicateDialogOpen(false);
+    setDuplicateMatches(null);
+    setConfirmCreateAnyway(false);
+    await performCreate(pendingValues);
+    setPendingValues(null);
+  }
+
   return (
+    <>
     <form
       onSubmit={handleSubmit(submit)}
       className="flex flex-col gap-6 rounded-lg border border-border bg-card p-6"
     >
+      {academyContext && (
+        <p className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+          {t("academyIntentBanner")}
+        </p>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="fullName">{t("fullName")}</Label>
@@ -296,14 +381,82 @@ export function ClientForm({
           type="button"
           variant="outline"
           onClick={() => router.back()}
-          disabled={submitting}
+          disabled={submitting || checkingDuplicates}
         >
           {t("cancel")}
         </Button>
-        <Button type="submit" disabled={submitting}>
-          {submitting ? t("saving") : t("save")}
+        <Button type="submit" disabled={submitting || checkingDuplicates}>
+          {checkingDuplicates
+            ? tDup("checking")
+            : submitting
+              ? t("saving")
+              : t("save")}
         </Button>
       </div>
     </form>
+
+    <Dialog open={duplicateDialogOpen} onOpenChange={setDuplicateDialogOpen}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{tDup("title")}</DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-muted-foreground">{tDup("description")}</p>
+
+        {duplicateMatches && (
+          <DuplicateMatchList
+            matches={duplicateMatches}
+            renderActions={(match) => (
+              <>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => reviewExistingPerson(match.id)}
+                >
+                  {tDup("reviewExisting")}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => selectExistingPerson(match.id)}
+                >
+                  {tDup("useExisting")}
+                </Button>
+              </>
+            )}
+          />
+        )}
+
+        <div className="flex flex-col gap-2 rounded-md border border-dashed border-border p-3">
+          <label className="flex items-start gap-2 text-sm">
+            <Checkbox
+              checked={confirmCreateAnyway}
+              onCheckedChange={(value) => setConfirmCreateAnyway(Boolean(value))}
+            />
+            {tDup("createAnywayConfirm")}
+          </label>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!confirmCreateAnyway || submitting}
+            onClick={createAnyway}
+            className="w-fit"
+          >
+            {tDup("createAnywayButton")}
+          </Button>
+        </div>
+
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setDuplicateDialogOpen(false)}
+          >
+            {tDup("cancel")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

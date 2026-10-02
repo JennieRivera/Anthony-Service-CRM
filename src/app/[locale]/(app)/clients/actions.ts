@@ -8,6 +8,7 @@ import { clientFormSchema, type ClientFormValues } from "@/lib/validation/client
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { logAuditEvent } from "@/lib/audit";
+import { findPossibleDuplicateClients } from "@/lib/queries/clients";
 
 function normalize(values: ClientFormValues) {
   const interestedServices = Array.from(new Set(values.interestedServices));
@@ -31,6 +32,30 @@ export async function createClientAction(rawValues: ClientFormValues) {
   const id = await insertClient(rawValues);
   const locale = await getLocale();
   redirect({ href: `/clients/${id}`, locale });
+}
+
+// Phase 2A — Academy New Student flow. Same creation path as
+// createClientAction, but lands back in Academy enrollment instead of the
+// plain client profile, so "search existing person, else create one" never
+// strands staff on a page with no obvious next step.
+export async function createClientAndContinueToEnrollmentAction(
+  rawValues: ClientFormValues,
+) {
+  const id = await insertClient(rawValues);
+  const locale = await getLocale();
+  redirect({ href: `/cases/new?serviceType=academy&clientId=${id}`, locale });
+}
+
+// Phase 2A — Master Person Identity Safety Net. Soft, informational only:
+// never merges, deletes, or blocks — see findPossibleDuplicateClients for
+// the matching rules. Reused by the New Client form, the Academy New
+// Student search, and Diamond Community's non-student member entry.
+export async function findPossibleDuplicateClientsAction(query: {
+  fullName?: string;
+  email?: string;
+  phone?: string;
+}) {
+  return findPossibleDuplicateClients(query);
 }
 
 // Used by the New Client form when a document is staged alongside it: a

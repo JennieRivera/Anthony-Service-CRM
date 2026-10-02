@@ -3,13 +3,16 @@
 import { useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Plus, Gem } from "lucide-react";
+import { Plus, Gem, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { businessDateString, formatDate } from "@/lib/dates";
+import { DuplicateMatchList } from "@/components/clients/DuplicateMatchList";
+import { findPossibleDuplicateClientsAction } from "@/app/[locale]/(app)/clients/actions";
+import type { ClientDuplicateMatch } from "@/lib/queries/clients";
 import {
   Select,
   SelectContent,
@@ -162,6 +165,7 @@ function AddMemberDialog({
 }) {
   const t = useTranslations("DiamondCommunity");
   const tType = useTranslations("DiamondMemberType");
+  const tDup = useTranslations("DuplicateMatch");
   const [open, setOpen] = useState(false);
   const [memberType, setMemberType] = useState<(typeof diamondMemberTypeValues)[number]>(
     "student",
@@ -178,6 +182,32 @@ function AddMemberDialog({
   const [error, setError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Phase 2A — Master Person Identity Safety Net. For non-student member
+  // types (teacher/instructor/mentor/mentee), search the existing clients
+  // master registry before falling back to the free-text name/phone/email
+  // below — reuses the same findPossibleDuplicateClients matching logic as
+  // the New Client dialog and Academy New Student search. Never restructures
+  // academy_diamond_members: a match just sets teacherClientId, exactly like
+  // picking one from the existing "linked client" dropdown.
+  const [matches, setMatches] = useState<ClientDuplicateMatch[] | null>(null);
+  const [searchPending, startSearch] = useTransition();
+
+  function searchForMatch() {
+    startSearch(async () => {
+      const found = await findPossibleDuplicateClientsAction({
+        fullName: name,
+        email,
+        phone,
+      });
+      setMatches(found);
+    });
+  }
+
+  function linkMatch(match: ClientDuplicateMatch) {
+    setTeacherClientId(match.id);
+    setMatches(null);
+  }
+
   function reset() {
     setMemberType("student");
     setCaseId("");
@@ -187,6 +217,7 @@ function AddMemberDialog({
     setEmail("");
     setJoinedDate(businessDateString());
     setError(null);
+    setMatches(null);
   }
 
   async function handleSave() {
@@ -236,9 +267,11 @@ function AddMemberDialog({
             <Label>{t("memberType")}</Label>
             <Select
               value={memberType}
-              onValueChange={(v) =>
-                setMemberType(v as (typeof diamondMemberTypeValues)[number])
-              }
+              onValueChange={(v) => {
+                setMemberType(v as (typeof diamondMemberTypeValues)[number]);
+                setTeacherClientId("");
+                setMatches(null);
+              }}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -272,28 +305,79 @@ function AddMemberDialog({
           ) : (
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1.5">
-                <Label>{t("linkedClient")}</Label>
-                <Select
-                  value={teacherClientId || "none"}
-                  onValueChange={(v) => setTeacherClientId(!v || v === "none" ? "" : v)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">{t("noLinkedClient")}</SelectItem>
-                    {clients.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.fullName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex flex-col gap-1.5">
                 <Label htmlFor="teacherName">{t("teacherName")}</Label>
                 <Input id="teacherName" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
+
+              {teacherClientId ? (
+                <div className="flex items-center justify-between rounded-md border border-border bg-muted/40 p-2 text-sm">
+                  <span className="text-foreground">
+                    {clients.find((c) => c.id === teacherClientId)?.fullName}
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setTeacherClientId("")}
+                  >
+                    {t("unlinkClient")}
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="w-fit"
+                    disabled={searchPending}
+                    onClick={searchForMatch}
+                  >
+                    <Search className="h-4 w-4" />
+                    {searchPending ? tDup("searching") : t("searchExistingPerson")}
+                  </Button>
+
+                  {matches && matches.length === 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      {t("noMatchFoundFreeText")}
+                    </p>
+                  )}
+                  {matches && matches.length > 0 && (
+                    <DuplicateMatchList
+                      matches={matches}
+                      renderActions={(match) => (
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => linkMatch(match)}
+                        >
+                          {tDup("linkThisPerson")}
+                        </Button>
+                      )}
+                    />
+                  )}
+
+                  <div className="flex flex-col gap-1.5">
+                    <Label>{t("orSelectManually")}</Label>
+                    <Select
+                      value={teacherClientId || "none"}
+                      onValueChange={(v) => setTeacherClientId(!v || v === "none" ? "" : v)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">{t("noLinkedClient")}</SelectItem>
+                        {clients.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.fullName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
             </div>
           )}
 

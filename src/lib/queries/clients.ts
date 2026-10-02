@@ -76,6 +76,119 @@ export async function searchClientsForMatch(query: {
     .slice(0, 10);
 }
 
+export type ClientDuplicateMatchReason = "email" | "phone" | "name";
+
+export type ClientDuplicateMatch = {
+  id: string;
+  fullName: string;
+  email: string | null;
+  phone: string | null;
+  status: (typeof clients.$inferSelect)["status"];
+  matchReasons: ClientDuplicateMatchReason[];
+  services: string[];
+};
+
+function normalizeFullName(name: string) {
+  return name.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function matchRank(reasons: ClientDuplicateMatchReason[]) {
+  if (reasons.includes("email")) return 3;
+  if (reasons.includes("phone")) return 2;
+  return 1;
+}
+
+// Phase 2A — Master Person Identity Safety Net. A soft, informational
+// duplicate check surfaced to staff before a new clients row is created
+// (New Client form, Academy New Student search, Diamond Community
+// non-student member entry) — it only ever *suggests*, never merges,
+// deletes, or blocks. Email and phone are normalized the same way as
+// searchClientsForMatch above (digit-only phone, lowercased email); full
+// name is matched case-/whitespace-insensitively but is deliberately the
+// weakest signal (two different real people can share a name), so every
+// caller must treat "name" as a hint, not grounds to refuse creation.
+// Short normalized phone fragments (<7 digits) are ignored to avoid noisy
+// false positives on partially-typed numbers.
+export async function findPossibleDuplicateClients(query: {
+  fullName?: string;
+  email?: string;
+  phone?: string;
+}): Promise<ClientDuplicateMatch[]> {
+  const db = getDb();
+  const normalizedEmail = query.email?.trim().toLowerCase() || undefined;
+  const normalizedPhone = query.phone?.replace(/\D/g, "") || undefined;
+  const normalizedName = query.fullName
+    ? normalizeFullName(query.fullName)
+    : undefined;
+
+  if (!normalizedEmail && !normalizedPhone && !normalizedName) return [];
+
+  const candidates = await db
+    .select({
+      id: clients.id,
+      fullName: clients.fullName,
+      email: clients.email,
+      phone: clients.phone,
+      status: clients.status,
+    })
+    .from(clients);
+
+  const matches = candidates
+    .map((c) => {
+      const reasons: ClientDuplicateMatchReason[] = [];
+      if (
+        normalizedEmail &&
+        c.email &&
+        c.email.trim().toLowerCase() === normalizedEmail
+      ) {
+        reasons.push("email");
+      }
+      if (
+        normalizedPhone &&
+        normalizedPhone.length >= 7 &&
+        c.phone &&
+        c.phone.replace(/\D/g, "") === normalizedPhone
+      ) {
+        reasons.push("phone");
+      }
+      if (normalizedName && normalizeFullName(c.fullName) === normalizedName) {
+        reasons.push("name");
+      }
+      return { ...c, reasons };
+    })
+    .filter((c) => c.reasons.length > 0)
+    .sort((a, b) => matchRank(b.reasons) - matchRank(a.reasons))
+    .slice(0, 10);
+
+  if (matches.length === 0) return [];
+
+  const matchedIds = matches.map((m) => m.id);
+  const serviceRows = await db
+    .selectDistinct({
+      clientId: cases.clientId,
+      serviceType: cases.serviceType,
+    })
+    .from(cases)
+    .where(inArray(cases.clientId, matchedIds));
+
+  const servicesByClient = new Map<string, string[]>();
+  for (const row of serviceRows) {
+    const list = servicesByClient.get(row.clientId) ?? [];
+    list.push(row.serviceType);
+    servicesByClient.set(row.clientId, list);
+  }
+
+  return matches.map((m) => ({
+    id: m.id,
+    fullName: m.fullName,
+    email: m.email,
+    phone: m.phone,
+    status: m.status,
+    matchReasons: m.reasons,
+    services: servicesByClient.get(m.id) ?? [],
+  }));
+}
+
 export type TimelineEntry = {
   date: Date;
   type:

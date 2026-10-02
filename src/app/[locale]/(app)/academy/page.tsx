@@ -5,6 +5,7 @@ import { listAcademyEnrollments } from "@/lib/queries/academy";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { AcademyTable } from "@/components/academy/AcademyTable";
+import { AcademySubNav } from "@/components/academy/AcademySubNav";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
 // SIDEBAR-PLAN.md follow-up — Academy's own module, showing only
@@ -32,12 +33,14 @@ export default async function AcademyPage() {
         <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
         <Button
           nativeButton={false}
-          render={<Link href="/cases/new?serviceType=academy" />}
+          render={<Link href="/academy/new-student" />}
         >
           <Plus className="h-4 w-4" />
           {t("newStudent")}
         </Button>
       </div>
+
+      <AcademySubNav active="students" />
 
       {!configured && <DatabaseNotConfigured />}
 
