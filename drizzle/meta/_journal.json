@@ -344,6 +344,20 @@
       "when": 1790918957288,
       "tag": "0048_lush_marvel_zombies",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1790926758151,
+      "tag": "0049_many_johnny_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1790926898102,
+      "tag": "0050_talented_oracle",
+      "breakpoints": true
     }
   ]
 }

@@ -4,10 +4,10 @@ import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { cases, tasks, clients, conversationMessages } from "@/lib/db/schema";
 import {
-  getActiveAgentIdForServiceType,
-  getActiveAgentIdForDepartment,
-  logAiActivity,
+  getActiveAgentForServiceType,
+  getActiveAgentForDepartment,
 } from "@/lib/ai/agentActivity";
+import { authorizeAndLogAgentAction } from "@/lib/ai/auditLog";
 
 // Phase 2, Session 7 — scheduled inactivity sweep (see vercel.json `crons`).
 // No period was specified in PHASE2-PLAN.md, so 14 days is a sensible default
@@ -77,13 +77,17 @@ export async function GET(request: NextRequest) {
 
       // Phase 6, Session 4 — attribute to the launched agent whose
       // department covers this case's service type, when one exists.
-      const agentId = await getActiveAgentIdForServiceType(c.serviceType);
-      if (agentId) {
-        await logAiActivity({
-          agentId,
+      // AI Foundation / Security phase — routed through the default-deny
+      // authorization layer (see cases/actions.ts's logTaskActivity for the
+      // identical reasoning: same behavior today, real enforcement now).
+      const agent = await getActiveAgentForServiceType(c.serviceType);
+      if (agent) {
+        await authorizeAndLogAgentAction({
+          agent,
+          moduleKey: "tasks",
+          action: "create_task",
           clientId: c.clientId,
           caseId: c.id,
-          action: "create_task",
           actionDetail: `Created inactivity alert for stale case "${c.title}"`,
         });
       }
@@ -107,7 +111,7 @@ export async function GET(request: NextRequest) {
   // A general "no communication logged" alert isn't tied to any one
   // service line — it's reception/relationship follow-up, Christal's
   // domain (client_service), not any of the service-specific agents.
-  const receptionAgentId = await getActiveAgentIdForDepartment("client_service");
+  const receptionAgent = await getActiveAgentForDepartment("client_service");
 
   let communicationAlertsCreated = 0;
   for (const { clientId } of activeClientIds) {
@@ -150,11 +154,12 @@ export async function GET(request: NextRequest) {
       });
       communicationAlertsCreated += 1;
 
-      if (receptionAgentId) {
-        await logAiActivity({
-          agentId: receptionAgentId,
-          clientId,
+      if (receptionAgent) {
+        await authorizeAndLogAgentAction({
+          agent: receptionAgent,
+          moduleKey: "tasks",
           action: "create_task",
+          clientId,
           actionDetail: "Created follow-up alert for a client with no recent communication logged",
         });
       }

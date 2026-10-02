@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
-import { aiEscalations } from "@/lib/db/schema";
+import { aiEscalations, users } from "@/lib/db/schema";
 import {
   aiEscalationFormSchema,
   aiEscalationResolutionFormSchema,
@@ -55,11 +55,29 @@ export async function updateAiEscalationResolutionAction(
   const values = aiEscalationResolutionFormSchema.parse(rawValues);
   const db = getDb();
 
+  // AI Foundation / Security phase — additive structured link alongside
+  // the free-text email: when it matches a real users.email, record the
+  // FK too, so a future UI can show/filter by an actual user instead of a
+  // string. Never required, never blocks saving on a non-matching email
+  // (e.g. an external accountant with no CRM login) — the free-text field
+  // alone remains fully sufficient, exactly as before this phase.
+  const assignedHumanEmail = values.assignedHumanEmail || null;
+  let assignedHumanUserId: string | null = null;
+  if (assignedHumanEmail) {
+    const [matchedUser] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(sql`lower(${users.email}) = lower(${assignedHumanEmail})`)
+      .limit(1);
+    assignedHumanUserId = matchedUser?.id ?? null;
+  }
+
   await db
     .update(aiEscalations)
     .set({
       status: values.status,
-      assignedHumanEmail: values.assignedHumanEmail || null,
+      assignedHumanEmail,
+      assignedHumanUserId,
       resolution: values.resolution || null,
       resolutionDate: values.resolutionDate || null,
       updatedAt: new Date(),

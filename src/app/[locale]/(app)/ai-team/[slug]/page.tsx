@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AiAgentAvatar } from "@/components/ai-team/AiAgentAvatar";
+import { getAiAgentExecutionLabel } from "@/lib/ai/executionStatus";
 
 export default async function AiAgentDetailPage({
   params,
@@ -16,11 +17,13 @@ export default async function AiAgentDetailPage({
   const { slug } = await params;
   const t = await getTranslations("AiTeam");
   const tStatus = await getTranslations("AiAgentStatus");
+  const tExecution = await getTranslations("AiAgentExecutionStatus");
   const tDepartment = await getTranslations("AiAgentDepartment");
   const tLanguage = await getTranslations("AiAgentLanguage");
   const tSection = await getTranslations("AiKnowledgeBaseSection");
   const tAction = await getTranslations("AiActivityAction");
   const tApprovalLevel = await getTranslations("AiApprovalLevel");
+  const tModule = await getTranslations("AiModuleKey");
 
   const result = await getAiAgentBySlug(slug);
   if (!result) notFound();
@@ -29,6 +32,12 @@ export default async function AiAgentDetailPage({
   const recentActivity = isComingSoon
     ? []
     : await getAiAgentRecentActivity(agent.id);
+  const executionLabel = getAiAgentExecutionLabel(agent);
+  const executionHintKey = `${executionLabel.replace(/_([a-z])/g, (_m, c: string) => c.toUpperCase())}Hint` as
+    | "comingSoonHint"
+    | "configuredHint"
+    | "readyForAiConnectionHint"
+    | "aiConnectedHint";
 
   const kbBySection = new Map<string, typeof knowledgeBase>();
   for (const entry of knowledgeBase) {
@@ -70,8 +79,12 @@ export default async function AiAgentDetailPage({
             {isComingSoon && (
               <Badge variant="outline">{t("comingSoonBadge")}</Badge>
             )}
+            <Badge variant="secondary">{tExecution(executionLabel)}</Badge>
           </div>
           <p className="text-muted-foreground">{agent.title}</p>
+          <p className="text-xs text-muted-foreground">
+            {tExecution(executionHintKey)}
+          </p>
           <div className="grid gap-3 text-sm sm:grid-cols-3">
             <div>
               <p className="text-muted-foreground">{t("department")}</p>
@@ -89,6 +102,50 @@ export default async function AiAgentDetailPage({
                 <p className="text-foreground">{tStatus(agent.status)}</p>
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+        <h2 className="font-heading text-lg text-foreground">
+          {t("accessTitle")}
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <p className="text-sm text-muted-foreground">
+              {t("allowedModules")}
+            </p>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              {agent.allowedModules?.length ? (
+                agent.allowedModules.map((key) => (
+                  <Badge key={key} variant="secondary">
+                    {tModule(key)}
+                  </Badge>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {t("noModulesAllowed")}
+                </p>
+              )}
+            </div>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">
+              {t("deniedModules")}
+            </p>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              {agent.deniedModules?.length ? (
+                agent.deniedModules.map((key) => (
+                  <Badge key={key} variant="destructive">
+                    {tModule(key)}
+                  </Badge>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {t("noModulesDenied")}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>

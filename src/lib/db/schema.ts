@@ -3193,6 +3193,18 @@ export const aiModuleKeyEnum = pgEnum("ai_module_key", [
   // covering consultingServiceDetails (diagnosis, package, sessions,
   // milestones, action plan, 30/90-day goals).
   "consulting_service_records",
+  // AI Foundation / Security phase — Diamond Community and B2B Alliances had
+  // no module key at all, which meant no agent's deniedModules array could
+  // even name them. Added so both can be explicitly DENIED (the default for
+  // every existing agent, including Camila, despite her department literally
+  // being "community_academy" — access is never inferred from a name) and so
+  // a future explicit grant is possible without a schema change.
+  "diamond_community",
+  "b2b_alliances",
+  // Same phase — Camila's future Academy scope (Students/Programs/Courses/
+  // Modules/Progress/Attendance/Evaluations) needs its own key, same
+  // specificity pattern as document_prep_records/consulting_service_records.
+  "academy_records",
 ]);
 
 export const aiKnowledgeBaseSectionEnum = pgEnum("ai_knowledge_base_section", [
@@ -3234,12 +3246,40 @@ export const aiActivityActionEnum = pgEnum("ai_activity_action", [
   "send_message",
   "escalate",
   "other",
+  // AI Foundation / Security phase — section 7's Level 2 list named several
+  // concrete action categories this enum had no value for yet, so the
+  // approval-level policy function had nothing to classify them against.
+  // Added so the architecture is enforceable, not just documented; none of
+  // these have a real caller yet (no execution engine exists — see the
+  // read-only audit).
+  "update_client_data",
+  "academy_grade_change",
+  "invoice_status_change",
+  "b2b_status_change",
+  // Level 3 — "human only", never executable by an agent under any
+  // approval, by design (see getApprovalLevelForAction).
+  "financial_transaction",
+  "payment_capture",
+  "delete_record",
+  "admin_change",
+  "commission_change",
+  "legal_determination",
+  "immigration_determination",
+  "document_release",
+  "diamond_community_write",
+  "b2b_alliance_write",
 ]);
 
 export const aiActivityOutcomeEnum = pgEnum("ai_activity_outcome", [
   "success",
   "failed",
   "pending_approval",
+  // AI Foundation / Security phase — distinct from "failed" (an attempted
+  // action that errored) and "pending_approval" (a level-2 action waiting on
+  // a human). "denied" records the authorization layer itself refusing the
+  // action before it was ever attempted — module not allowed, module
+  // explicitly denied, permission flag off, or level-3-human-only.
+  "denied",
 ]);
 
 // Section 11's 3-tier approval policy — a fixed rule about which *kind* of
@@ -3347,6 +3387,15 @@ export const aiEscalations = pgTable("ai_escalations", {
     .default("medium"),
   status: aiEscalationStatusEnum("status").notNull().default("open"),
   assignedHumanEmail: text("assigned_human_email"),
+  // AI Foundation / Security phase — additive structured link alongside the
+  // free-text email above (kept as-is for every existing row and for
+  // assigning to a human outside the users table, e.g. an external
+  // accountant). Populated automatically when assignedHumanEmail matches a
+  // real users.email, never required, never backfilled destructively.
+  assignedHumanUserId: uuid("assigned_human_user_id").references(
+    () => users.id,
+    { onDelete: "set null" },
+  ),
   resolution: text("resolution"),
   resolutionDate: date("resolution_date"),
 });
@@ -3367,6 +3416,12 @@ export const aiActivityLog = pgTable("ai_activity_log", {
   }),
   caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
   action: aiActivityActionEnum("action").notNull(),
+  // AI Foundation / Security phase — which module-key the authorization
+  // layer checked the action against, so a denial is traceable to a
+  // specific allow/deny-list decision, not just a free-text actionDetail
+  // guess. Nullable: pre-existing rows (and any future row logged outside
+  // the module-scoped authorization path) simply have no module to record.
+  moduleKey: aiModuleKeyEnum("module_key"),
   actionDetail: text("action_detail"),
   previousValue: text("previous_value"),
   newValue: text("new_value"),
@@ -3377,6 +3432,11 @@ export const aiActivityLog = pgTable("ai_activity_log", {
     .notNull()
     .default(false),
   humanApproved: boolean("human_approved"),
+  // Section 11 — "human approver if applicable". Separate from
+  // humanApproved (the yes/no) so the audit trail also records *who*
+  // approved a level-2 action, never a secret, always an email already
+  // visible elsewhere in the CRM.
+  humanApproverEmail: text("human_approver_email"),
   outcome: aiActivityOutcomeEnum("outcome").notNull().default("success"),
   errorMessage: text("error_message"),
 });

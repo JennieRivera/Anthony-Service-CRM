@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AiAgentAvatar } from "./AiAgentAvatar";
 import type { AiAgent } from "@/lib/db/schema";
+import { getAiAgentExecutionLabel } from "@/lib/ai/executionStatus";
 
 const STATUS_DOT_CLASSES: Record<string, string> = {
   online: "bg-emerald-500",
@@ -42,11 +43,18 @@ export function AiAgentCard({
 }) {
   const t = useTranslations("AiTeam");
   const tStatus = useTranslations("AiAgentStatus");
+  const tExecution = useTranslations("AiAgentExecutionStatus");
   const tDepartment = useTranslations("AiAgentDepartment");
   const tLanguage = useTranslations("AiAgentLanguage");
 
   const isComingSoon = agent.launchStatus === "coming_soon";
   const activePermissions = PERMISSION_KEYS.filter((key) => agent[key]).length;
+  const executionLabel = getAiAgentExecutionLabel(agent);
+  const executionHintKey = `${executionLabel.replace(/_([a-z])/g, (_m, c: string) => c.toUpperCase())}Hint` as
+    | "comingSoonHint"
+    | "configuredHint"
+    | "readyForAiConnectionHint"
+    | "aiConnectedHint";
 
   return (
     <Card className={cn(isComingSoon && "opacity-70")}>
@@ -83,11 +91,21 @@ export function AiAgentCard({
       <CardContent className="flex flex-col gap-4">
         {isComingSoon ? (
           <div className="flex flex-col gap-3">
-            <Badge variant="outline" className="w-fit">
-              {t("comingSoonBadge")}
-            </Badge>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="w-fit">
+                {t("comingSoonBadge")}
+              </Badge>
+              {executionLabel === "configured" && (
+                <Badge variant="secondary" className="w-fit">
+                  {tExecution("configured")}
+                </Badge>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               {t("comingSoonMessage")}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {tExecution(executionHintKey)}
             </p>
             <p className="text-xs text-muted-foreground">
               {t("department")}: {tDepartment(agent.department)}
@@ -95,6 +113,14 @@ export function AiAgentCard({
           </div>
         ) : (
           <>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="secondary" className="w-fit">
+                {tExecution(executionLabel)}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {tExecution(executionHintKey)}
+            </p>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
               <div>
                 <p className="text-muted-foreground">{t("department")}</p>

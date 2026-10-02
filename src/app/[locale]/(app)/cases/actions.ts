@@ -46,7 +46,8 @@ import {
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
-import { getActiveAgentIdForServiceType, logAiActivity } from "@/lib/ai/agentActivity";
+import { getActiveAgentForServiceType } from "@/lib/ai/agentActivity";
+import { authorizeAndLogAgentAction } from "@/lib/ai/auditLog";
 import { businessDateString } from "@/lib/dates";
 import { logAuditEvent } from "@/lib/audit";
 import { z } from "zod";
@@ -114,19 +115,29 @@ async function ensureOpenTask(
 // src/lib/ai/agentActivity.ts), when one is launched. Cases in a
 // department with no agent yet (notary, academy, credit_financing, etc.)
 // simply get no attribution — never invented.
+//
+// AI Foundation / Security phase — now routed through
+// authorizeAndLogAgentAction() instead of writing the log row directly.
+// Every one of today's 6 launched agents has "tasks" in allowedModules and
+// canCreateTask=true, so this is a no-behavior-change wiring: the same
+// task-creation automation keeps attributing to the same agent, but the
+// attribution now runs through the real default-deny gate (and would
+// correctly stop attributing — not stop the underlying task from being
+// created — if a future admin ever denied an agent the "tasks" module).
 async function logTaskActivity(
   serviceType: string,
   clientId: string,
   caseId: string,
   detail: string,
 ) {
-  const agentId = await getActiveAgentIdForServiceType(serviceType);
-  if (!agentId) return;
-  await logAiActivity({
-    agentId,
+  const agent = await getActiveAgentForServiceType(serviceType);
+  if (!agent) return;
+  await authorizeAndLogAgentAction({
+    agent,
+    moduleKey: "tasks",
+    action: "create_task",
     clientId,
     caseId,
-    action: "create_task",
     actionDetail: detail,
   });
 }

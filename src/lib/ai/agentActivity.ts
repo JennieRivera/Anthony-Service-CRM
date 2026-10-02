@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
   aiAgents,
@@ -8,22 +8,43 @@ import {
 } from "@/lib/db/schema";
 
 type Department = (typeof aiAgentDepartmentEnum.enumValues)[number];
-type ActivityAction = (typeof aiActivityActionEnum.enumValues)[number];
-type ApprovalLevel = "level_1_automatic" | "level_2_human_review" | "level_3_human_only";
+export type ActivityAction = (typeof aiActivityActionEnum.enumValues)[number];
+export type ApprovalLevel = "level_1_automatic" | "level_2_human_review" | "level_3_human_only";
 
 // Section 11's 3-tier policy, keyed by action type — a fixed rule, not a
 // per-agent or admin-editable setting. Level 1 covers "crear tarea, crear
 // nota, crear recordatorio, clasificar servicio, redactar mensaje (borrador,
 // no enviado)" — every action type this codebase's automation actually
-// performs today. Actually sending a message to a client is Level 2 for
-// this business (every service line here — taxes, immigration, credit,
-// commercial finance — is on section 11's Level 2 topic list), so
-// send_message never resolves to Level 1, even though no caller uses it
-// yet; nothing here can reach Level 3, since no action type represents a
-// legal/financial/government decision — those stay entirely human by the
-// absence of any code path, not by a check in this function.
+// performs today. Level 2 and level 3 action types (added in the AI
+// Foundation / Security phase) have no real caller yet — there is still no
+// execution engine anywhere in this app — but are classified here so
+// src/lib/ai/agentAuthorization.ts has a real policy to enforce against
+// instead of an empty list. Nothing promotes a level_3 action to anything
+// lower; see agentAuthorization.ts for why there is no override.
+const LEVEL_2_ACTIONS: ReadonlySet<ActivityAction> = new Set([
+  "send_message",
+  "update_client_data",
+  "academy_grade_change",
+  "invoice_status_change",
+  "b2b_status_change",
+]);
+
+const LEVEL_3_ACTIONS: ReadonlySet<ActivityAction> = new Set([
+  "financial_transaction",
+  "payment_capture",
+  "delete_record",
+  "admin_change",
+  "commission_change",
+  "legal_determination",
+  "immigration_determination",
+  "document_release",
+  "diamond_community_write",
+  "b2b_alliance_write",
+]);
+
 export function getApprovalLevelForAction(action: ActivityAction): ApprovalLevel {
-  if (action === "send_message") return "level_2_human_review";
+  if (LEVEL_3_ACTIONS.has(action)) return "level_3_human_only";
+  if (LEVEL_2_ACTIONS.has(action)) return "level_2_human_review";
   return "level_1_automatic";
 }
 
@@ -61,6 +82,39 @@ export async function getActiveAgentIdForServiceType(
   const department = DEPARTMENT_BY_SERVICE_TYPE[serviceType];
   if (!department) return null;
   return getActiveAgentIdForDepartment(department);
+}
+
+// AI Foundation / Security phase — same lookup as above, but returning the
+// full row authorizeAgentAction() needs (allowedModules/deniedModules/
+// permission booleans), not just an id. Added instead of widening the
+// existing id-only helpers so cases/[id]/page.tsx's unrelated "which agent
+// would this escalate to" lookup keeps its original, smaller shape.
+//
+// Also excludes a "paused" agent, unlike the id-only helper above — pausing
+// an agent (toggleAiAgentPauseAction) previously had no effect on whether
+// new automation kept getting attributed to it, which is exactly the kind
+// of status dishonesty section 9 asks to fix: a paused card should stop
+// claiming new work, not just display a different dot color while still
+// accumulating it under the hood.
+export async function getActiveAgentForDepartment(department: Department) {
+  const [agent] = await getDb()
+    .select()
+    .from(aiAgents)
+    .where(
+      and(
+        eq(aiAgents.department, department),
+        eq(aiAgents.launchStatus, "active"),
+        ne(aiAgents.status, "paused"),
+      ),
+    )
+    .limit(1);
+  return agent ?? null;
+}
+
+export async function getActiveAgentForServiceType(serviceType: string) {
+  const department = DEPARTMENT_BY_SERVICE_TYPE[serviceType];
+  if (!department) return null;
+  return getActiveAgentForDepartment(department);
 }
 
 // Section 15's "no duplicate data" rule extends to activity logging: this

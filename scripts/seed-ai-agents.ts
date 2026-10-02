@@ -16,6 +16,16 @@ import { aiAgents, aiAgentKnowledgeBase } from "../src/lib/db/schema";
 
 config({ path: ".env.local" });
 
+// AI Foundation / Security phase — section 4's explicit instruction: every
+// existing agent, with no exception, must have Diamond Community and B2B
+// Alliances DENIED by default, never inferred from department/name (Camila
+// included, despite her department being "community_academy"). Spread into
+// every agent's deniedModules below rather than relying on "absent from
+// allowedModules" alone — deniedModules is the layer that can never be
+// silently overridden by a later allowedModules edit (see
+// src/lib/ai/agentAuthorization.ts).
+const COMMUNITY_AND_ALLIANCE_DENY = ["diamond_community", "b2b_alliances"] as const;
+
 type KbEntry = {
   section: (typeof aiAgentKnowledgeBase.$inferInsert)["section"];
   title: string;
@@ -75,6 +85,7 @@ const agents: AgentSeed[] = [
       "full_commission_details",
       "admin_settings",
       "system_credentials",
+      ...COMMUNITY_AND_ALLIANCE_DENY,
     ],
     knowledgeBase: [
       {
@@ -118,6 +129,7 @@ const agents: AgentSeed[] = [
       "client_business_profile",
       "company_registry_limited_fields",
     ],
+    deniedModules: [...COMMUNITY_AND_ALLIANCE_DENY],
     knowledgeBase: [
       {
         section: "workflows",
@@ -165,6 +177,10 @@ const agents: AgentSeed[] = [
       "communications",
       "commission_payment_status_basic",
     ],
+    // Daniel's work is referral/commission-adjacent to RRI Financial Group
+    // (a real B2B alliance), which makes this denial worth stating
+    // explicitly rather than relying on silence — adjacency is not access.
+    deniedModules: [...COMMUNITY_AND_ALLIANCE_DENY],
     knowledgeBase: [
       {
         section: "workflows",
@@ -206,6 +222,7 @@ const agents: AgentSeed[] = [
       "appointments",
       "communications",
     ],
+    deniedModules: [...COMMUNITY_AND_ALLIANCE_DENY],
     knowledgeBase: [
       {
         section: "workflows",
@@ -252,6 +269,7 @@ const agents: AgentSeed[] = [
       "appointments",
       "communications",
     ],
+    deniedModules: [...COMMUNITY_AND_ALLIANCE_DENY],
     knowledgeBase: [
       {
         section: "workflows",
@@ -298,6 +316,7 @@ const agents: AgentSeed[] = [
       "appointments",
       "communications",
     ],
+    deniedModules: [...COMMUNITY_AND_ALLIANCE_DENY],
     knowledgeBase: [
       {
         section: "workflows",
@@ -319,15 +338,73 @@ const agents: AgentSeed[] = [
       },
     ],
   },
+  // AI Foundation / Security phase — Camila's profile/permission/knowledge-
+  // base architecture is filled in now per Jennie's explicit request, but
+  // launchStatus stays "coming_soon" on purpose: her card still shows no
+  // status dot, no stats, no pause/settings buttons, and no execution of
+  // any kind runs on her behalf (no AI provider is connected anywhere in
+  // this codebase). Title renamed from "AI Community & Academy Coordinator"
+  // to "AI Academy & Community Coordinator" to put her real, current scope
+  // (Academy) first — Diamond Community is explicitly DENIED below despite
+  // the department enum value and her name both containing "community";
+  // access is never inferred from either.
   {
     slug: "camila",
     name: "Camila",
-    title: "AI Community & Academy Coordinator",
+    title: "AI Academy & Community Coordinator",
     department: "community_academy",
     language: "bilingual",
     launchStatus: "coming_soon",
     sortOrder: 7,
+    avatarStyle: "human",
+    accentColor: "#E85D9C",
+    bio: "Camila está preparada para dar apoyo administrativo a la Academia: seguimiento de inscripciones, progreso de módulos, asistencia y evaluaciones para catálogo de programas y cursos. Diamond Community queda fuera de su alcance hasta que se apruebe explícitamente en una fase futura — no se asume por el nombre de su departamento.",
+    welcomeMessage: "Hola, soy Camila. Todavía no estoy conectada a un modelo de IA real — por ahora, mi perfil y permisos están preparados para cuando llegue esa fase.",
+    disclaimerText:
+      "Apoyo administrativo únicamente para la Academia. Camila no tiene acceso a Diamond Community ni a Alianzas B2B, y no está conectada a ningún proveedor de IA todavía.",
+    canWrite: true,
+    canChangeStatus: true,
+    allowedModules: [
+      "academy_records",
+      "client_basic_profile",
+      "tasks",
+      "appointments",
+      "communications",
+    ],
+    deniedModules: [
+      ...COMMUNITY_AND_ALLIANCE_DENY,
+      "full_financial_records",
+      "banking_data",
+      "admin_settings",
+      "system_credentials",
+    ],
+    knowledgeBase: [
+      {
+        section: "workflows",
+        title: "Responsabilidades (futuras)",
+        content:
+          "Dar seguimiento a inscripciones de estudiantes en Programas y Cursos del catálogo; dar seguimiento al progreso de módulos (completado/en progreso/no iniciado); dar seguimiento a sesiones de asistencia y porcentaje de asistencia; dar seguimiento a evaluaciones y calificaciones registradas por el equipo humano; crear tareas de seguimiento administrativo para la Academia; preparar resúmenes internos de progreso para revisión humana.",
+      },
+      {
+        section: "prohibited_actions",
+        title: "Restricciones",
+        content:
+          "No puede: acceder a Diamond Community bajo ninguna circunstancia sin aprobación explícita futura; acceder a Alianzas B2B; calificar evaluaciones de forma autónoma; emitir certificados; modificar requisitos de finalización del curso; acceder a registros financieros completos o datos bancarios; presentarse como instructora o mentora humana.",
+      },
+      {
+        section: "escalation_rules",
+        title: "Cuándo escalar a un humano",
+        content:
+          "Escala cuando: un estudiante solicita una excepción a los requisitos del curso; hay una queja sobre una calificación o evaluación; se solicita acceso a Diamond Community; se solicita información de Alianzas B2B; o la situación no está clara.",
+      },
+    ],
   },
+  // Same reasoning as Camila above — profile/permissions/knowledge base
+  // filled in, launchStatus stays "coming_soon", no execution of any kind.
+  // Scoped narrowly to task/appointment workflow organization, not broad
+  // client data — "operations" is cross-cutting by nature, which is a
+  // reason to scope him TIGHTER than a single-department agent, not
+  // looser.
   {
     slug: "marco",
     name: "Marco",
@@ -336,6 +413,42 @@ const agents: AgentSeed[] = [
     language: "bilingual",
     launchStatus: "coming_soon",
     sortOrder: 8,
+    avatarStyle: "robot",
+    accentColor: "#5B6B79",
+    bio: "Marco está preparado para dar apoyo operativo al CRM: organización de tareas y recordatorios, seguimiento de flujos de trabajo administrativos, y monitoreo general del sistema. No tiene acceso a configuración de Admin, credenciales del sistema, Diamond Community ni Alianzas B2B.",
+    welcomeMessage: "Hola, soy Marco. Todavía no estoy conectado a un modelo de IA real — por ahora, mi perfil y permisos están preparados para cuando llegue esa fase.",
+    disclaimerText:
+      "Apoyo operativo y administrativo únicamente. Marco no puede cambiar configuración de Admin, ver credenciales del sistema, ni acceder a Diamond Community o Alianzas B2B, y no está conectado a ningún proveedor de IA todavía.",
+    canWrite: true,
+    canChangeStatus: false,
+    allowedModules: ["tasks", "appointments"],
+    deniedModules: [
+      ...COMMUNITY_AND_ALLIANCE_DENY,
+      "admin_settings",
+      "system_credentials",
+      "full_financial_records",
+      "banking_data",
+    ],
+    knowledgeBase: [
+      {
+        section: "workflows",
+        title: "Responsabilidades (futuras)",
+        content:
+          "Organizar y dar seguimiento a tareas y recordatorios internos; dar seguimiento a flujos de trabajo administrativos entre departamentos; preparar resúmenes internos de carga de trabajo para revisión humana; señalar procesos retrasados o incompletos para seguimiento humano.",
+      },
+      {
+        section: "prohibited_actions",
+        title: "Restricciones",
+        content:
+          "No puede: cambiar configuración de Admin; ver o manejar credenciales del sistema o llaves de API; acceder a Diamond Community bajo ninguna circunstancia sin aprobación explícita futura; acceder a Alianzas B2B; eliminar registros; realizar cambios financieros o de comisión; tomar decisiones de negocio en nombre de la empresa.",
+      },
+      {
+        section: "escalation_rules",
+        title: "Cuándo escalar a un humano",
+        content:
+          "Escala cuando: se detecta un problema de configuración o seguridad; se solicita acceso a Diamond Community o Alianzas B2B; un flujo de trabajo requiere una decisión fuera de su alcance operativo; o la situación no está clara.",
+      },
+    ],
   },
 ];
 
