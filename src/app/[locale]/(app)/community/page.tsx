@@ -11,7 +11,8 @@ import { AllianceTable } from "@/components/alliances/AllianceTable";
 import { AssociationTable } from "@/components/associations/AssociationTable";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 import AccessDenied from "@/components/AccessDenied";
-import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
+import { getCurrentRole, hasAccessArea, hasAllianceViewAccess } from "@/lib/permissions";
+import { Settings2 } from "lucide-react";
 
 // SIDEBAR-PLAN.md section 3 — Community & Strategic Alliances is one
 // sidebar item, but deliberately does NOT merge the two underlying
@@ -38,7 +39,13 @@ export default async function CommunityPage({
   // together — this gate doesn't change who can reach this page, it just
   // makes the requirement real and server-enforced instead of implicit.
   const role = await getCurrentRole();
-  if (!role || (!hasAccessArea(role, "alliances") && !hasAccessArea(role, "associations"))) {
+  // B2B Memberships & Benefits — a role may reach this page on the
+  // strength of either membership area too (hasAllianceViewAccess),
+  // even though only "alliances" authorizes creating/editing an
+  // alliance record itself. This is what lets Bookkeeping Staff, who
+  // holds only b2b_membership_billing, browse to an alliance to link an
+  // invoice to its membership.
+  if (!role || (!hasAllianceViewAccess(role) && !hasAccessArea(role, "associations"))) {
     return (
       <div className="flex w-full flex-col gap-6 px-8 py-10">
         <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
@@ -46,7 +53,8 @@ export default async function CommunityPage({
       </div>
     );
   }
-
+  const canCreateAlliance = hasAccessArea(role, "alliances");
+  const canManageMemberships = hasAccessArea(role, "b2b_membership");
   const configured = isDatabaseConfigured();
   const { state, tab } = await searchParams;
   const activeTab = tab === "associations" ? "associations" : "alliances";
@@ -90,11 +98,19 @@ export default async function CommunityPage({
           </TabsList>
 
           <TabsContent value="alliances" className="flex flex-col gap-4 pt-4">
-            <div className="flex justify-end">
-              <Button render={<Link href="/alliances/new" />}>
-                <Plus className="h-4 w-4" />
-                {tAlliances("newAlliance")}
-              </Button>
+            <div className="flex justify-end gap-2">
+              {canManageMemberships && (
+                <Button variant="outline" render={<Link href="/community/membership-plans" />}>
+                  <Settings2 className="h-4 w-4" />
+                  {tAlliances("manageMembershipPlans")}
+                </Button>
+              )}
+              {canCreateAlliance && (
+                <Button render={<Link href="/alliances/new" />}>
+                  <Plus className="h-4 w-4" />
+                  {tAlliances("newAlliance")}
+                </Button>
+              )}
             </div>
             {alliances.length === 0 ? (
               <p className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">

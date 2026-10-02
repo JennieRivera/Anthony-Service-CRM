@@ -13,6 +13,7 @@ import {
   appointments,
 } from "@/lib/db/schema";
 import { listAuditLogForEntity } from "@/lib/queries/auditLog";
+import { getAllianceMembershipData, listInvoicesForClient } from "@/lib/queries/memberships";
 
 // B2B Network Foundation — both directions of this alliance's network
 // provenance: alliances THIS one introduced, and alliances that
@@ -177,10 +178,18 @@ export async function getAllianceById(id: string) {
         .orderBy(desc(appointments.startAt)),
     ]);
 
-  const [network, activity] = await Promise.all([
+  const [network, activity, membership] = await Promise.all([
     listAllianceNetworkRelationships(id),
     listAuditLogForEntity("alliance", id),
+    getAllianceMembershipData(id),
   ]);
+
+  // Invoices eligible to link to this alliance's membership — only the
+  // alliance's own linked client's invoices (section 27: membership
+  // never overrides privacy), and only when a client is actually linked
+  // (invoices.clientId is required, so there is nothing to offer
+  // otherwise).
+  const linkableInvoices = linkedClient ? await listInvoicesForClient(linkedClient.id) : [];
 
   return {
     alliance,
@@ -194,6 +203,8 @@ export async function getAllianceById(id: string) {
     linkedAppointments,
     network,
     activity,
+    membership,
+    linkableInvoices,
   };
 }
 

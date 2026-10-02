@@ -147,7 +147,27 @@ export type AccessArea =
   // (or "referrals") without duplicating that UI into a second page.
   | "referral_compensation_terms"
   | "referral_compensation_approval"
-  | "referral_compensation_payment";
+  | "referral_compensation_payment"
+  // B2B Memberships & Benefits — split the same way, for the same
+  // separation-of-duties reason as the referral compensation areas
+  // above, and deliberately NOT implied by any existing area:
+  // "alliances" (the B2B relationship itself) must never imply
+  // membership administration, and "invoices"/"payments"/"bookkeeping"
+  // must never imply it either.
+  //   - b2b_membership         — full membership administration: create/
+  //     edit plans, create/edit benefits, assign/change/pause/cancel an
+  //     alliance's membership, mark a fee complimentary/waived. Granted
+  //     to community_manager (the existing B2B operational role) — this
+  //     is the membership half of running B2B relationships day to day,
+  //     the same way "alliances" already covers the relationship half.
+  //   - b2b_membership_billing — narrow: view membership/benefit
+  //     information and link/unlink an existing Invoice to a membership.
+  //     Granted to bookkeeping_staff — the billing half of their
+  //     existing invoices/payments finance work, scoped so it implies
+  //     nothing about editing plans, benefits, or an alliance's
+  //     membership status/terms.
+  | "b2b_membership"
+  | "b2b_membership_billing";
 
 // "*" = every area, used only by the two roles with no narrower business
 // meaning. Every other role is an explicit array — "default deny when a
@@ -180,6 +200,10 @@ export const ROLE_PERMISSIONS: Record<Role, AccessArea[] | "*"> = {
     // the AccessArea comment above for why terms/earned/approval are
     // deliberately excluded.
     "referral_compensation_payment",
+    // B2B Memberships & Benefits — billing half only; see the
+    // AccessArea comment above for why plan/benefit/membership-status
+    // administration is deliberately excluded.
+    "b2b_membership_billing",
   ],
   notary_staff: ["notary", "online_notary"],
   // "Consulting Staff: business and company strategy"
@@ -200,8 +224,10 @@ export const ROLE_PERMISSIONS: Record<Role, AccessArea[] | "*"> = {
   // the AccessArea comment above for why approval/payment are deliberately
   // excluded.
   referral_manager: ["referrals", "referral_compensation_terms"],
-  // "Community Manager: associations and chambers"
-  community_manager: ["alliances", "associations"],
+  // "Community Manager: associations and chambers" — plus full B2B
+  // Membership administration (RBAC correction-style split: membership
+  // billing/linking alone goes to bookkeeping_staff above, not here).
+  community_manager: ["alliances", "associations", "b2b_membership"],
   // "Immigration Staff: immigration administrative cases only" — cases,
   // the Immigration Forms Library, and per-case document folders (which
   // live on the immigration case's own documents, so no separate area).
@@ -253,6 +279,22 @@ export function hasReferralViewAccess(role: Role): boolean {
     canAccessArea(role, "referral_compensation_terms") ||
     canAccessArea(role, "referral_compensation_approval") ||
     canAccessArea(role, "referral_compensation_payment")
+  );
+}
+
+// B2B Memberships & Benefits — same reasoning as hasReferralViewAccess
+// above: a role may reach the existing alliance detail page (where the
+// Membership section lives, per the brief's "extend the existing
+// profile, don't duplicate it") on the strength of EITHER "alliances"
+// or either membership area, even though only "alliances" itself
+// authorizes editing the alliance record. This is what lets Bookkeeping
+// Staff, who holds only b2b_membership_billing, open an alliance to
+// link an invoice to its membership without a second, duplicate page.
+export function hasAllianceViewAccess(role: Role): boolean {
+  return (
+    canAccessArea(role, "alliances") ||
+    canAccessArea(role, "b2b_membership") ||
+    canAccessArea(role, "b2b_membership_billing")
   );
 }
 

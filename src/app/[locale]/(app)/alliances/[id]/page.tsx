@@ -14,13 +14,21 @@ import { AllianceDocumentTypeSelect } from "@/components/alliances/AllianceDocum
 import { AllianceContactsSection } from "@/components/alliances/AllianceContactsSection";
 import { AllianceNetworkSection } from "@/components/alliances/AllianceNetworkSection";
 import { AllianceActivitySection } from "@/components/alliances/AllianceActivitySection";
+import { AllianceMembershipSection } from "@/components/alliances/AllianceMembershipSection";
 import AccessDenied from "@/components/AccessDenied";
-import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
+import { getCurrentRole, hasAccessArea, hasAllianceViewAccess } from "@/lib/permissions";
+import { listActiveMembershipPlansForSelect, listActiveMembershipBenefitsForSelect } from "@/lib/queries/memberships";
 import {
   createAllianceContactAction,
   deleteAllianceContactAction,
   createAllianceNetworkRelationshipAction,
   deleteAllianceNetworkRelationshipAction,
+  assignMembershipAction,
+  updateMembershipTermsAction,
+  changeMembershipStatusAction,
+  linkMembershipInvoiceAction,
+  addMembershipBenefitOverrideAction,
+  removeMembershipBenefitOverrideAction,
 } from "../actions";
 
 export default async function AllianceDetailPage({
@@ -35,7 +43,7 @@ export default async function AllianceDetailPage({
   const tAppointmentStatus = await getTranslations("AppointmentStatus");
 
   const role = await getCurrentRole();
-  if (!role || !hasAccessArea(role, "alliances")) {
+  if (!role || !hasAllianceViewAccess(role)) {
     return (
       <div className="flex w-full flex-col gap-6 px-8 py-10">
         <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
@@ -43,13 +51,18 @@ export default async function AllianceDetailPage({
       </div>
     );
   }
+  const canEditAlliance = hasAccessArea(role, "alliances");
+  const canManageMembership = hasAccessArea(role, "b2b_membership");
+  const canLinkInvoice = hasAccessArea(role, "b2b_membership_billing");
 
   const blobConfigured = isBlobConfigured();
 
-  const [result, clients, allAlliances] = await Promise.all([
+  const [result, clients, allAlliances, membershipPlans, membershipBenefits] = await Promise.all([
     getAllianceById(id),
     listClientsForSelect(),
     listAlliancesForSelect(),
+    listActiveMembershipPlansForSelect(),
+    listActiveMembershipBenefitsForSelect(),
   ]);
   if (!result) notFound();
 
@@ -65,6 +78,8 @@ export default async function AllianceDetailPage({
     linkedAppointments,
     network,
     activity,
+    membership,
+    linkableInvoices,
   } = result;
   const contractSigned = alliance.referralAgreement || alliance.commissionAgreement;
   const otherAlliances = allAlliances.filter((a) => a.id !== id);
@@ -78,10 +93,12 @@ export default async function AllianceDetailPage({
         >
           &larr; {t("backToAlliances")}
         </Link>
-        <Button render={<Link href={`/alliances/${id}/edit`} />}>
-          <Pencil className="h-4 w-4" />
-          {t("editAlliance")}
-        </Button>
+        {canEditAlliance && (
+          <Button render={<Link href={`/alliances/${id}/edit`} />}>
+            <Pencil className="h-4 w-4" />
+            {t("editAlliance")}
+          </Button>
+        )}
       </div>
 
       {/* Alliance information */}
@@ -263,6 +280,23 @@ export default async function AllianceDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Membership */}
+      <AllianceMembershipSection
+        allianceId={id}
+        membership={membership}
+        plans={membershipPlans}
+        benefits={membershipBenefits}
+        linkableInvoices={linkableInvoices}
+        canManage={canManageMembership}
+        canLinkInvoice={canLinkInvoice}
+        onAssign={assignMembershipAction}
+        onUpdateTerms={updateMembershipTermsAction}
+        onChangeStatus={changeMembershipStatusAction}
+        onLinkInvoice={linkMembershipInvoiceAction}
+        onAddOverride={addMembershipBenefitOverrideAction}
+        onRemoveOverride={removeMembershipBenefitOverrideAction}
+      />
 
       {/* Responsibilities */}
       {(alliance.amsResponsibilities || alliance.partnerResponsibilities) && (

@@ -3437,6 +3437,230 @@ export const allianceNetworkRelationships = pgTable(
 );
 
 // ===================================================================
+// B2B Memberships & Benefits — extends the existing B2B Alliance
+// architecture rather than duplicating it. The core distinction this
+// whole block preserves: a strategicAlliances row (the business
+// relationship itself) is NOT a membership. An alliance may remain
+// Active with zero membership relationship forever — membership is
+// optional and always a separate, explicit record a human creates.
+// Nothing here is ever created automatically from an alliance's
+// existence, status, or network connections.
+
+export const membershipBillingModelEnum = pgEnum("membership_billing_model", [
+  "free",
+  "paid",
+  "custom",
+]);
+
+export const membershipBillingFrequencyEnum = pgEnum(
+  "membership_billing_frequency",
+  ["monthly", "annual", "one_time", "custom"],
+);
+
+// Internal configurable catalog of plans AMS can offer — deliberately
+// no hardcoded "Basic/Professional/Premium" names; real plans are
+// staff-defined data, not schema. price/billingFrequency here are the
+// plan's CURRENT terms; an existing alliance's membership snapshots its
+// own agreed price/frequency at assignment time (see allianceMemberships
+// below), so editing a plan's price later never rewrites what an
+// existing member already agreed to pay — same snapshot principle as
+// the Referrals & Commissions compensation terms.
+export const membershipPlans = pgTable("membership_plans", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  name: text("name").notNull(),
+  description: text("description"),
+  billingModel: membershipBillingModelEnum("billing_model")
+    .notNull()
+    .default("free"),
+  price: numeric("price", { precision: 12, scale: 2 }),
+  billingFrequency: membershipBillingFrequencyEnum("billing_frequency"),
+  currency: text("currency").notNull().default("USD"),
+  benefitsSummary: text("benefits_summary"),
+  displayOrder: integer("display_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdByEmail: text("created_by_email"),
+});
+
+// Reusable benefit catalog — a benefit is defined once here and attached
+// to any number of plans via membershipPlanBenefits below, never
+// redefined per plan.
+export const membershipBenefits = pgTable("membership_benefits", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  name: text("name").notNull(),
+  description: text("description"),
+  // Free text, not an enum — the brief is explicit that benefit
+  // categories aren't a fixed taxonomy yet (directory, marketing,
+  // events, resources, referral tools, etc. are examples, not a final
+  // list).
+  category: text("category"),
+  isActive: boolean("is_active").notNull().default(true),
+  internalNotes: text("internal_notes"),
+});
+
+// Plan <-> Benefit join — a plan may list many benefits, a benefit may
+// belong to many plans, never duplicated.
+export const membershipPlanBenefits = pgTable(
+  "membership_plan_benefits",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    planId: uuid("plan_id")
+      .notNull()
+      .references(() => membershipPlans.id, { onDelete: "cascade" }),
+    benefitId: uuid("benefit_id")
+      .notNull()
+      .references(() => membershipBenefits.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    uniqueIndex("membership_plan_benefits_unique_pair").on(
+      table.planId,
+      table.benefitId,
+    ),
+  ],
+);
+
+export const allianceMembershipStatusEnum = pgEnum(
+  "alliance_membership_status",
+  ["pending", "active", "paused", "expired", "cancelled"],
+);
+
+// Deliberately separate from membershipBillingModel — a membership can
+// be billingModel="paid" on its plan yet still be feeType="waived" for
+// this one alliance (an explicit human decision), which is exactly the
+// flexibility section 9 of the brief asks for: $0 doesn't mean the same
+// thing in every situation.
+export const membershipFeeTypeEnum = pgEnum("membership_fee_type", [
+  "standard",
+  "complimentary",
+  "waived",
+  "sponsored",
+  "custom",
+]);
+
+// One row per membership "episode" — assigning a NEW plan to an
+// alliance that already has a membership inserts a new row rather than
+// mutating the existing one (see assignAllianceMembership in
+// src/lib/queries/memberships.ts), so planNameSnapshot/priceSnapshot on
+// a past episode never change retroactively and the alliance's full
+// plan history stays queryable by just listing every row for that
+// allianceId, ordered by createdAt — no separate "membership history"
+// table needed for plan changes (allianceMembershipStatusHistory below
+// covers status transitions WITHIN one episode, the same split already
+// used for referrals/compensation).
+//
+// planId is restricted (never cascaded) on delete: plans in this phase
+// are only ever deactivated (isActive=false), never hard-deleted once
+// any alliance has been on one, so this FK is a safety rail against
+// silently orphaning historical membership data, not an expected path.
+export const allianceMemberships = pgTable("alliance_memberships", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  allianceId: uuid("alliance_id")
+    .notNull()
+    .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+  planId: uuid("plan_id")
+    .notNull()
+    .references(() => membershipPlans.id, { onDelete: "restrict" }),
+  // Frozen at assignment time — survives the plan being renamed later.
+  planNameSnapshot: text("plan_name_snapshot").notNull(),
+  status: allianceMembershipStatusEnum("status").notNull().default("pending"),
+  feeType: membershipFeeTypeEnum("fee_type").notNull().default("standard"),
+  // Preserved reason when feeType is complimentary/waived/sponsored —
+  // never silently dropped.
+  waivedReason: text("waived_reason"),
+  priceSnapshot: numeric("price_snapshot", { precision: 12, scale: 2 }),
+  billingFrequencySnapshot: membershipBillingFrequencyEnum(
+    "billing_frequency_snapshot",
+  ),
+  startDate: date("start_date"),
+  renewalDate: date("renewal_date"),
+  // Optional pointer to an existing Invoice an authorized human created
+  // for this membership fee — never auto-created, never a second
+  // invoice system. Set null (not cascaded) if that invoice is ever
+  // deleted, so the membership record itself survives.
+  invoiceId: uuid("invoice_id").references(() => invoices.id, {
+    onDelete: "set null",
+  }),
+  notes: text("notes"),
+  createdByEmail: text("created_by_email"),
+});
+
+// Status transitions WITHIN one membership episode (pending -> active ->
+// paused -> active -> expired/cancelled) — identical shape and purpose
+// to allianceStatusHistory/referralStatusHistory above.
+export const allianceMembershipStatusHistory = pgTable(
+  "alliance_membership_status_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    membershipId: uuid("membership_id")
+      .notNull()
+      .references(() => allianceMemberships.id, { onDelete: "cascade" }),
+    previousStatus: allianceMembershipStatusEnum("previous_status"),
+    newStatus: allianceMembershipStatusEnum("new_status").notNull(),
+    changedByEmail: text("changed_by_email"),
+    changedAt: timestamp("changed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    note: text("note"),
+  },
+);
+
+export const membershipBenefitOverrideTypeEnum = pgEnum(
+  "membership_benefit_override_type",
+  ["include", "exclude"],
+);
+
+// Alliance-specific adjustment layered on top of the plan's own benefit
+// list (membershipPlanBenefits) — an extra benefit granted outside the
+// plan, or a plan benefit explicitly excluded for this one member.
+// Never mutates the global plan to customize a single alliance; the
+// effective benefit list for a membership is always "plan benefits" +
+// "include overrides" - "exclude overrides", computed at read time.
+export const allianceMembershipBenefitOverrides = pgTable(
+  "alliance_membership_benefit_overrides",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    membershipId: uuid("membership_id")
+      .notNull()
+      .references(() => allianceMemberships.id, { onDelete: "cascade" }),
+    benefitId: uuid("benefit_id")
+      .notNull()
+      .references(() => membershipBenefits.id, { onDelete: "cascade" }),
+    overrideType: membershipBenefitOverrideTypeEnum("override_type").notNull(),
+    note: text("note"),
+    createdByEmail: text("created_by_email"),
+  },
+);
+
+export type MembershipPlan = typeof membershipPlans.$inferSelect;
+export type MembershipBenefit = typeof membershipBenefits.$inferSelect;
+export type AllianceMembership = typeof allianceMemberships.$inferSelect;
+export type AllianceMembershipBenefitOverride =
+  typeof allianceMembershipBenefitOverrides.$inferSelect;
+
+// ===================================================================
 // Phase 6, Session 1 — AI Team / Equipo IA (foundation)
 //
 // These agents are a visual management layer over automation the system
