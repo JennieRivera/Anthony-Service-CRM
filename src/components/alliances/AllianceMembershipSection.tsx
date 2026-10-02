@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -133,7 +133,10 @@ export function AllianceMembershipSection({
 
   const statusForm = useForm<ChangeMembershipStatusFormValues>({
     resolver: zodResolver(changeMembershipStatusFormSchema),
-    defaultValues: { status: "active", note: "" },
+    // This dialog ("End Membership") only ever offers cancelled/expired as
+    // selectable options below, so the default must be one of those two —
+    // never "active", which isn't a registered item in this Select's list.
+    defaultValues: { status: "cancelled", note: "" },
   });
 
   const invoiceForm = useForm<LinkInvoiceFormValues>({
@@ -145,6 +148,30 @@ export function AllianceMembershipSection({
     resolver: zodResolver(benefitOverrideFormSchema),
     defaultValues: { benefitId: "", overrideType: "include", note: "" },
   });
+
+  // useForm's defaultValues are only read once, at mount — this component is
+  // already mounted (with `current: null`) before any membership exists, so
+  // termsForm/invoiceForm's initial defaults go stale the moment a real
+  // membership is assigned without a full remount. Re-sync them with the
+  // latest `current` each time their dialog opens, so "Edit Terms"/"Link
+  // Invoice" never shows (and could silently resubmit) outdated values.
+  useEffect(() => {
+    if (termsOpen && current) {
+      termsForm.reset({
+        feeType: current.feeType,
+        waivedReason: current.waivedReason ?? "",
+        startDate: current.startDate ?? "",
+        renewalDate: current.renewalDate ?? "",
+        notes: current.notes ?? "",
+      });
+    }
+  }, [termsOpen, current, termsForm]);
+
+  useEffect(() => {
+    if (invoiceOpen) {
+      invoiceForm.reset({ invoiceId: current?.invoiceId ?? "" });
+    }
+  }, [invoiceOpen, current, invoiceForm]);
 
   function submitAssign(values: AssignMembershipFormValues) {
     setError(null);
@@ -248,6 +275,9 @@ export function AllianceMembershipSection({
                             <SelectValue placeholder={t("selectPlan")} />
                           </SelectTrigger>
                           <SelectContent>
+                            <SelectItem value="none" disabled>
+                              {t("selectPlan")}
+                            </SelectItem>
                             {plans.map((p) => (
                               <SelectItem key={p.id} value={p.id}>
                                 {`${p.name}${p.price ? ` ($${Number(p.price).toFixed(2)})` : ""}`}
@@ -518,6 +548,9 @@ export function AllianceMembershipSection({
                                 <SelectValue placeholder={t("selectBenefit")} />
                               </SelectTrigger>
                               <SelectContent>
+                                <SelectItem value="none" disabled>
+                                  {t("selectBenefit")}
+                                </SelectItem>
                                 {benefits.map((b) => (
                                   <SelectItem key={b.id} value={b.id}>
                                     {b.name}
