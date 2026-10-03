@@ -81,14 +81,24 @@
  * unchanged — out of scope for this pass, not an oversight.
  */
 :root {
-  /* Pearl Cream — approved light-mode surface background. */
-  --background: #f6f5f0;
+  /* AMS Visual Correction — clean neutral white, not Pearl Cream. The
+     prior Pearl Cream (#F6F5F0) rendered directly on <body>, so it
+     showed through every page's canvas (gutters, margins, the space
+     around/behind cards) — not just the sidebar — reading as "too
+     cream" overall. Ivory/cream is now reserved for the sidebar and its
+     two slide-out drawers only (see --sidebar below); every normal page
+     workspace (Dashboard, tables, forms, charts) sits on this neutral
+     white instead. Contrast unaffected: navy text (#1C2B3E) on pure
+     white is ~17.4:1 (AAA), slightly higher than the prior 13.1:1. */
+  --background: #ffffff;
   /* Navy body text kept as-is: still the most legible choice on the new
      background (13:1, AAA) and was never "the primary brand color" in
      the sense this rebrand targets — it's a text-legibility choice. */
   --foreground: #1c2b3e;
-  /* Left pure white (not cream) on purpose: cards sit a hair whiter than
-     the Pearl Cream page background, so they visibly "lift" off the page. */
+  /* Same white as --background now (see above) — cards no longer "lift"
+     via a background-color difference from the page, they lift via the
+     Card component's own ring-1 ring-foreground/10 border (card.tsx),
+     which is independent of this token and unaffected by this change. */
   --card: #ffffff;
   --card-foreground: #1c2b3e;
   --popover: #ffffff;
@@ -139,12 +149,14 @@
   --chart-4: #65816f;
   --chart-5: #f3c8bc;
   --radius: 0.625rem;
-  /* AMS Visual Experience phase — the sidebar is no longer structurally
-     dark in both themes. Light mode now uses a very light ivory, LIGHTER
-     than --background's Pearl Cream (#F6F5F0), so the nav chrome reads as
-     "almost white but visibly warm" and sits in its own tier between the
-     page background and a pure-white card (background < sidebar < card
-     in lightness). Dark mode gets its own explicit block below reusing
+  /* AMS Visual Experience phase (updated by the Visual Correction pass —
+     see --background above) — the sidebar is no longer structurally dark
+     in both themes. Light mode uses a very light ivory — now the ONE warm
+     surface in the light-mode palette, deliberately a shade warmer than
+     --background/--card, which are both neutral white after the
+     Correction pass. Ivory is reserved for the sidebar and its two
+     slide-out drawers only; it must never spread back into the page
+     workspace. Dark mode gets its own explicit block below reusing
      the exact prior dark values, so Dark Mode's look is unchanged by
      this phase (brief: "Dark Mode may retain a darker accessible
      interpretation... do not force cream surfaces into Dark Mode").
