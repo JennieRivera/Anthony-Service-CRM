@@ -20,7 +20,8 @@
     "greeting": "How can I assist you inside Anthony Multiservice today?",
     "quickNavigation": "Quick Navigation",
     "inputPlaceholder": "Message input will connect once AI is enabled",
-    "send": "Send"
+    "send": "Send",
+    "avatarAlt": "MIADIAMANTE — AMS Executive Assistant"
   },
   "Dashboard": {
     "title": "Dashboard",

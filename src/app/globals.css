@@ -15,6 +15,17 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  /* AMS Visual Correction (owner review pass) — the two slide-out
+     drawers (Services, AMS Ecosystem) now have their own token family,
+     separate from the main --sidebar-* tokens above. See the :root
+     block below for why. */
+  --color-drawer-border: var(--drawer-border);
+  --color-drawer-accent-foreground: var(--drawer-accent-foreground);
+  --color-drawer-accent: var(--drawer-accent);
+  --color-drawer-primary-foreground: var(--drawer-primary-foreground);
+  --color-drawer-primary: var(--drawer-primary);
+  --color-drawer-foreground: var(--drawer-foreground);
+  --color-drawer: var(--drawer);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -149,37 +160,51 @@
   --chart-4: #65816f;
   --chart-5: #f3c8bc;
   --radius: 0.625rem;
-  /* AMS Visual Experience phase (updated by the Visual Correction pass —
-     see --background above) — the sidebar is no longer structurally dark
-     in both themes. Light mode uses a very light ivory — now the ONE warm
-     surface in the light-mode palette, deliberately a shade warmer than
-     --background/--card, which are both neutral white after the
-     Correction pass. Ivory is reserved for the sidebar and its two
-     slide-out drawers only; it must never spread back into the page
-     workspace. Dark mode gets its own explicit block below reusing
-     the exact prior dark values, so Dark Mode's look is unchanged by
-     this phase (brief: "Dark Mode may retain a darker accessible
-     interpretation... do not force cream surfaces into Dark Mode").
-     Contrast: dark-gold text/icons (#847047) vs this background ~4.6:1
-     (AA) — see the --premium derivation notes above; the literal
-     Champagne Gold (#C8A96B) still fails AA here (2.1:1) exactly as
-     already documented, so it is never used for sidebar text/icons,
-     only as a decorative, non-text accent (indicator bar). */
-  --sidebar: #fbfaf6;
-  /* Accessible dark gold (same derived value as --premium) for sidebar
-     text AND icons, per explicit instruction that both carry the gold
-     identity now (previously only icons did, against the old dark bg). */
-  --sidebar-foreground: #847047;
-  --sidebar-primary: #847047;
-  --sidebar-primary-foreground: #fbfaf6;
-  /* Active/hover nav row background reuses the existing --accent pair
-     (cream blended toward gold, #F0E6D0, paired with navy text at
-     #1C2B3E) — an already-contrast-verified combination elsewhere in
-     this file, not a new value to re-check. */
-  --sidebar-accent: #f0e6d0;
+  /* AMS Visual Correction (owner review pass) — the main permanent
+     sidebar is restored to a professional AMS BLUE identity. The prior
+     pass (AMS Visual Experience) had made the main sidebar share the
+     exact same pale-ivory/gold tokens as the two slide-out drawers
+     (Sidebar.tsx, MobileNav.tsx, and NavDrawer.tsx's SheetContent all
+     read --sidebar-*), which collapsed three visually distinct surfaces
+     into one look and read as "too ivory" overall. This value is the
+     SAME deepened Soft Blue already used for --primary above — not a
+     new, unverified color — so its AA text contrast is already
+     documented (~4.93:1 vs cream text). It is a medium/soft blue,
+     deliberately lighter than the old pre-rebrand dark navy (#213547),
+     which Dark Mode's sidebar below still uses unchanged. */
+  --sidebar: #477297;
+  --sidebar-foreground: #fdfbf6;
+  /* Icons: cream/white, NOT gold. Checked against this medium blue:
+     literal Champagne Gold (#c8a96b) ~2.3:1 and the deepened premium
+     gold (#847047) ~1.1:1 — both fail even the lenient 3:1 UI-component
+     guideline here (gold only worked against the much darker navy
+     #213547). Cream matches the label text at the same documented
+     ~4.93:1 AA, so icons stay "clearly readable" as required. */
+  --sidebar-primary: #fdfbf6;
+  --sidebar-primary-foreground: #1c2b3e;
+  /* Active/hover nav row: the brand's literal Elegant Sky Blue wash +
+     navy text — an already contrast-verified pair elsewhere in this
+     file (~6.48:1 AAA) — reused here so the active item is unmistakably
+     lighter/brighter than the surrounding blue, not a faint tint. */
+  --sidebar-accent: #78b7d0;
   --sidebar-accent-foreground: #1c2b3e;
-  --sidebar-border: #ede2c8;
-  --sidebar-ring: #477297;
+  /* Subtle separator, a touch lighter than the sidebar fill so it stays
+     visible against both the sidebar and the white workspace it borders. */
+  --sidebar-border: #5a85a8;
+  --sidebar-ring: #78b7d0;
+  /* The two slide-out drawers (Services, AMS Ecosystem) keep the pale
+     ivory/dark-gold identity the main sidebar is moving away from —
+     these are exactly the values --sidebar-* held before this pass,
+     only renamed to their own token family so the drawers and the main
+     sidebar can differ. See NavDrawer.tsx for the matching fix to the
+     opacity modifiers that were independently washing this gold out. */
+  --drawer: #fbfaf6;
+  --drawer-foreground: #847047;
+  --drawer-primary: #847047;
+  --drawer-primary-foreground: #fbfaf6;
+  --drawer-accent: #f0e6d0;
+  --drawer-accent-foreground: #1c2b3e;
+  --drawer-border: #ede2c8;
 }
 
 /*
@@ -257,6 +282,18 @@
   --sidebar-accent-foreground: #fdfbf6;
   --sidebar-border: #2c3f50;
   --sidebar-ring: #477297;
+  /* AMS Visual Correction — Dark Mode is explicitly out of scope for
+     this pass. The two drawers keep reusing the sidebar's own dark-navy
+     tokens, unchanged from before this pass, so nothing about Dark
+     Mode's look changes here even though the drawers now read a
+     separate --drawer-* token family in Light Mode. */
+  --drawer: #213547;
+  --drawer-foreground: #fdfbf6;
+  --drawer-primary: #c8a96b;
+  --drawer-primary-foreground: #0f1a2b;
+  --drawer-accent: #2f4b64;
+  --drawer-accent-foreground: #fdfbf6;
+  --drawer-border: #2c3f50;
 }
 
 /*
@@ -306,6 +343,8 @@
 :root[data-theme="dark"][data-accent="sage"] {
   --sidebar-accent: #3e585d;
   --sidebar-accent-foreground: #fdfbf6;
+  --drawer-accent: #3e585d;
+  --drawer-accent-foreground: #fdfbf6;
 }
 
 /* Teal / Verde Azulado. Fill #3e7a74 vs cream text: ~4.8:1 (AA). */
@@ -317,6 +356,8 @@
 :root[data-theme="dark"][data-accent="teal"] {
   --sidebar-accent: #2a4a55;
   --sidebar-accent-foreground: #fdfbf6;
+  --drawer-accent: #2a4a55;
+  --drawer-accent-foreground: #fdfbf6;
 }
 
 /* Gold / Dorado. Same deepened fill as --premium (#847047), ~4.6:1 vs
@@ -330,6 +371,8 @@
 :root[data-theme="dark"][data-accent="gold"] {
   --sidebar-accent: #535852;
   --sidebar-accent-foreground: #fdfbf6;
+  --drawer-accent: #535852;
+  --drawer-accent-foreground: #fdfbf6;
 }
 
 @layer base {

@@ -20,7 +20,8 @@
     "greeting": "¿Cómo puedo ayudarte dentro de Anthony Multiservice hoy?",
     "quickNavigation": "Navegación Rápida",
     "inputPlaceholder": "La entrada de mensajes se activará cuando se habilite la IA",
-    "send": "Enviar"
+    "send": "Enviar",
+    "avatarAlt": "MIADIAMANTE — Asistente Ejecutivo de AMS"
   },
   "Dashboard": {
     "title": "Panel",

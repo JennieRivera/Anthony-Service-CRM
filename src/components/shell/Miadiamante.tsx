@@ -8,6 +8,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { Minus, X, Send, Users, GraduationCap, Network, BarChart3, ListChecks, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -30,7 +31,12 @@ const DEFAULT_MARGIN = 24;
 const DEFAULT_RIGHT = DEFAULT_MARGIN + BUTTON_SIZE + 16;
 const DRAG_THRESHOLD = 4;
 const PANEL_WIDTH = 320;
-const PANEL_HEIGHT = 440;
+// AMS Visual Correction — bumped from the original 440 so the avatar
+// header (see AvatarFrame, now a 144px official photo) has room without
+// cramping the quick-nav/input sections below; the middle section is
+// already independently scrollable (overflow-y-auto), so this is a
+// sizing-only change, not a layout restructure.
+const PANEL_HEIGHT = 520;
 const PANEL_GAP = 12;
 // FloatingCalculator's own default (never-dragged) PANEL sits at
 // { right: 24, bottom: 96 } with a 288px width (its own DEFAULT_MARGIN /
@@ -89,6 +95,49 @@ function DiamondMark({ className }: { className?: string }) {
       <polygon points="19,8 12,11 12,22" fill="#dcedf4" />
       <line x1="5" y1="8" x2="19" y2="8" stroke="#78b7d0" strokeWidth="0.4" opacity="0.6" />
     </svg>
+  );
+}
+
+// MIADIAMANTE — approved official avatar (owner-provided, integrated
+// verbatim; see public/miadiamante/avatar.png). The file is byte-for-byte
+// identical to the approved source image — never regenerated, recolored,
+// or redrawn. It is already a finished, self-contained circular badge
+// (professional Latina executive, AMS-branded notebook + pen, blue/white/
+// gold ring) rendered on a square 1254x1254 canvas with an OPAQUE white
+// matte (no alpha channel) around that circle.
+//
+// Sizing/crop choice: the container below is `rounded-full overflow-
+// hidden` with the image at `object-cover` on a 1:1 (square) box. Because
+// the source is already exactly square, object-cover performs NO pixel
+// cropping of the circular badge itself (same aspect ratio in and out) —
+// it only lets the circular CSS mask trim the few corner slivers of
+// blank white canvas OUTSIDE the image's own ring. Nothing in the
+// portrait, notebook, pen, or AMS branding is cut. This is what the
+// Light Mode screenshot confirmed is a clean fit, and it also avoids a
+// harsh opaque-white square appearing on Dark Mode's dark card
+// background (there is no transparency in the source to rely on
+// instead).
+function AvatarFrame({ label }: { label: string }) {
+  return (
+    <div className="relative" role="img" aria-label={label}>
+      <div className="relative h-36 w-36 overflow-hidden rounded-full shadow-[0_0_16px_3px_rgba(120,183,208,0.4)]">
+        <Image
+          src="/miadiamante/avatar.png"
+          alt={label}
+          fill
+          sizes="144px"
+          priority
+          className="object-cover"
+        />
+      </div>
+      {/* Diamond brand badge — keeps the crystalline diamond identity
+          present as an accent even though the avatar is now the open
+          panel's primary visual; the launcher button (closed/minimized
+          state) remains the diamond's main appearance, unchanged. */}
+      <div className="absolute right-0 bottom-0 flex h-9 w-9 items-center justify-center rounded-full border border-[var(--info)]/60 bg-white shadow-md">
+        <DiamondMark className="h-5 w-5" />
+      </div>
+    </div>
   );
 }
 
@@ -211,13 +260,11 @@ export function Miadiamante() {
 
   const welcomePanel = (
     <>
-      <div className="flex flex-col gap-1 border-b border-border p-4">
-        <div className="flex items-center gap-2.5">
-          <DiamondMark className="miadiamante-shimmer h-6 w-6 shrink-0" />
-          <div>
-            <p className="font-heading text-base leading-tight text-foreground">{t("name")}</p>
-            <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
-          </div>
+      <div className="flex flex-col items-center gap-2 border-b border-border p-4 text-center">
+        <AvatarFrame label={t("avatarAlt")} />
+        <div>
+          <p className="font-heading text-base leading-tight text-foreground">{t("name")}</p>
+          <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
         </div>
       </div>
 
@@ -287,7 +334,13 @@ export function Miadiamante() {
             ...(position ? { left: position.x, top: position.y } : { right: DEFAULT_RIGHT, bottom: DEFAULT_MARGIN }),
           }}
           className={cn(
-            "fixed z-50 flex h-14 w-14 touch-none items-center justify-center rounded-full border border-[var(--info)]/50 bg-white shadow-lg transition-transform hover:scale-105",
+            // AMS Visual Correction (owner review pass) — strengthened from a
+            // half-opacity border + a generic shadow-lg (which read as too
+            // faint against the white workspace) to a solid icy-blue border
+            // plus a soft sky-blue glow, while staying a WHITE circle (never
+            // a solid-blue fill like FloatingCalculator) so the two floating
+            // controls stay visually distinct at a glance.
+            "fixed z-50 flex h-14 w-14 touch-none items-center justify-center rounded-full border-2 border-[var(--info)] bg-white shadow-[0_0_18px_4px_rgba(120,183,208,0.5),0_4px_10px_rgba(28,43,62,0.15)] transition-transform hover:scale-105",
             dragging ? "cursor-grabbing" : "cursor-grab",
           )}
         >
@@ -357,7 +410,10 @@ export function Miadiamante() {
           // at bottom-6/right-6 on every viewport — stacked vertically
           // above it (not beside it) here since narrow phone widths have
           // less horizontal room to spare than vertical.
-          className="fixed right-4 bottom-20 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--info)]/50 bg-white shadow-lg"
+          // AMS Visual Correction — same strengthened icy-blue border/glow
+          // as the desktop launcher above (see that button's comment);
+          // this is the one the owner specifically flagged as too faint.
+          className="fixed right-4 bottom-20 z-50 flex h-14 w-14 items-center justify-center rounded-full border-2 border-[var(--info)] bg-white shadow-[0_0_18px_4px_rgba(120,183,208,0.5),0_4px_10px_rgba(28,43,62,0.15)]"
         >
           <DiamondMark className="miadiamante-shimmer h-7 w-7" />
         </button>

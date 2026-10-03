@@ -69,7 +69,11 @@ import {
   upcomingAppointmentsInputSchema,
 } from "./schemas";
 
-const NEUTRAL_UNAVAILABLE_MESSAGE = "Not authorized or resource unavailable.";
+// Exported (Phase 2B-1) so the conversation controller's "unknown/
+// unimplemented tool" denial uses the identical caller-facing copy as
+// every Phase 2A denial path — one message, never a second, driftable
+// copy of the same string.
+export const NEUTRAL_UNAVAILABLE_MESSAGE = "Not authorized or resource unavailable.";
 
 export type MiadiamanteCapabilityResult<TData> =
   | { allowed: true; data: TData; audit: MiadiamanteAuditEntry }

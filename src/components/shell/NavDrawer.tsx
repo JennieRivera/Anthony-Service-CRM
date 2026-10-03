@@ -55,24 +55,31 @@ export function NavDrawer({
           </>
         )}
       </SheetTrigger>
-      {/* AMS Visual Experience phase — the drawer now reuses the sidebar's
-          own ivory/gold tokens (not the default white bg-popover) so the
-          sidebar -> drawer -> workspace relationship reads as one system,
-          per the brief's explicit "same AMS system" requirement. These
-          tokens already flip correctly between Light and Dark mode (see
-          globals.css), so this component needs no theme-conditional code. */}
+      {/* AMS Visual Correction (owner review pass) — the drawer now reads
+          its OWN --drawer-* token family (pale ivory + dark gold),
+          separate from --sidebar-* (now blue) so the two surfaces can
+          differ. Full opacity throughout: the prior /60 and /70 opacity
+          modifiers on the gold text were the root cause of the
+          "too pale/washed out" gold the owner flagged — blending a
+          modest-contrast gold at 60% opacity over a near-white
+          background pushes the effective contrast under 2:1. Removing
+          the opacity (not darkening the brand color further) is the fix;
+          --drawer-foreground is already an AA-contrast-verified brand
+          value (see globals.css). These tokens already flip correctly
+          between Light and Dark mode, so this component needs no
+          theme-conditional code. */}
       <SheetContent
         side="left"
-        className="w-80 overflow-y-auto border-[var(--sidebar-border)] bg-[var(--sidebar)] [&_[data-slot=sheet-close]]:text-[var(--sidebar-foreground)]"
+        className="w-80 overflow-y-auto border-[var(--drawer-border)] bg-[var(--drawer)] [&_[data-slot=sheet-close]]:text-[var(--drawer-foreground)]"
       >
         <SheetHeader>
-          <SheetTitle className="text-[var(--sidebar-foreground)]">{t(labelKey)}</SheetTitle>
+          <SheetTitle className="text-[var(--drawer-foreground)]">{t(labelKey)}</SheetTitle>
         </SheetHeader>
         <div className="flex flex-col gap-4 px-4 pb-4">
           {sections.map((section, index) => (
             <div key={index} className="flex flex-col gap-1">
               {section.headingKey && (
-                <p className="px-1 pt-1 text-xs font-medium tracking-wide text-[var(--sidebar-foreground)]/60 uppercase">
+                <p className="px-1 pt-1 text-xs font-semibold tracking-wide text-[var(--drawer-foreground)] uppercase">
                   {t(section.headingKey)}
                 </p>
               )}
@@ -90,9 +97,9 @@ export function NavDrawer({
                     // navigation entirely. Letting the click's own handlers
                     // run first, then closing on the next tick, fixed it.
                     onClick={() => setTimeout(() => setOpen(false), 0)}
-                    className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-[var(--sidebar-foreground)] transition-colors hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+                    className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-[var(--drawer-foreground)] transition-colors hover:bg-[var(--drawer-accent)] hover:text-[var(--drawer-accent-foreground)]"
                   >
-                    <LinkIcon className="h-4 w-4 shrink-0 opacity-80" />
+                    <LinkIcon className="h-4 w-4 shrink-0" />
                     <span>{t(link.navLabelKey ?? link.labelKey ?? "")}</span>
                   </Link>
                 );
