@@ -11,6 +11,7 @@ import {
   boolean,
   pgEnum,
   uniqueIndex,
+  index,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
@@ -4020,6 +4021,105 @@ export const aiActivityLog = pgTable("ai_activity_log", {
   errorMessage: text("error_message"),
 });
 
+// MIADIAMANTE AI Foundation — Phase 2B-2: conversation persistence.
+//
+// Deliberately separate tables, not a reuse of any existing one — see the
+// Phase 2B-2 audit report for the full survey. In particular:
+//   - conversation_messages (the Communications module) requires a
+//     clientId and models real-world logged client contact, not an
+//     internal AI turn.
+//   - website_chat_sessions is anonymous public-website visitor capture,
+//     not an authenticated internal AMS user.
+//   - ai_agents/ai_escalations belong to the 8-agent AI Team; MIADIAMANTE
+//     is explicitly NOT a 9th ai_agents row (Phase 1B decision).
+//   - ai_activity_log is the security/audit trail (see below) — product
+//     conversation history and security audit history must never become
+//     substitutes for each other, so there is no FK between this table
+//     family and ai_activity_log in either direction.
+export const miadiamanteConversationStatusEnum = pgEnum(
+  "miadiamante_conversation_status",
+  ["active", "closed"],
+);
+
+export const miadiamanteMessageRoleEnum = pgEnum("miadiamante_message_role", [
+  "user",
+  "assistant",
+]);
+
+export const miadiamanteConversations = pgTable(
+  "miadiamante_conversations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    // Ownership key — always server-derived from the authenticated
+    // session's email (never a client-supplied value), always lowercased
+    // before write/compare. This is the field every ownership check
+    // compares against, matching the established requestedByUserEmail /
+    // assignedHumanEmail pattern: the owner (ADMIN_EMAIL) can be a fully
+    // valid super_admin session with NO corresponding `users` row, and
+    // session.user.id is the OAuth provider's own account id (no Auth.js
+    // database adapter configured) — so email, not a user_id FK, is the
+    // only identity every authenticated session is guaranteed to have.
+    ownerEmail: text("owner_email").notNull(),
+    // Optional, advisory-only structured link — populated when a `users`
+    // row happens to exist for ownerEmail, same pattern as
+    // ai_escalations.assignedHumanUserId. Never required, never the
+    // field an ownership check compares against.
+    ownerUserId: uuid("owner_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    title: text("title"),
+    status: miadiamanteConversationStatusEnum("status")
+      .notNull()
+      .default("active"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    lastMessageAt: timestamp("last_message_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("miadiamante_conversations_owner_email_idx").on(table.ownerEmail),
+  ],
+);
+
+export const miadiamanteMessages = pgTable(
+  "miadiamante_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    // Cascade is deliberate here, unlike the "never cascade" convention
+    // used for audit/identity FKs elsewhere in this file (ai_activity_log,
+    // ai_escalations) — those protect a record describing some OTHER
+    // business entity from disappearing when that entity is deleted. A
+    // message has no existence independent of its conversation; it IS
+    // the conversation's content, not a record describing something
+    // else. Direct precedent: invoice_line_items.invoice_id is
+    // NOT NULL, onDelete: cascade for the identical reason.
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => miadiamanteConversations.id, { onDelete: "cascade" }),
+    role: miadiamanteMessageRoleEnum("role").notNull(),
+    content: text("content").notNull(),
+    // Phase 2B-2 data-minimization decision (owner-approved): the ONLY
+    // tool-related metadata ever persisted. Never tool arguments, never
+    // raw tool results, never the underlying client/invoice/task/
+    // appointment DTOs a tool call returned, never raw exception text.
+    // The assistant's own natural-language reply text (content above) is
+    // what gets stored — never the structured data behind it.
+    toolName: text("tool_name"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("miadiamante_messages_conversation_created_idx").on(
+      table.conversationId,
+      table.createdAt,
+    ),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type Client = typeof clients.$inferSelect;
 export type Case = typeof cases.$inferSelect;
@@ -4108,5 +4208,8 @@ export type AiAgentKnowledgeBaseEntry =
   typeof aiAgentKnowledgeBase.$inferSelect;
 export type AiEscalation = typeof aiEscalations.$inferSelect;
 export type AiActivityLogEntry = typeof aiActivityLog.$inferSelect;
+export type MiadiamanteConversation =
+  typeof miadiamanteConversations.$inferSelect;
+export type MiadiamanteMessage = typeof miadiamanteMessages.$inferSelect;
 export type ServiceColorSetting = typeof serviceColorSettings.$inferSelect;
 export type ServiceCatalogItem = typeof serviceCatalogItems.$inferSelect;

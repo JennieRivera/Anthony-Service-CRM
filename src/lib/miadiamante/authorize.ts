@@ -141,3 +141,54 @@ export async function authorizeMiadiamanteRead(
   const role = await getCurrentRole();
   return decideMiadiamanteRead(role, capabilityName);
 }
+
+// --- Layer 1: "may this human use MIADIAMANTE at all?" ------------------
+// MIADIAMANTE Phase 2B-2 access hardening (owner decision). This is
+// evaluated BEFORE and INDEPENDENTLY of any specific capability — it is
+// not a replacement for decideMiadiamanteRead() above (Layer 2, "which
+// individual capability may run"), it is the gate conversation
+// creation/use checks, which decideMiadiamanteRead() was never designed
+// for (its own capabilities, e.g. current_user_context.read, are
+// intentionally ungated for every active role, matching their real-page
+// equivalents elsewhere in the CRM — reusing one of them as a general
+// "may use MIADIAMANTE" check would have allowed every active role,
+// which is exactly what this owner decision overrides).
+//
+// Conservative initial release policy: super_admin only. Expected to
+// broaden to additional roles later via a SEPARATELY APPROVED RBAC
+// change — when that happens, this is the one function to update; no
+// other part of the MIADIAMANTE stack (capability-level authorization,
+// conversation ownership) needs to change.
+//
+// Why a direct role check here, not a new AccessArea in permissions.ts:
+// super_admin, admin, and manager are structurally indistinguishable in
+// ROLE_PERMISSIONS today — all three resolve to the "*" wildcard, not an
+// individual area list — so no AccessArea could single out super_admin
+// alone without restructuring that wildcard (and therefore admin/
+// manager's other, unrelated permissions too), a far larger change than
+// this conservative release calls for. This is "the smallest explicit
+// MIADIAMANTE access gate within the existing permission architecture,"
+// not a new parallel authentication mechanism: it reuses the exact same
+// Role type, the exact same getCurrentRole() resolution path (so an
+// isActive/deactivated check is already included for free), and the
+// exact same DENIAL_MESSAGES copy as every other decision in this file.
+export interface MiadiamanteAccessDecision {
+  allowed: boolean;
+  role: Role | null;
+  message?: string;
+}
+
+export function decideMiadiamanteAccess(role: Role | null): MiadiamanteAccessDecision {
+  if (!role) {
+    return { allowed: false, role: null, message: DENIAL_MESSAGES.unauthenticated };
+  }
+  if (role !== "super_admin") {
+    return { allowed: false, role, message: DENIAL_MESSAGES.human_rbac_denied };
+  }
+  return { allowed: true, role };
+}
+
+export async function authorizeMiadiamanteAccess(): Promise<MiadiamanteAccessDecision> {
+  const role = await getCurrentRole();
+  return decideMiadiamanteAccess(role);
+}
