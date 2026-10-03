@@ -99,10 +99,18 @@ export function decideMiadiamanteRead(
     return deny("capability_not_implemented", role);
   }
 
-  // Layer 1: human_has_access. A capability with no requiredAccessArea
-  // is available to any authenticated role (identity/navigation shape
-  // only — see capabilities.ts for why those two are the exception).
-  if (capability.requiredAccessArea !== null && !canAccessArea(role, capability.requiredAccessArea)) {
+  // Layer 1: human_has_access. A capability with a compositeVisibilityCheck
+  // (e.g. financial_report_summary.read mirroring the Reports page's own
+  // composed getReportsVisibility().any gate — see capabilities.ts) uses
+  // that instead of a single AccessArea. Otherwise, a capability with no
+  // requiredAccessArea is available to any authenticated role
+  // (identity/navigation/tasks/appointments — see capabilities.ts for why
+  // each is ungated, by audit, not assumption).
+  if (capability.compositeVisibilityCheck) {
+    if (!capability.compositeVisibilityCheck(role)) {
+      return deny("human_rbac_denied", role);
+    }
+  } else if (capability.requiredAccessArea !== null && !canAccessArea(role, capability.requiredAccessArea)) {
     return deny("human_rbac_denied", role);
   }
 

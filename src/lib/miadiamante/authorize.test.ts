@@ -13,6 +13,12 @@
 import assert from "node:assert/strict";
 import { decideMiadiamanteRead } from "./authorize";
 import { buildMiadiamanteAuditEntry } from "./audit";
+import {
+  invoiceSummaryInputSchema,
+  financialReportSummaryInputSchema,
+  taskListInputSchema,
+  upcomingAppointmentsInputSchema,
+} from "./schemas";
 import type { Role } from "@/lib/permissions";
 
 let passed = 0;
@@ -56,7 +62,7 @@ check("ACADEMY_STAFF can read identity/navigation (ungated capabilities)", () =>
 });
 
 check("ACADEMY_STAFF denied a finance-only capability", () => {
-  const r = decideMiadiamanteRead("academy_staff", "invoice.read");
+  const r = decideMiadiamanteRead("academy_staff", "client.read");
   assert.equal(r.allowed, false);
   // Unimplemented AND would-be-denied-by-RBAC: not_implemented fires
   // first, which is correct (default deny, fail closed before even
@@ -87,7 +93,7 @@ check("REFERRAL_MANAGER identity/navigation allowed, academy_student.read denied
 
 check("GENERAL_STAFF default-deny: ungated capabilities still allowed, everything else denied", () => {
   const identity = decideMiadiamanteRead("general_staff", "current_user_context.read");
-  const finance = decideMiadiamanteRead("general_staff", "invoice.read");
+  const finance = decideMiadiamanteRead("general_staff", "client.read");
   const academy = decideMiadiamanteRead("general_staff", "academy_student.read");
   assert.equal(identity.allowed, true); // identity is not a data leak — same as being able to see your own name in the UI
   assert.equal(finance.allowed, false);
@@ -125,7 +131,7 @@ check("cross-module request: academy_staff requesting b2b_alliance.read denied t
 });
 
 check("denial messages never vary by reason (no side-channel leakage) except unauthenticated", () => {
-  const denied1 = decideMiadiamanteRead("general_staff", "invoice.read");
+  const denied1 = decideMiadiamanteRead("general_staff", "client.read");
   const denied2 = decideMiadiamanteRead("academy_staff", "b2b_alliance.read");
   assert.equal(!denied1.allowed && !denied2.allowed, true);
   if (!denied1.allowed && !denied2.allowed) {
@@ -157,14 +163,15 @@ check("every role in roleValues resolves without throwing for every capability (
   const capabilities = [
     "current_user_context.read",
     "authorized_navigation.read",
+    "invoice_summary.read",
+    "financial_report_summary.read",
+    "task_list.read",
+    "upcoming_appointments.read",
     "client.read",
-    "invoice.read",
-    "report.read",
     "academy_student.read",
     "b2b_alliance.read",
     "referral_compensation.read",
-    "appointment.read",
-    "task.read",
+    "this_capability_does_not_exist", // exercises the unknown_capability path
   ];
   for (const role of roles) {
     for (const capability of capabilities) {
@@ -251,15 +258,15 @@ check("legacy/null compatibility: an audit entry with no requester is still a we
 });
 
 check("denied capability audit entry records the capability name, not the denial reason, in requestedByUserEmail (no field confusion)", () => {
-  const result = decideMiadiamanteRead("general_staff", "invoice.read");
+  const result = decideMiadiamanteRead("general_staff", "client.read");
   const entry = buildMiadiamanteAuditEntry({
-    capabilityName: "invoice.read",
+    capabilityName: "client.read",
     requestedByEmail: "general.staff@anthonymultiservice.com",
     result,
   });
   assert.equal(entry.requestedByUserEmail, "general.staff@anthonymultiservice.com");
   assert.equal(entry.outcome, "denied");
-  assert.ok(entry.actionDetail?.includes("capability=invoice.read"));
+  assert.ok(entry.actionDetail?.includes("capability=client.read"));
   assert.ok(entry.actionDetail?.includes("denied_reason="));
 });
 
@@ -280,6 +287,173 @@ check("SPOOFING: capabilityRunner's exported functions take no parameters — th
     result,
   });
   assert.equal(attemptedSpoof.requestedByUserEmail, "real.session.email@anthonymultiservice.com");
+});
+
+// --- Phase 2A: record-level capability authorization test matrix -----------
+console.log("\nPhase 2A — record-level capability test matrix (section 25):");
+
+check("OWNER/SUPER_ADMIN: all four new capabilities allowed", () => {
+  for (const cap of ["invoice_summary.read", "financial_report_summary.read", "task_list.read", "upcoming_appointments.read"]) {
+    const r = decideMiadiamanteRead("super_admin", cap);
+    assert.equal(r.allowed, true, `expected super_admin allowed for ${cap}`);
+  }
+});
+
+check("BOOKKEEPING_STAFF: invoice_summary.read allowed (holds 'invoices')", () => {
+  const r = decideMiadiamanteRead("bookkeeping_staff", "invoice_summary.read");
+  assert.equal(r.allowed, true);
+});
+
+check("BOOKKEEPING_STAFF: financial_report_summary.read allowed (holds 'financial_reports' -> visibility.full)", () => {
+  const r = decideMiadiamanteRead("bookkeeping_staff", "financial_report_summary.read");
+  assert.equal(r.allowed, true);
+});
+
+check("REFERRAL_MANAGER: invoice_summary.read denied (holds no 'invoices' area)", () => {
+  const r = decideMiadiamanteRead("referral_manager", "invoice_summary.read");
+  assert.equal(r.allowed, false);
+});
+
+check("REFERRAL_MANAGER: financial_report_summary.read ALLOWED at the capability gate (composite visibility via referral_compensation_terms) — section-level filtering to referral-only happens inside the DTO, not here", () => {
+  const r = decideMiadiamanteRead("referral_manager", "financial_report_summary.read");
+  assert.equal(r.allowed, true, "referral_manager must be able to call the capability to receive their own authorized section (master prompt section 25) — denying outright would be MORE restrictive than the real Reports page");
+});
+
+check("COMMUNITY_MANAGER: invoice_summary.read denied (holds no 'invoices' area)", () => {
+  const r = decideMiadiamanteRead("community_manager", "invoice_summary.read");
+  assert.equal(r.allowed, false);
+});
+
+check("COMMUNITY_MANAGER: financial_report_summary.read ALLOWED at the capability gate (composite visibility via alliances/b2b_membership)", () => {
+  const r = decideMiadiamanteRead("community_manager", "financial_report_summary.read");
+  assert.equal(r.allowed, true);
+});
+
+check("ACADEMY_STAFF: invoice_summary.read denied (holds no 'invoices' area)", () => {
+  const r = decideMiadiamanteRead("academy_staff", "invoice_summary.read");
+  assert.equal(r.allowed, false);
+});
+
+check("ACADEMY_STAFF: financial_report_summary.read denied (holds zero report-visibility areas — reports/financial_reports/referrals/referral_compensation_*/alliances/b2b_membership* all absent)", () => {
+  const r = decideMiadiamanteRead("academy_staff", "financial_report_summary.read");
+  assert.equal(r.allowed, false, "academy_staff must not access company financial reports unless RBAC explicitly permits it (master prompt section 25) — confirmed it does not");
+});
+
+check("GENERAL_STAFF: task_list.read and upcoming_appointments.read allowed (mirror the real, ungated Tasks/Appointments pages — confirmed by audit, not a privilege expansion)", () => {
+  assert.equal(decideMiadiamanteRead("general_staff", "task_list.read").allowed, true);
+  assert.equal(decideMiadiamanteRead("general_staff", "upcoming_appointments.read").allowed, true);
+});
+
+check("GENERAL_STAFF: invoice_summary.read and financial_report_summary.read denied (default deny, zero finance areas granted)", () => {
+  assert.equal(decideMiadiamanteRead("general_staff", "invoice_summary.read").allowed, false);
+  assert.equal(decideMiadiamanteRead("general_staff", "financial_report_summary.read").allowed, false);
+});
+
+check("INSTRUCTOR: task_list.read and upcoming_appointments.read allowed (same ungated-module mirror as general_staff — not a broadened permission)", () => {
+  assert.equal(decideMiadiamanteRead("instructor", "task_list.read").allowed, true);
+  assert.equal(decideMiadiamanteRead("instructor", "upcoming_appointments.read").allowed, true);
+});
+
+check("INSTRUCTOR: invoice_summary.read and financial_report_summary.read denied (empty ROLE_PERMISSIONS array, default deny)", () => {
+  assert.equal(decideMiadiamanteRead("instructor", "invoice_summary.read").allowed, false);
+  assert.equal(decideMiadiamanteRead("instructor", "financial_report_summary.read").allowed, false);
+});
+
+check("UNAUTHENTICATED: all four new capabilities denied, never throw", () => {
+  for (const cap of ["invoice_summary.read", "financial_report_summary.read", "task_list.read", "upcoming_appointments.read"]) {
+    const r = decideMiadiamanteRead(null, cap);
+    assert.equal(r.allowed, false, `expected unauthenticated denied for ${cap}`);
+    if (!r.allowed) assert.equal(r.reason, "unauthenticated");
+  }
+});
+
+// --- Phase 2A: input validation / security tests (section 26) --------------
+console.log("\nPhase 2A — input validation / security tests:");
+
+check("invoiceSummaryInputSchema: rejects a malformed (non-UUID) invoiceId", () => {
+  const r = invoiceSummaryInputSchema.safeParse({ invoiceId: "not-a-uuid" });
+  assert.equal(r.success, false);
+});
+
+check("invoiceSummaryInputSchema: rejects a SQL-injection-shaped invoiceId", () => {
+  const r = invoiceSummaryInputSchema.safeParse({ invoiceId: "'; DROP TABLE invoices; --" });
+  assert.equal(r.success, false);
+});
+
+check("invoiceSummaryInputSchema: rejects missing invoiceId", () => {
+  const r = invoiceSummaryInputSchema.safeParse({});
+  assert.equal(r.success, false);
+});
+
+check("invoiceSummaryInputSchema: accepts a well-formed UUID", () => {
+  const r = invoiceSummaryInputSchema.safeParse({ invoiceId: "123e4567-e89b-12d3-a456-426614174000" });
+  assert.equal(r.success, true);
+});
+
+check("financialReportSummaryInputSchema: accepts an empty object (defaults applied downstream)", () => {
+  const r = financialReportSummaryInputSchema.safeParse({});
+  assert.equal(r.success, true);
+});
+
+check("financialReportSummaryInputSchema: rejects an excessive date range (>730 days)", () => {
+  const r = financialReportSummaryInputSchema.safeParse({ from: "2015-01-01", to: "2026-01-01" });
+  assert.equal(r.success, false);
+});
+
+check("financialReportSummaryInputSchema: rejects 'to' before 'from'", () => {
+  const r = financialReportSummaryInputSchema.safeParse({ from: "2026-06-01", to: "2026-01-01" });
+  assert.equal(r.success, false);
+});
+
+check("financialReportSummaryInputSchema: rejects an unexpected/malformed date value", () => {
+  const r = financialReportSummaryInputSchema.safeParse({ from: "not-a-date", to: "also-not-a-date" });
+  assert.equal(r.success, false);
+});
+
+check("taskListInputSchema: rejects a limit above the bounded maximum (50)", () => {
+  const r = taskListInputSchema.safeParse({ limit: 100000 });
+  assert.equal(r.success, false);
+});
+
+check("taskListInputSchema: rejects a negative/zero limit", () => {
+  assert.equal(taskListInputSchema.safeParse({ limit: 0 }).success, false);
+  assert.equal(taskListInputSchema.safeParse({ limit: -5 }).success, false);
+});
+
+check("taskListInputSchema: rejects a non-numeric limit (unexpected value/enum-like injection)", () => {
+  const r = taskListInputSchema.safeParse({ limit: "'; DROP TABLE tasks; --" });
+  assert.equal(r.success, false);
+});
+
+check("taskListInputSchema: defaults to the maximum bound when limit is omitted", () => {
+  const r = taskListInputSchema.safeParse({});
+  assert.equal(r.success, true);
+  if (r.success) assert.equal(r.data.limit, 50);
+});
+
+check("upcomingAppointmentsInputSchema: rejects a limit above the bounded maximum (20)", () => {
+  const r = upcomingAppointmentsInputSchema.safeParse({ limit: 9999 });
+  assert.equal(r.success, false);
+});
+
+check("upcomingAppointmentsInputSchema: defaults to 5 when limit is omitted (does not dump the entire calendar)", () => {
+  const r = upcomingAppointmentsInputSchema.safeParse({});
+  assert.equal(r.success, true);
+  if (r.success) assert.equal(r.data.limit, 5);
+});
+
+check("every role resolves without throwing for all four new capabilities (no crash = fail-open risk)", () => {
+  const roles: Role[] = [
+    "admin", "manager", "tax_staff", "bookkeeping_staff", "notary_staff",
+    "consulting_staff", "academy_staff", "referral_manager", "community_manager",
+    "immigration_staff", "super_admin", "instructor", "general_staff",
+  ];
+  const caps = ["invoice_summary.read", "financial_report_summary.read", "task_list.read", "upcoming_appointments.read"];
+  for (const role of roles) {
+    for (const cap of caps) {
+      decideMiadiamanteRead(role, cap);
+    }
+  }
 });
 
 console.log(`\n${passed} checks passed.`);
