@@ -63,12 +63,24 @@ export function Sidebar() {
                   )}
                   title={collapsed ? t(item.labelKey) : undefined}
                 >
-                  {/* Final visual correction — nav icons now carry the
-                      Champagne Gold brand accent (--sidebar-primary) in
-                      both active and inactive states; only the row's text
-                      color still tracks active/hover, per instruction that
-                      gold applies to icons, not the full label. */}
-                  <Icon className="h-4.5 w-4.5 shrink-0 text-[var(--sidebar-primary)]" />
+                  {/* AMS Visual Correction (active-icon contrast
+                      micro-correction) — gold (--sidebar-primary) only
+                      when inactive. On the active row the icon switches
+                      to the same dark navy as the active text
+                      (--sidebar-accent-foreground): gold measures only
+                      ~1.3:1 against the sky-blue active background
+                      (--sidebar-accent), which read as washed out — navy
+                      matches the text at the already-documented ~6.48:1
+                      AAA pairing used for --sidebar-accent-foreground
+                      elsewhere in this file. Resting-hover (not active)
+                      intentionally stays gold — only ACTIVE was reported
+                      as a problem, so only ACTIVE changes here. */}
+                  <Icon
+                    className={cn(
+                      "h-4.5 w-4.5 shrink-0",
+                      isActive ? "text-[var(--sidebar-accent-foreground)]" : "text-[var(--sidebar-primary)]",
+                    )}
+                  />
                   {!collapsed && <span>{t(item.labelKey)}</span>}
                 </Link>
               );

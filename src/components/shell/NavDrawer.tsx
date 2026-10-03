@@ -55,31 +55,29 @@ export function NavDrawer({
           </>
         )}
       </SheetTrigger>
-      {/* AMS Visual Correction (owner review pass) — the drawer now reads
-          its OWN --drawer-* token family (pale ivory + dark gold),
-          separate from --sidebar-* (now blue) so the two surfaces can
-          differ. Full opacity throughout: the prior /60 and /70 opacity
-          modifiers on the gold text were the root cause of the
-          "too pale/washed out" gold the owner flagged — blending a
-          modest-contrast gold at 60% opacity over a near-white
-          background pushes the effective contrast under 2:1. Removing
-          the opacity (not darkening the brand color further) is the fix;
-          --drawer-foreground is already an AA-contrast-verified brand
-          value (see globals.css). These tokens already flip correctly
-          between Light and Dark mode, so this component needs no
-          theme-conditional code. */}
+      {/* AMS Visual Correction (final drawer direction) — the drawer now
+          mirrors the main sidebar's own AMS blue (--drawer == --sidebar's
+          values) instead of the earlier pale-ivory look, so it reads as
+          an extension of the permanent sidebar. Menu/link TEXT uses
+          --drawer-foreground (white/cream); the drawer's TITLE, section
+          headings, and link ICONS use the separate --drawer-primary gold
+          instead — those three no longer share a color with the menu
+          text, so each needs its own explicit class (icons in particular
+          can no longer just inherit currentColor from the link's white
+          text). These tokens already flip correctly between Light and
+          Dark mode, so this component needs no theme-conditional code. */}
       <SheetContent
         side="left"
         className="w-80 overflow-y-auto border-[var(--drawer-border)] bg-[var(--drawer)] [&_[data-slot=sheet-close]]:text-[var(--drawer-foreground)]"
       >
         <SheetHeader>
-          <SheetTitle className="text-[var(--drawer-foreground)]">{t(labelKey)}</SheetTitle>
+          <SheetTitle className="text-[var(--drawer-primary)]">{t(labelKey)}</SheetTitle>
         </SheetHeader>
         <div className="flex flex-col gap-4 px-4 pb-4">
           {sections.map((section, index) => (
             <div key={index} className="flex flex-col gap-1">
               {section.headingKey && (
-                <p className="px-1 pt-1 text-xs font-semibold tracking-wide text-[var(--drawer-foreground)] uppercase">
+                <p className="px-1 pt-1 text-xs font-semibold tracking-wide text-[var(--drawer-primary)] uppercase">
                   {t(section.headingKey)}
                 </p>
               )}
@@ -99,7 +97,7 @@ export function NavDrawer({
                     onClick={() => setTimeout(() => setOpen(false), 0)}
                     className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-[var(--drawer-foreground)] transition-colors hover:bg-[var(--drawer-accent)] hover:text-[var(--drawer-accent-foreground)]"
                   >
-                    <LinkIcon className="h-4 w-4 shrink-0" />
+                    <LinkIcon className="h-4 w-4 shrink-0 text-[var(--drawer-primary)]" />
                     <span>{t(link.navLabelKey ?? link.labelKey ?? "")}</span>
                   </Link>
                 );

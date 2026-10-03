@@ -64,8 +64,16 @@ export function MobileNav() {
                         : "text-[var(--sidebar-foreground)]/70 hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]",
                     )}
                   >
-                    {/* Final visual correction — gold nav icons, see Sidebar.tsx. */}
-                    <Icon className="h-4.5 w-4.5 shrink-0 text-[var(--sidebar-primary)]" />
+                    {/* AMS Visual Correction (active-icon contrast
+                        micro-correction) — see Sidebar.tsx for the full
+                        rationale: gold when inactive, navy
+                        (--sidebar-accent-foreground) when active. */}
+                    <Icon
+                      className={cn(
+                        "h-4.5 w-4.5 shrink-0",
+                        isActive ? "text-[var(--sidebar-accent-foreground)]" : "text-[var(--sidebar-primary)]",
+                      )}
+                    />
                     <span>{t(item.labelKey)}</span>
                   </Link>
                 );

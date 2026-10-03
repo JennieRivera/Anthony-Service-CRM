@@ -334,13 +334,21 @@ export function Miadiamante() {
             ...(position ? { left: position.x, top: position.y } : { right: DEFAULT_RIGHT, bottom: DEFAULT_MARGIN }),
           }}
           className={cn(
-            // AMS Visual Correction (owner review pass) — strengthened from a
-            // half-opacity border + a generic shadow-lg (which read as too
-            // faint against the white workspace) to a solid icy-blue border
-            // plus a soft sky-blue glow, while staying a WHITE circle (never
-            // a solid-blue fill like FloatingCalculator) so the two floating
-            // controls stay visually distinct at a glance.
-            "fixed z-50 flex h-14 w-14 touch-none items-center justify-center rounded-full border-2 border-[var(--info)] bg-white shadow-[0_0_18px_4px_rgba(120,183,208,0.5),0_4px_10px_rgba(28,43,62,0.15)] transition-transform hover:scale-105",
+            // AMS Visual Correction (final launcher visibility pass) — the
+            // owner found the prior icy-blue border/glow still too faint
+            // against the white workspace. Three distinct layers now do
+            // three distinct jobs, per the brief's own breakdown: (1) a
+            // thin, crisp AMS-blue (--primary) trim ring just outside the
+            // sky-blue border gives the outline real DEFINITION — pure
+            // sky-blue (--info) alone only measures ~2.2:1 against white,
+            // under the UI-component 3:1 floor, which is why it read as
+            // faint; (2) a stronger, slightly larger sky-blue glow keeps
+            // the "icy" brand feel; (3) the existing soft navy drop-shadow
+            // stays for depth. The border itself and the white fill are
+            // unchanged — still a WHITE circle, never a solid-blue fill
+            // like FloatingCalculator, and still the same 56px size (not
+            // oversized/neon/aggressive).
+            "fixed z-50 flex h-14 w-14 touch-none items-center justify-center rounded-full border-2 border-[var(--info)] bg-white shadow-[0_0_0_1.5px_rgba(71,114,151,0.45),0_0_22px_5px_rgba(120,183,208,0.55),0_4px_10px_rgba(28,43,62,0.18)] transition-transform hover:scale-105",
             dragging ? "cursor-grabbing" : "cursor-grab",
           )}
         >
@@ -413,7 +421,7 @@ export function Miadiamante() {
           // AMS Visual Correction — same strengthened icy-blue border/glow
           // as the desktop launcher above (see that button's comment);
           // this is the one the owner specifically flagged as too faint.
-          className="fixed right-4 bottom-20 z-50 flex h-14 w-14 items-center justify-center rounded-full border-2 border-[var(--info)] bg-white shadow-[0_0_18px_4px_rgba(120,183,208,0.5),0_4px_10px_rgba(28,43,62,0.15)]"
+          className="fixed right-4 bottom-20 z-50 flex h-14 w-14 items-center justify-center rounded-full border-2 border-[var(--info)] bg-white shadow-[0_0_0_1.5px_rgba(71,114,151,0.45),0_0_22px_5px_rgba(120,183,208,0.55),0_4px_10px_rgba(28,43,62,0.18)]"
         >
           <DiamondMark className="miadiamante-shimmer h-7 w-7" />
         </button>

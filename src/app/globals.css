@@ -174,13 +174,18 @@
      which Dark Mode's sidebar below still uses unchanged. */
   --sidebar: #477297;
   --sidebar-foreground: #fdfbf6;
-  /* Icons: cream/white, NOT gold. Checked against this medium blue:
-     literal Champagne Gold (#c8a96b) ~2.3:1 and the deepened premium
-     gold (#847047) ~1.1:1 — both fail even the lenient 3:1 UI-component
-     guideline here (gold only worked against the much darker navy
-     #213547). Cream matches the label text at the same documented
-     ~4.93:1 AA, so icons stay "clearly readable" as required. */
-  --sidebar-primary: #fdfbf6;
+  /* AMS Visual Correction (final sidebar brand color pass) — icons and
+     the AMS monogram now use the SAME elegant gold already approved for
+     the Services/AMS Ecosystem drawer icons (--drawer-primary), per
+     explicit instruction to reuse it rather than introduce a second
+     gold. This is deliberately NOT the literal Champagne Gold (#c8a96b,
+     ~2.3:1 here) or the deepened Premium Gold (#847047, ~1.1:1 here) —
+     both fail even the lenient 3:1 UI-component floor against this
+     medium blue; #f0c268 is the brightened value already chosen for the
+     drawers specifically because it's the brightest gold that still
+     clears 3:1 against this exact background (~3.06:1 measured) — see
+     the --drawer-primary note below for the full derivation. */
+  --sidebar-primary: #f0c268;
   --sidebar-primary-foreground: #1c2b3e;
   /* Active/hover nav row: the brand's literal Elegant Sky Blue wash +
      navy text — an already contrast-verified pair elsewhere in this
@@ -192,19 +197,30 @@
      visible against both the sidebar and the white workspace it borders. */
   --sidebar-border: #5a85a8;
   --sidebar-ring: #78b7d0;
-  /* The two slide-out drawers (Services, AMS Ecosystem) keep the pale
-     ivory/dark-gold identity the main sidebar is moving away from —
-     these are exactly the values --sidebar-* held before this pass,
-     only renamed to their own token family so the drawers and the main
-     sidebar can differ. See NavDrawer.tsx for the matching fix to the
-     opacity modifiers that were independently washing this gold out. */
-  --drawer: #fbfaf6;
-  --drawer-foreground: #847047;
-  --drawer-primary: #847047;
-  --drawer-primary-foreground: #fbfaf6;
-  --drawer-accent: #f0e6d0;
+  /* AMS Visual Correction (final drawer direction) — the two slide-out
+     drawers (Services, AMS Ecosystem) now mirror the main sidebar's own
+     AMS blue directly (same --sidebar/-border/-accent values) instead of
+     the earlier pale-ivory look, so they read as intentional extensions
+     of the permanent sidebar rather than a separate surface. Menu/link
+     TEXT reuses --sidebar-foreground (white/cream, same ~4.93:1 AA
+     already documented above).
+     Icons/title/section-headings get their OWN --drawer-primary gold,
+     distinct from --sidebar-primary (which is white, not gold, on this
+     same blue — see the --sidebar-primary note above). A literal "dark"
+     gold cannot clear 3:1 against this medium blue (checked: literal
+     Champagne Gold #c8a96b ~2.3:1, deepened premium #847047 ~1.1:1 — both
+     fail even the lenient non-text/UI-component 3:1 floor). This value
+     is deliberately the brightest, most saturated amber-gold that still
+     reads as a rich metallic gold (not a pale/washed cream) while
+     actually clearing 3:1 (~3.06:1 measured) — the accessible ceiling
+     for "dark gold on this exact blue," not an arbitrary pick. */
+  --drawer: #477297;
+  --drawer-foreground: #fdfbf6;
+  --drawer-primary: #f0c268;
+  --drawer-primary-foreground: #1c2b3e;
+  --drawer-accent: #78b7d0;
   --drawer-accent-foreground: #1c2b3e;
-  --drawer-border: #ede2c8;
+  --drawer-border: #5a85a8;
 }
 
 /*
