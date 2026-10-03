@@ -1,0 +1,1 @@
+ALTER TABLE "ai_activity_log" ADD COLUMN "requested_by_user_email" text;

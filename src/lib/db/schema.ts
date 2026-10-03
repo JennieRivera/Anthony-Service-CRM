@@ -3997,6 +3997,25 @@ export const aiActivityLog = pgTable("ai_activity_log", {
   // approved a level-2 action, never a secret, always an email already
   // visible elsewhere in the CRM.
   humanApproverEmail: text("human_approver_email"),
+  // MIADIAMANTE AI Foundation Phase 1B — WHO requested the logged action,
+  // distinct from humanApproverEmail above (who approved it, if anyone).
+  // Nullable: every pre-existing row (and any future row logged from a
+  // path with no human requester, e.g. a scheduled/system action) simply
+  // has no requester to record — never backfilled, never guessed.
+  //
+  // Deliberately email (text), not a user_id FK, matching the exact
+  // convention humanApproverEmail already established in this table:
+  // getCurrentRole()/the signIn callback in src/auth.ts both resolve
+  // identity by email, and ADMIN_EMAIL (the owner) can be a fully valid
+  // super_admin session with NO corresponding `users` row at all (see
+  // auth.ts — the owner check never touches the database). A `user_id`
+  // FK would be unrecordable for the owner whenever no such row exists,
+  // and even for a normal staff session, `session.user.id` is the OAuth
+  // provider's own account id (there is no Auth.js database adapter
+  // configured), not reliably equal to `users.id` — so a FK here would
+  // be a second, less trustworthy identity path, not a stronger one.
+  // Always normalized to lowercase before write, matching users.email.
+  requestedByUserEmail: text("requested_by_user_email"),
   outcome: aiActivityOutcomeEnum("outcome").notNull().default("success"),
   errorMessage: text("error_message"),
 });

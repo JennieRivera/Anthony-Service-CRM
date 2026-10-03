@@ -1,0 +1,135 @@
+// MIADIAMANTE AI Foundation — Phase 1. The single enforcement point every
+// future MIADIAMANTE capability call must pass through. Mirrors master
+// prompt section 6's formula exactly:
+//
+//   ALLOW = human_has_access AND ai_has_read_permission
+//           AND resource_is_allowed AND requested_operation_is_allowed
+//
+// Layer 1 (human_has_access) reuses `getCurrentRole()` / `canAccessArea()`
+// from src/lib/permissions.ts verbatim — the same, already-enforced human
+// RBAC every page and server action in this CRM already depends on. This
+// file never re-implements or shadows that logic.
+//
+// Layer 2 (ai_has_read_permission / resource_is_allowed /
+// requested_operation_is_allowed) is new: whether MIADIAMANTE itself is
+// permitted to read this capability at all, independent of who is asking.
+// This phase has no live `ai_agents` row for MIADIAMANTE (see the Phase 1
+// report's identity recommendation) — until one exists, MIADIAMANTE's own
+// permission is derived from the capability registry's `implemented` and
+// `operationType` fields only: every capability here is read-only, and an
+// unimplemented one is refused outright, never silently allowed. This is
+// intentionally narrower than the existing agentAuthorization.ts model
+// (no canWrite/canSendMessage dimension exists to check, because nothing
+// here can write) — see the report for why a future phase should still
+// issue MIADIAMANTE a real ai_agents row and reuse
+// authorizeAgentAction()'s machinery once write/draft capabilities exist.
+//
+// ANY failure at ANY layer returns a DENY with a reason that is safe to
+// show the caller (never "does a hidden record exist," never a count,
+// never a name) — see master prompt section 14 (no side-channel leakage).
+
+import { getCurrentRole, canAccessArea, type Role } from "@/lib/permissions";
+import { CAPABILITY_REGISTRY, type MiadiamanteCapability } from "./capabilities";
+
+export type MiadiamanteDenialReason =
+  | "unauthenticated"
+  | "unknown_capability"
+  | "capability_not_implemented"
+  | "human_rbac_denied"
+  | "ai_permission_denied";
+
+export type MiadiamanteAuthorizationResult =
+  | {
+      allowed: true;
+      role: Role;
+      capability: MiadiamanteCapability;
+    }
+  | {
+      allowed: false;
+      role: Role | null;
+      reason: MiadiamanteDenialReason;
+      // A neutral, user-safe message only — see sanitizeDenialMessage below.
+      message: string;
+    };
+
+// Fixed, neutral copy per denial reason. Never interpolates the
+// capability name, role, or any record identifier into the user-facing
+// message — section 14's "no side-channel leakage" requirement means the
+// SAME message must be returned whether the capability doesn't exist,
+// the human lacks access, or MIADIAMANTE itself isn't permitted to read
+// it, except for the authentication case (which is not a leak — anyone
+// signed out already knows they're signed out).
+const DENIAL_MESSAGES: Record<MiadiamanteDenialReason, string> = {
+  unauthenticated: "You need to be signed in to use MIADIAMANTE.",
+  unknown_capability: "MIADIAMANTE can't help with that yet.",
+  capability_not_implemented: "MIADIAMANTE can't help with that yet.",
+  human_rbac_denied: "MIADIAMANTE can't help with that yet.",
+  ai_permission_denied: "MIADIAMANTE can't help with that yet.",
+};
+
+function deny(reason: MiadiamanteDenialReason, role: Role | null): MiadiamanteAuthorizationResult {
+  return { allowed: false, role, reason, message: DENIAL_MESSAGES[reason] };
+}
+
+// Pure decision core — no I/O, no session, no database. Takes an
+// already-resolved role (or null for "not signed in") and makes the same
+// four-layer ALLOW/DENY decision authorizeMiadiamanteRead() exposes.
+// Split out specifically so the test matrix (master prompt section 31)
+// can exercise every role against every capability with static fixtures,
+// per section 32's "prefer pure-function tests ... static authorization
+// fixtures" instruction, with zero database access.
+export function decideMiadiamanteRead(
+  role: Role | null,
+  capabilityName: string,
+): MiadiamanteAuthorizationResult {
+  // Layer 0: must resolve to a real, active, signed-in staff member.
+  if (!role) {
+    return deny("unauthenticated", null);
+  }
+
+  const capability = CAPABILITY_REGISTRY[capabilityName];
+  if (!capability) {
+    return deny("unknown_capability", role);
+  }
+
+  // Layer 2a: resource_is_allowed / requested_operation_is_allowed —
+  // MIADIAMANTE has no permission to perform a capability that isn't
+  // built and reviewed yet, regardless of the human's own access.
+  if (!("implemented" in capability) || !(capability as { implemented?: boolean }).implemented) {
+    return deny("capability_not_implemented", role);
+  }
+
+  // Layer 1: human_has_access. A capability with no requiredAccessArea
+  // is available to any authenticated role (identity/navigation shape
+  // only — see capabilities.ts for why those two are the exception).
+  if (capability.requiredAccessArea !== null && !canAccessArea(role, capability.requiredAccessArea)) {
+    return deny("human_rbac_denied", role);
+  }
+
+  // Layer 2b: ai_has_read_permission. Every capability in the registry is
+  // operationType "read" by construction (see capabilities.ts — no
+  // write/draft/protected capability exists in this phase), so this is a
+  // defensive check against a future registry entry being added with a
+  // different operation type before its own enforcement path exists,
+  // not a reachable branch today.
+  if (capability.operationType !== "read") {
+    return deny("ai_permission_denied", role);
+  }
+
+  return { allowed: true, role, capability };
+}
+
+// The one function every future MIADIAMANTE capability executor calls
+// before touching any data. Server-side only (reads the session via
+// getCurrentRole(), same as every other RBAC check in this codebase) —
+// never callable from, or trusted from, the browser. A thin I/O wrapper
+// around decideMiadiamanteRead() — all the actual decision logic lives
+// there so it can be tested without a session.
+export async function authorizeMiadiamanteRead(
+  capabilityName: string,
+): Promise<MiadiamanteAuthorizationResult> {
+  // Identical resolution path (and identical fail-safe null-on-any-error
+  // behavior) as every other permission check in this CRM.
+  const role = await getCurrentRole();
+  return decideMiadiamanteRead(role, capabilityName);
+}
