@@ -28,7 +28,10 @@ export async function UpcomingAppointments({
             href={`/appointments/${appt.id}`}
             className="flex items-start gap-3 rounded-md border border-border p-3 transition-colors hover:bg-muted"
           >
-            <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+            {/* AMS Visual Correction (dashboard icon contrast) — see
+                FollowUpTasksCard.tsx for the full rationale: --accent is a
+                background wash, not an icon color; --primary replaces it. */}
+            <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <div className="flex flex-col">
               <span className="text-sm font-medium text-foreground">
                 {appt.title}

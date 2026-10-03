@@ -40,7 +40,11 @@ export async function RecentActivity({ items }: { items: ActivityItem[] }) {
           const Icon = icons[item.type];
           return (
             <div key={`${item.type}-${item.id}`} className="flex items-start gap-3">
-              <Icon className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+              {/* AMS Visual Correction (dashboard icon contrast) — see
+                  FollowUpTasksCard.tsx for the full rationale: --accent is
+                  a background wash, not an icon color; --primary replaces
+                  it. */}
+              <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <div className="flex flex-col">
                 <span className="text-sm text-foreground">
                   {labels[item.type]}: {item.label}

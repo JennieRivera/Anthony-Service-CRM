@@ -30,7 +30,12 @@ export async function FollowUpTasksCard({
             href={`/clients/${task.clientId}`}
             className="flex items-start gap-3 rounded-md border border-border p-3 transition-colors hover:bg-muted"
           >
-            <Bell className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+            {/* AMS Visual Correction (dashboard icon contrast) — --accent
+                is a pale badge/dropdown BACKGROUND wash (#f0e6d0), never
+                meant as an icon foreground; at ~1.1:1 against a white card
+                it read as nearly invisible. --primary (AMS Professional
+                Blue) is the normal-functional-icon color per the brief. */}
+            <Bell className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <div className="flex flex-col">
               <span className="text-sm font-medium text-foreground">
                 {task.title}

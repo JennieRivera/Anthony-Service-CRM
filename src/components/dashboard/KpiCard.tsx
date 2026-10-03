@@ -19,7 +19,10 @@ export function KpiCard({
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {label}
         </CardTitle>
-        <Icon className="h-4 w-4 text-accent" />
+        {/* AMS Visual Correction (dashboard icon contrast) — see
+            FollowUpTasksCard.tsx for the full rationale: --accent is a
+            background wash, not an icon color; --primary replaces it. */}
+        <Icon className="h-4 w-4 text-primary" />
       </CardHeader>
       <CardContent>
         <div className="font-heading text-2xl text-foreground">{value}</div>

@@ -49,7 +49,14 @@ export async function ActionNeededList({
             href={`/cases/${c.id}`}
             className="flex items-start gap-3 rounded-md border border-border p-3 transition-colors hover:bg-muted"
           >
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+            {/* AMS Visual Correction (dashboard icon contrast) — --accent
+                is a pale background wash, not an icon color (see
+                FollowUpTasksCard.tsx). This triangle is the same warning
+                semantic as the overdue-invoice one above, so it reuses
+                --destructive for consistency within this one card, rather
+                than the plain --primary used for purely informational
+                dashboard icons elsewhere. */}
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
             <div className="flex flex-col">
               <span className="text-sm font-medium text-foreground">
                 {t("stalledCase")}: {c.title}

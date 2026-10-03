@@ -24,7 +24,10 @@ export async function AiAgentsCard({ agents }: { agents: AiAgent[] }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
-        <Sparkles className="h-4 w-4 text-accent" />
+        {/* AMS Visual Correction (dashboard icon contrast) — see
+            FollowUpTasksCard.tsx for the full rationale: --accent is a
+            background wash, not an icon color; --primary replaces it. */}
+        <Sparkles className="h-4 w-4 text-primary" />
         <CardTitle>{t("aiAgentsTitle")}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
