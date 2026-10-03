@@ -8,7 +8,10 @@ import {
   conversationMessages,
   strategicAlliances,
   associationsChambers,
+  referralCompensations,
+  referralCompensationPayments,
 } from "@/lib/db/schema";
+import { getRecordedPaymentsByInvoice, computeBalanceDue } from "./financialReports";
 import { listUpcomingAppointments } from "./appointments";
 import { listOpenTasks } from "./tasks";
 
@@ -38,6 +41,9 @@ export async function getDashboardData() {
     allCommunications,
     allAlliances,
     allAssociations,
+    allCompensations,
+    allCompensationPayments,
+    recordedPaymentsByInvoice,
   ] = await Promise.all([
     db.select().from(clients),
     db.select().from(cases),
@@ -49,6 +55,9 @@ export async function getDashboardData() {
     db.select().from(conversationMessages),
     db.select().from(strategicAlliances),
     db.select().from(associationsChambers),
+    db.select().from(referralCompensations),
+    db.select().from(referralCompensationPayments),
+    getRecordedPaymentsByInvoice(),
   ]);
 
   const now = new Date();
@@ -86,11 +95,24 @@ export async function getDashboardData() {
     (c) => !["completed", "cancelled"].includes(c.status),
   ).length;
 
-  const outstandingInvoices = allInvoices.filter((inv) =>
-    ["unpaid", "overdue"].includes(inv.status),
-  );
+  // Financial & Reporting Relationships (correction) — Balance Due is
+  // invoice total minus every recorded payment against it (see
+  // computeBalanceDue/getRecordedPaymentsByInvoice in financialReports.ts
+  // for why balanceDue can't be trusted on individual payments rows).
+  // Reused here, not reimplemented, specifically so this KPI and the
+  // Reports "Outstanding" tab can never disagree. An invoice whose
+  // recorded payments already cover its total is excluded — its status
+  // field being stuck at unpaid/overdue is a data-hygiene gap, not money
+  // still owed.
+  const outstandingInvoices = allInvoices
+    .filter((inv) => ["unpaid", "overdue"].includes(inv.status))
+    .map((inv) => ({
+      ...inv,
+      balanceDue: computeBalanceDue(Number(inv.total), recordedPaymentsByInvoice.get(inv.id) ?? 0),
+    }))
+    .filter((inv) => inv.balanceDue > 0);
   const outstandingTotal = outstandingInvoices.reduce(
-    (sum, inv) => sum + Number(inv.total),
+    (sum, inv) => sum + inv.balanceDue,
     0,
   );
 
@@ -211,14 +233,23 @@ export async function getDashboardData() {
     .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
     .slice(0, 8);
 
-  // Action needed: overdue invoices + stalled cases (waiting_on_client)
-  const overdueInvoices = allInvoices.filter(
-    (inv) =>
-      inv.status === "overdue" ||
-      (inv.status === "unpaid" &&
-        inv.dueDate &&
-        new Date(inv.dueDate) < now),
-  );
+  // Action needed: overdue invoices + stalled cases (waiting_on_client).
+  // Same Balance Due logic as outstandingInvoices above — an overdue
+  // invoice already covered by recorded payments doesn't belong in a
+  // "still needs collecting" worklist.
+  const overdueInvoices = allInvoices
+    .filter(
+      (inv) =>
+        inv.status === "overdue" ||
+        (inv.status === "unpaid" &&
+          inv.dueDate &&
+          new Date(inv.dueDate) < now),
+    )
+    .map((inv) => ({
+      ...inv,
+      balanceDue: computeBalanceDue(Number(inv.total), recordedPaymentsByInvoice.get(inv.id) ?? 0),
+    }))
+    .filter((inv) => inv.balanceDue > 0);
   const stalledCases = allCases.filter(
     (c) => c.status === "waiting_on_client",
   );
@@ -239,9 +270,30 @@ export async function getDashboardData() {
   const openReferrals = allReferrals.filter((r) =>
     ["submitted", "in_progress"].includes(r.status),
   );
-  const commissionDueTotal = allReferrals
-    .filter((r) => !r.commissionPaidDate)
-    .reduce((sum, r) => sum + Number(r.commissionDue ?? 0), 0);
+  // Financial & Reporting Relationships — this KPI used to sum the legacy
+  // referrals.commissionDue/commissionPaidDate fields (a flat manual
+  // calculator with no earning/approval workflow behind it — see the
+  // phase report). Replaced with the structured Referral Compensation
+  // model's own "Payable" figure (approved minus non-reversed payments,
+  // the same math recomputePaidStatus() in referralCompensations.ts
+  // uses), so this card and the Referral Compensation report can never
+  // disagree. The legacy fields/UI on the referral detail page are
+  // untouched.
+  const paidByCompId = new Map<string, number>();
+  for (const p of allCompensationPayments) {
+    if (p.reversed) continue;
+    paidByCompId.set(
+      p.referralCompensationId,
+      (paidByCompId.get(p.referralCompensationId) ?? 0) + Number(p.amountPaid),
+    );
+  }
+  const commissionDueTotal = allCompensations
+    .filter((c) => c.status === "approved" || c.status === "paid")
+    .reduce((sum, c) => {
+      const approved = Number(c.approvedAmount ?? 0);
+      const paid = paidByCompId.get(c.id) ?? 0;
+      return sum + Math.max(approved - paid, 0);
+    }, 0);
 
   const pendingFollowUpComms = allCommunications.filter(
     (c) => c.status === "pending_follow_up",
@@ -285,9 +337,19 @@ export async function getDashboardData() {
   const referralsFromPartners = allReferrals.filter(
     (r) => r.allianceId,
   ).length;
-  const revenueFromPartners = allReferrals
-    .filter((r) => r.allianceId)
-    .reduce((sum, r) => sum + Number(r.grossRevenue ?? 0), 0);
+  // Financial & Reporting Relationships — this used to sum the legacy,
+  // manually-typed referrals.grossRevenue field for every alliance-linked
+  // referral: an invented attribution with no link to an actual Invoice.
+  // Replaced with the same defensible rule the B2B Alliance Performance
+  // report uses — only invoices whose caseId matches a case linked to one
+  // of these referrals are counted, and never more than once. A referral
+  // with no case, or a case with no invoice, contributes $0.
+  const partnerReferralCaseIds = new Set(
+    allReferrals.filter((r) => r.allianceId && r.caseId).map((r) => r.caseId as string),
+  );
+  const revenueFromPartners = allInvoices
+    .filter((inv) => inv.caseId && partnerReferralCaseIds.has(inv.caseId) && inv.status !== "cancelled")
+    .reduce((sum, inv) => sum + Number(inv.total), 0);
 
   const partnerFollowUpsDue =
     allAlliances.filter(

@@ -298,6 +298,45 @@ export function hasAllianceViewAccess(role: Role): boolean {
   );
 }
 
+// Financial & Reporting Relationships — same composition pattern as
+// hasReferralViewAccess/hasAllianceViewAccess above, reusing existing
+// AccessAreas rather than adding new ones (per the phase brief's "if
+// financial_reports is sufficient, reuse it; otherwise minimum additive"
+// instruction — composition over the existing areas turned out to be
+// sufficient).
+//   - full: the whole Reports page, every section (Owner/Admin/Manager
+//     via "*", or "financial_reports"/"reports" explicitly).
+//   - referral: Referral Performance + Referral Compensation sections
+//     only — granted to anyone holding any referral-related area, so
+//     Referral Manager sees referral operational numbers without seeing
+//     company-wide billing.
+//   - b2b: B2B Alliance Performance + Membership Financials sections
+//     only — granted to anyone holding any alliance/membership area, so
+//     Community Manager sees B2B operational numbers without seeing
+//     company-wide billing.
+// A role with none of these (Academy Staff, General Staff, Instructor,
+// service-specific staff) gets no Reports access at all — default deny.
+export function getReportsVisibility(role: Role): {
+  full: boolean;
+  referral: boolean;
+  b2b: boolean;
+  any: boolean;
+} {
+  const full = canAccessArea(role, "reports") || canAccessArea(role, "financial_reports");
+  const referral =
+    full ||
+    canAccessArea(role, "referrals") ||
+    canAccessArea(role, "referral_compensation_terms") ||
+    canAccessArea(role, "referral_compensation_approval") ||
+    canAccessArea(role, "referral_compensation_payment");
+  const b2b =
+    full ||
+    canAccessArea(role, "alliances") ||
+    canAccessArea(role, "b2b_membership") ||
+    canAccessArea(role, "b2b_membership_billing");
+  return { full, referral, b2b, any: full || referral || b2b };
+}
+
 // Phase 2H — the owner branch (report section H, "Owner Safety").
 // Deliberately NOT a database lookup: the owner's access can never
 // depend on a `users` row existing, a migration having run, a down

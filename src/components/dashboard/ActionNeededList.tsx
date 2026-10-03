@@ -8,7 +8,7 @@ export async function ActionNeededList({
   overdueInvoices,
   stalledCases,
 }: {
-  overdueInvoices: Invoice[];
+  overdueInvoices: (Invoice & { balanceDue: number })[];
   stalledCases: Case[];
 }) {
   const t = await getTranslations("Dashboard");
@@ -38,7 +38,7 @@ export async function ActionNeededList({
                 {String(inv.invoiceSeq).padStart(5, "0")}
               </span>
               <span className="text-xs text-muted-foreground">
-                ${Number(inv.total).toFixed(2)}
+                ${inv.balanceDue.toFixed(2)}
               </span>
             </div>
           </Link>
