@@ -55,35 +55,48 @@ export function NavDrawer({
           </>
         )}
       </SheetTrigger>
-      <SheetContent side="left" className="w-80 overflow-y-auto">
+      {/* AMS Visual Experience phase — the drawer now reuses the sidebar's
+          own ivory/gold tokens (not the default white bg-popover) so the
+          sidebar -> drawer -> workspace relationship reads as one system,
+          per the brief's explicit "same AMS system" requirement. These
+          tokens already flip correctly between Light and Dark mode (see
+          globals.css), so this component needs no theme-conditional code. */}
+      <SheetContent
+        side="left"
+        className="w-80 overflow-y-auto border-[var(--sidebar-border)] bg-[var(--sidebar)] [&_[data-slot=sheet-close]]:text-[var(--sidebar-foreground)]"
+      >
         <SheetHeader>
-          <SheetTitle>{t(labelKey)}</SheetTitle>
+          <SheetTitle className="text-[var(--sidebar-foreground)]">{t(labelKey)}</SheetTitle>
         </SheetHeader>
         <div className="flex flex-col gap-4 px-4 pb-4">
           {sections.map((section, index) => (
             <div key={index} className="flex flex-col gap-1">
               {section.headingKey && (
-                <p className="px-1 pt-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                <p className="px-1 pt-1 text-xs font-medium tracking-wide text-[var(--sidebar-foreground)]/60 uppercase">
                   {t(section.headingKey)}
                 </p>
               )}
-              {section.links.map((link) => (
-                <Link
-                  key={`${link.href}-${link.navLabelKey ?? link.labelKey}`}
-                  href={link.href}
-                  // Deferred: closing the Sheet synchronously in the same
-                  // click that triggers the Link's navigation unmounts the
-                  // anchor (Sheet content lives in a portal) before
-                  // Next.js's own click handler finishes calling
-                  // router.push, which intermittently drops the
-                  // navigation entirely. Letting the click's own handlers
-                  // run first, then closing on the next tick, fixed it.
-                  onClick={() => setTimeout(() => setOpen(false), 0)}
-                  className="rounded-md px-2 py-1.5 text-sm text-foreground transition-colors hover:bg-muted"
-                >
-                  {t(link.navLabelKey ?? link.labelKey ?? "")}
-                </Link>
-              ))}
+              {section.links.map((link) => {
+                const LinkIcon = link.icon;
+                return (
+                  <Link
+                    key={`${link.href}-${link.navLabelKey ?? link.labelKey}`}
+                    href={link.href}
+                    // Deferred: closing the Sheet synchronously in the same
+                    // click that triggers the Link's navigation unmounts the
+                    // anchor (Sheet content lives in a portal) before
+                    // Next.js's own click handler finishes calling
+                    // router.push, which intermittently drops the
+                    // navigation entirely. Letting the click's own handlers
+                    // run first, then closing on the next tick, fixed it.
+                    onClick={() => setTimeout(() => setOpen(false), 0)}
+                    className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-[var(--sidebar-foreground)] transition-colors hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]"
+                  >
+                    <LinkIcon className="h-4 w-4 shrink-0 opacity-80" />
+                    <span>{t(link.navLabelKey ?? link.labelKey ?? "")}</span>
+                  </Link>
+                );
+              })}
             </div>
           ))}
         </div>

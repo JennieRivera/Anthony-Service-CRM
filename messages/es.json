@@ -9,6 +9,19 @@
     "open": "Abrir calculadora",
     "close": "Cerrar calculadora"
   },
+  "Miadiamante": {
+    "name": "MIADIAMANTE",
+    "subtitle": "Asistente Ejecutivo de AMS",
+    "open": "Abrir MIADIAMANTE",
+    "close": "Cerrar MIADIAMANTE",
+    "minimize": "Minimizar MIADIAMANTE",
+    "readyForConnection": "Lista para Conexión de IA",
+    "readyForConnectionHint": "MIADIAMANTE es actualmente solo una estructura interna. Ningún proveedor de IA está conectado todavía — no puede leer, resumir ni actuar sobre datos del CRM hasta que una fase futura la conecte.",
+    "greeting": "¿Cómo puedo ayudarte dentro de Anthony Multiservice hoy?",
+    "quickNavigation": "Navegación Rápida",
+    "inputPlaceholder": "La entrada de mensajes se activará cuando se habilite la IA",
+    "send": "Enviar"
+  },
   "Dashboard": {
     "title": "Panel",
     "activeClients": "Clientes Activos",

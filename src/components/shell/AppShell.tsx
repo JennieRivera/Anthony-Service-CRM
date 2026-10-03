@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { FloatingCalculator } from "./FloatingCalculator";
+import { Miadiamante } from "./Miadiamante";
 
 // Phase 2F — printing a certificate (or any other page) should never
 // include the sidebar/topbar/calculator chrome. Wrapping each in its own
@@ -21,6 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
       <div className="print:hidden">
         <FloatingCalculator />
+        <Miadiamante />
       </div>
     </div>
   );

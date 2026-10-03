@@ -7,6 +7,37 @@
 // `labelKey` (the 10 service categories + "generic" case flows) get new
 // copy that doesn't already exist anywhere, so those live under a new
 // "Nav.servicesDrawer.*" namespace instead.
+//
+// AMS Visual Experience phase — `icon` added to every leaf link (brief
+// section 8: "tasteful professional icons... DO NOT add random stock
+// images... DO NOT use emoji navigation"). Content/hrefs are otherwise
+// byte-for-byte unchanged from before this phase.
+
+import type { LucideIcon } from "lucide-react";
+import {
+  Building2,
+  Calculator,
+  Stamp,
+  Globe,
+  Target,
+  LineChart,
+  Landmark,
+  Cpu,
+  Megaphone,
+  PartyPopper,
+  Map,
+  FileText,
+  BookOpen,
+  GraduationCap,
+  Gem,
+  Network,
+  Image,
+  Share2,
+  Bot,
+  AlertTriangle,
+  Wrench,
+  Globe2,
+} from "lucide-react";
 
 export type DrawerLink = {
   href: string;
@@ -16,6 +47,7 @@ export type DrawerLink = {
   // Used only for links that have no existing sidebar entry to borrow a
   // label from (the 10 service categories, and section headings).
   labelKey?: string;
+  icon: LucideIcon;
 };
 
 export type DrawerSection = {
@@ -39,26 +71,26 @@ export type DrawerSection = {
 export const SERVICES_DRAWER_SECTIONS: DrawerSection[] = [
   {
     links: [
-      { href: "/cases/new?serviceType=company_registration", labelKey: "servicesBusinessFormation" },
-      { href: "/cases/new", labelKey: "servicesTaxesBookkeeping" },
-      { href: "/cases/new", labelKey: "servicesNotaryDocuments" },
-      { href: "/cases/new?serviceType=immigration", labelKey: "servicesImmigration" },
-      { href: "/cases/new?serviceType=leadership", labelKey: "servicesConsulting" },
-      { href: "/cases/new?serviceType=credit_financing", labelKey: "servicesCreditFinancial" },
-      { href: "/referrals/new", labelKey: "servicesCommercialFinance" },
-      { href: "/cases/new?serviceType=marketing", labelKey: "servicesCrmTech" },
-      { href: "/cases/new?serviceType=marketing", labelKey: "servicesMarketingBranding" },
-      { href: "/cases/new", labelKey: "servicesCorporateEvents" },
+      { href: "/cases/new?serviceType=company_registration", labelKey: "servicesBusinessFormation", icon: Building2 },
+      { href: "/cases/new", labelKey: "servicesTaxesBookkeeping", icon: Calculator },
+      { href: "/cases/new", labelKey: "servicesNotaryDocuments", icon: Stamp },
+      { href: "/cases/new?serviceType=immigration", labelKey: "servicesImmigration", icon: Globe },
+      { href: "/cases/new?serviceType=leadership", labelKey: "servicesConsulting", icon: Target },
+      { href: "/cases/new?serviceType=credit_financing", labelKey: "servicesCreditFinancial", icon: LineChart },
+      { href: "/referrals/new", labelKey: "servicesCommercialFinance", icon: Landmark },
+      { href: "/cases/new?serviceType=marketing", labelKey: "servicesCrmTech", icon: Cpu },
+      { href: "/cases/new?serviceType=marketing", labelKey: "servicesMarketingBranding", icon: Megaphone },
+      { href: "/cases/new", labelKey: "servicesCorporateEvents", icon: PartyPopper },
     ],
   },
   {
     headingKey: "resourceLinksHeading",
     links: [
-      { href: "/company-registration", navLabelKey: "companyRegistration" },
-      { href: "/sales-tax-map", navLabelKey: "salesTaxMap" },
-      { href: "/irs-resources", navLabelKey: "irsResources" },
-      { href: "/immigration-forms", navLabelKey: "immigrationForms" },
-      { href: "/notary-state-guide", navLabelKey: "notaryStateGuide" },
+      { href: "/company-registration", navLabelKey: "companyRegistration", icon: Building2 },
+      { href: "/sales-tax-map", navLabelKey: "salesTaxMap", icon: Map },
+      { href: "/irs-resources", navLabelKey: "irsResources", icon: FileText },
+      { href: "/immigration-forms", navLabelKey: "immigrationForms", icon: FileText },
+      { href: "/notary-state-guide", navLabelKey: "notaryStateGuide", icon: BookOpen },
     ],
   },
 ];
@@ -66,39 +98,39 @@ export const SERVICES_DRAWER_SECTIONS: DrawerSection[] = [
 export const ECOSYSTEM_DRAWER_SECTIONS: DrawerSection[] = [
   {
     links: [
-      { href: "/academy", navLabelKey: "academy" },
-      { href: "/diamond-community", navLabelKey: "diamondCommunity" },
-      { href: "/community", navLabelKey: "community" },
-      { href: "/latino-business-map", navLabelKey: "latinoBusinessMap" },
+      { href: "/academy", navLabelKey: "academy", icon: GraduationCap },
+      { href: "/diamond-community", navLabelKey: "diamondCommunity", icon: Gem },
+      { href: "/community", navLabelKey: "community", icon: Network },
+      { href: "/latino-business-map", navLabelKey: "latinoBusinessMap", icon: Map },
     ],
   },
   {
     headingKey: "marketingStudioHeading",
     links: [
-      { href: "/marketing-content", navLabelKey: "marketingContent" },
-      { href: "/social-media", navLabelKey: "socialMedia" },
+      { href: "/marketing-content", navLabelKey: "marketingContent", icon: Image },
+      { href: "/social-media", navLabelKey: "socialMedia", icon: Share2 },
     ],
   },
   {
     headingKey: "aiAutomationHeading",
     links: [
-      { href: "/ai-team", navLabelKey: "aiTeam" },
-      { href: "/ai-escalations", navLabelKey: "aiEscalations" },
+      { href: "/ai-team", navLabelKey: "aiTeam", icon: Bot },
+      { href: "/ai-escalations", navLabelKey: "aiEscalations", icon: AlertTriangle },
     ],
   },
   {
     headingKey: "professionalResourceCenterHeading",
     links: [
-      { href: "/notary-state-guide", navLabelKey: "notaryStateGuide" },
-      { href: "/irs-resources", navLabelKey: "irsResources" },
-      { href: "/immigration-forms", navLabelKey: "immigrationForms" },
-      { href: "/sales-tax-map", navLabelKey: "salesTaxMap" },
+      { href: "/notary-state-guide", navLabelKey: "notaryStateGuide", icon: BookOpen },
+      { href: "/irs-resources", navLabelKey: "irsResources", icon: FileText },
+      { href: "/immigration-forms", navLabelKey: "immigrationForms", icon: FileText },
+      { href: "/sales-tax-map", navLabelKey: "salesTaxMap", icon: Map },
     ],
   },
   {
     links: [
-      { href: "/professional-systems", navLabelKey: "professionalSystems" },
-      { href: "/websites", navLabelKey: "websites" },
+      { href: "/professional-systems", navLabelKey: "professionalSystems", icon: Wrench },
+      { href: "/websites", navLabelKey: "websites", icon: Globe2 },
     ],
   },
 ];

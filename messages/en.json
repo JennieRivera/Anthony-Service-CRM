@@ -9,6 +9,19 @@
     "open": "Open calculator",
     "close": "Close calculator"
   },
+  "Miadiamante": {
+    "name": "MIADIAMANTE",
+    "subtitle": "AMS Executive Assistant",
+    "open": "Open MIADIAMANTE",
+    "close": "Close MIADIAMANTE",
+    "minimize": "Minimize MIADIAMANTE",
+    "readyForConnection": "Ready for AI Connection",
+    "readyForConnectionHint": "MIADIAMANTE is an internal-only assistant shell. No AI provider is connected yet — it cannot read, summarize, or act on CRM data until a future phase connects it.",
+    "greeting": "How can I assist you inside Anthony Multiservice today?",
+    "quickNavigation": "Quick Navigation",
+    "inputPlaceholder": "Message input will connect once AI is enabled",
+    "send": "Send"
+  },
   "Dashboard": {
     "title": "Dashboard",
     "activeClients": "Active Clients",

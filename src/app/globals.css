@@ -139,29 +139,34 @@
   --chart-4: #65816f;
   --chart-5: #f3c8bc;
   --radius: 0.625rem;
-  /* Sidebar stays structurally dark in both Light and Dark mode (same
-     value either way — it never changes with --theme), but is now a
-     deep Soft-Blue-derived panel (58% darken of #4F7FA8) instead of the
-     old near-black navy (#0F1A2B), per explicit instruction that navy
-     must not remain as the hidden default. */
-  --sidebar: #213547;
-  --sidebar-foreground: #fdfbf6;
-  /* Champagne Gold — deliberately held CONSTANT here (not preset-
-     varying, unlike --sidebar-accent below) and used in exactly one
-     place: the collapsed "AMS" logo monogram (Logo.tsx). This is the
-     "restrained premium accent" — ordinary nav icons no longer tint
-     gold at all (see Sidebar.tsx/MobileNav.tsx/NavDrawer.tsx), so gold
-     no longer appears throughout the sidebar, only at the brand mark.
-     ~5.6:1 against the new --sidebar background (AA pass). */
-  --sidebar-primary: #c8a96b;
-  --sidebar-primary-foreground: #0f1a2b;
-  /* Default (no accent preset) active/hover nav row background — a
-     blue-tinted wash of the new --sidebar value, ~8.8:1 with cream text. */
-  --sidebar-accent: #2f4b64;
-  --sidebar-accent-foreground: #fdfbf6;
-  /* Subtle separator, blended ~5% toward cream from the new --sidebar. */
-  --sidebar-border: #2c3f50;
-  /* Matches the new default --primary. */
+  /* AMS Visual Experience phase — the sidebar is no longer structurally
+     dark in both themes. Light mode now uses a very light ivory, LIGHTER
+     than --background's Pearl Cream (#F6F5F0), so the nav chrome reads as
+     "almost white but visibly warm" and sits in its own tier between the
+     page background and a pure-white card (background < sidebar < card
+     in lightness). Dark mode gets its own explicit block below reusing
+     the exact prior dark values, so Dark Mode's look is unchanged by
+     this phase (brief: "Dark Mode may retain a darker accessible
+     interpretation... do not force cream surfaces into Dark Mode").
+     Contrast: dark-gold text/icons (#847047) vs this background ~4.6:1
+     (AA) — see the --premium derivation notes above; the literal
+     Champagne Gold (#C8A96B) still fails AA here (2.1:1) exactly as
+     already documented, so it is never used for sidebar text/icons,
+     only as a decorative, non-text accent (indicator bar). */
+  --sidebar: #fbfaf6;
+  /* Accessible dark gold (same derived value as --premium) for sidebar
+     text AND icons, per explicit instruction that both carry the gold
+     identity now (previously only icons did, against the old dark bg). */
+  --sidebar-foreground: #847047;
+  --sidebar-primary: #847047;
+  --sidebar-primary-foreground: #fbfaf6;
+  /* Active/hover nav row background reuses the existing --accent pair
+     (cream blended toward gold, #F0E6D0, paired with navy text at
+     #1C2B3E) — an already-contrast-verified combination elsewhere in
+     this file, not a new value to re-check. */
+  --sidebar-accent: #f0e6d0;
+  --sidebar-accent-foreground: #1c2b3e;
+  --sidebar-border: #ede2c8;
   --sidebar-ring: #477297;
 }
 
@@ -225,6 +230,21 @@
   --premium-foreground: #fdfbf6;
   --info: #304953;
   --info-foreground: #fdfbf6;
+  /* AMS Visual Experience phase — Dark Mode keeps the sidebar's ORIGINAL
+     (pre-rebrand) dark panel exactly as it already was and was already
+     contrast-verified (deep Soft-Blue-derived #213547, ~5.6:1 for the
+     literal Champagne Gold used here). Light mode's new ivory sidebar
+     (see :root above) never bleeds into Dark Mode — this block is the
+     one explicit exception the brief allows ("may retain a darker
+     accessible interpretation"). */
+  --sidebar: #213547;
+  --sidebar-foreground: #fdfbf6;
+  --sidebar-primary: #c8a96b;
+  --sidebar-primary-foreground: #0f1a2b;
+  --sidebar-accent: #2f4b64;
+  --sidebar-accent-foreground: #fdfbf6;
+  --sidebar-border: #2c3f50;
+  --sidebar-ring: #477297;
 }
 
 /*
@@ -252,6 +272,16 @@
  * --accent/--accent-foreground (badge/chip backgrounds and dropdown
  * "selected option" highlighting) still deliberately do NOT vary by
  * preset — confirmed with the user in Phase 1.5C.
+ *
+ * AMS Visual Experience phase — each preset's --sidebar-accent/
+ * -foreground override is now scoped to :root[data-theme="dark"] ONLY
+ * (compound selector, e.g. [data-theme="dark"][data-accent="sage"]),
+ * preserving dark mode's existing per-accent hover tint exactly as
+ * before. In LIGHT mode the sidebar's own ivory/gold --sidebar-accent
+ * (set once in the base :root block above) is no longer overridden by
+ * the chosen accent — the new premium sidebar identity is one
+ * consistent look, not six different hover-color variants, matching
+ * the brief's single "APPROVED TARGET" sidebar description.
  */
 
 /* Sage Green / Verde Salvia. Same deepened fill as --success (#5b7664),
@@ -260,6 +290,8 @@
   --primary: #5b7664;
   --primary-foreground: #fdfbf6;
   --ring: #5b7664;
+}
+:root[data-theme="dark"][data-accent="sage"] {
   --sidebar-accent: #3e585d;
   --sidebar-accent-foreground: #fdfbf6;
 }
@@ -269,6 +301,8 @@
   --primary: #3e7a74;
   --primary-foreground: #fdfbf6;
   --ring: #3e7a74;
+}
+:root[data-theme="dark"][data-accent="teal"] {
   --sidebar-accent: #2a4a55;
   --sidebar-accent-foreground: #fdfbf6;
 }
@@ -280,6 +314,8 @@
   --primary: #847047;
   --primary-foreground: #fdfbf6;
   --ring: #847047;
+}
+:root[data-theme="dark"][data-accent="gold"] {
   --sidebar-accent: #535852;
   --sidebar-accent-foreground: #fdfbf6;
 }
@@ -365,6 +401,32 @@
 
 @media (prefers-reduced-motion: reduce) {
   .diamond-badge-glow {
+    animation: none;
+  }
+}
+
+/* MIADIAMANTE — AMS Executive Assistant shell. A restrained, lightweight
+   shimmer (brightness + soft white/sky-blue drop-shadow only — no blur
+   filter, no continuous transform) for the floating launcher's white
+   crystalline diamond mark, in the same spirit as diamond-badge-glow
+   above but slower and subtler, since this one is visible continuously
+   on every authenticated page rather than only within one card. */
+@keyframes miadiamante-shimmer {
+  0%,
+  100% {
+    filter: brightness(1) drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  50% {
+    filter: brightness(1.2) drop-shadow(0 0 5px rgba(216, 236, 245, 0.9));
+  }
+}
+
+.miadiamante-shimmer {
+  animation: miadiamante-shimmer 3.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .miadiamante-shimmer {
     animation: none;
   }
 }
