@@ -43,6 +43,24 @@
 // found") is recorded only in the audit entry's errorMessage, which is an
 // internal operator-visible field, never part of the capability's return
 // value to a caller.
+//
+// AUDIT-TIMING CORRECTION (Phase 2B-3 prerequisite, owner-approved): the
+// audit row is now written exactly ONCE per call, after the capability's
+// own Zod validation (and DTO lookup) has run — never optimistically at
+// the RBAC-decision step. The previous design wrote the audit row
+// immediately inside authorizeAndAudit(), based solely on the RBAC
+// decision, before each run* function's own input validation; a call that
+// passed RBAC but failed Zod validation (or whose DTO lookup returned
+// null) therefore logged outcome:"success" in the database even though
+// the caller was correctly denied. authorizeAndAudit() below now only
+// SHAPES the audit entry (still pure, still no write) — each run*
+// function calls writeMiadiamanteAuditEntry() itself, exactly once,
+// immediately before every one of its own return statements, with
+// whatever the TRUE final outcome at that point actually is. Still
+// fire-and-forget (void, never awaited into the response path) — this is
+// a timing correction, not a behavioral one; nothing about response
+// latency or "a write failure never blocks an already-authorized result"
+// changes.
 
 import { auth } from "@/auth";
 import { authorizeMiadiamanteRead, type MiadiamanteAuthorizationResult } from "./authorize";
@@ -79,11 +97,12 @@ export type MiadiamanteCapabilityResult<TData> =
   | { allowed: true; data: TData; audit: MiadiamanteAuditEntry }
   | { allowed: false; message: string; audit: MiadiamanteAuditEntry };
 
-// Shared first two pipeline steps for every capability: authenticate +
-// authorize, then shape AND write the audit entry (fire-and-forget —
-// writeMiadiamanteAuditEntry never throws, see audit.ts). Returns both the
-// authorization result and the audit entry so callers can branch on
-// result.allowed without re-deriving the audit shape.
+// Shared first pipeline step for every capability: authenticate + authorize,
+// then SHAPE (but do not yet write) the audit entry. Returns both the
+// authorization result and the unwritten audit entry so callers can branch
+// on result.allowed without re-deriving the audit shape. Writing happens in
+// each run* function below, once, at its true final outcome — see the
+// AUDIT-TIMING CORRECTION note above.
 async function authorizeAndAudit(capabilityName: ImplementedCapabilityName) {
   const result: MiadiamanteAuthorizationResult = await authorizeMiadiamanteRead(capabilityName);
   const session = await auth();
@@ -95,7 +114,6 @@ async function authorizeAndAudit(capabilityName: ImplementedCapabilityName) {
     result,
     moduleKey,
   });
-  void writeMiadiamanteAuditEntry(audit);
 
   return { result, audit };
 }
@@ -104,15 +122,21 @@ export async function runCurrentUserContext(): Promise<
   MiadiamanteCapabilityResult<CurrentUserContextDto>
 > {
   const { result, audit } = await authorizeAndAudit("current_user_context.read");
-  if (!result.allowed) return { allowed: false, message: result.message, audit };
+  if (!result.allowed) {
+    void writeMiadiamanteAuditEntry(audit);
+    return { allowed: false, message: result.message, audit };
+  }
 
   const data = await getCurrentUserContext();
   if (data === null) {
     // Should not happen given authorizeMiadiamanteRead already required a
     // role (which requires a session) — fail safe rather than return a
     // partial shape.
-    return { allowed: false, message: NEUTRAL_UNAVAILABLE_MESSAGE, audit: { ...audit, outcome: "denied", errorMessage: "fetchData returned null after authorization passed" } };
+    const deniedAudit: MiadiamanteAuditEntry = { ...audit, outcome: "denied", errorMessage: "fetchData returned null after authorization passed" };
+    void writeMiadiamanteAuditEntry(deniedAudit);
+    return { allowed: false, message: NEUTRAL_UNAVAILABLE_MESSAGE, audit: deniedAudit };
   }
+  void writeMiadiamanteAuditEntry(audit);
   return { allowed: true, data, audit };
 }
 
@@ -120,12 +144,18 @@ export async function runAuthorizedNavigation(): Promise<
   MiadiamanteCapabilityResult<AuthorizedNavigationDto>
 > {
   const { result, audit } = await authorizeAndAudit("authorized_navigation.read");
-  if (!result.allowed) return { allowed: false, message: result.message, audit };
+  if (!result.allowed) {
+    void writeMiadiamanteAuditEntry(audit);
+    return { allowed: false, message: result.message, audit };
+  }
 
   const data = await getAuthorizedNavigation();
   if (data === null) {
-    return { allowed: false, message: NEUTRAL_UNAVAILABLE_MESSAGE, audit: { ...audit, outcome: "denied", errorMessage: "fetchData returned null after authorization passed" } };
+    const deniedAudit: MiadiamanteAuditEntry = { ...audit, outcome: "denied", errorMessage: "fetchData returned null after authorization passed" };
+    void writeMiadiamanteAuditEntry(deniedAudit);
+    return { allowed: false, message: NEUTRAL_UNAVAILABLE_MESSAGE, audit: deniedAudit };
   }
+  void writeMiadiamanteAuditEntry(audit);
   return { allowed: true, data, audit };
 }
 
@@ -138,25 +168,25 @@ export async function runInvoiceSummary(
   rawInput: unknown,
 ): Promise<MiadiamanteCapabilityResult<InvoiceSummaryDto>> {
   const { result, audit } = await authorizeAndAudit("invoice_summary.read");
-  if (!result.allowed) return { allowed: false, message: result.message, audit };
+  if (!result.allowed) {
+    void writeMiadiamanteAuditEntry(audit);
+    return { allowed: false, message: result.message, audit };
+  }
 
   const parsed = invoiceSummaryInputSchema.safeParse(rawInput);
   if (!parsed.success) {
-    return {
-      allowed: false,
-      message: NEUTRAL_UNAVAILABLE_MESSAGE,
-      audit: { ...audit, outcome: "denied", errorMessage: "malformed_input: invoiceId" },
-    };
+    const deniedAudit: MiadiamanteAuditEntry = { ...audit, outcome: "denied", errorMessage: "malformed_input: invoiceId" };
+    void writeMiadiamanteAuditEntry(deniedAudit);
+    return { allowed: false, message: NEUTRAL_UNAVAILABLE_MESSAGE, audit: deniedAudit };
   }
 
   const data = await getInvoiceSummary(parsed.data.invoiceId);
   if (data === null) {
-    return {
-      allowed: false,
-      message: NEUTRAL_UNAVAILABLE_MESSAGE,
-      audit: { ...audit, outcome: "denied", errorMessage: "invoice not found" },
-    };
+    const deniedAudit: MiadiamanteAuditEntry = { ...audit, outcome: "denied", errorMessage: "invoice not found" };
+    void writeMiadiamanteAuditEntry(deniedAudit);
+    return { allowed: false, message: NEUTRAL_UNAVAILABLE_MESSAGE, audit: deniedAudit };
   }
+  void writeMiadiamanteAuditEntry(audit);
   return { allowed: true, data, audit };
 }
 
@@ -169,18 +199,20 @@ export async function runFinancialReportSummary(
   rawInput: unknown,
 ): Promise<MiadiamanteCapabilityResult<FinancialReportSummaryDto>> {
   const { result, audit } = await authorizeAndAudit("financial_report_summary.read");
-  if (!result.allowed) return { allowed: false, message: result.message, audit };
+  if (!result.allowed) {
+    void writeMiadiamanteAuditEntry(audit);
+    return { allowed: false, message: result.message, audit };
+  }
 
   const parsed = financialReportSummaryInputSchema.safeParse(rawInput ?? {});
   if (!parsed.success) {
-    return {
-      allowed: false,
-      message: NEUTRAL_UNAVAILABLE_MESSAGE,
-      audit: { ...audit, outcome: "denied", errorMessage: "malformed_input: date range" },
-    };
+    const deniedAudit: MiadiamanteAuditEntry = { ...audit, outcome: "denied", errorMessage: "malformed_input: date range" };
+    void writeMiadiamanteAuditEntry(deniedAudit);
+    return { allowed: false, message: NEUTRAL_UNAVAILABLE_MESSAGE, audit: deniedAudit };
   }
 
   const data = await getFinancialReportSummary(result.role, parsed.data);
+  void writeMiadiamanteAuditEntry(audit);
   return { allowed: true, data, audit };
 }
 
@@ -190,18 +222,20 @@ export async function runTaskList(
   rawInput: unknown,
 ): Promise<MiadiamanteCapabilityResult<TaskListDto>> {
   const { result, audit } = await authorizeAndAudit("task_list.read");
-  if (!result.allowed) return { allowed: false, message: result.message, audit };
+  if (!result.allowed) {
+    void writeMiadiamanteAuditEntry(audit);
+    return { allowed: false, message: result.message, audit };
+  }
 
   const parsed = taskListInputSchema.safeParse(rawInput ?? {});
   if (!parsed.success) {
-    return {
-      allowed: false,
-      message: NEUTRAL_UNAVAILABLE_MESSAGE,
-      audit: { ...audit, outcome: "denied", errorMessage: "malformed_input: limit" },
-    };
+    const deniedAudit: MiadiamanteAuditEntry = { ...audit, outcome: "denied", errorMessage: "malformed_input: limit" };
+    void writeMiadiamanteAuditEntry(deniedAudit);
+    return { allowed: false, message: NEUTRAL_UNAVAILABLE_MESSAGE, audit: deniedAudit };
   }
 
   const data = await getTaskListSummary(parsed.data.limit);
+  void writeMiadiamanteAuditEntry(audit);
   return { allowed: true, data, audit };
 }
 
@@ -211,17 +245,19 @@ export async function runUpcomingAppointments(
   rawInput: unknown,
 ): Promise<MiadiamanteCapabilityResult<UpcomingAppointmentsDto>> {
   const { result, audit } = await authorizeAndAudit("upcoming_appointments.read");
-  if (!result.allowed) return { allowed: false, message: result.message, audit };
+  if (!result.allowed) {
+    void writeMiadiamanteAuditEntry(audit);
+    return { allowed: false, message: result.message, audit };
+  }
 
   const parsed = upcomingAppointmentsInputSchema.safeParse(rawInput ?? {});
   if (!parsed.success) {
-    return {
-      allowed: false,
-      message: NEUTRAL_UNAVAILABLE_MESSAGE,
-      audit: { ...audit, outcome: "denied", errorMessage: "malformed_input: limit" },
-    };
+    const deniedAudit: MiadiamanteAuditEntry = { ...audit, outcome: "denied", errorMessage: "malformed_input: limit" };
+    void writeMiadiamanteAuditEntry(deniedAudit);
+    return { allowed: false, message: NEUTRAL_UNAVAILABLE_MESSAGE, audit: deniedAudit };
   }
 
   const data = await getUpcomingAppointmentsSummary(parsed.data.limit);
+  void writeMiadiamanteAuditEntry(audit);
   return { allowed: true, data, audit };
 }
