@@ -4120,6 +4120,35 @@ export const miadiamanteMessages = pgTable(
   ],
 );
 
+// Phase 2B-3 durable rate limiter (owner-approved design audit). An
+// append-only event log, NOT a counter row — this is what makes a true
+// rolling window possible (count WHERE occurred_at > now() - interval
+// '1 hour' on read, rather than a fixed-window counter that resets on a
+// clock boundary). Deliberately owner_email-only, with NO FK to users
+// or to miadiamante_conversations/miadiamante_messages: this table has
+// no relationship to conversation content, only to the rate-limiting
+// decision itself, and (like ai_activity_log.requestedByUserEmail) the
+// owner/ADMIN_EMAIL must be rate-limitable with no corresponding
+// `users` row. No cleanup/retention mechanism yet (explicitly deferred
+// to a later step) — old rows outside the window are simply never
+// counted, so their presence doesn't affect correctness.
+export const miadiamanteRateLimitEvents = pgTable(
+  "miadiamante_rate_limit_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerEmail: text("owner_email").notNull(),
+    occurredAt: timestamp("occurred_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("miadiamante_rate_limit_events_owner_occurred_idx").on(
+      table.ownerEmail,
+      table.occurredAt,
+    ),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type Client = typeof clients.$inferSelect;
 export type Case = typeof cases.$inferSelect;
@@ -4211,5 +4240,7 @@ export type AiActivityLogEntry = typeof aiActivityLog.$inferSelect;
 export type MiadiamanteConversation =
   typeof miadiamanteConversations.$inferSelect;
 export type MiadiamanteMessage = typeof miadiamanteMessages.$inferSelect;
+export type MiadiamanteRateLimitEvent =
+  typeof miadiamanteRateLimitEvents.$inferSelect;
 export type ServiceColorSetting = typeof serviceColorSettings.$inferSelect;
 export type ServiceCatalogItem = typeof serviceCatalogItems.$inferSelect;
