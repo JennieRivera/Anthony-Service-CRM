@@ -28,6 +28,7 @@
 // show the caller (never "does a hidden record exist," never a count,
 // never a name) — see master prompt section 14 (no side-channel leakage).
 
+import { auth } from "@/auth";
 import { getCurrentRole, canAccessArea, type Role } from "@/lib/permissions";
 import { CAPABILITY_REGISTRY, type MiadiamanteCapability } from "./capabilities";
 
@@ -191,4 +192,35 @@ export function decideMiadiamanteAccess(role: Role | null): MiadiamanteAccessDec
 export async function authorizeMiadiamanteAccess(): Promise<MiadiamanteAccessDecision> {
   const role = await getCurrentRole();
   return decideMiadiamanteAccess(role);
+}
+
+// --- Canonical server-derived identity helper ---------------------------
+// Phase 2B-3 rate-limiter-wiring refactor (owner decision): this was
+// previously a private, unexported function inside conversationStore.ts.
+// Moved here — not duplicated — because this IS Layer 1's own job
+// ("derive identity, enforce whether this human may use MIADIAMANTE at
+// all"), and because a second future caller (providerExecutor.ts) now
+// needs the exact same resolution with no risk of a second, driftable
+// copy. conversationStore.ts imports this instead of defining its own.
+//
+// Returns the authenticated session's email, lowercased, ONLY if
+// authorizeMiadiamanteAccess() (Layer 1, super_admin-only for this
+// release) admits the caller — null on any denial (unauthenticated,
+// inactive/deactivated, or simply not an authorized role), collapsing
+// every reason to the same "no identity" outcome so a caller can never
+// distinguish *why* access was denied from this function's return value
+// alone.
+//
+// There is no parameter here at all — this function takes no input from
+// its caller, so there is structurally no way for a caller to supply or
+// override the email or role it resolves. It always re-derives identity
+// fresh from the current request's session; nothing is cached.
+export async function getMiadiamanteAuthorizedSessionEmail(): Promise<string | null> {
+  const accessResult = await authorizeMiadiamanteAccess();
+  if (!accessResult.allowed) {
+    return null;
+  }
+  const session = await auth();
+  const email = session?.user?.email;
+  return email ? email.toLowerCase() : null;
 }

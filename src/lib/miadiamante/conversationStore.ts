@@ -63,7 +63,6 @@
 // all) using the same neutral copy every other denial in this codebase
 // already uses, never the specific underlying reason.
 
-import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import {
   miadiamanteConversations,
@@ -75,27 +74,21 @@ import {
 import { eq, asc } from "drizzle-orm";
 import { z } from "zod";
 import { NEUTRAL_UNAVAILABLE_MESSAGE } from "./capabilityRunner";
-import { authorizeMiadiamanteAccess } from "./authorize";
+import { getMiadiamanteAuthorizedSessionEmail } from "./authorize";
 
 export { NEUTRAL_UNAVAILABLE_MESSAGE };
 
 // The ONE gate every exported function in this file resolves identity
-// through. Reuses authorizeMiadiamanteAccess() — the dedicated Layer 1
-// "may use MIADIAMANTE at all" decision in authorize.ts — no new
-// decision logic lives here. A denial (unauthenticated, inactive/
-// deactivated, or simply not an authorized role) returns null,
-// collapsing to the same NEUTRAL_UNAVAILABLE_MESSAGE every other denial
-// in this file already uses — callers never see *why* access was
-// denied, only that it was.
-async function getAuthorizedSessionEmail(): Promise<string | null> {
-  const accessResult = await authorizeMiadiamanteAccess();
-  if (!accessResult.allowed) {
-    return null;
-  }
-  const session = await auth();
-  const email = session?.user?.email;
-  return email ? email.toLowerCase() : null;
-}
+// through. Phase 2B-3 refactor (owner decision): this used to be a
+// private copy of this exact logic defined in this file; it now reuses
+// the canonical helper in authorize.ts — the same one providerExecutor.ts
+// uses — so there is exactly one implementation of "derive identity,
+// enforce Layer 1" in the whole codebase, never two drifting copies.
+// Behavior is unchanged: a denial (unauthenticated, inactive/
+// deactivated, or simply not an authorized role) still collapses to
+// null here, and from there to the same NEUTRAL_UNAVAILABLE_MESSAGE
+// every other denial in this file already uses.
+const getAuthorizedSessionEmail = getMiadiamanteAuthorizedSessionEmail;
 
 // Bounded well below any realistic human-typed message — generous enough
 // for a genuine question, far short of anything resembling a pasted

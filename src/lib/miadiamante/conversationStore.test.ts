@@ -271,12 +271,26 @@ async function main() {
   );
 
   await check(
-    "conversationStore.ts imports authorizeMiadiamanteAccess from ./authorize (Layer 1) — not authorizeMiadiamanteRead (Layer 2) — for its identity gate",
+    "conversationStore.ts imports the canonical getMiadiamanteAuthorizedSessionEmail from ./authorize (Phase 2B-3 identity-helper refactor) — not authorizeMiadiamanteRead (Layer 2) — for its identity gate",
     () => {
+      // Phase 2B-3 (rate-limiter-wiring) refactor: conversationStore.ts
+      // no longer calls authorizeMiadiamanteAccess() directly — that
+      // call now lives inside the canonical
+      // getMiadiamanteAuthorizedSessionEmail() helper in authorize.ts
+      // itself (reused by providerExecutor.ts too, so there is exactly
+      // one implementation of "derive identity, enforce Layer 1" in the
+      // codebase). Layer 1 enforcement is unchanged — it just moved one
+      // level down, inside the imported helper — see authorize.test.ts
+      // for the direct proof that getMiadiamanteAuthorizedSessionEmail
+      // itself still routes through authorizeMiadiamanteAccess().
       const importLines = storeSource.split("\n").filter((l) => /^\s*import\b/.test(l));
       assert(
-        importLines.some((l) => l.includes('from "./authorize"') && l.includes("authorizeMiadiamanteAccess")),
-        "expected an import of authorizeMiadiamanteAccess from ./authorize",
+        importLines.some((l) => l.includes('from "./authorize"') && l.includes("getMiadiamanteAuthorizedSessionEmail")),
+        "expected an import of getMiadiamanteAuthorizedSessionEmail from ./authorize",
+      );
+      assert(
+        !importLines.some((l) => l.includes("authorizeMiadiamanteRead")),
+        "must not import authorizeMiadiamanteRead (Layer 2) for the identity gate",
       );
     },
   );

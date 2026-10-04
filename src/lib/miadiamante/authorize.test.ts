@@ -11,6 +11,8 @@
 //   npx tsx src/lib/miadiamante/authorize.test.ts
 
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
 import { decideMiadiamanteRead } from "./authorize";
 import { buildMiadiamanteAuditEntry } from "./audit";
 import {
@@ -455,5 +457,42 @@ check("every role resolves without throwing for all four new capabilities (no cr
     }
   }
 });
+
+// --- Phase 2B-3 identity-helper refactor: getMiadiamanteAuthorizedSessionEmail ---
+// The canonical "derive identity, enforce Layer 1" helper, relocated
+// here from a private copy that used to live in conversationStore.ts
+// (owner decision — see conversationStore.test.ts and
+// providerExecutor.test.ts for the reuse proofs at each call site).
+console.log("\ngetMiadiamanteAuthorizedSessionEmail() — canonical identity helper:");
+
+const authorizeSourceForIdentityCheck = fs.readFileSync(path.join(__dirname, "authorize.ts"), "utf-8");
+
+check("getMiadiamanteAuthorizedSessionEmail() internally routes through authorizeMiadiamanteAccess() (Layer 1) before resolving the session email", () => {
+  const fnMatch = authorizeSourceForIdentityCheck.match(/export async function getMiadiamanteAuthorizedSessionEmail\(\)[\s\S]*?\n}/);
+  assert.ok(fnMatch, "expected to find the function body");
+  const body = fnMatch![0];
+  const accessCheckIndex = body.indexOf("authorizeMiadiamanteAccess()");
+  const authCallIndex = body.indexOf("await auth()");
+  assert.ok(accessCheckIndex !== -1, "expected a call to authorizeMiadiamanteAccess()");
+  assert.ok(authCallIndex !== -1, "expected a call to auth()");
+  assert.ok(accessCheckIndex < authCallIndex, "expected the Layer 1 check to run BEFORE resolving the session email");
+});
+
+check("getMiadiamanteAuthorizedSessionEmail() takes no parameters — structurally no input path for a caller to supply or override identity", () => {
+  const fnMatch = authorizeSourceForIdentityCheck.match(/export async function getMiadiamanteAuthorizedSessionEmail\(([^)]*)\)/);
+  assert.ok(fnMatch, "expected to find the function signature");
+  assert.equal(fnMatch![1].trim(), "", "expected zero parameters");
+});
+
+// Note: a live call to getMiadiamanteAuthorizedSessionEmail() in this
+// bare tsx script is NOT exercised here — next-auth's auth() internally
+// calls Next.js's headers(), which THROWS ("called outside a request
+// scope") rather than resolving to null when there is no real Next.js
+// request context, confirmed directly by running it. That throw is
+// exactly what providerExecutor.ts's outer try/catch is designed to
+// collapse into the same neutral denial (see providerExecutor.test.ts's
+// "unauthenticated" test, which proves this end-to-end through the
+// choke point) — it isn't a "gracefully returns null" behavior worth
+// asserting on in isolation here.
 
 console.log(`\n${passed} checks passed.`);
