@@ -5,6 +5,7 @@ import { CompanyForm } from "@/components/companies/CompanyForm";
 import { getCompanyById } from "@/lib/queries/companies";
 import { updateCompanyAction } from "../../actions";
 import type { CompanyFormValues } from "@/lib/validation/company";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function EditCompanyPage({
   params,
@@ -19,6 +20,7 @@ export default async function EditCompanyPage({
 
   async function submit(values: CompanyFormValues) {
     "use server";
+    await requireAuthenticatedUser();
     await updateCompanyAction(id, values);
   }
 

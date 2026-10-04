@@ -10,6 +10,7 @@ import { listAlliancesForSelect } from "@/lib/queries/alliances";
 import { listAssociationsChambersForSelect } from "@/lib/queries/associationsChambers";
 import { updateCommunicationAction } from "../../actions";
 import type { CommunicationFormValues } from "@/lib/validation/communication";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function EditCommunicationPage({
   params,
@@ -33,6 +34,7 @@ export default async function EditCommunicationPage({
 
   async function submit(values: CommunicationFormValues) {
     "use server";
+    await requireAuthenticatedUser();
     await updateCommunicationAction(id, values);
   }
 

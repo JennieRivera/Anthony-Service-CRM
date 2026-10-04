@@ -11,6 +11,7 @@ import {
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function normalize(values: SocialMediaContentFormValues) {
   return {
@@ -44,6 +45,7 @@ function normalize(values: SocialMediaContentFormValues) {
 export async function createSocialMediaContentAction(
   rawValues: SocialMediaContentFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = socialMediaContentFormSchema.parse(rawValues);
   const session = await auth();
   const db = getDb();
@@ -65,6 +67,7 @@ export async function updateSocialMediaContentAction(
   id: string,
   rawValues: SocialMediaContentFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = socialMediaContentFormSchema.parse(rawValues);
   const db = getDb();
 

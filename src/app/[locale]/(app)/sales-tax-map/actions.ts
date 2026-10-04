@@ -8,11 +8,13 @@ import {
   type SalesTaxStateInfoFormValues,
 } from "@/lib/validation/salesTaxMap";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export async function upsertSalesTaxStateInfoAction(
   state: string,
   rawValues: SalesTaxStateInfoFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = salesTaxStateInfoFormSchema.parse(rawValues);
   const detail = {
     stateTaxAgency: values.stateTaxAgency || null,

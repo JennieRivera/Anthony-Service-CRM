@@ -22,6 +22,7 @@ import { KpiCard } from "@/components/dashboard/KpiCard";
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 import { toggleAiAgentPauseAction } from "./actions";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function AiTeamPage() {
   const t = await getTranslations("AiTeam");
@@ -122,6 +123,7 @@ export default async function AiTeamPage() {
           {agents.map((agent) => {
             async function pauseAgent() {
               "use server";
+              await requireAuthenticatedUser();
               await toggleAiAgentPauseAction(agent.id);
             }
 

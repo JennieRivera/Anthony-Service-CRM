@@ -11,6 +11,8 @@ import {
 } from "@/lib/validation/invoice";
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
+import { markInvoicePaid } from "@/lib/payments/stripeLedger";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function computeTotal(items: InvoiceFormValues["items"]) {
   return items.reduce(
@@ -20,6 +22,7 @@ function computeTotal(items: InvoiceFormValues["items"]) {
 }
 
 export async function createInvoiceAction(rawValues: InvoiceFormValues) {
+  await requireAuthenticatedUser();
   const values = invoiceFormSchema.parse(rawValues);
   const db = getDb();
   const total = computeTotal(values.items);
@@ -59,23 +62,13 @@ export async function markInvoicePaidAction(
   id: string,
   rawValues: { paymentMethod: string },
 ) {
+  await requireAuthenticatedUser();
   const values = markPaidSchema.parse(rawValues);
-  const db = getDb();
-
-  await db
-    .update(invoices)
-    .set({
-      status: "paid",
-      paymentMethod: values.paymentMethod,
-      paidAt: new Date(),
-    })
-    .where(eq(invoices.id, id));
-
-  revalidatePath("/invoices");
-  revalidatePath(`/invoices/${id}`);
+  await markInvoicePaid(id, values.paymentMethod);
 }
 
 export async function cancelInvoiceAction(id: string) {
+  await requireAuthenticatedUser();
   const db = getDb();
   await db
     .update(invoices)

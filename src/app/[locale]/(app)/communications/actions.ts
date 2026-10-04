@@ -16,6 +16,7 @@ import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function normalize(values: CommunicationFormValues) {
   return {
@@ -118,6 +119,7 @@ async function ensureFollowUpTask(
 export async function createCommunicationAction(
   rawValues: CommunicationFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = communicationFormSchema.parse(rawValues);
   await assertOutboundChannelAllowed(values.clientId, values.channel, values.direction);
   const db = getDb();
@@ -150,6 +152,7 @@ export async function updateCommunicationAction(
   id: string,
   rawValues: CommunicationFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = communicationFormSchema.parse(rawValues);
   await assertOutboundChannelAllowed(values.clientId, values.channel, values.direction);
   const db = getDb();

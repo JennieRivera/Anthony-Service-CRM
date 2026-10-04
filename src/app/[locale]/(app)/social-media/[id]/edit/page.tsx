@@ -8,6 +8,7 @@ import {
 } from "@/lib/queries/socialMedia";
 import { updateSocialMediaContentAction } from "../../actions";
 import type { SocialMediaContentFormValues } from "@/lib/validation/socialMedia";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function EditSocialMediaContentPage({
   params,
@@ -25,6 +26,7 @@ export default async function EditSocialMediaContentPage({
 
   async function submit(values: SocialMediaContentFormValues) {
     "use server";
+    await requireAuthenticatedUser();
     await updateSocialMediaContentAction(id, values);
   }
 

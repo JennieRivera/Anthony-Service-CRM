@@ -7,10 +7,12 @@ import {
   conversationMessageFormSchema,
   type ConversationMessageFormValues,
 } from "@/lib/validation/conversation";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export async function createConversationMessageAction(
   rawValues: ConversationMessageFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = conversationMessageFormSchema.parse(rawValues);
 
   await getDb()

@@ -5,6 +5,7 @@ import { TemplateForm } from "@/components/templates/TemplateForm";
 import { getMessageTemplateById } from "@/lib/queries/messageTemplates";
 import { updateMessageTemplateAction } from "../../actions";
 import type { MessageTemplateFormValues } from "@/lib/validation/messageTemplate";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function EditTemplatePage({
   params,
@@ -19,6 +20,7 @@ export default async function EditTemplatePage({
 
   async function submit(values: MessageTemplateFormValues) {
     "use server";
+    await requireAuthenticatedUser();
     await updateMessageTemplateAction(id, values);
   }
 

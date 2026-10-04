@@ -9,6 +9,7 @@ import {
   type WebsiteLinkFormValues,
 } from "@/lib/validation/websiteLink";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function normalize(values: WebsiteLinkFormValues) {
   return {
@@ -23,6 +24,7 @@ function normalize(values: WebsiteLinkFormValues) {
 }
 
 export async function createWebsiteLinkAction(rawValues: WebsiteLinkFormValues) {
+  await requireAuthenticatedUser();
   const values = websiteLinkFormSchema.parse(rawValues);
   const db = getDb();
 
@@ -52,6 +54,7 @@ export async function updateWebsiteLinkAction(
   id: string,
   rawValues: WebsiteLinkFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = websiteLinkFormSchema.parse(rawValues);
 
   await getDb()
@@ -71,6 +74,7 @@ export async function updateWebsiteLinkAction(
 }
 
 export async function toggleWebsiteLinkActiveAction(id: string, active: boolean) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(websiteLinks)
     .set({ active, updatedAt: new Date() })
@@ -88,6 +92,7 @@ export async function toggleWebsiteLinkActiveAction(id: string, active: boolean)
 }
 
 export async function reorderWebsiteLinkAction(id: string, direction: "up" | "down") {
+  await requireAuthenticatedUser();
   const db = getDb();
   const rows = await db
     .select({ id: websiteLinks.id, sortOrder: websiteLinks.sortOrder })

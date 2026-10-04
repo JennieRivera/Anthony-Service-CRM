@@ -9,6 +9,7 @@ import {
   type IrsResourceFormValues,
 } from "@/lib/validation/irsResource";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function normalize(values: IrsResourceFormValues) {
   return {
@@ -24,6 +25,7 @@ function normalize(values: IrsResourceFormValues) {
 }
 
 export async function createIrsResourceAction(rawValues: IrsResourceFormValues) {
+  await requireAuthenticatedUser();
   const values = irsResourceFormSchema.parse(rawValues);
   const [created] = await getDb()
     .insert(irsResources)
@@ -44,6 +46,7 @@ export async function updateIrsResourceAction(
   id: string,
   rawValues: IrsResourceFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = irsResourceFormSchema.parse(rawValues);
 
   await getDb()
@@ -62,6 +65,7 @@ export async function updateIrsResourceAction(
 }
 
 export async function toggleIrsResourceActiveAction(id: string, active: boolean) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(irsResources)
     .set({ active, updatedAt: new Date() })
@@ -78,6 +82,7 @@ export async function toggleIrsResourceActiveAction(id: string, active: boolean)
 }
 
 export async function deleteIrsResourceAction(id: string) {
+  await requireAuthenticatedUser();
   await getDb().delete(irsResources).where(eq(irsResources.id, id));
 
   await logAuditEvent({

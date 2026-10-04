@@ -15,12 +15,14 @@ import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { businessDateString, businessLocalToUtc, formatDateTime } from "@/lib/dates";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export async function searchClientMatchesAction(query: {
   phone?: string;
   email?: string;
   businessName?: string;
 }) {
+  await requireAuthenticatedUser();
   return searchClientsForMatch(query);
 }
 
@@ -91,6 +93,7 @@ function normalize(
 export async function createAppointmentAction(
   rawValues: AppointmentFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = appointmentFormSchema.parse(rawValues);
   const clientId = await resolveClientId(values);
   const session = await auth();
@@ -124,6 +127,7 @@ export async function updateAppointmentAction(
   id: string,
   rawValues: AppointmentFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = appointmentFormSchema.parse(rawValues);
   const clientId = await resolveClientId(values);
   const db = getDb();
@@ -220,6 +224,7 @@ export async function updateAppointmentStatusAction(
   id: string,
   status: Appointment["status"],
 ) {
+  await requireAuthenticatedUser();
   const db = getDb();
   const [existing] = await db
     .select({ status: appointments.status })
@@ -244,6 +249,7 @@ export async function updateAppointmentStatusAction(
 // ever changes status. This is the one deliberate exception, confirmed
 // through a dialog in the UI before it ever runs.
 export async function deleteAppointmentAction(id: string) {
+  await requireAuthenticatedUser();
   const db = getDb();
   const [appt] = await db
     .select({ title: appointments.title, clientId: appointments.clientId })
@@ -274,6 +280,7 @@ export async function updateAppointmentPaymentStatusAction(
   id: string,
   paymentStatus: NonNullable<Appointment["paymentStatus"]>,
 ) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(appointments)
     .set({ paymentStatus, updatedAt: new Date() })
@@ -287,6 +294,7 @@ export async function updateAppointmentPaymentStatusAction(
 // replacing the field, since staff may add several quick notes over time
 // without wanting to lose what was there before.
 export async function addAppointmentNoteAction(id: string, note: string) {
+  await requireAuthenticatedUser();
   const trimmed = note.trim();
   if (!trimmed) return;
 
@@ -317,6 +325,7 @@ export async function addAppointmentNoteAction(id: string, note: string) {
 // completed/no-show workflow via appointmentId + type, so clicking this
 // and later marking the appointment completed doesn't create two.
 export async function createFollowUpTaskAction(id: string) {
+  await requireAuthenticatedUser();
   const db = getDb();
   const [appt] = await db
     .select({
@@ -367,6 +376,7 @@ export async function rescheduleAppointmentAction(
   id: string,
   values: { startAt: string; endAt: string },
 ) {
+  await requireAuthenticatedUser();
   const db = getDb();
   const [original] = await db
     .select()

@@ -13,10 +13,12 @@ import {
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 // Pausing an agent only flips its own status flag — it never touches the
 // clients/cases/tasks it works over (section 15).
 export async function toggleAiAgentPauseAction(id: string) {
+  await requireAuthenticatedUser();
   const db = getDb();
   const [agent] = await db
     .select({ status: aiAgents.status })
@@ -44,6 +46,7 @@ export async function updateAiAgentProfileAction(
   id: string,
   rawValues: AiAgentProfileFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = aiAgentProfileFormSchema.parse(rawValues);
   const db = getDb();
 
@@ -93,6 +96,7 @@ export async function createKnowledgeBaseEntryAction(
   agentId: string,
   rawValues: AiAgentKnowledgeBaseFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = aiAgentKnowledgeBaseFormSchema.parse(rawValues);
   const db = getDb();
 
@@ -128,6 +132,7 @@ export async function updateKnowledgeBaseEntryAction(
   id: string,
   rawValues: AiAgentKnowledgeBaseFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = aiAgentKnowledgeBaseFormSchema.parse(rawValues);
   const db = getDb();
 
@@ -158,6 +163,7 @@ export async function updateKnowledgeBaseEntryAction(
 }
 
 export async function deleteKnowledgeBaseEntryAction(id: string) {
+  await requireAuthenticatedUser();
   const db = getDb();
 
   const [existing] = await db

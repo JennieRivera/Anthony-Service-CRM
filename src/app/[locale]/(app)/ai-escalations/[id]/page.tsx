@@ -8,6 +8,7 @@ import { AiEscalationStatusBadge } from "@/components/ai-escalations/AiEscalatio
 import { AiEscalationResolutionForm } from "@/components/ai-escalations/AiEscalationResolutionForm";
 import { updateAiEscalationResolutionAction } from "../actions";
 import type { AiEscalationResolutionFormValues } from "@/lib/validation/aiEscalation";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function AiEscalationDetailPage({
   params,
@@ -23,6 +24,7 @@ export default async function AiEscalationDetailPage({
 
   async function submit(values: AiEscalationResolutionFormValues) {
     "use server";
+    await requireAuthenticatedUser();
     await updateAiEscalationResolutionAction(id, values);
   }
 

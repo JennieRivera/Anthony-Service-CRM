@@ -10,6 +10,7 @@ import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { updateClientAction } from "../../actions";
 import type { ClientFormValues } from "@/lib/validation/client";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function EditClientPage({
   params,
@@ -30,6 +31,7 @@ export default async function EditClientPage({
 
   async function submit(values: ClientFormValues) {
     "use server";
+    await requireAuthenticatedUser();
     await updateClientAction(id, values);
   }
 

@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { CaseForm } from "@/components/cases/CaseForm";
 import { updateCaseAction } from "../../actions";
 import type { CaseFormValues } from "@/lib/validation/case";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function EditCasePage({
   params,
@@ -32,6 +33,7 @@ export default async function EditCasePage({
 
   async function submit(values: CaseFormValues) {
     "use server";
+    await requireAuthenticatedUser();
     await updateCaseAction(id, values);
   }
 

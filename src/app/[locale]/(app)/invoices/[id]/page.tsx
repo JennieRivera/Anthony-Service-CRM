@@ -17,6 +17,7 @@ import { InvoiceStatusBadge } from "@/components/invoices/InvoiceStatusBadge";
 import { MarkAsPaidDialog } from "@/components/invoices/MarkAsPaidDialog";
 import { PaymentOptions } from "@/components/invoices/PaymentOptions";
 import { cancelInvoiceAction } from "../actions";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function InvoiceDetailPage({
   params,
@@ -34,6 +35,7 @@ export default async function InvoiceDetailPage({
 
   async function cancelInvoice() {
     "use server";
+    await requireAuthenticatedUser();
     await cancelInvoiceAction(id);
   }
 

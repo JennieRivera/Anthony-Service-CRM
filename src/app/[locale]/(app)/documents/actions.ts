@@ -9,11 +9,13 @@ import { isBlobConfigured } from "@/lib/blob/config";
 import { documents } from "@/lib/db/schema";
 import { selectableDocumentCategoryValues } from "@/lib/validation/documentCategory";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export async function updateDocumentCategoryAction(
   documentId: string,
   category: string,
 ) {
+  await requireAuthenticatedUser();
   const session = await auth();
   if (!session?.user) {
     throw new Error("Unauthorized");
@@ -39,6 +41,7 @@ export async function updateDocumentCategoryAction(
 }
 
 export async function deleteDocumentAction(documentId: string) {
+  await requireAuthenticatedUser();
   const session = await auth();
   if (!session?.user) {
     throw new Error("Unauthorized");

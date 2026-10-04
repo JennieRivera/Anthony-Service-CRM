@@ -9,6 +9,7 @@ import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { logAuditEvent } from "@/lib/audit";
 import { findPossibleDuplicateClients } from "@/lib/queries/clients";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function normalize(values: ClientFormValues) {
   const interestedServices = Array.from(new Set(values.interestedServices));
@@ -29,6 +30,7 @@ function normalize(values: ClientFormValues) {
 }
 
 export async function createClientAction(rawValues: ClientFormValues) {
+  await requireAuthenticatedUser();
   const id = await insertClient(rawValues);
   const locale = await getLocale();
   redirect({ href: `/clients/${id}`, locale });
@@ -41,6 +43,7 @@ export async function createClientAction(rawValues: ClientFormValues) {
 export async function createClientAndContinueToEnrollmentAction(
   rawValues: ClientFormValues,
 ) {
+  await requireAuthenticatedUser();
   const id = await insertClient(rawValues);
   const locale = await getLocale();
   redirect({ href: `/cases/new?serviceType=academy&clientId=${id}`, locale });
@@ -55,6 +58,7 @@ export async function findPossibleDuplicateClientsAction(query: {
   email?: string;
   phone?: string;
 }) {
+  await requireAuthenticatedUser();
   return findPossibleDuplicateClients(query);
 }
 
@@ -63,6 +67,7 @@ export async function findPossibleDuplicateClientsAction(query: {
 // creates the client and hands back its id (no redirect) so the caller
 // can upload the file, then navigate itself.
 export async function createClientForUploadAction(rawValues: ClientFormValues) {
+  await requireAuthenticatedUser();
   return insertClient(rawValues);
 }
 
@@ -83,6 +88,7 @@ export async function updateClientAction(
   id: string,
   rawValues: ClientFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = clientFormSchema.parse(rawValues);
   const db = getDb();
 
@@ -105,6 +111,7 @@ export async function updateClientAction(
 export async function deleteClientAction(
   id: string,
 ): Promise<{ ok: true } | { ok: false; reason: "has_billing_history" }> {
+  await requireAuthenticatedUser();
   const db = getDb();
   const [existing] = await db
     .select({ fullName: clients.fullName })

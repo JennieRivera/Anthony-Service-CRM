@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { AssociationChamberForm } from "@/components/associations/AssociationChamberForm";
 import { updateAssociationChamberAction } from "../../actions";
 import type { AssociationChamberFormValues } from "@/lib/validation/associationChamber";
+import { requireAccessArea } from "@/lib/permissions";
 
 export default async function EditAssociationPage({
   params,
@@ -25,6 +26,7 @@ export default async function EditAssociationPage({
 
   async function submit(values: AssociationChamberFormValues) {
     "use server";
+    await requireAccessArea("associations");
     await updateAssociationChamberAction(id, values);
   }
 

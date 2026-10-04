@@ -7,6 +7,7 @@ import { AiAgentProfileForm } from "@/components/ai-team/AiAgentProfileForm";
 import { AiAgentKnowledgeBaseManager } from "@/components/ai-team/AiAgentKnowledgeBaseManager";
 import { updateAiAgentProfileAction } from "../../actions";
 import type { AiAgentProfileFormValues } from "@/lib/validation/aiAgent";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function AiAgentEditPage({
   params,
@@ -22,6 +23,7 @@ export default async function AiAgentEditPage({
 
   async function submit(values: AiAgentProfileFormValues) {
     "use server";
+    await requireAuthenticatedUser();
     await updateAiAgentProfileAction(agent.id, values);
   }
 

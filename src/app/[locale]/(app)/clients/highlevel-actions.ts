@@ -8,11 +8,13 @@ import {
   type HighlevelSyncFormValues,
 } from "@/lib/validation/highlevel";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export async function upsertClientHighlevelSyncAction(
   clientId: string,
   rawValues: HighlevelSyncFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = highlevelSyncFormSchema.parse(rawValues);
 
   const detail = {

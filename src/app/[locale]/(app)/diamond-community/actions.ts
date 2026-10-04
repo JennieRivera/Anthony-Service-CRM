@@ -9,10 +9,12 @@ import {
   diamondMemberFormSchema,
   type DiamondMemberFormValues,
 } from "@/lib/validation/academyDiamond";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export async function createDiamondMemberAction(
   rawValues: DiamondMemberFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = diamondMemberFormSchema.parse(rawValues);
 
   await getDb()
@@ -40,6 +42,7 @@ export async function updateDiamondMemberStatusAction(
   id: string,
   status: AcademyDiamondMember["status"],
 ) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(academyDiamondMembers)
     .set({ status, updatedAt: new Date() })
@@ -49,6 +52,7 @@ export async function updateDiamondMemberStatusAction(
 }
 
 export async function updateDiamondMemberNotesAction(id: string, notes: string) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(academyDiamondMembers)
     .set({ notes: notes.trim() || null, updatedAt: new Date() })

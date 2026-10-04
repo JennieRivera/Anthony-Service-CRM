@@ -8,6 +8,7 @@ import { PaymentForm } from "@/components/payments/PaymentForm";
 import { listInvoicesForSelect } from "@/lib/queries/payments";
 import { updatePaymentAction } from "../../actions";
 import type { PaymentFormValues } from "@/lib/validation/payment";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function EditPaymentPage({
   params,
@@ -29,6 +30,7 @@ export default async function EditPaymentPage({
 
   async function submit(values: PaymentFormValues) {
     "use server";
+    await requireAuthenticatedUser();
     await updatePaymentAction(id, values);
   }
 

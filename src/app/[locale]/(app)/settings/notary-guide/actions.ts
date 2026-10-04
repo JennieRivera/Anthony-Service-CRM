@@ -9,11 +9,13 @@ import {
 } from "@/lib/validation/notaryStateGuide";
 import { logAuditEvent } from "@/lib/audit";
 import { businessDateString } from "@/lib/dates";
+import { requireAccessArea } from "@/lib/permissions";
 
 export async function updateNotaryStateGuideAction(
   state: string,
   rawValues: NotaryStateGuideFormValues,
 ) {
+  await requireAccessArea("settings");
   const values = notaryStateGuideFormSchema.parse(rawValues);
   const detail = {
     officialAgency: values.officialAgency || null,

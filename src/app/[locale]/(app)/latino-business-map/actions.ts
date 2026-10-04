@@ -8,11 +8,13 @@ import {
   type LatinoBusinessDataFormValues,
 } from "@/lib/validation/latinoBusinessMap";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export async function upsertLatinoBusinessDataAction(
   state: string,
   rawValues: LatinoBusinessDataFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = latinoBusinessDataFormSchema.parse(rawValues);
   const detail = {
     estimatedLatinoPopulation: values.estimatedLatinoPopulation

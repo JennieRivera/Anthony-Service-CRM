@@ -8,7 +8,7 @@ import { listAlliancesForSelect } from "@/lib/queries/alliances";
 import { updateReferralAction } from "../../actions";
 import type { ReferralFormValues } from "@/lib/validation/referral";
 import AccessDenied from "@/components/AccessDenied";
-import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
+import { getCurrentRole, hasAccessArea, requireAccessArea } from "@/lib/permissions";
 
 export default async function EditReferralPage({
   params,
@@ -39,6 +39,7 @@ export default async function EditReferralPage({
 
   async function submit(values: ReferralFormValues) {
     "use server";
+    await requireAccessArea("referrals");
     await updateReferralAction(id, values);
   }
 

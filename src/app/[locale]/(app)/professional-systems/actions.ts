@@ -9,6 +9,7 @@ import {
   type ProfessionalSystemFormValues,
 } from "@/lib/validation/professionalSystem";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function normalize(values: ProfessionalSystemFormValues) {
   return {
@@ -29,6 +30,7 @@ function normalize(values: ProfessionalSystemFormValues) {
 export async function createProfessionalSystemAction(
   rawValues: ProfessionalSystemFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = professionalSystemFormSchema.parse(rawValues);
   const db = getDb();
 
@@ -58,6 +60,7 @@ export async function updateProfessionalSystemAction(
   id: string,
   rawValues: ProfessionalSystemFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = professionalSystemFormSchema.parse(rawValues);
 
   await getDb()
@@ -80,6 +83,7 @@ export async function toggleProfessionalSystemActiveAction(
   id: string,
   active: boolean,
 ) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(professionalSystems)
     .set({ active, updatedAt: new Date() })
@@ -100,6 +104,7 @@ export async function reorderProfessionalSystemAction(
   id: string,
   direction: "up" | "down",
 ) {
+  await requireAuthenticatedUser();
   const db = getDb();
   const rows = await db
     .select({ id: professionalSystems.id, sortOrder: professionalSystems.sortOrder })

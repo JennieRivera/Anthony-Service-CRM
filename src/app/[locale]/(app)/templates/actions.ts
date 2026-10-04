@@ -12,6 +12,7 @@ import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { eq } from "drizzle-orm";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function normalize(values: MessageTemplateFormValues) {
   return {
@@ -29,6 +30,7 @@ function normalize(values: MessageTemplateFormValues) {
 export async function createMessageTemplateAction(
   rawValues: MessageTemplateFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = messageTemplateFormSchema.parse(rawValues);
   const session = await auth();
 
@@ -53,6 +55,7 @@ export async function updateMessageTemplateAction(
   id: string,
   rawValues: MessageTemplateFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = messageTemplateFormSchema.parse(rawValues);
 
   await getDb()

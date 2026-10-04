@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 import { markTaskDoneAction } from "./actions";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function TasksPage() {
   const t = await getTranslations("Tasks");
@@ -72,6 +73,7 @@ export default async function TasksPage() {
                   {openTasks.map((task) => {
                     async function completeTask() {
                       "use server";
+                      await requireAuthenticatedUser();
                       await markTaskDoneAction(task.id);
                     }
 

@@ -19,10 +19,12 @@ import {
   type WebsiteChatSessionFormValues,
 } from "@/lib/validation/socialChannels";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export async function createFacebookThreadAction(
   rawValues: FacebookThreadFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = facebookThreadFormSchema.parse(rawValues);
   const [created] = await getDb()
     .insert(facebookMessengerThreads)
@@ -47,6 +49,7 @@ export async function updateFacebookThreadStatusAction(
   id: string,
   status: (typeof metaChannelStatusValues)[number],
 ) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(facebookMessengerThreads)
     .set({ status, updatedAt: new Date() })
@@ -63,6 +66,7 @@ export async function updateFacebookThreadStatusAction(
 export async function createInstagramThreadAction(
   rawValues: InstagramThreadFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = instagramThreadFormSchema.parse(rawValues);
   const [created] = await getDb()
     .insert(instagramDmThreads)
@@ -87,6 +91,7 @@ export async function updateInstagramThreadStatusAction(
   id: string,
   status: (typeof metaChannelStatusValues)[number],
 ) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(instagramDmThreads)
     .set({ status, updatedAt: new Date() })
@@ -103,6 +108,7 @@ export async function updateInstagramThreadStatusAction(
 export async function createWebsiteChatSessionAction(
   rawValues: WebsiteChatSessionFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = websiteChatSessionFormSchema.parse(rawValues);
   const [created] = await getDb()
     .insert(websiteChatSessions)
@@ -134,6 +140,7 @@ export async function updateWebsiteChatStatusAction(
   id: string,
   conversationStatus: WebsiteChatSessionFormValues["conversationStatus"],
 ) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(websiteChatSessions)
     .set({ conversationStatus, updatedAt: new Date() })

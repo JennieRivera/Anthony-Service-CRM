@@ -11,6 +11,7 @@ import {
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAccessArea } from "@/lib/permissions";
 
 function normalize(values: AssociationChamberFormValues) {
   return {
@@ -45,6 +46,7 @@ function normalize(values: AssociationChamberFormValues) {
 export async function createAssociationChamberAction(
   rawValues: AssociationChamberFormValues,
 ) {
+  await requireAccessArea("associations");
   const values = associationChamberFormSchema.parse(rawValues);
   const [created] = await getDb()
     .insert(associationsChambers)
@@ -68,6 +70,7 @@ export async function updateAssociationChamberAction(
   id: string,
   rawValues: AssociationChamberFormValues,
 ) {
+  await requireAccessArea("associations");
   const values = associationChamberFormSchema.parse(rawValues);
 
   await getDb()
@@ -93,6 +96,7 @@ export async function toggleAssociationChamberActiveAction(
   id: string,
   active: boolean,
 ) {
+  await requireAccessArea("associations");
   await getDb()
     .update(associationsChambers)
     .set({ active, updatedAt: new Date() })

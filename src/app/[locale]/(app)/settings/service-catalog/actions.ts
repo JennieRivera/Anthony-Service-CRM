@@ -9,6 +9,7 @@ import {
   type ServiceCatalogItemFormValues,
 } from "@/lib/validation/serviceCatalog";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAccessArea } from "@/lib/permissions";
 
 function normalize(values: ServiceCatalogItemFormValues) {
   return {
@@ -24,6 +25,7 @@ function normalize(values: ServiceCatalogItemFormValues) {
 export async function createServiceCatalogItemAction(
   rawValues: ServiceCatalogItemFormValues,
 ) {
+  await requireAccessArea("settings");
   const values = serviceCatalogItemFormSchema.parse(rawValues);
   const db = getDb();
 
@@ -53,6 +55,7 @@ export async function updateServiceCatalogItemAction(
   id: string,
   rawValues: ServiceCatalogItemFormValues,
 ) {
+  await requireAccessArea("settings");
   const values = serviceCatalogItemFormSchema.parse(rawValues);
 
   await getDb()
@@ -75,6 +78,7 @@ export async function toggleServiceCatalogItemActiveAction(
   id: string,
   active: boolean,
 ) {
+  await requireAccessArea("settings");
   await getDb()
     .update(serviceCatalogItems)
     .set({ active, updatedAt: new Date() })

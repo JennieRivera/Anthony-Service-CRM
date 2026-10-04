@@ -9,6 +9,7 @@ import {
   type ImmigrationFormFormValues,
 } from "@/lib/validation/immigrationForm";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function normalize(values: ImmigrationFormFormValues) {
   return {
@@ -33,6 +34,7 @@ function normalize(values: ImmigrationFormFormValues) {
 export async function createImmigrationFormAction(
   rawValues: ImmigrationFormFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = immigrationFormFormSchema.parse(rawValues);
   const [created] = await getDb()
     .insert(immigrationForms)
@@ -53,6 +55,7 @@ export async function updateImmigrationFormAction(
   id: string,
   rawValues: ImmigrationFormFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = immigrationFormFormSchema.parse(rawValues);
 
   await getDb()
@@ -74,6 +77,7 @@ export async function toggleImmigrationFormActiveAction(
   id: string,
   active: boolean,
 ) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(immigrationForms)
     .set({ active, updatedAt: new Date() })
@@ -90,6 +94,7 @@ export async function toggleImmigrationFormActiveAction(
 }
 
 export async function deleteImmigrationFormAction(id: string) {
+  await requireAuthenticatedUser();
   await getDb().delete(immigrationForms).where(eq(immigrationForms.id, id));
 
   await logAuditEvent({

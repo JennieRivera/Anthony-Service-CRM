@@ -27,6 +27,7 @@ import {
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function normalizeCompany(values: CompanyFormValues) {
   return {
@@ -76,6 +77,7 @@ function normalizeCompany(values: CompanyFormValues) {
 }
 
 export async function createCompanyAction(rawValues: CompanyFormValues) {
+  await requireAuthenticatedUser();
   const values = companyFormSchema.parse(rawValues);
   const [created] = await getDb()
     .insert(companies)
@@ -98,6 +100,7 @@ export async function updateCompanyAction(
   id: string,
   rawValues: CompanyFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = companyFormSchema.parse(rawValues);
 
   await getDb()
@@ -122,6 +125,7 @@ export async function createCompanyOwnerAction(
   companyId: string,
   rawValues: CompanyOwnerFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = companyOwnerFormSchema.parse(rawValues);
   await getDb()
     .insert(companyOwners)
@@ -153,6 +157,7 @@ export async function createCompanyOwnerAction(
 }
 
 export async function deleteCompanyOwnerAction(companyId: string, ownerId: string) {
+  await requireAuthenticatedUser();
   await getDb().delete(companyOwners).where(eq(companyOwners.id, ownerId));
   await logAuditEvent({
     action: "company.owner_removed",
@@ -167,6 +172,7 @@ export async function createCompanyContactAction(
   companyId: string,
   rawValues: CompanyContactFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = companyContactFormSchema.parse(rawValues);
   await getDb()
     .insert(companyContacts)
@@ -194,6 +200,7 @@ export async function deleteCompanyContactAction(
   companyId: string,
   contactId: string,
 ) {
+  await requireAuthenticatedUser();
   await getDb().delete(companyContacts).where(eq(companyContacts.id, contactId));
   await logAuditEvent({
     action: "company.contact_removed",
@@ -208,6 +215,7 @@ export async function createCompanyAuthorizedRepresentativeAction(
   companyId: string,
   rawValues: CompanyAuthorizedRepresentativeFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = companyAuthorizedRepresentativeFormSchema.parse(rawValues);
   await getDb()
     .insert(companyAuthorizedRepresentatives)
@@ -235,6 +243,7 @@ export async function deleteCompanyAuthorizedRepresentativeAction(
   companyId: string,
   representativeId: string,
 ) {
+  await requireAuthenticatedUser();
   await getDb()
     .delete(companyAuthorizedRepresentatives)
     .where(eq(companyAuthorizedRepresentatives.id, representativeId));
@@ -251,6 +260,7 @@ export async function createCompanyChecklistItemAction(
   companyId: string,
   rawValues: CompanyDocumentChecklistItemFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = companyDocumentChecklistItemFormSchema.parse(rawValues);
   await getDb()
     .insert(companyDocumentChecklistItems)
@@ -278,6 +288,7 @@ export async function updateCompanyChecklistItemAction(
   itemId: string,
   rawValues: CompanyDocumentChecklistItemFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = companyDocumentChecklistItemFormSchema.parse(rawValues);
   await getDb()
     .update(companyDocumentChecklistItems)
@@ -305,6 +316,7 @@ export async function deleteCompanyChecklistItemAction(
   companyId: string,
   itemId: string,
 ) {
+  await requireAuthenticatedUser();
   await getDb()
     .delete(companyDocumentChecklistItems)
     .where(eq(companyDocumentChecklistItems.id, itemId));

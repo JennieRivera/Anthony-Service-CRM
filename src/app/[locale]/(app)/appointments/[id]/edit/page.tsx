@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { AppointmentForm } from "@/components/appointments/AppointmentForm";
 import { updateAppointmentAction } from "../../actions";
 import type { AppointmentFormValues } from "@/lib/validation/appointment";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function EditAppointmentPage({
   params,
@@ -27,6 +28,7 @@ export default async function EditAppointmentPage({
 
   async function submit(values: AppointmentFormValues) {
     "use server";
+    await requireAuthenticatedUser();
     await updateAppointmentAction(id, values);
   }
 

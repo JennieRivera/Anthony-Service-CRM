@@ -9,11 +9,13 @@ import {
   type ServiceColorFormValues,
 } from "@/lib/validation/serviceColor";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAccessArea } from "@/lib/permissions";
 
 export async function updateServiceColorAction(
   key: string,
   rawValues: ServiceColorFormValues,
 ) {
+  await requireAccessArea("settings");
   const values = serviceColorFormSchema.parse(rawValues);
 
   await getDb()

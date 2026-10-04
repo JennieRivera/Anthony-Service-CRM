@@ -11,8 +11,10 @@ import {
   updateAcademyProgram,
   updateAcademyProgramStatus,
 } from "@/lib/queries/academyPrograms";
+import { requireAccessArea } from "@/lib/permissions";
 
 export async function createAcademyProgramAction(rawValues: AcademyProgramFormValues) {
+  await requireAccessArea("academy");
   const values = academyProgramFormSchema.parse(rawValues);
   await createAcademyProgram(values);
   revalidatePath("/academy/programs");
@@ -22,6 +24,7 @@ export async function updateAcademyProgramAction(
   id: string,
   rawValues: AcademyProgramFormValues,
 ) {
+  await requireAccessArea("academy");
   const values = academyProgramFormSchema.parse(rawValues);
   await updateAcademyProgram(id, values);
   revalidatePath("/academy/programs");
@@ -33,6 +36,7 @@ export async function updateAcademyProgramStatusAction(
   id: string,
   status: AcademyProgram["status"],
 ) {
+  await requireAccessArea("academy");
   await updateAcademyProgramStatus(id, status);
   revalidatePath("/academy/programs");
 }

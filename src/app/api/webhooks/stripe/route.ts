@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripeClient, isStripeConfigured } from "@/lib/payments/stripe";
-import { markInvoicePaidAction } from "@/app/[locale]/(app)/invoices/actions";
-import { recordStripePaymentAction } from "@/app/[locale]/(app)/payments/actions";
+import { markInvoicePaid, recordStripePayment } from "@/lib/payments/stripeLedger";
 import { getInvoiceById } from "@/lib/queries/invoices";
 
 // Stripe calls this automatically after a successful Checkout payment so the
@@ -39,14 +38,14 @@ export async function POST(request: Request) {
     const session = event.data.object as Stripe.Checkout.Session;
     const invoiceId = session.metadata?.invoiceId;
     if (invoiceId) {
-      await markInvoicePaidAction(invoiceId, { paymentMethod: "Stripe" });
+      await markInvoicePaid(invoiceId, "Stripe");
 
       // Additive: also log this charge in the Payments ledger. Wrapped so a
       // failure here never affects the invoice already being marked paid.
       try {
         const result = await getInvoiceById(invoiceId);
         if (result) {
-          await recordStripePaymentAction({
+          await recordStripePayment({
             invoiceId,
             amountTotal: Number(result.invoice.total),
             transactionConfirmation: session.id,

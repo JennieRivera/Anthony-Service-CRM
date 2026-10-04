@@ -9,11 +9,13 @@ import {
   type CommunicationPreferencesFormValues,
 } from "@/lib/validation/communicationPreferences";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export async function upsertCommunicationPreferencesAction(
   clientId: string,
   rawValues: CommunicationPreferencesFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = communicationPreferencesFormSchema.parse(rawValues);
 
   const [existing] = await getDb()

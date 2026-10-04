@@ -8,7 +8,7 @@ import { AllianceForm } from "@/components/alliances/AllianceForm";
 import { updateAllianceAction } from "../../actions";
 import type { AllianceFormValues } from "@/lib/validation/alliance";
 import AccessDenied from "@/components/AccessDenied";
-import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
+import { getCurrentRole, hasAccessArea, requireAccessArea } from "@/lib/permissions";
 
 export default async function EditAlliancePage({
   params,
@@ -37,6 +37,7 @@ export default async function EditAlliancePage({
 
   async function submit(values: AllianceFormValues) {
     "use server";
+    await requireAccessArea("alliances");
     await updateAllianceAction(id, values);
   }
 

@@ -12,12 +12,14 @@ import { getInvoiceForPayment } from "@/lib/queries/payments";
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { businessDateString } from "@/lib/dates";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 function computeBalance(amountTotal: number, amountPaid: number) {
   return Math.max(amountTotal - amountPaid, 0).toFixed(2);
 }
 
 export async function createPaymentAction(rawValues: PaymentFormValues) {
+  await requireAuthenticatedUser();
   const values = paymentFormSchema.parse(rawValues);
   const invoice = await getInvoiceForPayment(values.invoiceId);
   if (!invoice) throw new Error("Invoice not found");
@@ -55,6 +57,7 @@ export async function updatePaymentAction(
   id: string,
   rawValues: PaymentFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = paymentFormSchema.parse(rawValues);
   const invoice = await getInvoiceForPayment(values.invoiceId);
   if (!invoice) throw new Error("Invoice not found");
@@ -89,32 +92,3 @@ export async function updatePaymentAction(
   redirect({ href: `/payments/${id}`, locale });
 }
 
-// Called from the Stripe webhook after a checkout session completes, so the
-// payment ledger stays in sync with the card charge that already marked the
-// invoice paid. Never trusts client input — invoiceId/amount come from the
-// verified Stripe event, not a form submission.
-export async function recordStripePaymentAction({
-  invoiceId,
-  amountTotal,
-  transactionConfirmation,
-}: {
-  invoiceId: string;
-  amountTotal: number;
-  transactionConfirmation: string;
-}) {
-  const db = getDb();
-
-  await db.insert(payments).values({
-    invoiceId,
-    amountTotal: amountTotal.toFixed(2),
-    amountPaid: amountTotal.toFixed(2),
-    balanceDue: "0.00",
-    status: "paid",
-    paymentDate: businessDateString(),
-    paymentMethod: "Stripe",
-    transactionConfirmation,
-    refundStatus: "none",
-  });
-
-  revalidatePath("/payments");
-}

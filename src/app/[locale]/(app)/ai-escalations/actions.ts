@@ -13,6 +13,7 @@ import {
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAuthenticatedUser } from "@/lib/permissions";
 
 // Escalations are always staff-logged today (section 16 — no live
 // conversational AI yet to raise one on its own). This is the manual
@@ -20,6 +21,7 @@ import { logAuditEvent } from "@/lib/audit";
 export async function createAiEscalationAction(
   rawValues: AiEscalationFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = aiEscalationFormSchema.parse(rawValues);
   const db = getDb();
 
@@ -52,6 +54,7 @@ export async function updateAiEscalationResolutionAction(
   id: string,
   rawValues: AiEscalationResolutionFormValues,
 ) {
+  await requireAuthenticatedUser();
   const values = aiEscalationResolutionFormSchema.parse(rawValues);
   const db = getDb();
 

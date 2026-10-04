@@ -391,6 +391,27 @@ export async function requireAccessArea(area: AccessArea): Promise<Role> {
   return role;
 }
 
+// Baseline guard for every Server Action whose page isn't gated by a
+// specific access area: the caller must resolve to an active role (the
+// owner, or an active `users` row) — the exact same population that can
+// sign in at all. proxy.ts alone is NOT enough: a Server Action can be
+// invoked by POSTing its action ID to any route the proxy lets through
+// (e.g. the public /book page), so every action re-checks here itself.
+export async function requireAuthenticatedUser(): Promise<Role> {
+  const role = await getCurrentRole();
+  if (!role) {
+    const session = await auth();
+    await logAuditEvent({
+      action: "permission.denied",
+      entityType: "server_action",
+      entityId: "authenticated_user",
+      summary: `Unauthenticated Server Action call denied for ${session?.user?.email ?? "unauthenticated"}`,
+    });
+    throw new Error("Unauthorized");
+  }
+  return role;
+}
+
 // Phase 4, Session 7 — "Communication Security" role rules (spec #13),
 // layered on the same design as the rest of this file.
 //

@@ -6,6 +6,7 @@ import { getDb } from "@/lib/db";
 import { integrationSettings } from "@/lib/db/schema";
 import { getIntegrationDefinition } from "@/lib/integrations";
 import { logAuditEvent } from "@/lib/audit";
+import { requireAccessArea } from "@/lib/permissions";
 
 async function ensureRow(integrationKey: string) {
   await getDb()
@@ -20,6 +21,7 @@ async function ensureRow(integrationKey: string) {
 // an honest "is it configured" check standing in for a live connection
 // test until one is built.
 export async function testIntegrationConnectionAction(integrationKey: string) {
+  await requireAccessArea("settings");
   const definition = getIntegrationDefinition(integrationKey);
   if (!definition) throw new Error("Unknown integration");
 
@@ -72,6 +74,7 @@ export async function testIntegrationConnectionAction(integrationKey: string) {
 }
 
 export async function disconnectIntegrationAction(integrationKey: string) {
+  await requireAccessArea("settings");
   await ensureRow(integrationKey);
   await getDb()
     .update(integrationSettings)
@@ -97,6 +100,7 @@ export async function updateIntegrationNotesAction(
   integrationKey: string,
   notes: string,
 ) {
+  await requireAccessArea("settings");
   await ensureRow(integrationKey);
   await getDb()
     .update(integrationSettings)

@@ -50,7 +50,7 @@ import { getActiveAgentForServiceType } from "@/lib/ai/agentActivity";
 import { authorizeAndLogAgentAction } from "@/lib/ai/auditLog";
 import { businessDateString } from "@/lib/dates";
 import { logAuditEvent } from "@/lib/audit";
-import { requireAccessArea } from "@/lib/permissions";
+import { requireAccessArea, requireAuthenticatedUser } from "@/lib/permissions";
 import { z } from "zod";
 import { upsertModuleProgress } from "@/lib/queries/academyProgress";
 import {
@@ -843,6 +843,7 @@ async function upsertServiceDetails(
 }
 
 export async function createCaseAction(rawValues: CaseFormValues) {
+  await requireAuthenticatedUser();
   const values = caseFormSchema.parse(rawValues);
   const db = getDb();
   const effectiveStatus = deriveEffectiveStatus(values);
@@ -892,6 +893,7 @@ export async function createCaseAction(rawValues: CaseFormValues) {
 }
 
 export async function updateCaseAction(id: string, rawValues: CaseFormValues) {
+  await requireAuthenticatedUser();
   const values = caseFormSchema.parse(rawValues);
   const db = getDb();
   const effectiveStatus = deriveEffectiveStatus(values);
@@ -959,6 +961,7 @@ export async function updateCaseStatusAction(
   id: string,
   status: (typeof caseStatusEnum.enumValues)[number],
 ) {
+  await requireAuthenticatedUser();
   const db = getDb();
 
   const [existing] = await db
@@ -1000,6 +1003,7 @@ export async function updateCaseStatusAction(
 // tasks keep existing, and a notary journal entry keeps its frozen
 // clientNameSnapshot even once its caseId goes null.
 export async function deleteCaseAction(id: string) {
+  await requireAuthenticatedUser();
   const db = getDb();
   const [existing] = await db
     .select({ title: cases.title, clientId: cases.clientId })
@@ -1033,6 +1037,7 @@ export async function deleteCaseAction(id: string) {
 // staff retype them.
 
 export async function linkFormationCompanyAction(caseId: string, companyId: string) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(businessFormationDetails)
     .set({ companyId })
@@ -1049,6 +1054,7 @@ export async function linkFormationCompanyAction(caseId: string, companyId: stri
 }
 
 export async function unlinkFormationCompanyAction(caseId: string) {
+  await requireAuthenticatedUser();
   await getDb()
     .update(businessFormationDetails)
     .set({ companyId: null })
@@ -1077,6 +1083,7 @@ export async function createCompanyFromFormationAction(
   caseId: string,
   rawValues: CreateCompanyFromFormationValues,
 ) {
+  await requireAuthenticatedUser();
   const values = createCompanyFromFormationSchema.parse(rawValues);
   const db = getDb();
 
