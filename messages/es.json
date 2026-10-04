@@ -484,7 +484,9 @@
       "folderNumber": "Número de carpeta",
       "folderNumberPlaceholder": "ej. 001",
       "academyIntentBanner": "Después de guardar, continuarás directamente a la inscripción en la Academia para esta persona."
-    }
+    },
+    "email": "Correo",
+    "phone": "Teléfono"
   },
   "Cases": {
     "title": "Casos",
@@ -3581,7 +3583,7 @@
     "fullName": "Nombre completo",
     "phone": "Teléfono celular",
     "phoneHint": "Te llamaremos a este número.",
-    "email": "Correo electrónico",
+    "email": "Correo electrónico (opcional)",
     "comment": "Comentario (opcional)",
     "commentPlaceholder": "¿Algo que debamos saber antes de llamarte?",
     "preferredLanguage": "Idioma preferido",
@@ -3666,6 +3668,10 @@
   },
   "AppointmentSource": {
     "staff": "Personal",
-    "online_booking": "Reserva en línea"
+    "online_booking": "Reserva en línea",
+    "confirmPrefix": "Confirmar: ",
+    "requestedLanguage": "El cliente pidió atención en {language} en esta reserva.",
+    "language_en": "Inglés",
+    "language_es": "Español"
   }
 }

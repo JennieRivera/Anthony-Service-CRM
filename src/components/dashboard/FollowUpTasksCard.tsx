@@ -4,6 +4,7 @@ import { Bell } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import type { listOpenTasks } from "@/lib/queries/tasks";
+import { getBookingTitleLocalizer } from "@/lib/booking/titleLocalizer";
 
 export async function FollowUpTasksCard({
   tasks,
@@ -12,6 +13,7 @@ export async function FollowUpTasksCard({
 }) {
   const t = await getTranslations("Dashboard");
   const tTaskType = await getTranslations("TaskType");
+  const bookingTitle = await getBookingTitleLocalizer();
 
   return (
     <Card>
@@ -38,7 +40,7 @@ export async function FollowUpTasksCard({
             <Bell className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <div className="flex flex-col">
               <span className="text-sm font-medium text-foreground">
-                {task.title}
+                {bookingTitle(task.title)}
               </span>
               <span className="text-xs text-muted-foreground">
                 {task.clientName} · {tTaskType(task.type)}

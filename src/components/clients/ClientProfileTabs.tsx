@@ -37,6 +37,7 @@ import type {
 } from "@/lib/db/schema";
 import type { TimelineEntry } from "@/lib/queries/clients";
 import type { getHighLevelSyncPreview } from "@/lib/queries/highlevel";
+import { useBookingTitle } from "@/components/booking/useBookingTitle";
 
 function formatMoney(value: string | null) {
   if (!value) return "—";
@@ -96,6 +97,7 @@ export function ClientProfileTabs({
   const tService = useTranslations("ServiceType");
   const tReferrals = useTranslations("Referrals");
   const tTaskType = useTranslations("TaskType");
+  const bookingTitle = useBookingTitle();
 
   // Calendar enhancement, Session 6 (section 9) — every appointment lands
   // in exactly one bucket (including "rescheduled", a real status this
@@ -176,7 +178,7 @@ export function ClientProfileTabs({
             <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
               <div className="flex items-center gap-3">
                 <span aria-hidden>{timelineIcon[entry.type]}</span>
-                <span className="text-sm text-foreground">{entry.label}</span>
+                <span className="text-sm text-foreground">{bookingTitle(entry.label)}</span>
               </div>
               <span className="text-xs text-muted-foreground">
                 {formatDateTime(entry.date)}
@@ -364,7 +366,7 @@ export function ClientProfileTabs({
                   >
                     <div className="flex flex-col gap-1">
                       <span className="font-medium text-foreground">
-                        {appt.title}
+                        {bookingTitle(appt.title)}
                       </span>
                       <span className="text-sm text-muted-foreground">
                         {tService(appt.serviceType)} ·{" "}
@@ -390,7 +392,7 @@ export function ClientProfileTabs({
           >
             <div className="flex flex-col gap-1">
               <span className="font-medium text-foreground">
-                {task.title}
+                {bookingTitle(task.title)}
               </span>
               <span className="text-sm text-muted-foreground">
                 {tTaskType(task.type)}

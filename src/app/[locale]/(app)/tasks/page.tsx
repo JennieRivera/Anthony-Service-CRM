@@ -15,12 +15,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
+import { getBookingTitleLocalizer } from "@/lib/booking/titleLocalizer";
 import { markTaskDoneAction } from "./actions";
 import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export default async function TasksPage() {
   const t = await getTranslations("Tasks");
   const tType = await getTranslations("TaskType");
+  const bookingTitle = await getBookingTitleLocalizer();
   const configured = isDatabaseConfigured();
 
   let openTasks: Awaited<ReturnType<typeof listOpenTasks>> = [];
@@ -83,7 +85,7 @@ export default async function TasksPage() {
                           <Badge variant="outline">{tType(task.type)}</Badge>
                         </TableCell>
                         <TableCell className="text-foreground">
-                          {task.title}
+                          {bookingTitle(task.title)}
                         </TableCell>
                         <TableCell>
                           <Link

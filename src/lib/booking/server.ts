@@ -1,10 +1,10 @@
 import { createHmac } from "node:crypto";
 import { sql } from "drizzle-orm";
-import { getTranslations } from "next-intl/server";
 import { getDb } from "@/lib/db";
 import { formatUsPhone, publicBookingSchema, usPhoneDigits } from "@/lib/validation/onlineBooking";
 import { getBusyIntervals, getOnlineBookingConfig } from "@/lib/queries/onlineBooking";
 import { BOOKING_RATE_LIMITS, type ServiceType } from "./config";
+import { bookingLanguageNote, buildBookingTitle } from "./titles";
 import {
   bookingWindowDates,
   computeAvailability,
@@ -129,14 +129,13 @@ export async function submitPublicBooking(
   });
   if (!freeSlots.includes(values.time)) return { status: "slot_taken" };
 
-  const tService = await getTranslations({ locale: "en", namespace: "ServiceType" });
-  const serviceLabel = tService(values.serviceType);
-  const title = `Online booking — ${serviceLabel}: ${values.fullName}`;
+  // Stored in English; translated for display by localizeBookingTitle().
+  const title = buildBookingTitle(values.serviceType, values.fullName);
   const notes = [
     "Online booking request — pending confirmation. Phone appointment: call the client at the scheduled time.",
     `Name entered: ${values.fullName}`,
     `Phone entered: ${formatUsPhone(phoneDigits)}`,
-    `Email entered: ${values.email}`,
+    `Email entered: ${values.email || "(none)"}`,
     `Preferred language: ${values.preferredLanguage === "es" ? "Spanish" : "English"}`,
     values.comment ? `Comment: ${values.comment}` : null,
   ]
@@ -152,9 +151,10 @@ export async function submitPublicBooking(
 
   // One round trip; the function does the lock + rate limit + overlap
   // check + client match/create + inserts atomically — see migration
-  // 0062_online_booking_book_fn.sql for why this can't be done from here.
+  // 0062_online_booking_book_fn.sql for why this can't be done from here
+  // (v2, migration 0063, adds the language note on the confirmation task).
   const result = await getDb().execute(sql`
-    select status from book_online_appointment(
+    select status from book_online_appointment_v2(
       ${new Date(startMs).toISOString()}::timestamptz,
       ${new Date(endMs).toISOString()}::timestamptz,
       ${settings.bufferMinutes}::integer,
@@ -169,7 +169,8 @@ export async function submitPublicBooking(
       ${new Date(nowMs).toISOString()}::timestamptz,
       ARRAY[${sql.join(rateKeys.map((k) => sql`${k}`), sql`, `)}]::text[],
       ARRAY[${sql.join(rateLimits.map((n) => sql`${n}`), sql`, `)}]::integer[],
-      ${BOOKING_RATE_LIMITS.windowMinutes}::integer
+      ${BOOKING_RATE_LIMITS.windowMinutes}::integer,
+      ${bookingLanguageNote(values.preferredLanguage)}
     )
   `);
   const rows = Array.isArray(result) ? result : (result as { rows: unknown[] }).rows;

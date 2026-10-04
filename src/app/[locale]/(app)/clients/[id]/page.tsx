@@ -73,11 +73,11 @@ export default async function ClientProfilePage({
         </div>
         <div className="grid gap-3 text-sm sm:grid-cols-3">
           <div>
-            <p className="text-muted-foreground">Email</p>
+            <p className="text-muted-foreground">{t("email")}</p>
             <p className="text-foreground">{client.email ?? "—"}</p>
           </div>
           <div>
-            <p className="text-muted-foreground">Phone</p>
+            <p className="text-muted-foreground">{t("phone")}</p>
             <p className="text-foreground">{client.phone ?? "—"}</p>
           </div>
           <div>

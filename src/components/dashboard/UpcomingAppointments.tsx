@@ -4,6 +4,7 @@ import { CalendarClock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import type { listUpcomingAppointments } from "@/lib/queries/appointments";
+import { getBookingTitleLocalizer } from "@/lib/booking/titleLocalizer";
 
 export async function UpcomingAppointments({
   appointments,
@@ -12,6 +13,7 @@ export async function UpcomingAppointments({
 }) {
   const t = await getTranslations("Dashboard");
   const tService = await getTranslations("ServiceType");
+  const bookingTitle = await getBookingTitleLocalizer();
 
   return (
     <Card>
@@ -34,7 +36,7 @@ export async function UpcomingAppointments({
             <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <div className="flex flex-col">
               <span className="text-sm font-medium text-foreground">
-                {appt.title}
+                {bookingTitle(appt.title)}
               </span>
               <span className="text-xs text-muted-foreground">
                 {appt.clientName} · {tService(appt.serviceType)}

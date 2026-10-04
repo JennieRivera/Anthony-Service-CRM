@@ -63,10 +63,14 @@ function formatDayChip(date: string, locale: string) {
   };
 }
 
-function formatTime(time: string, locale: string) {
-  return new Intl.DateTimeFormat(locale, {
+// Always 12-hour "1:00 PM", in both languages — what US clients expect
+// (Spanish's default 24-hour "13:00" read as confusing). Display only:
+// the API keeps "HH:mm".
+function formatTime(time: string) {
+  return new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "2-digit",
+    hour12: true,
     timeZone: "UTC",
   }).format(wallClock("2000-01-01", time));
 }
@@ -220,16 +224,18 @@ export function BookingFlow({
   };
 
   if (summary) {
-    const rows: [string, string][] = [
-      [t("summaryService"), tService(summary.serviceType)],
-      [t("summaryWhen"), `${formatLongDate(summary.date, locale)} · ${formatTime(summary.time, locale)}`],
-      [t("summaryDuration"), t("minutes", { count: summary.durationMinutes })],
-      [t("summaryType"), t("phoneAppointment")],
-      [t("summaryName"), summary.fullName],
-      [t("summaryPhone"), summary.phone],
-      [t("summaryEmail"), summary.email],
-      [t("summaryLanguage"), summary.preferredLanguage === "es" ? t("languageEs") : t("languageEn")],
-    ];
+    const rows = (
+      [
+        [t("summaryService"), tService(summary.serviceType)],
+        [t("summaryWhen"), `${formatLongDate(summary.date, locale)} · ${formatTime(summary.time)}`],
+        [t("summaryDuration"), t("minutes", { count: summary.durationMinutes })],
+        [t("summaryType"), t("phoneAppointment")],
+        [t("summaryName"), summary.fullName],
+        [t("summaryPhone"), summary.phone],
+        [t("summaryEmail"), summary.email],
+        [t("summaryLanguage"), summary.preferredLanguage === "es" ? t("languageEs") : t("languageEn")],
+      ] as [string, string][]
+    ).filter(([, value]) => value !== "");
     return (
       <section className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5 sm:p-6" aria-live="polite">
         <div className="flex items-start gap-3">
@@ -363,7 +369,7 @@ export function BookingFlow({
                           : "border-border bg-card text-foreground hover:border-primary/60",
                       )}
                     >
-                      {formatTime(slot, locale)}
+                      {formatTime(slot)}
                     </button>
                   );
                 })}
@@ -385,7 +391,7 @@ export function BookingFlow({
           <div className="flex flex-col gap-1">
             <StepTitle>{t("stepDetails")}</StepTitle>
             <p className="text-sm text-muted-foreground">
-              {tService(serviceType)} · {formatLongDate(date, locale)} · {formatTime(time, locale)}
+              {tService(serviceType)} · {formatLongDate(date, locale)} · {formatTime(time)}
             </p>
           </div>
 

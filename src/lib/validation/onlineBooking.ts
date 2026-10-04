@@ -38,7 +38,14 @@ export const publicBookingSchema = z.object({
     .trim()
     .max(30, "phone")
     .refine((v) => usPhoneDigits(v) !== null, "phone"),
-  email: z.string().trim().toLowerCase().max(254, "email").pipe(z.email("email")),
+  // Optional (clients are called by phone): empty is accepted; anything
+  // typed must be a valid address.
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .max(254, "email")
+    .pipe(z.union([z.literal(""), z.email("email")])),
   comment: z.string().trim().max(1000, "commentTooLong").regex(SAFE_TEXT, "comment"),
   preferredLanguage: z.enum(["en", "es"]),
   consent: z.literal(true, { message: "consent" }),

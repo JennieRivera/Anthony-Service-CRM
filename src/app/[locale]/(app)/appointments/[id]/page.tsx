@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AppointmentStatusBadge } from "@/components/appointments/AppointmentStatusBadge";
 import { AppointmentDetailActions } from "@/components/appointments/AppointmentDetailActions";
+import { getBookingTitleLocalizer } from "@/lib/booking/titleLocalizer";
 
 function formatDuration(startAt: Date, endAt: Date) {
   const minutes = Math.round((endAt.getTime() - startAt.getTime()) / 60000);
@@ -27,6 +28,7 @@ export default async function AppointmentDetailPage({
   const td = await getTranslations("Appointments.detail");
   const tService = await getTranslations("ServiceType");
   const tSource = await getTranslations("AppointmentSource");
+  const bookingTitle = await getBookingTitleLocalizer();
   const tType = await getTranslations("AppointmentType");
   const tPaymentStatus = await getTranslations("PaymentStatus");
 
@@ -52,7 +54,7 @@ export default async function AppointmentDetailPage({
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-3">
-            <h1 className="font-heading text-2xl text-foreground">{appointment.title}</h1>
+            <h1 className="font-heading text-2xl text-foreground">{bookingTitle(appointment.title)}</h1>
             <Badge variant="outline">{tService(appointment.serviceType)}</Badge>
             {appointment.source === "online_booking" && (
               <Badge variant="secondary">{tSource("online_booking")}</Badge>

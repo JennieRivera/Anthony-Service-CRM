@@ -35,6 +35,7 @@ import type {
   updateCompanyChecklistItemAction,
   deleteCompanyChecklistItemAction,
 } from "@/app/[locale]/(app)/companies/actions";
+import { useBookingTitle } from "@/components/booking/useBookingTitle";
 
 function formatMoney(value: string | number) {
   return new Intl.NumberFormat("en-US", {
@@ -94,6 +95,7 @@ export function CompanyProfileTabs({
   const t = useTranslations("Companies.tabs");
   const tService = useTranslations("ServiceType");
   const tTaskType = useTranslations("TaskType");
+  const bookingTitle = useBookingTitle();
 
   return (
     <Tabs defaultValue="profile">
@@ -157,7 +159,7 @@ export function CompanyProfileTabs({
             <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
               <div className="flex items-center gap-3">
                 <span aria-hidden>{timelineIcon[entry.type]}</span>
-                <span className="text-sm text-foreground">{entry.label}</span>
+                <span className="text-sm text-foreground">{bookingTitle(entry.label)}</span>
               </div>
               <span className="text-xs text-muted-foreground">
                 {formatDateTime(entry.date)}
@@ -267,7 +269,7 @@ export function CompanyProfileTabs({
             className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
           >
             <div className="flex flex-col gap-1">
-              <span className="font-medium text-foreground">{appt.title}</span>
+              <span className="font-medium text-foreground">{bookingTitle(appt.title)}</span>
               <span className="text-sm text-muted-foreground">
                 {formatDateTime(appt.startAt)}
               </span>
@@ -287,7 +289,7 @@ export function CompanyProfileTabs({
             className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
           >
             <div className="flex flex-col gap-1">
-              <span className="font-medium text-foreground">{task.title}</span>
+              <span className="font-medium text-foreground">{bookingTitle(task.title)}</span>
               <span className="text-sm text-muted-foreground">
                 {tTaskType(task.type)}
                 {task.dueDate

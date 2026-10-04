@@ -484,7 +484,9 @@
       "folderNumber": "Folder number",
       "folderNumberPlaceholder": "e.g. 001",
       "academyIntentBanner": "After saving, you'll continue directly to Academy enrollment for this person."
-    }
+    },
+    "email": "Email",
+    "phone": "Phone"
   },
   "Cases": {
     "title": "Cases",
@@ -3581,7 +3583,7 @@
     "fullName": "Full name",
     "phone": "Mobile phone",
     "phoneHint": "We'll call you at this number.",
-    "email": "Email",
+    "email": "Email (optional)",
     "comment": "Comment (optional)",
     "commentPlaceholder": "Anything we should know before we call?",
     "preferredLanguage": "Preferred language",
@@ -3666,6 +3668,10 @@
   },
   "AppointmentSource": {
     "staff": "Staff",
-    "online_booking": "Online booking"
+    "online_booking": "Online booking",
+    "confirmPrefix": "Confirm: ",
+    "requestedLanguage": "Client requested {language} for this booking.",
+    "language_en": "English",
+    "language_es": "Spanish"
   }
 }

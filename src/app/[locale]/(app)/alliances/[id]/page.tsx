@@ -30,6 +30,7 @@ import {
   addMembershipBenefitOverrideAction,
   removeMembershipBenefitOverrideAction,
 } from "../actions";
+import { getBookingTitleLocalizer } from "@/lib/booking/titleLocalizer";
 
 export default async function AllianceDetailPage({
   params,
@@ -41,6 +42,7 @@ export default async function AllianceDetailPage({
   const tOrgType = await getTranslations("OrganizationType");
   const tChannel = await getTranslations("ConversationChannel");
   const tAppointmentStatus = await getTranslations("AppointmentStatus");
+  const bookingTitle = await getBookingTitleLocalizer();
 
   const role = await getCurrentRole();
   if (!role || !hasAllianceViewAccess(role)) {
@@ -418,7 +420,7 @@ export default async function AllianceDetailPage({
                   className="flex items-center gap-2 font-medium text-foreground hover:underline"
                 >
                   <Calendar className="h-3.5 w-3.5" />
-                  {appt.title} — {appt.clientName}
+                  {bookingTitle(appt.title)} — {appt.clientName}
                 </Link>
                 <span className="text-muted-foreground">
                   {formatDateTime(appt.startAt)} · {tAppointmentStatus(appt.status)}
