@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { withBotId } from "botid/next/config";
 
 const withNextIntl = createNextIntlPlugin();
 
@@ -11,4 +12,6 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["pdf-parse"],
 };
 
-export default withNextIntl(nextConfig);
+// withBotId adds the rewrites Vercel BotID needs for its invisible
+// challenge on the public /book page (see instrumentation-client.ts).
+export default withBotId(withNextIntl(nextConfig));

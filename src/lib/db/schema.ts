@@ -9,6 +9,7 @@ import {
   date,
   time,
   boolean,
+  jsonb,
   pgEnum,
   uniqueIndex,
   index,
@@ -1289,6 +1290,17 @@ export const appointments = pgTable("appointments", {
     .notNull()
     .default("not_connected"),
   lastExternalSyncAt: timestamp("last_external_sync_at", { withTimezone: true }),
+  // Public online booking (/book) — where the appointment came from.
+  // Plain text-with-enum (like clients.preferredLanguage) rather than a
+  // pgEnum so a future source can be added without an enum migration.
+  source: text("source", { enum: ["staff", "online_booking"] })
+    .notNull()
+    .default("staff"),
+  // When the client ticked the privacy/consent checkbox on /book. Only
+  // ever set for source = "online_booking".
+  onlineBookingConsentAt: timestamp("online_booking_consent_at", {
+    withTimezone: true,
+  }),
 });
 
 // Calendar enhancement, Session 1 (section 4) — one centralized, admin-
@@ -1334,6 +1346,76 @@ export const serviceCatalogItems = pgTable("service_catalog_items", {
   sortOrder: integer("sort_order").notNull().default(0),
   notes: text("notes"),
 });
+
+// Public online booking (/book) — admin-editable availability rules. A
+// single row keyed "default"; when it doesn't exist yet, the code-level
+// defaults in src/lib/booking/config.ts apply, so no seed step is needed.
+// weeklyHours is indexed by JS weekday (0 = Sunday … 6 = Saturday), each
+// entry either null (closed) or a single "HH:mm" open/close range in
+// America/New_York wall-clock time.
+export const onlineBookingSettings = pgTable("online_booking_settings", {
+  id: text("id").primaryKey().default("default"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  enabled: boolean("enabled").notNull().default(true),
+  weeklyHours: jsonb("weekly_hours")
+    .$type<({ start: string; end: string } | null)[]>()
+    .notNull(),
+  slotIntervalMinutes: integer("slot_interval_minutes").notNull().default(30),
+  bufferMinutes: integer("buffer_minutes").notNull().default(15),
+  minNoticeMinutes: integer("min_notice_minutes").notNull().default(120),
+  maxDaysAhead: integer("max_days_ahead").notNull().default(30),
+});
+
+// Which service types the public /book page offers, and how long each
+// booked appointment lasts. One row per service type that has ever been
+// configured; a missing row falls back to src/lib/booking/config.ts.
+export const onlineBookingServices = pgTable("online_booking_services", {
+  serviceType: serviceTypeEnum("service_type").primaryKey(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  bookable: boolean("bookable").notNull().default(false),
+  durationMinutes: integer("duration_minutes").notNull().default(30),
+});
+
+// Whole days the public /book page offers no times at all (vacation,
+// holidays). A business-timezone calendar date, not an instant.
+export const onlineBookingBlockedDates = pgTable(
+  "online_booking_blocked_dates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    date: date("date", { mode: "string" }).notNull(),
+    reason: text("reason"),
+  },
+  (table) => [uniqueIndex("online_booking_blocked_dates_date_idx").on(table.date)],
+);
+
+// Durable per-IP / per-phone counter for the public booking endpoint.
+// Stores only an HMAC of the IP or phone digits (keyed with AUTH_SECRET),
+// never the raw value. Written and counted exclusively inside the
+// book_online_appointment() Postgres function (see its migration), under
+// the same advisory lock as the slot check.
+export const onlineBookingRateLimitEvents = pgTable(
+  "online_booking_rate_limit_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    keyHash: text("key_hash").notNull(),
+    occurredAt: timestamp("occurred_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("online_booking_rate_limit_events_key_occurred_idx").on(
+      table.keyHash,
+      table.occurredAt,
+    ),
+  ],
+);
 
 export const invoices = pgTable("invoices", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -4244,3 +4326,6 @@ export type MiadiamanteRateLimitEvent =
   typeof miadiamanteRateLimitEvents.$inferSelect;
 export type ServiceColorSetting = typeof serviceColorSettings.$inferSelect;
 export type ServiceCatalogItem = typeof serviceCatalogItems.$inferSelect;
+export type OnlineBookingSettingsRow = typeof onlineBookingSettings.$inferSelect;
+export type OnlineBookingServiceRow = typeof onlineBookingServices.$inferSelect;
+export type OnlineBookingBlockedDate = typeof onlineBookingBlockedDates.$inferSelect;

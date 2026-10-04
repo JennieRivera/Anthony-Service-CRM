@@ -26,6 +26,7 @@ export default async function AppointmentDetailPage({
   const t = await getTranslations("Appointments");
   const td = await getTranslations("Appointments.detail");
   const tService = await getTranslations("ServiceType");
+  const tSource = await getTranslations("AppointmentSource");
   const tType = await getTranslations("AppointmentType");
   const tPaymentStatus = await getTranslations("PaymentStatus");
 
@@ -53,6 +54,9 @@ export default async function AppointmentDetailPage({
           <div className="flex items-center gap-3">
             <h1 className="font-heading text-2xl text-foreground">{appointment.title}</h1>
             <Badge variant="outline">{tService(appointment.serviceType)}</Badge>
+            {appointment.source === "online_booking" && (
+              <Badge variant="secondary">{tSource("online_booking")}</Badge>
+            )}
           </div>
           <AppointmentStatusBadge status={appointment.status} />
         </div>

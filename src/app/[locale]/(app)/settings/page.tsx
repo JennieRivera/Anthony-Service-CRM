@@ -5,12 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Plug, ShieldCheck, LayoutGrid, Globe, Palette, Stamp, DollarSign, SunMoon, Users } from "lucide-react";
+import { Plug, ShieldCheck, LayoutGrid, Globe, Palette, Stamp, DollarSign, SunMoon, Users, CalendarClock } from "lucide-react";
 import AccessDenied from "@/components/AccessDenied";
 import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
 
 export default async function SettingsPage() {
   const t = await getTranslations("Settings");
+  const tBooking = await getTranslations("OnlineBooking");
   const session = await auth();
 
   // Phase 2H — section 4: Administration (Settings/Integrations/Security/
@@ -169,6 +170,26 @@ export default async function SettingsPage() {
             >
               <DollarSign className="h-4 w-4" />
               {t("manageServiceCatalog")}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{tBooking("settingsCard")}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <p className="text-sm text-muted-foreground">
+            {tBooking("settingsCardDescription")}
+          </p>
+          <div>
+            <Button
+              variant="outline"
+              render={<Link href="/settings/online-booking" />}
+            >
+              <CalendarClock className="h-4 w-4" />
+              {tBooking("manage")}
             </Button>
           </div>
         </CardContent>

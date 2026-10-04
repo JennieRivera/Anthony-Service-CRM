@@ -27,6 +27,7 @@
     "@react-pdf/renderer": "^4.5.1",
     "@vercel/blob": "^2.5.0",
     "ai": "^7.0.127",
+    "botid": "^1.5.11",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",

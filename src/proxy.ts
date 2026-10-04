@@ -5,8 +5,13 @@ import { auth } from "@/auth";
 
 const handleI18nRouting = createMiddleware(routing);
 
+// The ONLY routes reachable without signing in: the login page, and the
+// public online-booking page (/book, plus the bare locale-less /book so
+// next-intl can redirect it to /en/book or /es/book). Exact match for
+// /book — no sub-paths. Its data comes from /api/public/booking/*.
 const isPublicPath = (pathname: string) =>
-  /^\/(en|es)\/login(\/.*)?$/.test(pathname);
+  /^\/(en|es)\/login(\/.*)?$/.test(pathname) ||
+  /^(\/(en|es))?\/book\/?$/.test(pathname);
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
@@ -39,5 +44,11 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!api|trpc|_next|_vercel|.*\\..*).*)"],
+  // The 149e9513-… prefix is Vercel BotID's own challenge/proxy path
+  // (added as a rewrite by withBotId in next.config.ts) — it must reach
+  // that rewrite without a login redirect, or the bot check can't run
+  // for anonymous visitors on /book.
+  matcher: [
+    "/((?!api|trpc|_next|_vercel|149e9513-01fa-4fb0-aad4-566afd725d1b|.*\\..*).*)",
+  ],
 };
