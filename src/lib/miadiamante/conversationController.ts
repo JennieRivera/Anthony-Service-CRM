@@ -65,6 +65,7 @@ import {
   type MiadiamanteCapabilityResult,
 } from "./capabilityRunner";
 import { IMPLEMENTED_CAPABILITIES, CAPABILITY_REGISTRY, type ImplementedCapabilityName } from "./capabilities";
+import { MAX_TOOL_CALLS_PER_TURN } from "./providerSafety";
 
 // --- Tool allow-list, derived from the capability registry -----------------
 // Keyed by `ImplementedCapabilityName` (the type derived from
@@ -163,7 +164,14 @@ export async function runConversationTurn(
   proposal: ModelTurnProposal,
   toolRunners: Record<string, (args: unknown) => Promise<MiadiamanteCapabilityResult<unknown>>> = TOOL_RUNNERS,
 ): Promise<ConversationTurnResult> {
-  const toolCalls = proposal.toolCalls ?? [];
+  // Phase 2B-3 provider-foundation safety cap (owner-approved): at most
+  // MAX_TOOL_CALLS_PER_TURN proposed calls are ever executed from one
+  // turn — a breadth limit on cost/blast-radius, never a substitute for
+  // each individual call's own authorization. Every call that DOES run,
+  // still runs through the exact same TOOL_RUNNERS/Zod/authorization
+  // chain as before, unchanged; this only ever means FEWER calls
+  // execute, never a different or weaker check on the ones that do.
+  const toolCalls = (proposal.toolCalls ?? []).slice(0, MAX_TOOL_CALLS_PER_TURN);
   const toolResults: ToolCallOutcome[] = [];
 
   for (const call of toolCalls) {

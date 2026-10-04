@@ -309,6 +309,50 @@ await check("provider.ts is untouched by this phase (still throws, never returns
   assert.ok(/throw new Error/.test(source), "getMiadiamanteModelProvider must still throw rather than fake a response");
 });
 
+// --- Phase 2B-3 provider-foundation safety cap: max tool calls per turn -----
+console.log("\nMax tool calls per turn (Phase 2B-3 provider-foundation safety cap):");
+
+await check("at most MAX_TOOL_CALLS_PER_TURN proposed calls are executed, even when more are proposed", async () => {
+  const { MAX_TOOL_CALLS_PER_TURN } = await import("./providerSafety");
+  const countingRunners: Record<string, (args: unknown) => Promise<MiadiamanteCapabilityResult<unknown>>> = {
+    "task_list.read": () => allow({ tasks: [] }),
+  };
+  const tooMany = Array.from({ length: MAX_TOOL_CALLS_PER_TURN + 5 }, () => ({
+    toolName: "task_list.read",
+    args: { limit: 1 },
+  }));
+  const result = await runConversationTurn({ toolCalls: tooMany }, countingRunners);
+  assert.equal(
+    result.toolResults.length,
+    MAX_TOOL_CALLS_PER_TURN,
+    `expected exactly ${MAX_TOOL_CALLS_PER_TURN} results even though ${tooMany.length} were proposed`,
+  );
+});
+
+await check("fewer-than-the-cap proposals are unaffected (the cap never adds or denies calls that weren't over the limit)", async () => {
+  const { MAX_TOOL_CALLS_PER_TURN } = await import("./providerSafety");
+  const countingRunners: Record<string, (args: unknown) => Promise<MiadiamanteCapabilityResult<unknown>>> = {
+    "task_list.read": () => allow({ tasks: [] }),
+  };
+  const underCap = Array.from({ length: MAX_TOOL_CALLS_PER_TURN - 1 }, () => ({
+    toolName: "task_list.read",
+    args: { limit: 1 },
+  }));
+  const result = await runConversationTurn({ toolCalls: underCap }, countingRunners);
+  assert.equal(result.toolResults.length, underCap.length, "expected every proposed call under the cap to still execute");
+});
+
+await check("the calls that DO execute still run through the real authorization chain unchanged — the cap only reduces breadth, never weakens an individual call's own check", async () => {
+  const { MAX_TOOL_CALLS_PER_TURN } = await import("./providerSafety");
+  const tooMany = Array.from({ length: MAX_TOOL_CALLS_PER_TURN + 5 }, () => ({
+    toolName: "mark_invoice_paid", // a write-shaped name — must still be denied even under the cap
+    args: {},
+  }));
+  const result = await runConversationTurn({ toolCalls: tooMany }); // real default TOOL_RUNNERS
+  assert.equal(result.toolResults.length, MAX_TOOL_CALLS_PER_TURN, "expected the cap to still apply with the real runners");
+  assert.ok(result.toolResults.every((r) => r.allowed === false), "expected every executed call to still be denied — the cap does not grant authorization");
+});
+
 console.log(`\n${passed} checks passed.`);
 }
 
