@@ -21,14 +21,27 @@ export const DEFAULT_LEGAL_TEXTS: Record<LegalTextKey, LegalText> = {
     en: "I understand that Anthony Multiservice is not a law firm and does not give me legal advice.",
     es: "Entiendo que Anthony Multiservice no es una firma de abogados y no me da asesoría legal.",
   },
-  // Deliberately empty: the exact wording Florida law requires of a
-  // non-attorney notary (especially when advertising in Spanish) must come
-  // from an attorney, not from code. Shown only once filled in.
-  florida_notary_disclosure: { en: "", es: "" },
+  // Florida Statutes §117.05(10): a non-attorney notary public who
+  // advertises notary services in a language other than English must post
+  // this notice in English AND in the language of the advertisement. The
+  // English text is the statute's exact wording (supplied by the owner,
+  // 2026-10-04); the Spanish translation is pending attorney review.
+  // Always displayed in BOTH languages together — see bothLanguages().
+  florida_notary_disclosure: {
+    en: "I AM NOT AN ATTORNEY LICENSED TO PRACTICE LAW IN THE STATE OF FLORIDA, AND I MAY NOT GIVE LEGAL ADVICE OR ACCEPT FEES FOR LEGAL ADVICE.",
+    es: "NO SOY ABOGADO CON LICENCIA PARA EJERCER LA ABOGACÍA EN EL ESTADO DE FLORIDA, Y NO PUEDO DAR ASESORÍA LEGAL NI ACEPTAR HONORARIOS POR ASESORÍA LEGAL.",
+  },
 };
 
 export type LegalTexts = Record<LegalTextKey, LegalText>;
 
 export function pickLocale(text: LegalText, locale: string): string {
   return locale === "es" ? text.es : text.en;
+}
+
+// For notices the law requires in English AND Spanish at the same time
+// (the §117.05(10) disclosure): English first, then Spanish, skipping
+// empty ones.
+export function bothLanguages(text: LegalText): string[] {
+  return [text.en, text.es].map((t) => t.trim()).filter(Boolean);
 }

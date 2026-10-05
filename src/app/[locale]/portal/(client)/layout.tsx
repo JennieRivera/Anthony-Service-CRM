@@ -51,7 +51,7 @@ export default async function PortalClientLayout({
       </main>
       <LegalFooter
         notALawFirm={pickLocale(texts.not_a_law_firm, locale)}
-        floridaNotaryDisclosure={pickLocale(texts.florida_notary_disclosure, locale)}
+        floridaNotaryDisclosure={texts.florida_notary_disclosure}
         questionsLabel={t("questions", { phone: businessInfo.phone })}
       />
     </>

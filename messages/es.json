@@ -201,7 +201,7 @@
     "manager": "Gerente",
     "tax_staff": "Personal de Impuestos",
     "bookkeeping_staff": "Personal de Finanzas / Contabilidad",
-    "notary_staff": "Personal de Notaría",
+    "notary_staff": "Personal de Notary Public",
     "consulting_staff": "Personal de Consultoría",
     "academy_staff": "Personal de Academia",
     "referral_manager": "Gerente de Referidos",
@@ -380,7 +380,7 @@
     "professionalResourceCenterHeading": "Centro de Recursos Profesionales",
     "servicesBusinessFormation": "Formación de Negocios y Servicios Corporativos",
     "servicesTaxesBookkeeping": "Impuestos y Contabilidad",
-    "servicesNotaryDocuments": "Notaría y Servicios de Documentos",
+    "servicesNotaryDocuments": "Notary Public y Servicios de Documentos",
     "servicesImmigration": "Servicios Administrativos de Inmigración",
     "servicesConsulting": "Consultoría de Negocios",
     "servicesCreditFinancial": "Crédito y Preparación Financiera",
@@ -390,13 +390,13 @@
     "servicesCorporateEvents": "Eventos Corporativos y Alianzas Culinarias"
   },
   "ServiceType": {
-    "online_notary": "Notaría en Línea",
+    "online_notary": "Notary Public en Línea (RON)",
     "document_prep": "Preparación de Documentos",
     "tax_prep": "Taxes / Contabilidad",
     "company_registration": "Registro de Compañía",
     "credit_financing": "Crédito y Financiamiento",
     "leadership": "Consultoría de Negocios",
-    "notary": "Notaría / RON / IPEN / Firma de Préstamos",
+    "notary": "Notary Public / RON / IPEN / Firma de Préstamos",
     "bookkeeping": "Contabilidad",
     "immigration": "Servicios Administrativos de Inmigración",
     "academy": "Academia / Capacitación",
@@ -1479,7 +1479,7 @@
     "mayContainSensitiveData": "Puede contener datos sensibles"
   },
   "DocumentDrawer": {
-    "notaria": "Notaría",
+    "notaria": "Notary Public",
     "impuestos": "Impuestos",
     "bookkeeping": "Bookkeeping",
     "inmigracion": "Inmigración",
@@ -3836,12 +3836,12 @@
   },
   "LegalTexts": {
     "settingsCard": "Textos legales",
-    "settingsCardDescription": "El aviso \"no somos abogados\", la casilla que el cliente debe aceptar y el aviso de notario de Florida, que se muestran en /book y en el portal del cliente.",
+    "settingsCardDescription": "El aviso \"no somos abogados\", la casilla que el cliente debe aceptar y el aviso de Notary Public de Florida (sección 117.05), que se muestran en /book y en el portal del cliente.",
     "manage": "Editar textos legales",
     "title": "Textos legales",
     "description": "Se muestran en la página pública de reservas y en el portal del cliente, en español e inglés.",
     "backToSettings": "Volver a Configuración",
-    "attorneyReviewWarning": "Estos textos no son asesoría legal. La redacción final de cada texto, en especial el aviso de notario de Florida, debe revisarla un abogado licenciado en Florida antes de usarla.",
+    "attorneyReviewWarning": "Estos textos no son asesoría legal. La redacción final de cada texto, en especial la traducción al español del aviso de Notary Public de Florida, debe revisarla un abogado licenciado en Florida antes de usarla.",
     "spanish": "Español",
     "english": "Inglés",
     "restoreDefault": "Restaurar el texto original",
@@ -3852,15 +3852,15 @@
     "keys": {
       "not_a_law_firm": {
         "title": "Aviso: \"No somos abogados\"",
-        "help": "Pie de página de /book y del portal, página de inicio del portal, y destacado en /book para Inmigración y Notaría."
+        "help": "Pie de página de /book y del portal, página de inicio del portal, y destacado en /book para Inmigración y Notary Public."
       },
       "not_a_law_firm_ack": {
         "title": "Casilla obligatoria",
         "help": "La casilla que el cliente debe marcar en /book y la primera vez que entra al portal. Cada aceptación se guarda con fecha, hora, IP y el texto exacto."
       },
       "florida_notary_disclosure": {
-        "title": "Aviso de notario de Florida",
-        "help": "El texto exacto que exige la ley de Florida a un notario que no es abogado (en especial al anunciarse en español). Déjalo vacío hasta que un abogado te dé la redacción: solo se muestra cuando tiene texto."
+        "title": "Aviso de Notary Public de Florida (sección 117.05(10))",
+        "help": "Texto exigido por la sección 117.05(10) de Florida. El texto en español debe ser revisado por un abogado. Se muestra siempre en inglés y en español juntos, en tamaño visible: en el pie de /book y del portal, y destacado cuando eligen Notary Public."
       }
     }
   },

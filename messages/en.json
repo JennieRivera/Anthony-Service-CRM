@@ -3836,12 +3836,12 @@
   },
   "LegalTexts": {
     "settingsCard": "Legal texts",
-    "settingsCardDescription": "The \"not a law firm\" notice, the acknowledgment clients must accept, and the Florida notary disclosure, shown on /book and in the client portal.",
+    "settingsCardDescription": "The \"not a law firm\" notice, the acknowledgment clients must accept, and the Florida Notary Public disclosure (section 117.05), shown on /book and in the client portal.",
     "manage": "Edit legal texts",
     "title": "Legal texts",
     "description": "Shown on the public booking page and in the client portal, in Spanish and English.",
     "backToSettings": "Back to Settings",
-    "attorneyReviewWarning": "These texts are not legal advice. The final wording of every text — especially the Florida notary disclosure — must be reviewed by a licensed Florida attorney before you rely on it.",
+    "attorneyReviewWarning": "These texts are not legal advice. The final wording of every text — especially the Spanish translation of the Florida Notary Public disclosure — must be reviewed by a licensed Florida attorney before you rely on it.",
     "spanish": "Spanish",
     "english": "English",
     "restoreDefault": "Restore the original text",
@@ -3852,15 +3852,15 @@
     "keys": {
       "not_a_law_firm": {
         "title": "Notice: \"We are not attorneys\"",
-        "help": "Footer of /book and of the client portal, the portal home page, and highlighted on /book for Immigration and Notary services."
+        "help": "Footer of /book and of the client portal, the portal home page, and highlighted on /book for Immigration and Notary Public services."
       },
       "not_a_law_firm_ack": {
         "title": "Mandatory acknowledgment",
         "help": "The checkbox clients must tick on /book and the first time they open the portal. Each acceptance is saved with date, time, IP and the exact text."
       },
       "florida_notary_disclosure": {
-        "title": "Florida notary disclosure",
-        "help": "The exact text Florida law requires of a notary who is not an attorney (especially when advertising in Spanish). Leave it empty until an attorney gives you the wording — it is only shown once filled in."
+        "title": "Florida Notary Public disclosure (section 117.05(10))",
+        "help": "Text required by Florida Statutes section 117.05(10). The Spanish text must be reviewed by an attorney. Always shown in English and Spanish together, at a readable size: in the footer of /book and the portal, and highlighted when Notary Public is chosen."
       }
     }
   },
