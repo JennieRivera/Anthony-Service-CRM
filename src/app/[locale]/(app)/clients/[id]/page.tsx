@@ -53,12 +53,12 @@ export default async function ClientProfilePage({
   } = result;
 
   return (
-    <div className="flex w-full flex-col gap-6 px-8 py-10">
-      <div className="flex items-center justify-between">
+    <div className="flex w-full min-w-0 flex-col gap-6 px-4 py-10 sm:px-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Link href="/clients" className="text-sm text-muted-foreground underline">
           &larr; {t("backToClients")}
         </Link>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             render={<Link href={`/ai-escalations/new?clientId=${id}`} />}
@@ -75,7 +75,7 @@ export default async function ClientProfilePage({
       </div>
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {client.photoBlobUrl && (
             // Private photo (added by the client in the portal), streamed
             // by /api/clients/[id]/photo after a staff auth() check.
@@ -86,12 +86,14 @@ export default async function ClientProfilePage({
               className="size-14 rounded-full border border-border object-cover"
             />
           )}
-          <h1 className="font-heading text-2xl text-foreground">
+          <h1 className="min-w-0 font-heading text-2xl text-foreground wrap-anywhere">
             {client.fullName}
           </h1>
           <ClientStatusBadge status={client.status} />
         </div>
-        <div className="grid gap-3 text-sm sm:grid-cols-3">
+        {/* Long values (e.g. an email) wrap inside their own column instead
+            of running into the next one. */}
+        <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3 [&>div]:min-w-0 [&_p]:wrap-anywhere">
           <div>
             <p className="text-muted-foreground">{t("email")}</p>
             <p className="text-foreground">{client.email ?? "—"}</p>
@@ -140,7 +142,7 @@ export default async function ClientProfilePage({
         {client.notes && (
           <div className="text-sm">
             <p className="text-muted-foreground">{t("notes")}</p>
-            <p className="text-foreground">{client.notes}</p>
+            <p className="text-foreground wrap-anywhere">{client.notes}</p>
           </div>
         )}
       </div>

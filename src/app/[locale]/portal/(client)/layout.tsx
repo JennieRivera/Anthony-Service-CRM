@@ -55,6 +55,9 @@ export default async function PortalClientLayout({
         questionsLabel={t("questions", { phone: businessInfo.phone })}
         privacyLabel={t("privacyLink")}
       />
+      {/* Room for the phone bottom navigation (PortalHeader), so it never
+          covers the end of the footer. */}
+      <div className="h-[calc(3.5rem+env(safe-area-inset-bottom))] sm:hidden" aria-hidden />
     </>
   );
 }

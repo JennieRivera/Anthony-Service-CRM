@@ -4,7 +4,13 @@ import { businessDateString } from "@/lib/dates";
 import { formatUsPhone, usPhoneDigits } from "@/lib/validation/onlineBooking";
 import { portalProfileSchema, type BestTimeToCall } from "@/lib/validation/portalProfile";
 import { serviceTypeValues } from "@/lib/validation/client";
-import { buildPortalProfileChangeTitle, buildPortalServiceInterestTitle } from "@/lib/booking/titles";
+import {
+  PROFILE_BEST_TIME_LABELS_EN,
+  PROFILE_FIELD_LABELS_EN,
+  PROFILE_LANGUAGE_LABELS_EN,
+  buildPortalProfileChangeTitle,
+  buildPortalServiceInterestTitle,
+} from "@/lib/booking/titles";
 import type { ServiceType } from "@/lib/booking/config";
 import { getLatestConsents, recordConsentEvent } from "@/lib/legal/texts";
 import type { PortalDb } from "./db";
@@ -68,21 +74,10 @@ export async function getPortalProfile(db: PortalDb, clientId: string) {
 }
 
 // English labels for the staff task (stored in English, like every other
-// system-generated task title).
-const FIELD_LABELS_EN = {
-  phone: "Phone",
-  email: "Email",
-  address: "Address",
-  preferredLanguage: "Language",
-  bestTimeToCall: "Best time to call",
-} as const;
-const LANGUAGE_EN = { en: "English", es: "Spanish" } as const;
-const BEST_TIME_EN: Record<BestTimeToCall, string> = {
-  morning: "Morning",
-  midday: "Midday",
-  afternoon: "Afternoon",
-  evening: "Evening",
-};
+// system-generated task title, and translated at display time).
+const FIELD_LABELS_EN = PROFILE_FIELD_LABELS_EN;
+const LANGUAGE_EN = PROFILE_LANGUAGE_LABELS_EN;
+const BEST_TIME_EN: Record<BestTimeToCall, string> = PROFILE_BEST_TIME_LABELS_EN;
 
 export type ProfileUpdateResult = { changed: (keyof typeof FIELD_LABELS_EN)[] };
 

@@ -12,6 +12,8 @@ import {
   bookingLanguageNote,
   buildBookingTitle,
   buildPortalChangeRequestTitle,
+  buildPortalProfileChangeTitle,
+  buildPortalServiceInterestTitle,
   buildPortalUploadTitle,
   localizeBookingTitle,
   parseBookingTitle,
@@ -91,5 +93,38 @@ assert.equal(
   "Client requested cancellation: 2026-12-01 10:30 AM",
 );
 assert.equal(localizeBookingTitle(change, translators(en)), change);
+
+// Client portal task titles (Step 2B): field names, "(empty)", language /
+// best-time values and service names are translated; client-typed values
+// stay as they are.
+const profile = buildPortalProfileChangeTitle(
+  [
+    { label: "Phone", before: "(555) 555-0101", after: "(555) 555-0199" },
+    { label: "Address", before: "", after: "1 Main St; Apt 2" },
+    { label: "Language", before: "English", after: "Spanish" },
+    { label: "Best time to call", before: "", after: "Evening" },
+  ],
+  true,
+);
+assert.equal(
+  localizeBookingTitle(profile, translators(es)),
+  `${es.SystemTitles.portalInfoChangePhone}Teléfono: (555) 555-0101 → (555) 555-0199; Dirección: (vacío) → 1 Main St; Apt 2; Idioma: Inglés → Español; Mejor hora para llamar: (vacío) → Noche`,
+);
+assert.equal(localizeBookingTitle(profile, translators(en)), profile);
+const emailOnly = buildPortalProfileChangeTitle([{ label: "Email", before: "a@example.com", after: "" }], false);
+assert.equal(
+  localizeBookingTitle(emailOnly, translators(es)),
+  `${es.SystemTitles.portalInfoChange}Correo: a@example.com → (vacío)`,
+);
+const interest = buildPortalServiceInterestTitle(["company_registration", "irs_administrative"], "Necesito abrir una LLC");
+assert.equal(
+  localizeBookingTitle(interest, translators(es)),
+  `${es.SystemTitles.portalServiceInterest}${es.ServiceType.company_registration}, ${es.ServiceType.irs_administrative} — "Necesito abrir una LLC"`,
+);
+assert.equal(localizeBookingTitle(interest, translators(en)), interest);
+assert.equal(
+  localizeBookingTitle(buildPortalServiceInterestTitle([], "Hola"), translators(es)),
+  `${es.SystemTitles.portalServiceInterest}(ver comentario) — "Hola"`,
+);
 
 console.log("titles.test.ts: all title assertions passed.");

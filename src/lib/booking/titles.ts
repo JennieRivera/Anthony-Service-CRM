@@ -131,6 +131,25 @@ export function buildPortalChangeRequestTitle(
 
 const clip = (value: string, max = 120) => (value.length > max ? `${value.slice(0, max - 1)}…` : value);
 
+// The English words stored in 2B titles, each translated at display time
+// by localizeBookingTitle() (SystemTitles namespace).
+export const PROFILE_FIELD_LABELS_EN = {
+  phone: "Phone",
+  email: "Email",
+  address: "Address",
+  preferredLanguage: "Language",
+  bestTimeToCall: "Best time to call",
+} as const;
+export const PROFILE_LANGUAGE_LABELS_EN = { en: "English", es: "Spanish" } as const;
+export const PROFILE_BEST_TIME_LABELS_EN = {
+  morning: "Morning",
+  midday: "Midday",
+  afternoon: "Afternoon",
+  evening: "Evening",
+} as const;
+const EMPTY_VALUE = "(empty)";
+const SEE_COMMENT = "(see comment)";
+
 // e.g. 'Review client info change: Phone: (555) 555-0101 → (555) 555-0199;
 // Email: (empty) → ana@example.com'. A phone change gets its own prefix so
 // staff verify it before sending a new portal link (the link is confirmed
@@ -142,14 +161,14 @@ export function buildPortalProfileChangeTitle(
   const prefix = phoneChanged
     ? "Review client info change (phone changed — verify before a new portal link): "
     : "Review client info change: ";
-  const show = (v: string) => (v ? clip(v) : "(empty)");
+  const show = (v: string) => (v ? clip(v) : EMPTY_VALUE);
   return `${prefix}${changes.map((c) => `${c.label}: ${show(c.before)} → ${show(c.after)}`).join("; ")}`;
 }
 
 // e.g. 'Client requested information about: Tax & Accounting, Company
 // Registration — "I need to open an LLC"'.
 export function buildPortalServiceInterestTitle(services: ServiceType[], comment: string): string {
-  const list = services.length ? services.map((s) => SERVICE_LABELS_EN[s]).join(", ") : "(see comment)";
+  const list = services.length ? services.map((s) => SERVICE_LABELS_EN[s]).join(", ") : SEE_COMMENT;
   const note = comment.trim() ? ` — "${comment.trim()}"` : "";
   return `Client requested information about: ${list}${note}`;
 }
@@ -166,9 +185,63 @@ export type BookingTitleTranslators = {
   system: (key: string) => string;
 };
 
+// Step 2B bodies: field names, "(empty)", language / best-time values and
+// service names are translated; what the client typed (phone, email,
+// address, comment) is shown as-is. Anything that doesn't parse cleanly is
+// returned unchanged.
+const FIELD_KEY_BY_LABEL = new Map(
+  Object.entries(PROFILE_FIELD_LABELS_EN).map(([key, label]) => [label, key as keyof typeof PROFILE_FIELD_LABELS_EN]),
+);
+const FIELD_SPLIT = new RegExp(
+  `; (?=(?:${[...FIELD_KEY_BY_LABEL.keys()].map((l) => l.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")}): )`,
+);
+
+function localizeProfileChangeBody(body: string, t: BookingTitleTranslators): string {
+  const parts = body.split(FIELD_SPLIT);
+  const out: string[] = [];
+  for (const part of parts) {
+    const label = [...FIELD_KEY_BY_LABEL.keys()].find((l) => part.startsWith(`${l}: `));
+    if (!label) return body;
+    const field = FIELD_KEY_BY_LABEL.get(label)!;
+    const rest = part.slice(label.length + 2);
+    const arrow = rest.indexOf(" → ");
+    if (arrow < 0) return body;
+    const value = (v: string) => {
+      if (v === EMPTY_VALUE) return t.system("valueEmpty");
+      if (field === "preferredLanguage") {
+        const lang = (Object.entries(PROFILE_LANGUAGE_LABELS_EN).find(([, l]) => l === v) ?? [])[0];
+        return lang ? t.system(`language_${lang}`) : v;
+      }
+      if (field === "bestTimeToCall") {
+        const time = (Object.entries(PROFILE_BEST_TIME_LABELS_EN).find(([, l]) => l === v) ?? [])[0];
+        return time ? t.system(`bestTime_${time}`) : v;
+      }
+      return v;
+    };
+    out.push(`${t.system(`field_${field}`)}: ${value(rest.slice(0, arrow))} → ${value(rest.slice(arrow + 3))}`);
+  }
+  return out.join("; ");
+}
+
+function localizeServiceInterestBody(body: string, t: BookingTitleTranslators): string {
+  const cut = body.indexOf(' — "');
+  const list = cut >= 0 ? body.slice(0, cut) : body;
+  const note = cut >= 0 ? body.slice(cut) : "";
+  if (list === SEE_COMMENT) return `${t.system("seeComment")}${note}`;
+  const services = list.split(", ").map((label) => LABEL_TO_SERVICE.get(label));
+  if (services.some((s) => !s)) return body;
+  return `${services.map((s) => t.service(s!)).join(", ")}${note}`;
+}
+
 export function localizeBookingTitle(title: string, t: BookingTitleTranslators): string {
   for (const [prefix, key] of Object.entries(PORTAL_PREFIXES)) {
-    if (title.startsWith(prefix)) return `${t.system(key)}${title.slice(prefix.length)}`;
+    if (!title.startsWith(prefix)) continue;
+    const body = title.slice(prefix.length);
+    if (key === "portalInfoChange" || key === "portalInfoChangePhone") {
+      return `${t.system(key)}${localizeProfileChangeBody(body, t)}`;
+    }
+    if (key === "portalServiceInterest") return `${t.system(key)}${localizeServiceInterestBody(body, t)}`;
+    return `${t.system(key)}${body}`;
   }
   const parsed = parseBookingTitle(title);
   if (!parsed) return title;

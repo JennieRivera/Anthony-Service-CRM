@@ -3722,7 +3722,8 @@
       "documents": "Documents",
       "services": "Services",
       "profile": "My profile",
-      "authorizations": "Authorizations"
+      "authorizations": "Authorizations",
+      "more": "More"
     },
     "questions": "Questions? Call us at {phone}.",
     "access": {
@@ -4022,7 +4023,20 @@
     "portalRescheduleRequest": "Client requested reschedule: ",
     "portalInfoChangePhone": "Review client info change (phone changed — verify before a new portal link): ",
     "portalInfoChange": "Review client info change: ",
-    "portalServiceInterest": "Client requested information about: "
+    "portalServiceInterest": "Client requested information about: ",
+    "field_phone": "Phone",
+    "field_email": "Email",
+    "field_address": "Address",
+    "field_preferredLanguage": "Language",
+    "field_bestTimeToCall": "Best time to call",
+    "valueEmpty": "(empty)",
+    "language_en": "English",
+    "language_es": "Spanish",
+    "bestTime_morning": "Morning",
+    "bestTime_midday": "Midday",
+    "bestTime_afternoon": "Afternoon",
+    "bestTime_evening": "Evening",
+    "seeComment": "(see comment)"
   },
   "Privacy": {
     "metaTitle": "Privacy Notice | Anthony Multiservice",

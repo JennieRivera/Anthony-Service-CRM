@@ -2,19 +2,38 @@
 
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarClock, LogOut, UserRound } from "lucide-react";
+import {
+  CalendarClock,
+  CalendarDays,
+  Ellipsis,
+  FileText,
+  FolderOpen,
+  House,
+  LogOut,
+  ShieldCheck,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
-const NAV = [
-  { href: "/portal", key: "home" },
-  { href: "/portal/cases", key: "cases" },
-  { href: "/portal/appointments", key: "appointments" },
-  { href: "/portal/documents", key: "documents" },
-  { href: "/portal/services", key: "services" },
-  { href: "/portal/profile", key: "profile" },
-  { href: "/portal/authorizations", key: "authorizations" },
+// On a computer every section is a tab under the header. On a phone the
+// first four go in a bottom bar and the rest open from its "More" button.
+const MAIN_NAV = [
+  { href: "/portal", key: "home", icon: House },
+  { href: "/portal/cases", key: "cases", icon: FolderOpen },
+  { href: "/portal/appointments", key: "appointments", icon: CalendarDays },
+  { href: "/portal/documents", key: "documents", icon: FileText },
 ] as const;
+const MORE_NAV = [
+  { href: "/portal/services", key: "services", icon: Sparkles },
+  { href: "/portal/profile", key: "profile", icon: UserRound },
+  { href: "/portal/authorizations", key: "authorizations", icon: ShieldCheck },
+] as const;
+const NAV = [...MAIN_NAV, ...MORE_NAV];
+
+const isActive = (pathname: string, href: string) =>
+  href === "/portal" ? pathname === "/portal" : pathname.startsWith(href);
 
 export function PortalHeader({
   signedIn,
@@ -30,6 +49,11 @@ export function PortalHeader({
   const pathname = usePathname();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
+  // The "More" panel is open only on the page where it was opened, so it
+  // closes by itself after navigating.
+  const [moreOpenOn, setMoreOpenOn] = useState<string | null>(null);
+  const moreOpen = moreOpenOn === pathname;
+  const moreActive = MORE_NAV.some((item) => isActive(pathname, item.href));
 
   async function signOut() {
     setSigningOut(true);
@@ -88,10 +112,10 @@ export function PortalHeader({
         </div>
       </div>
       {signedIn && (
-        <nav className="mx-auto w-full max-w-3xl overflow-x-auto px-2" aria-label={t("navLabel")}>
+        <nav className="mx-auto hidden w-full max-w-3xl overflow-x-auto px-2 sm:block" aria-label={t("navLabel")}>
           <ul className="flex gap-1">
             {NAV.map((item) => {
-              const active = item.href === "/portal" ? pathname === "/portal" : pathname.startsWith(item.href);
+              const active = isActive(pathname, item.href);
               return (
                 <li key={item.href}>
                   <Link
@@ -107,6 +131,73 @@ export function PortalHeader({
                 </li>
               );
             })}
+          </ul>
+        </nav>
+      )}
+      {signedIn && (
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] sm:hidden"
+          aria-label={t("navLabel")}
+        >
+          {moreOpen && (
+            <ul id="portal-more-menu" className="flex flex-col border-b border-border py-1">
+              {MORE_NAV.map((item) => {
+                const active = isActive(pathname, item.href);
+                const Icon = item.icon;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => setMoreOpenOn(null)}
+                      className={cn(
+                        "flex min-h-12 items-center gap-3 px-5 text-base",
+                        active ? "font-medium text-primary" : "text-foreground",
+                      )}
+                    >
+                      <Icon className="size-5" aria-hidden />
+                      {t(`nav.${item.key}`)}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <ul className="grid grid-cols-5">
+            {MAIN_NAV.map((item) => {
+              const active = isActive(pathname, item.href);
+              const Icon = item.icon;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-14 flex-col items-center justify-center gap-0.5 px-1 text-xs",
+                      active ? "font-medium text-primary" : "text-muted-foreground",
+                    )}
+                  >
+                    <Icon className="size-5" aria-hidden />
+                    <span className="max-w-full truncate">{t(`nav.${item.key}`)}</span>
+                  </Link>
+                </li>
+              );
+            })}
+            <li>
+              <button
+                type="button"
+                aria-expanded={moreOpen}
+                aria-controls="portal-more-menu"
+                onClick={() => setMoreOpenOn(moreOpen ? null : pathname)}
+                className={cn(
+                  "flex min-h-14 w-full flex-col items-center justify-center gap-0.5 px-1 text-xs",
+                  moreOpen || moreActive ? "font-medium text-primary" : "text-muted-foreground",
+                )}
+              >
+                <Ellipsis className="size-5" aria-hidden />
+                <span>{t("nav.more")}</span>
+              </button>
+            </li>
           </ul>
         </nav>
       )}

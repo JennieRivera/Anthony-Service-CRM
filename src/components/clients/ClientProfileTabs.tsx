@@ -138,7 +138,9 @@ export function ClientProfileTabs({
 
   return (
     <Tabs defaultValue="timeline">
-      <TabsList>
+      {/* Ten tabs: wrap onto more lines on narrow screens instead of
+          pushing the page sideways. */}
+      <TabsList className="h-auto max-w-full flex-wrap justify-start group-data-horizontal/tabs:h-auto">
         <TabsTrigger value="timeline">{t("tabTimeline")}</TabsTrigger>
         <TabsTrigger value="conversations">
           {t("tabConversations")} ({conversations.length})
