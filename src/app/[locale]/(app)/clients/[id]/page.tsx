@@ -9,6 +9,10 @@ import { Button } from "@/components/ui/button";
 import { ClientStatusBadge } from "@/components/clients/StatusBadge";
 import { ClientProfileTabs } from "@/components/clients/ClientProfileTabs";
 import { ClientDeleteButton } from "@/components/clients/ClientDeleteButton";
+import { PortalAccessCard } from "@/components/clients/PortalAccessCard";
+import { getDb } from "@/lib/db";
+import { getPortalAccessSummary } from "@/lib/portal/access";
+import type { PortalDb } from "@/lib/portal/db";
 
 export default async function ClientProfilePage({
   params,
@@ -22,9 +26,10 @@ export default async function ClientProfilePage({
   const result = await getClientById(id);
   if (!result) notFound();
 
-  const [highlevelSync, highlevelPreview] = await Promise.all([
+  const [highlevelSync, highlevelPreview, portalAccess] = await Promise.all([
     getClientHighlevelSync(id),
     getHighLevelSyncPreview(id),
+    getPortalAccessSummary(getDb() as unknown as PortalDb, id),
   ]);
 
   const {
@@ -114,6 +119,23 @@ export default async function ClientProfilePage({
           </div>
         )}
       </div>
+
+      <PortalAccessCard
+        clientId={client.id}
+        hasPhone={(client.phone ?? "").replace(/\D/g, "").length >= 4}
+        summary={{
+          pendingLink: portalAccess.pendingLink
+            ? {
+                createdAt: portalAccess.pendingLink.createdAt.toISOString(),
+                expiresAt: portalAccess.pendingLink.expiresAt.toISOString(),
+                locked: portalAccess.pendingLink.locked,
+              }
+            : null,
+          activeSessions: portalAccess.activeSessions,
+          lastSeenAt: portalAccess.lastSeenAt ? new Date(portalAccess.lastSeenAt).toISOString() : null,
+          lastLoginAt: portalAccess.lastLoginAt ? new Date(portalAccess.lastLoginAt).toISOString() : null,
+        }}
+      />
 
       <ClientProfileTabs
         clientId={client.id}

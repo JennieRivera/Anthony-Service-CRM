@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { del } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
@@ -79,4 +79,36 @@ export async function deleteDocumentAction(documentId: string) {
   revalidatePath(`/clients/${doc.clientId}`);
   if (doc.caseId) revalidatePath(`/cases/${doc.caseId}`);
   revalidatePath("/documents");
+}
+
+// Client portal (Step 2A): staff decide, per document, whether the client
+// can see and download it in the portal. Default is NOT visible. A
+// client's own uploads are always visible to them and can't be hidden.
+export async function setDocumentClientVisibilityAction(documentId: string, visible: boolean) {
+  await requireAuthenticatedUser();
+
+  const [doc] = await getDb()
+    .update(documents)
+    .set({ visibleToClient: visible })
+    .where(
+      visible
+        ? eq(documents.id, documentId)
+        : and(eq(documents.id, documentId), eq(documents.uploadedByClient, false)),
+    )
+    .returning({
+      fileName: documents.fileName,
+      clientId: documents.clientId,
+      caseId: documents.caseId,
+    });
+  if (!doc) return;
+
+  await logAuditEvent({
+    action: visible ? "document.shared_with_client" : "document.unshared_with_client",
+    entityType: "document",
+    entityId: documentId,
+    summary: `${visible ? "Made visible" : "Hidden"} in the client portal: ${doc.fileName}`,
+  });
+
+  revalidatePath(`/clients/${doc.clientId}`);
+  if (doc.caseId) revalidatePath(`/cases/${doc.caseId}`);
 }

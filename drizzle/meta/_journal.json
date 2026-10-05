@@ -449,6 +449,13 @@
       "when": 1791157411531,
       "tag": "0063_online_booking_book_fn_v2",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1791166284825,
+      "tag": "0064_client_portal",
+      "breakpoints": true
     }
   ]
 }

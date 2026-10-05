@@ -980,6 +980,11 @@ export const taskTypeEnum = pgEnum("task_type", [
   // recordatorio". Both dedupe per appointment via tasks.appointmentId.
   "appointment_confirmation",
   "appointment_reminder",
+  // Client portal (Step 2A) — created when a client uploads a document,
+  // and when a client asks to cancel or reschedule an appointment (the
+  // portal never changes the appointment itself).
+  "document_review",
+  "appointment_change_request",
 ]);
 
 export const taskStatusEnum = pgEnum("task_status", [
@@ -1079,6 +1084,15 @@ export const documents = pgTable("documents", {
   // Nullable: documents uploaded before this field existed have no category
   // and show up under an "Uncategorized" bucket in the general Documents view.
   category: documentCategoryEnum("category"),
+  // Client portal (Step 2A). A staff-uploaded document is only ever shown
+  // in the portal once staff explicitly ticks "Visible to client"
+  // (default false). A client's own uploads are always visible to that
+  // client. sensitiveDataReason is set (never blocking) when a portal
+  // upload looks like it contains an SSN/ITIN/card number — clients
+  // legitimately send W-2s and immigration forms.
+  visibleToClient: boolean("visible_to_client").notNull().default(false),
+  uploadedByClient: boolean("uploaded_by_client").notNull().default(false),
+  sensitiveDataReason: text("sensitive_data_reason"),
 });
 
 // Phase 1 follow-up — a content library for marketing/social assets, kept
@@ -1411,6 +1425,130 @@ export const onlineBookingRateLimitEvents = pgTable(
   },
   (table) => [
     index("online_booking_rate_limit_events_key_occurred_idx").on(
+      table.keyHash,
+      table.occurredAt,
+    ),
+  ],
+);
+
+// Client portal (Step 2A) — the personal access links staff generate from
+// the client's CRM record and send by WhatsApp. Only a SHA-256 hash of the
+// token is stored. A link is single-use (usedAt), expires, can be revoked,
+// and locks itself after too many wrong last-4-digit attempts.
+export const portalAccessLinks = pgTable(
+  "portal_access_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    clientId: uuid("client_id")
+      .notNull()
+      .references(() => clients.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    failedAttempts: integer("failed_attempts").notNull().default(0),
+    createdByEmail: text("created_by_email"),
+  },
+  (table) => [
+    uniqueIndex("portal_access_links_token_hash_idx").on(table.tokenHash),
+    index("portal_access_links_client_idx").on(table.clientId),
+  ],
+);
+
+// Client portal sessions — deliberately separate from Auth.js (staff).
+// The browser holds a random token in an httpOnly cookie; only its
+// SHA-256 hash is stored here. A portal session can never carry a staff
+// role: staff Server Actions only accept an Auth.js session.
+export const portalSessions = pgTable(
+  "portal_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    clientId: uuid("client_id")
+      .notNull()
+      .references(() => clients.id, { onDelete: "cascade" }),
+    linkId: uuid("link_id").references(() => portalAccessLinks.id, {
+      onDelete: "set null",
+    }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("portal_sessions_token_hash_idx").on(table.tokenHash),
+    index("portal_sessions_client_idx").on(table.clientId),
+  ],
+);
+
+// Legal/disclosure texts shown to the public and clients, editable in
+// Settings → Legal texts (one row per key). A missing row falls back to
+// the code-level default in src/lib/legal/texts.ts. Every final wording
+// must be reviewed by a licensed attorney — nothing here is legal advice.
+export const legalTexts = pgTable("legal_texts", {
+  key: text("key").primaryKey(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  textEn: text("text_en").notNull().default(""),
+  textEs: text("text_es").notNull().default(""),
+  updatedByEmail: text("updated_by_email"),
+});
+
+// Append-only evidence of every acknowledgment/authorization a client (or
+// a /book visitor) gives or withdraws: what, when, from which IP/browser,
+// and the exact text they saw. Rows are never updated or deleted by the
+// app; the current state is the latest row per (client, consentType).
+// clientId is set null (not cascade) on client deletion — same reasoning
+// as the notary journal: the record must survive, with its name snapshot.
+export const clientConsentEvents = pgTable(
+  "client_consent_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    clientId: uuid("client_id").references(() => clients.id, { onDelete: "set null" }),
+    clientNameSnapshot: text("client_name_snapshot").notNull(),
+    appointmentId: uuid("appointment_id").references(() => appointments.id, {
+      onDelete: "set null",
+    }),
+    consentType: text("consent_type").notNull(),
+    granted: boolean("granted").notNull(),
+    source: text("source", { enum: ["portal", "online_booking"] }).notNull(),
+    textShown: text("text_shown").notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+  },
+  (table) => [
+    index("client_consent_events_client_type_idx").on(
+      table.clientId,
+      table.consentType,
+      table.createdAt,
+    ),
+  ],
+);
+
+// Failed portal sign-in attempts per IP (HMAC of the IP, never the raw
+// value), for the brute-force limit on /api/portal/login.
+export const portalRateLimitEvents = pgTable(
+  "portal_rate_limit_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    keyHash: text("key_hash").notNull(),
+    occurredAt: timestamp("occurred_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("portal_rate_limit_events_key_occurred_idx").on(
       table.keyHash,
       table.occurredAt,
     ),
@@ -4329,3 +4467,5 @@ export type ServiceCatalogItem = typeof serviceCatalogItems.$inferSelect;
 export type OnlineBookingSettingsRow = typeof onlineBookingSettings.$inferSelect;
 export type OnlineBookingServiceRow = typeof onlineBookingServices.$inferSelect;
 export type OnlineBookingBlockedDate = typeof onlineBookingBlockedDates.$inferSelect;
+export type PortalAccessLink = typeof portalAccessLinks.$inferSelect;
+export type PortalSession = typeof portalSessions.$inferSelect;

@@ -50,6 +50,8 @@ export async function listAllDocuments() {
       caseTitle: cases.title,
       serviceType: cases.serviceType,
       referralId: documents.referralId,
+      uploadedByClient: documents.uploadedByClient,
+      sensitiveDataReason: documents.sensitiveDataReason,
     })
     .from(documents)
     .innerJoin(clients, eq(documents.clientId, clients.id))

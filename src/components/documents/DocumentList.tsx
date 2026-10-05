@@ -9,6 +9,8 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { DocumentStatusPill } from "./StatusPill";
 import { viewHref, downloadHref } from "./downloadHref";
 import { MoveCategorySelect } from "./MoveCategorySelect";
+import { ClientVisibilityToggle } from "./ClientVisibilityToggle";
+import { Badge } from "@/components/ui/badge";
 import { deleteDocumentAction } from "@/app/[locale]/(app)/documents/actions";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 import type { Document } from "@/lib/db/schema";
@@ -28,8 +30,17 @@ function DocumentRow({ doc }: { doc: Document }) {
         <span className="truncate">{doc.fileName}</span>
       </a>
       <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+        {doc.uploadedByClient && <Badge variant="secondary">{t("uploadedByClient")}</Badge>}
+        {doc.sensitiveDataReason && (
+          <Badge variant="destructive">{t("mayContainSensitiveData")}</Badge>
+        )}
         {doc.documentType && <span>{doc.documentType}</span>}
         <DocumentStatusPill status={doc.status} />
+        <ClientVisibilityToggle
+          documentId={doc.id}
+          visible={doc.visibleToClient}
+          uploadedByClient={doc.uploadedByClient}
+        />
         <span>{formatDate(doc.createdAt)}</span>
         {/* A document with a fine immigration sub-folder stays tied to it —
             moving it to a general folder here would desync the two. */}

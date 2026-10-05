@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { checkBotId } from "botid/server";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { submitPublicBooking } from "@/lib/booking/server";
+import { requestIp, requestUserAgent } from "@/lib/request-info";
 
 // Public route (no login — /api is outside proxy.ts's matcher): the
 // /book page's "Request appointment" submit. Layers, in order: Vercel
@@ -10,11 +11,6 @@ import { submitPublicBooking } from "@/lib/booking/server";
 // The response only ever echoes back what the visitor submitted.
 
 const MAX_BODY_BYTES = 8 * 1024;
-
-function clientIp(request: Request): string | null {
-  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return forwarded || request.headers.get("x-real-ip") || null;
-}
 
 export async function POST(request: Request) {
   const verification = await checkBotId();
@@ -39,7 +35,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await submitPublicBooking(body, { ip: clientIp(request) });
+    const result = await submitPublicBooking(body, {
+      ip: requestIp(request.headers),
+      userAgent: requestUserAgent(request.headers),
+    });
     const httpStatus =
       result.status === "ok"
         ? 200

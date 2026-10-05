@@ -5,6 +5,8 @@ import { formatUsPhone, publicBookingSchema, usPhoneDigits } from "@/lib/validat
 import { getBusyIntervals, getOnlineBookingConfig } from "@/lib/queries/onlineBooking";
 import { BOOKING_RATE_LIMITS, type ServiceType } from "./config";
 import { bookingLanguageNote, buildBookingTitle } from "./titles";
+import { getLegalTexts, pickLocale, recordConsentEvent } from "@/lib/legal/texts";
+import type { PortalDb } from "@/lib/portal/db";
 import {
   bookingWindowDates,
   computeAvailability,
@@ -83,7 +85,7 @@ export type PublicBookingResult =
 
 export async function submitPublicBooking(
   raw: unknown,
-  context: { ip: string | null },
+  context: { ip: string | null; userAgent?: string | null },
   nowMs = Date.now(),
 ): Promise<PublicBookingResult> {
   const parsed = publicBookingSchema.safeParse(raw);
@@ -154,7 +156,7 @@ export async function submitPublicBooking(
   // 0062_online_booking_book_fn.sql for why this can't be done from here
   // (v2, migration 0063, adds the language note on the confirmation task).
   const result = await getDb().execute(sql`
-    select status from book_online_appointment_v2(
+    select status, appointment_id, client_id from book_online_appointment_v2(
       ${new Date(startMs).toISOString()}::timestamptz,
       ${new Date(endMs).toISOString()}::timestamptz,
       ${settings.bufferMinutes}::integer,
@@ -174,9 +176,28 @@ export async function submitPublicBooking(
     )
   `);
   const rows = Array.isArray(result) ? result : (result as { rows: unknown[] }).rows;
-  const status = (rows[0] as { status?: string } | undefined)?.status;
+  const row = rows[0] as { status?: string; appointment_id?: string; client_id?: string } | undefined;
+  const status = row?.status;
 
-  if (status === "ok") return { status: "ok", summary };
+  if (status === "ok") {
+    // Evidence of the mandatory "not a law firm" acknowledgment, tied to
+    // this booking (date/time, IP, browser, exact text shown).
+    if (row?.client_id) {
+      const db = getDb() as unknown as PortalDb;
+      const texts = await getLegalTexts(db);
+      await recordConsentEvent(db, {
+        clientId: row.client_id,
+        appointmentId: row.appointment_id ?? null,
+        consentType: "not_a_law_firm",
+        granted: true,
+        source: "online_booking",
+        textShown: pickLocale(texts.not_a_law_firm_ack, values.locale ?? values.preferredLanguage),
+        ipAddress: context.ip,
+        userAgent: context.userAgent ?? null,
+      });
+    }
+    return { status: "ok", summary };
+  }
   if (status === "slot_taken" || status === "rate_limited") return { status };
   throw new Error(`Unexpected booking result: ${String(status)}`);
 }

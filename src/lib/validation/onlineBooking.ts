@@ -49,6 +49,10 @@ export const publicBookingSchema = z.object({
   comment: z.string().trim().max(1000, "commentTooLong").regex(SAFE_TEXT, "comment"),
   preferredLanguage: z.enum(["en", "es"]),
   consent: z.literal(true, { message: "consent" }),
+  // "I understand Anthony Multiservice is not a law firm…" — mandatory.
+  legalAck: z.literal(true, { message: "legalAck" }),
+  // The page language, so the stored evidence records the exact text shown.
+  locale: z.enum(["en", "es"]).optional(),
   // Honeypot: visually hidden, never filled in by a real person.
   website: z.string().max(500),
 });

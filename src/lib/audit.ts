@@ -12,12 +12,16 @@ export async function logAuditEvent(params: {
   entityType: string;
   entityId?: string | null;
   summary: string;
+  // Set for events with no staff session — e.g. "client-portal:<clientId>"
+  // for actions a client takes in the portal. Otherwise the signed-in
+  // staff member's email is recorded.
+  actor?: string;
 }) {
-  const session = await auth();
+  const actor = params.actor ?? (await auth())?.user?.email ?? null;
   await getDb()
     .insert(auditLog)
     .values({
-      actorEmail: session?.user?.email ?? null,
+      actorEmail: actor,
       action: params.action,
       entityType: params.entityType,
       entityId: params.entityId ?? null,

@@ -641,6 +641,8 @@ function CabinetDocumentList({
         </a>
         <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
           {showClientName && <span>{doc.clientName}</span>}
+          {doc.uploadedByClient && <Badge variant="secondary">{t("uploadedByClient")}</Badge>}
+          {doc.sensitiveDataReason && <Badge variant="destructive">{t("mayContainSensitiveData")}</Badge>}
           {doc.documentType && <span>{doc.documentType}</span>}
           {doc.category && <span className="text-xs">{tCategory(doc.category)}</span>}
           <DocumentStatusPill status={doc.status} />

@@ -11,6 +11,8 @@ import {
   SERVICE_LABELS_EN,
   bookingLanguageNote,
   buildBookingTitle,
+  buildPortalChangeRequestTitle,
+  buildPortalUploadTitle,
   localizeBookingTitle,
   parseBookingTitle,
   type BookingTitleTranslators,
@@ -32,6 +34,7 @@ function translators(m: typeof es): BookingTitleTranslators {
       for (const [name, value] of Object.entries(v ?? {})) s = s.replace(`{${name}}`, value);
       return s;
     },
+    system: (k) => m.SystemTitles[k],
   };
 }
 
@@ -69,5 +72,24 @@ for (const key of Object.keys(SERVICE_LABELS_EN) as (keyof typeof SERVICE_LABELS
 for (const t of ["Consulta fiscal", "Confirm: Notary visit", "Online booking — Unknown: X", "Online booking — Notary"]) {
   assert.equal(localizeBookingTitle(t, translators(es)), t);
 }
+
+// Client portal task titles (Step 2A).
+assert.equal(buildPortalUploadTitle("W2.pdf", false), "Client upload: W2.pdf");
+assert.equal(
+  localizeBookingTitle(buildPortalUploadTitle("W2.pdf", true), translators(es)),
+  `${es.SystemTitles.portalUploadSensitive}W2.pdf`,
+);
+// 2026-10-05 19:00Z = 3:00 PM EDT in Kissimmee.
+const change = buildPortalChangeRequestTitle("reschedule", new Date("2026-10-05T19:00:00Z"), ' ¿Puede ser a las 4? ');
+assert.equal(change, 'Client requested reschedule: 2026-10-05 3:00 PM — "¿Puede ser a las 4?"');
+assert.equal(
+  localizeBookingTitle(change, translators(es)),
+  `${es.SystemTitles.portalRescheduleRequest}2026-10-05 3:00 PM — "¿Puede ser a las 4?"`,
+);
+assert.equal(
+  buildPortalChangeRequestTitle("cancel", new Date("2026-12-01T15:30:00Z"), ""),
+  "Client requested cancellation: 2026-12-01 10:30 AM",
+);
+assert.equal(localizeBookingTitle(change, translators(en)), change);
 
 console.log("titles.test.ts: all title assertions passed.");

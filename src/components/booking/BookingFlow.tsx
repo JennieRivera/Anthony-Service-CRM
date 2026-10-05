@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, Clock, Phone } from "lucide-react";
+import { CheckCircle2, Clock, Phone, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,7 @@ const detailsSchema = publicBookingSchema.pick({
   comment: true,
   preferredLanguage: true,
   consent: true,
+  legalAck: true,
   website: true,
 });
 
@@ -36,6 +37,7 @@ type DetailsValues = {
   comment: string;
   preferredLanguage: "en" | "es";
   consent: boolean;
+  legalAck: boolean;
   website: string;
 };
 
@@ -89,15 +91,34 @@ function StepTitle({ children }: { children: React.ReactNode }) {
   return <h2 className="text-base font-semibold text-foreground">{children}</h2>;
 }
 
+// Services whose page shows the "not a law firm" notice prominently.
+const LEGAL_NOTICE_SERVICES = new Set(["immigration", "notary", "online_notary"]);
+const NOTARY_SERVICES = new Set(["notary", "online_notary"]);
+
+export type BookingLegalTexts = {
+  notALawFirm: string;
+  acknowledgment: string;
+  floridaNotaryDisclosure: string;
+};
+
 export function BookingFlow({
   services,
   locale,
+  legal,
+  prefill,
+  initialService,
 }: {
   services: PublicBookingService[];
   locale: "en" | "es";
+  legal: BookingLegalTexts;
+  // A signed-in client-portal visitor's own contact details, read from
+  // their portal session server-side (never from the URL).
+  prefill?: { fullName: string; phone: string; email: string } | null;
+  initialService?: string | null;
 }) {
   const t = useTranslations("Book");
-  const tService = useTranslations("ServiceType");
+  // Public-facing names: never "notario" / "consultor de inmigración".
+  const tService = useTranslations("PublicServiceType");
 
   const [serviceType, setServiceType] = useState<string | null>(null);
   const [availability, setAvailability] = useState<Availability>({ state: "idle" });
@@ -111,12 +132,13 @@ export function BookingFlow({
   const form = useForm<DetailsValues>({
     resolver: zodResolver(detailsSchema) as never,
     defaultValues: {
-      fullName: "",
-      phone: "",
-      email: "",
+      fullName: prefill?.fullName ?? "",
+      phone: prefill?.phone ?? "",
+      email: prefill?.email ?? "",
       comment: "",
       preferredLanguage: locale,
       consent: false,
+      legalAck: false,
       website: "",
     },
   });
@@ -152,6 +174,16 @@ export function BookingFlow({
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
+  // /book?service=… (e.g. from the client portal) preselects a service,
+  // only if it is actually bookable online.
+  useEffect(() => {
+    if (initialService && services.some((s) => s.serviceType === initialService)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time preselection from the URL
+      setServiceType(initialService);
+      void loadAvailability(initialService);
+    }
+  }, [initialService, services, loadAvailability]);
+
   function chooseService(next: string) {
     setServiceType(next);
     setTime(null);
@@ -178,7 +210,7 @@ export function BookingFlow({
       const res = await fetch("/api/public/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, serviceType, date, time }),
+        body: JSON.stringify({ ...values, serviceType, date, time, locale }),
       });
       const data = (await res.json().catch(() => ({}))) as {
         status?: string;
@@ -298,6 +330,17 @@ export function BookingFlow({
           <Phone className="size-4" aria-hidden />
           {t("phoneAppointment")} · {t("allTimesNote")}
         </p>
+        {serviceType && LEGAL_NOTICE_SERVICES.has(serviceType) && (
+          <div className="flex flex-col gap-2 rounded-xl border-2 border-primary/50 bg-card p-4 text-sm text-foreground" role="note">
+            <p className="flex items-start gap-2 font-medium">
+              <Scale className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+              <span>{legal.notALawFirm}</span>
+            </p>
+            {NOTARY_SERVICES.has(serviceType) && legal.floridaNotaryDisclosure && (
+              <p className="whitespace-pre-line">{legal.floridaNotaryDisclosure}</p>
+            )}
+          </div>
+        )}
       </section>
 
       {/* 2 + 3. Day and time */}
@@ -473,6 +516,26 @@ export function BookingFlow({
                 )}
               />
               {fieldError("consent")}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Controller
+                control={control}
+                name="legalAck"
+                render={({ field }) => (
+                  <label htmlFor="legalAck" className="flex cursor-pointer items-start gap-3 text-sm text-foreground">
+                    <Checkbox
+                      id="legalAck"
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                      aria-invalid={!!errors.legalAck}
+                      className="mt-0.5 size-5"
+                    />
+                    <span>{legal.acknowledgment}</span>
+                  </label>
+                )}
+              />
+              {fieldError("legalAck")}
             </div>
 
             {submitError && (

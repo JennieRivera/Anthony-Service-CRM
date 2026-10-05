@@ -10,6 +10,23 @@ const nextConfig: NextConfig = {
   // require() instead — same reasoning as the @react-pdf/renderer entry
   // Next.js externalizes by default.
   serverExternalPackages: ["pdf-parse"],
+  // The client portal must never be indexed by search engines (the pages
+  // also set <meta name="robots" content="noindex">).
+  async headers() {
+    return [
+      {
+        source: "/:locale(en|es)/portal/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+        ],
+      },
+      {
+        source: "/api/portal/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
 };
 
 // withBotId adds the rewrites Vercel BotID needs for its invisible

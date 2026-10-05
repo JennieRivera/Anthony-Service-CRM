@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import { auth } from "@/auth";
+import { PORTAL_SESSION_COOKIE } from "@/lib/portal/config";
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -9,9 +10,16 @@ const handleI18nRouting = createMiddleware(routing);
 // public online-booking page (/book, plus the bare locale-less /book so
 // next-intl can redirect it to /en/book or /es/book). Exact match for
 // /book — no sub-paths. Its data comes from /api/public/booking/*.
+// The client portal (/en/portal, /es/portal and sub-routes) is NOT a
+// staff route: it has its own session (cookie PORTAL_SESSION_COOKIE,
+// never Auth.js), enforced by every portal page and /api/portal route.
+const isPortalPath = (pathname: string) => /^\/(en|es)\/portal(\/.*)?$/.test(pathname);
+const isPortalAccessPath = (pathname: string) => /^\/(en|es)\/portal\/access\/?$/.test(pathname);
+
 const isPublicPath = (pathname: string) =>
   /^\/(en|es)\/login(\/.*)?$/.test(pathname) ||
-  /^(\/(en|es))?\/book\/?$/.test(pathname);
+  /^(\/(en|es))?\/book\/?$/.test(pathname) ||
+  isPortalPath(pathname);
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
@@ -25,6 +33,18 @@ export default auth((req) => {
   // also re-checks the session itself (see requireAuthenticatedUser).
   if (isPublicPath(pathname) && req.headers.has("next-action")) {
     return new NextResponse(null, { status: 403 });
+  }
+
+  // Defense in depth for the portal: without a portal cookie at all,
+  // only the access page is reachable. (Pages still validate the session
+  // itself — a cookie being present proves nothing.)
+  if (
+    isPortalPath(pathname) &&
+    !isPortalAccessPath(pathname) &&
+    !req.cookies.has(PORTAL_SESSION_COOKIE)
+  ) {
+    const locale = pathname.startsWith("/es") ? "es" : "en";
+    return NextResponse.redirect(new URL(`/${locale}/portal/access`, req.nextUrl.origin));
   }
 
   // Must check for an actual signed-in user, not just a truthy req.auth:

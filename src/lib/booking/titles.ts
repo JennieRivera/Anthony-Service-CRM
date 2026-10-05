@@ -81,6 +81,48 @@ export function parseBookingTitle(title: string): ParsedBookingTitle | null {
   };
 }
 
+// ── Client portal task titles (Step 2A) ───────────────────────────────
+// Same idea: stored in English with a fixed prefix, translated at display
+// time. The text after the prefix (a file name, a date, the client's own
+// words) is never translated.
+
+const PORTAL_PREFIXES = {
+  "Client upload (may contain sensitive data): ": "portalUploadSensitive",
+  "Client upload: ": "portalUpload",
+  "Client requested cancellation: ": "portalCancelRequest",
+  "Client requested reschedule: ": "portalRescheduleRequest",
+} as const;
+
+export function buildPortalUploadTitle(fileName: string, mayBeSensitive: boolean): string {
+  return mayBeSensitive
+    ? `Client upload (may contain sensitive data): ${fileName}`
+    : `Client upload: ${fileName}`;
+}
+
+// e.g. 'Client requested reschedule: 2026-10-05 3:00 PM — "Can we do 4?"'
+// (date/time in Florida business time; language-neutral format).
+export function buildPortalChangeRequestTitle(
+  kind: "cancel" | "reschedule",
+  startAt: Date,
+  message: string,
+): string {
+  const when = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(startAt);
+  const time = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(startAt);
+  const prefix = kind === "cancel" ? "Client requested cancellation: " : "Client requested reschedule: ";
+  const note = message.trim() ? ` — "${message.trim()}"` : "";
+  return `${prefix}${when} ${time}${note}`;
+}
+
 // Translator functions come from next-intl (getTranslations on the
 // server, useTranslations in client components), so this file stays free
 // of any next-intl import and works in both.
@@ -89,9 +131,14 @@ export type BookingTitleTranslators = {
   // AppointmentSource namespace: online_booking, confirmPrefix,
   // requestedLanguage ({language}), language_en, language_es.
   source: (key: string, values?: Record<string, string>) => string;
+  // SystemTitles namespace: the PORTAL_PREFIXES keys above.
+  system: (key: string) => string;
 };
 
 export function localizeBookingTitle(title: string, t: BookingTitleTranslators): string {
+  for (const [prefix, key] of Object.entries(PORTAL_PREFIXES)) {
+    if (title.startsWith(prefix)) return `${t.system(key)}${title.slice(prefix.length)}`;
+  }
   const parsed = parseBookingTitle(title);
   if (!parsed) return title;
   let out = `${t.source("online_booking")} — ${t.service(parsed.serviceType)}: ${parsed.name}`;

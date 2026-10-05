@@ -621,6 +621,7 @@ export function CaseForm({
               id="documentsRequested"
               {...register("documentsRequested")}
             />
+            <p className="text-xs text-muted-foreground">{t("visibleInPortalHint")}</p>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -631,6 +632,7 @@ export function CaseForm({
           <div className="flex flex-col gap-1.5 sm:col-span-2">
             <Label htmlFor="nextAction">{t("nextAction")}</Label>
             <Input id="nextAction" {...register("nextAction")} />
+            <p className="text-xs text-muted-foreground">{t("visibleInPortalHint")}</p>
           </div>
         </div>
       </div>

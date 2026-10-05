@@ -739,7 +739,8 @@
       "insuranceRenewalReminderDays": "Remind Me (Days Before Expiration)",
       "insuranceStatus": "Status",
       "insuranceLastRenewedDate": "Last Renewed",
-      "insuranceComplianceNotes": "Compliance Notes"
+      "insuranceComplianceNotes": "Compliance Notes",
+      "visibleInPortalHint": "Visible to the client in the portal."
     },
     "salesTaxCaseDetails": "Sales Tax Registration Details",
     "irsCaseDetails": "IRS / EIN / ITIN Case Details",
@@ -1472,7 +1473,10 @@
     "enrolledCourses": "Enrolled courses",
     "startDate": "Start",
     "endDate": "End",
-    "targetDate": "Target:"
+    "targetDate": "Target:",
+    "visibleToClient": "Visible to client",
+    "uploadedByClient": "Uploaded by client",
+    "mayContainSensitiveData": "May contain sensitive data"
   },
   "DocumentDrawer": {
     "notaria": "Notary",
@@ -2026,7 +2030,9 @@
     "inactivity_alert": "Inactivity Alert",
     "renewal_reminder": "Renewal Reminder",
     "appointment_confirmation": "Appointment Confirmation",
-    "appointment_reminder": "Appointment Reminder"
+    "appointment_reminder": "Appointment Reminder",
+    "document_review": "Review Client Document",
+    "appointment_change_request": "Appointment Change Request"
   },
   "Tasks": {
     "title": "Tasks",
@@ -3618,7 +3624,8 @@
       "slotTaken": "Sorry, that time was just taken. Please choose another time.",
       "rateLimited": "We've received several requests from you today. Please call us to book.",
       "unavailable": "That service can't be booked online right now. Please call us.",
-      "generic": "Something went wrong. Please try again or call us."
+      "generic": "Something went wrong. Please try again or call us.",
+      "legalAck": "Please confirm you understand we are not attorneys."
     }
   },
   "OnlineBooking": {
@@ -3673,5 +3680,194 @@
     "requestedLanguage": "Client requested {language} for this booking.",
     "language_en": "English",
     "language_es": "Spanish"
+  },
+  "PublicServiceType": {
+    "online_notary": "Florida Notary Public — remote online notarization",
+    "document_prep": "Document preparation",
+    "tax_prep": "Taxes / Accounting",
+    "company_registration": "Company registration",
+    "credit_financing": "Credit & financing",
+    "leadership": "Business consulting",
+    "notary": "Florida Notary Public — signature notarization",
+    "bookkeeping": "Bookkeeping",
+    "immigration": "Immigration form preparation (administrative service)",
+    "academy": "Academy / Training",
+    "marketing": "Marketing / Branding / AI / Automation",
+    "sales_tax": "Sales tax registration",
+    "irs_administrative": "IRS / EIN / ITIN paperwork",
+    "insurance_compliance": "Insurance & compliance"
+  },
+  "Portal": {
+    "hello": "Hi, {name}",
+    "signOut": "Sign out",
+    "navLabel": "Portal sections",
+    "nav": {
+      "home": "Home",
+      "cases": "My cases",
+      "appointments": "My appointments",
+      "documents": "Documents"
+    },
+    "questions": "Questions? Call us at {phone}.",
+    "access": {
+      "title": "Your client portal",
+      "intro": "To protect your information, enter the last 4 digits of the phone number we have on file for you.",
+      "lastFourLabel": "Last 4 digits of your phone",
+      "continue": "Continue",
+      "checking": "Checking…",
+      "noLink": "To open your portal you need the personal link we send you. If it expired or doesn't work, ask us for a new one.",
+      "callUs": "Call us at {phone}",
+      "errors": {
+        "format": "Please enter 4 digits.",
+        "invalid": "Those digits don't match, or this link is no longer valid.",
+        "locked": "This link was locked after too many attempts. Please call us at {phone} for a new one.",
+        "rateLimited": "Too many attempts. Please wait a few minutes and try again.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "gate": {
+      "title": "Before you continue",
+      "continue": "Continue to my portal",
+      "error": "We couldn't save your answer. Please try again."
+    },
+    "home": {
+      "title": "Hi, {name}",
+      "intro": "Here you can follow your cases, see your appointments and send us documents.",
+      "uploadCta": "Upload documents",
+      "bookCta": "Book an appointment",
+      "activeCases": "Your active cases",
+      "noActiveCases": "You have no active cases right now.",
+      "upcomingAppointments": "Upcoming appointments",
+      "noUpcoming": "You have no upcoming appointments.",
+      "allAppointments": "See all my appointments"
+    },
+    "cases": {
+      "title": "My cases",
+      "empty": "You don't have any cases with us yet.",
+      "since": "since {date}",
+      "back": "My cases",
+      "nextAction": "Next step",
+      "documentsRequested": "Documents we need from you"
+    },
+    "caseStatus": {
+      "received": "Received",
+      "in_progress": "In progress",
+      "waiting_on_you": "Waiting on you",
+      "completed": "Completed",
+      "closed": "Closed"
+    },
+    "appointmentStatus": {
+      "pending": "Pending confirmation",
+      "confirmed": "Confirmed",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "missed": "Missed"
+    },
+    "documents": {
+      "title": "Documents",
+      "yours": "Your documents",
+      "empty": "No documents yet.",
+      "fromYou": "Sent by you",
+      "fromUs": "Shared by Anthony Multiservice",
+      "download": "Download"
+    },
+    "upload": {
+      "title": "Send us documents",
+      "titleForCase": "Send documents for this case",
+      "caseLabel": "Which case is this for?",
+      "noCase": "General (no specific case)",
+      "chooseFiles": "Choose files",
+      "takePhoto": "Take a photo",
+      "rules": "PDF, JPG, PNG, HEIC, WEBP or Word · up to 10 MB each. Your files are stored privately.",
+      "uploading": "Uploading {name}…",
+      "done": "{count, plural, one {Document received} other {# documents received}}. We'll review it soon.",
+      "errors": {
+        "type": "This type of file isn't accepted. Please send a PDF, a photo (JPG, PNG, HEIC, WEBP) or a Word document.",
+        "size": "The file is larger than 10 MB.",
+        "limit": "You've sent many files today. Please try again tomorrow or call us.",
+        "generic": "The file couldn't be uploaded. Please try again."
+      }
+    },
+    "appointments": {
+      "title": "My appointments",
+      "book": "Book an appointment",
+      "calendar": "Calendar",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "showAll": "Show all appointments",
+      "upcoming": "Upcoming",
+      "noUpcoming": "No upcoming appointments.",
+      "past": "Past",
+      "requestChange": "Ask to change or cancel",
+      "reschedule": "Change date/time",
+      "cancel": "Cancel",
+      "messagePlaceholder": "Optional: tell us what works better for you",
+      "requestNote": "This doesn't change your appointment yet — we'll call you to confirm.",
+      "sendRequest": "Send request",
+      "requestSent": "We received your request. We'll call you to confirm.",
+      "alreadyRequested": "We already have a request for this appointment. We'll call you soon.",
+      "requestError": "We couldn't send your request. Please try again or call us."
+    }
+  },
+  "PortalAccess": {
+    "title": "Client portal access",
+    "description": "Generate a personal link and send it to the client by WhatsApp. The client confirms it with the last 4 digits of their phone. Links expire in 7 days and work once; the session lasts 30 days.",
+    "generate": "Generate link",
+    "generateNew": "Generate new link",
+    "revoke": "Revoke access",
+    "revoking": "Revoking…",
+    "revokeConfirmTitle": "Revoke portal access?",
+    "revokeConfirmDescription": "Any unused link stops working and the client is signed out everywhere. You can generate a new link later.",
+    "cancel": "Cancel",
+    "needsPhone": "Add a phone number to the client first — the link is confirmed with its last 4 digits.",
+    "error": "Something went wrong",
+    "linkReady": "Personal link ready — copy it and send it by WhatsApp:",
+    "copy": "Copy link",
+    "copied": "Copied",
+    "expires": "Expires {date}",
+    "shownOnce": "For security, this link is only shown now. If you lose it, generate a new one.",
+    "status": "Status",
+    "statusActive": "{count, plural, one {Signed in (1 session)} other {Signed in (# sessions)}}",
+    "statusLocked": "Link locked after too many wrong attempts",
+    "statusPending": "Link sent, not used yet (expires {date})",
+    "statusNone": "No access",
+    "lastLogin": "Last sign-in",
+    "lastSeen": "Last activity"
+  },
+  "LegalTexts": {
+    "settingsCard": "Legal texts",
+    "settingsCardDescription": "The \"not a law firm\" notice, the acknowledgment clients must accept, and the Florida notary disclosure, shown on /book and in the client portal.",
+    "manage": "Edit legal texts",
+    "title": "Legal texts",
+    "description": "Shown on the public booking page and in the client portal, in Spanish and English.",
+    "backToSettings": "Back to Settings",
+    "attorneyReviewWarning": "These texts are not legal advice. The final wording of every text — especially the Florida notary disclosure — must be reviewed by a licensed Florida attorney before you rely on it.",
+    "spanish": "Spanish",
+    "english": "English",
+    "restoreDefault": "Restore the original text",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "error": "Something went wrong",
+    "keys": {
+      "not_a_law_firm": {
+        "title": "Notice: \"We are not attorneys\"",
+        "help": "Footer of /book and of the client portal, the portal home page, and highlighted on /book for Immigration and Notary services."
+      },
+      "not_a_law_firm_ack": {
+        "title": "Mandatory acknowledgment",
+        "help": "The checkbox clients must tick on /book and the first time they open the portal. Each acceptance is saved with date, time, IP and the exact text."
+      },
+      "florida_notary_disclosure": {
+        "title": "Florida notary disclosure",
+        "help": "The exact text Florida law requires of a notary who is not an attorney (especially when advertising in Spanish). Leave it empty until an attorney gives you the wording — it is only shown once filled in."
+      }
+    }
+  },
+  "SystemTitles": {
+    "portalUpload": "Client upload: ",
+    "portalUploadSensitive": "Client upload (may contain sensitive data): ",
+    "portalCancelRequest": "Client requested cancellation: ",
+    "portalRescheduleRequest": "Client requested reschedule: "
   }
 }

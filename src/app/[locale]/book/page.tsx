@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { CalendarClock, Phone } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { businessInfo } from "@/lib/business-info";
 import { getPublicBookingServices } from "@/lib/booking/server";
 import { BookingFlow } from "@/components/booking/BookingFlow";
+import { LegalFooter } from "@/components/portal/LegalFooter";
+import { getDb } from "@/lib/db";
+import { DEFAULT_LEGAL_TEXTS, getLegalTexts, pickLocale } from "@/lib/legal/texts";
+import { getPortalBookingPrefill } from "@/lib/portal/queries";
+import { getPortalSession } from "@/lib/portal/session";
+import type { PortalDb } from "@/lib/portal/db";
 
 // PUBLIC page — no login (see isPublicPath in src/proxy.ts) and outside
 // the (app) route group, so no AppShell, no navigation, no admin UI. The
@@ -26,10 +32,13 @@ export async function generateMetadata({
 
 export default async function BookPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ service?: string | string[] }>;
 }) {
   const { locale } = await params;
+  const { service } = await searchParams;
   setRequestLocale(locale);
   // Services and hours are admin-editable, so never prerender this page.
   await connection();
@@ -39,6 +48,17 @@ export default async function BookPage({
     ? await getPublicBookingServices()
     : { enabled: false, services: [] };
   const otherLocale = locale === "es" ? "en" : "es";
+  const db = isDatabaseConfigured() ? (getDb() as unknown as PortalDb) : null;
+  const legalTexts = db ? await getLegalTexts(db) : DEFAULT_LEGAL_TEXTS;
+  const legal = {
+    notALawFirm: pickLocale(legalTexts.not_a_law_firm, locale),
+    acknowledgment: pickLocale(legalTexts.not_a_law_firm_ack, locale),
+    floridaNotaryDisclosure: pickLocale(legalTexts.florida_notary_disclosure, locale),
+  };
+  // A signed-in client-portal visitor gets their own name/phone/email
+  // prefilled — read from their portal session here, never from the URL.
+  const portalSession = db ? await getPortalSession() : null;
+  const prefill = db && portalSession ? await getPortalBookingPrefill(db, portalSession.clientId) : null;
 
   return (
     <div className="flex min-h-full flex-1 flex-col bg-secondary/40">
@@ -69,7 +89,13 @@ export default async function BookPage({
         </div>
 
         {enabled && services.length > 0 ? (
-          <BookingFlow services={services} locale={locale === "es" ? "es" : "en"} />
+          <BookingFlow
+            services={services}
+            locale={locale === "es" ? "es" : "en"}
+            legal={legal}
+            prefill={prefill}
+            initialService={typeof service === "string" ? service : null}
+          />
         ) : (
           <p className="rounded-xl border border-border bg-card p-6 text-foreground">
             {t("closed", { phone: businessInfo.phone })}
@@ -77,14 +103,11 @@ export default async function BookPage({
         )}
       </main>
 
-      <footer className="border-t border-border bg-card">
-        <div className="mx-auto flex w-full max-w-2xl items-center gap-2 px-4 py-4 text-sm text-muted-foreground">
-          <Phone className="size-4" aria-hidden />
-          <a href={`tel:${businessInfo.phone.replace(/\D/g, "")}`} className="underline">
-            {t("questions", { phone: businessInfo.phone })}
-          </a>
-        </div>
-      </footer>
+      <LegalFooter
+        notALawFirm={legal.notALawFirm}
+        floridaNotaryDisclosure={legal.floridaNotaryDisclosure}
+        questionsLabel={t("questions", { phone: businessInfo.phone })}
+      />
     </div>
   );
 }

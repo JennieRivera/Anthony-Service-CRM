@@ -7,9 +7,11 @@ import { localizeBookingTitle } from "./titles";
 export async function getBookingTitleLocalizer(): Promise<(title: string) => string> {
   const tService = await getTranslations("ServiceType");
   const tSource = await getTranslations("AppointmentSource");
+  const tSystem = await getTranslations("SystemTitles");
   return (title) =>
     localizeBookingTitle(title, {
       service: (k) => tService(k),
       source: (k, v) => tSource(k as "online_booking", v),
+      system: (k) => tSystem(k as "portalUpload"),
     });
 }
