@@ -53,8 +53,6 @@ export default async function BookPage({
   const legal = {
     notALawFirm: pickLocale(legalTexts.not_a_law_firm, locale),
     acknowledgment: pickLocale(legalTexts.not_a_law_firm_ack, locale),
-    // Florida §117.05(10): always English AND Spanish together.
-    floridaNotaryDisclosure: legalTexts.florida_notary_disclosure,
   };
   // A signed-in client-portal visitor gets their own name/phone/email
   // prefilled — read from their portal session here, never from the URL.
@@ -106,7 +104,8 @@ export default async function BookPage({
 
       <LegalFooter
         notALawFirm={legal.notALawFirm}
-        floridaNotaryDisclosure={legal.floridaNotaryDisclosure}
+        // Florida §117.05(10): English AND Spanish, once per page (footer only).
+        floridaNotaryDisclosure={legalTexts.florida_notary_disclosure}
         questionsLabel={t("questions", { phone: businessInfo.phone })}
       />
     </div>

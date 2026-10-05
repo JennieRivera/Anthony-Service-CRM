@@ -4,7 +4,8 @@ import { bothLanguages, type LegalText } from "@/lib/legal/keys";
 
 // Footer of every public and client-facing page: the "not a law firm"
 // notice, the Florida §117.05(10) notary disclosure (always in English AND
-// Spanish together, at a readable size — not fine print), and the phone.
+// Spanish together, same size as the footer text — never smaller), and the
+// phone. The only place the disclosure is rendered, so it shows once per page.
 // Texts come from Settings → Legal texts.
 export function LegalFooter({
   notALawFirm,
@@ -23,8 +24,11 @@ export function LegalFooter({
           <Scale className="mt-0.5 size-4 shrink-0" aria-hidden />
           <span>{notALawFirm}</span>
         </p>
+        {/* §117.05(10) asks for a "conspicuous size": same size as the
+            surrounding footer text (never smaller), full-contrast text, in
+            a soft box — rendered only here, so once per page. */}
         {disclosure.length > 0 && (
-          <div className="flex flex-col gap-1 rounded-lg border border-border p-3 text-base font-semibold text-foreground">
+          <div className="flex flex-col gap-1 rounded-lg border border-border bg-secondary/60 p-3 text-foreground">
             {disclosure.map((line) => (
               <p key={line}>{line}</p>
             ))}

@@ -12,7 +12,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { publicBookingSchema } from "@/lib/validation/onlineBooking";
-import { bothLanguages } from "@/lib/legal/keys";
 import type { PublicBookingService, PublicBookingSummary } from "@/lib/booking/server";
 import type { DayAvailability } from "@/lib/booking/slots";
 
@@ -94,13 +93,10 @@ function StepTitle({ children }: { children: React.ReactNode }) {
 
 // Services whose page shows the "not a law firm" notice prominently.
 const LEGAL_NOTICE_SERVICES = new Set(["immigration", "notary", "online_notary"]);
-const NOTARY_SERVICES = new Set(["notary", "online_notary"]);
 
 export type BookingLegalTexts = {
   notALawFirm: string;
   acknowledgment: string;
-  // Florida §117.05(10) notice — always shown in English AND Spanish.
-  floridaNotaryDisclosure: { en: string; es: string };
 };
 
 export function BookingFlow({
@@ -338,10 +334,6 @@ export function BookingFlow({
               <Scale className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
               <span>{legal.notALawFirm}</span>
             </p>
-            {NOTARY_SERVICES.has(serviceType) &&
-              bothLanguages(legal.floridaNotaryDisclosure).map((line) => (
-                <p key={line} className="text-base font-semibold">{line}</p>
-              ))}
           </div>
         )}
       </section>
