@@ -3862,7 +3862,9 @@
         "title": "Aviso de Notary Public de Florida (sección 117.05(10))",
         "help": "Texto exigido por la sección 117.05(10) de Florida. El texto en español debe ser revisado por un abogado. Se muestra siempre en inglés y en español juntos, en tamaño visible: en el pie de /book y del portal, y destacado cuando eligen Notary Public."
       }
-    }
+    },
+    "pendingAttorneyReview": "Traducción — pendiente de revisión de un abogado",
+    "statuteText": "Texto exacto de la ley (§117.05(10))"
   },
   "SystemTitles": {
     "portalUpload": "Documento subido por el cliente: ",

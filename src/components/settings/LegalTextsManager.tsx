@@ -42,7 +42,16 @@ export function LegalTextsManager({ texts, defaults }: { texts: LegalTexts; defa
           <CardContent className="flex flex-col gap-4">
             {(["es", "en"] as const).map((lang) => (
               <div key={lang} className="flex flex-col gap-1.5">
-                <Label htmlFor={`${key}-${lang}`}>{lang === "es" ? t("spanish") : t("english")}</Label>
+                <Label htmlFor={`${key}-${lang}`} className="flex flex-wrap items-center gap-2">
+                  {lang === "es" ? t("spanish") : t("english")}
+                  {/* §117.05(10): the English text is the statute's; the
+                      Spanish one is a translation an attorney must review. */}
+                  {key === "florida_notary_disclosure" && (
+                    <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
+                      {lang === "es" ? t("pendingAttorneyReview") : t("statuteText")}
+                    </span>
+                  )}
+                </Label>
                 <Textarea
                   id={`${key}-${lang}`}
                   rows={key === "not_a_law_firm_ack" ? 2 : 5}

@@ -3862,7 +3862,9 @@
         "title": "Florida Notary Public disclosure (section 117.05(10))",
         "help": "Text required by Florida Statutes section 117.05(10). The Spanish text must be reviewed by an attorney. Always shown in English and Spanish together, at a readable size: in the footer of /book and the portal, and highlighted when Notary Public is chosen."
       }
-    }
+    },
+    "pendingAttorneyReview": "Translation — pending attorney review",
+    "statuteText": "Exact statutory text (§117.05(10))"
   },
   "SystemTitles": {
     "portalUpload": "Client upload: ",
