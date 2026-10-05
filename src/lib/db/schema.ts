@@ -549,6 +549,16 @@ export const clients = pgTable("clients", {
   // staff, not auto-generated. Purely a display label for the Documents
   // module's per-client sub-folder; carries no other meaning.
   folderNumber: text("folder_number"),
+  // Client portal (Step 2B) — contact details the client can keep up to
+  // date themselves (every change also creates a staff review task).
+  address: text("address"),
+  bestTimeToCall: text("best_time_to_call", {
+    enum: ["morning", "midday", "afternoon", "evening"],
+  }),
+  // Optional square profile photo in private Vercel Blob. Only ever
+  // streamed through /api/portal/profile/photo (the client) or
+  // /api/clients/[id]/photo (staff) — never linked directly.
+  photoBlobUrl: text("photo_blob_url"),
 });
 
 // Phase 4, Session 3 — one optional row per client, the same 1:1-extension
@@ -574,6 +584,8 @@ export const clientCommunicationPreferences = pgTable(
     smsConsent: boolean("sms_consent").notNull().default(false),
     whatsappConsent: boolean("whatsapp_consent").notNull().default(false),
     marketingConsent: boolean("marketing_consent").notNull().default(false),
+    // Client portal (Step 2B) — "I agree to be called by phone".
+    phoneCallConsent: boolean("phone_call_consent").notNull().default(false),
     partnerReferralConsent: boolean("partner_referral_consent")
       .notNull()
       .default(false),
@@ -985,6 +997,10 @@ export const taskTypeEnum = pgEnum("task_type", [
   // portal never changes the appointment itself).
   "document_review",
   "appointment_change_request",
+  // Client portal (Step 2B) — the client changed their contact details
+  // (the title carries before → after), and the client asked about services.
+  "client_info_review",
+  "service_interest",
 ]);
 
 export const taskStatusEnum = pgEnum("task_status", [
@@ -1451,6 +1467,11 @@ export const portalAccessLinks = pgTable(
     revokedAt: timestamp("revoked_at", { withTimezone: true }),
     failedAttempts: integer("failed_attempts").notNull().default(0),
     createdByEmail: text("created_by_email"),
+    // HMAC of the phone's last 4 digits when the link was created, so a
+    // phone number changed later (e.g. from inside the portal) doesn't
+    // change what an outstanding link asks for. Null on links created
+    // before Step 2B — those fall back to the client's current phone.
+    phoneLast4Hash: text("phone_last4_hash"),
   },
   (table) => [
     uniqueIndex("portal_access_links_token_hash_idx").on(table.tokenHash),
@@ -1522,8 +1543,12 @@ export const clientConsentEvents = pgTable(
     }),
     consentType: text("consent_type").notNull(),
     granted: boolean("granted").notNull(),
-    source: text("source", { enum: ["portal", "online_booking"] }).notNull(),
+    // "staff": changed by staff in the CRM (Communication Preferences).
+    source: text("source", { enum: ["portal", "online_booking", "staff"] }).notNull(),
     textShown: text("text_shown").notNull(),
+    // The client's typed name as a simple signature (document-processing
+    // authorization only).
+    signatureName: text("signature_name"),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
   },

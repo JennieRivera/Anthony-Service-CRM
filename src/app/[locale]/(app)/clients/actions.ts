@@ -26,6 +26,8 @@ function normalize(values: ClientFormValues) {
     notes: values.notes || null,
     companyId: values.companyId || null,
     folderNumber: values.folderNumber || null,
+    ...(values.address !== undefined ? { address: values.address || null } : {}),
+    ...(values.bestTimeToCall !== undefined ? { bestTimeToCall: values.bestTimeToCall || null } : {}),
   };
 }
 

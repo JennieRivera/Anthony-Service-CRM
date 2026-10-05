@@ -25,7 +25,7 @@ const root = process.cwd();
 const rel = (p: string) => path.relative(root, p).split(path.sep).join("/");
 
 const pages = walk(path.join(root, "src/app/[locale]/portal/(client)")).filter((f) => f.endsWith("page.tsx"));
-assert.ok(pages.length >= 5, `expected the portal pages, found ${pages.length}`);
+assert.ok(pages.length >= 8, `expected the portal pages, found ${pages.length}`);
 for (const page of pages) {
   const src = fs.readFileSync(page, "utf8");
   assert.ok(/await requirePortalPage\(/.test(src), `${rel(page)} must call requirePortalPage()`);
@@ -34,16 +34,24 @@ for (const page of pages) {
 
 const SESSION_LIFECYCLE = new Set(["src/app/api/portal/login/route.ts", "src/app/api/portal/logout/route.ts"]);
 const routes = walk(path.join(root, "src/app/api/portal")).filter((f) => f.endsWith("route.ts"));
-assert.ok(routes.length >= 7, `expected the portal API routes, found ${routes.length}`);
+assert.ok(routes.length >= 11, `expected the portal API routes, found ${routes.length}`);
 for (const route of routes) {
   const src = fs.readFileSync(route, "utf8");
   if (SESSION_LIFECYCLE.has(rel(route))) continue;
   assert.ok(/await requirePortalSessionForApi\(\)/.test(src), `${rel(route)} must call requirePortalSessionForApi()`);
-  // Every state-changing portal route also requires a same-origin request.
-  if (/export async function POST/.test(src)) {
-    assert.ok(/isSameOrigin\(request\)/.test(src), `${rel(route)} POST must check isSameOrigin()`);
+  // Every state-changing handler also requires a same-origin request
+  // (checked per handler — a route file can export GET + POST + DELETE).
+  for (const handler of src.split(/(?=export async function )/)) {
+    const method = handler.match(/^export async function (POST|PUT|PATCH|DELETE)\b/)?.[1];
+    if (!method) continue;
+    assert.ok(/isSameOrigin\(request\)/.test(handler), `${rel(route)} ${method} must check isSameOrigin()`);
+    assert.ok(/await requirePortalSessionForApi\(\)/.test(handler), `${rel(route)} ${method} must call requirePortalSessionForApi()`);
   }
 }
+
+// The staff-side photo route must check the staff (Auth.js) session.
+const staffPhoto = fs.readFileSync(path.join(root, "src/app/api/clients/[id]/photo/route.ts"), "utf8");
+assert.ok(/await auth\(\)/.test(staffPhoto), "src/app/api/clients/[id]/photo/route.ts must call auth()");
 
 // Portal code never reads a client id from the request — only from the session.
 for (const file of [...pages, ...routes]) {

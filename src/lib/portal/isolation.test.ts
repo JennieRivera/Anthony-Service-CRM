@@ -238,6 +238,162 @@ async function main() {
     assert.equal(await access.resolvePortalSession(db, r.ok ? r.sessionToken : "", later), null);
   });
 
+  // ── Step 2B: profile, photo, services, authorizations ───────────────
+  const acct = await import("./account");
+  const { clientCommunicationPreferences, clientConsentEvents } = schema;
+  const clientRow = async (id: string) => (await db.select().from(clients).where(eq(clients.id, id)))[0];
+  const tasksOf = async (type: "client_info_review" | "service_interest") =>
+    db.select().from(tasks).where(eq(tasks.type, type));
+  const validProfile = {
+    phone: "(555) 555-0101",
+    email: "a@example.com",
+    address: "",
+    preferredLanguage: "en",
+    bestTimeToCall: "",
+  };
+
+  await ok("profile: A reads only A's details, never the photo blob URL", async () => {
+    const p = await acct.getPortalProfile(db, a.id);
+    assert.equal(p?.fullName, "Client A");
+    assert.equal(p?.phone, "(555) 555-0101");
+    assert.ok(p && !("photoBlobUrl" in p));
+  });
+  await ok("profile: saving unchanged details writes nothing and creates no task", async () => {
+    assert.deepEqual((await acct.updatePortalProfile(db, { clientId: a.id, values: validProfile })).changed, []);
+    assert.equal((await tasksOf("client_info_review")).length, 0);
+  });
+  await ok("profile: an invalid phone is rejected and nothing is written", async () => {
+    await assert.rejects(
+      acct.updatePortalProfile(db, { clientId: a.id, values: { ...validProfile, phone: "123" } }),
+      acct.PortalValidationError,
+    );
+    assert.equal((await clientRow(a.id)).phone, "(555) 555-0101");
+  });
+
+  // An outstanding link created BEFORE a phone change keeps asking for the
+  // original last 4 digits.
+  const linkBeforeChange = await access.createPortalAccessLink(db, { clientId: a.id, createdByEmail: null });
+  await ok("profile: A's change updates A only, never the name, and creates A's review task", async () => {
+    const { changed } = await acct.updatePortalProfile(db, {
+      clientId: a.id,
+      values: { ...validProfile, phone: "555-555-0199", address: "1 Main St", bestTimeToCall: "evening", fullName: "Hacked Name" },
+    });
+    assert.deepEqual(changed.sort(), ["address", "bestTimeToCall", "phone"]);
+    const rowA = await clientRow(a.id);
+    assert.equal(rowA.phone, "(555) 555-0199");
+    assert.equal(rowA.fullName, "Client A");
+    assert.equal((await clientRow(b.id)).phone, "(555) 555-0102");
+    const [task] = await tasksOf("client_info_review");
+    assert.equal(task.clientId, a.id);
+    assert.ok(task.title.startsWith("Review client info change (phone changed"));
+    assert.ok(task.title.includes("(555) 555-0101 → (555) 555-0199"));
+  });
+  await ok("a link created before a phone change still asks for the ORIGINAL last 4", async () => {
+    assert.equal((await access.redeemPortalAccessLink(db, { token: linkBeforeChange.token, lastFour: "0199", ipKey: null })).ok, false);
+    const r = await access.redeemPortalAccessLink(db, { token: linkBeforeChange.token, lastFour: "0101", ipKey: null });
+    assert.ok(r.ok && r.clientId === a.id);
+  });
+  await ok("profile: too many changes in a day are refused", async () => {
+    for (let i = 0; i < acct.PORTAL_MAX_PROFILE_CHANGES_PER_DAY - 1; i++) {
+      await acct.updatePortalProfile(db, { clientId: a.id, values: { ...validProfile, phone: "555-555-0199", address: `Apt ${i}` } });
+    }
+    await assert.rejects(
+      acct.updatePortalProfile(db, { clientId: a.id, values: { ...validProfile, phone: "555-555-0199", address: "Too many" } }),
+      acct.PortalLimitError,
+    );
+  });
+
+  await ok("photo: A's photo is A's only", async () => {
+    assert.equal(await acct.setPortalPhoto(db, a.id, "https://blob.example/photo-a.jpg"), null);
+    assert.equal(await acct.getPortalPhotoBlobUrl(db, a.id), "https://blob.example/photo-a.jpg");
+    assert.equal(await acct.getPortalPhotoBlobUrl(db, b.id), null);
+    assert.equal((await q.getPortalClient(db, a.id))?.hasPhoto, true);
+    assert.equal((await q.getPortalClient(db, b.id))?.hasPhoto, false);
+    assert.ok(!JSON.stringify(await q.getPortalClient(db, a.id)).includes("blob.example"));
+  });
+  await ok("photo: replacing returns the previous blob (to delete) and removing clears it", async () => {
+    assert.equal(await acct.setPortalPhoto(db, a.id, "https://blob.example/photo-a2.jpg"), "https://blob.example/photo-a.jpg");
+    assert.equal(await acct.setPortalPhoto(db, a.id, null), "https://blob.example/photo-a2.jpg");
+    assert.equal((await q.getPortalClient(db, a.id))?.hasPhoto, false);
+  });
+
+  await db.update(clients).set({ interestedServices: ["tax_prep", "tax_prep"] }).where(eq(clients.id, a.id));
+  await ok("services: A's request merges into A's list without duplicates, with A's task", async () => {
+    const { added } = await acct.requestPortalServices(db, {
+      clientId: a.id,
+      services: ["tax_prep", "company_registration", "company_registration"],
+      comment: "Necesito abrir una LLC",
+    });
+    assert.deepEqual(added, ["company_registration"]);
+    assert.deepEqual((await clientRow(a.id)).interestedServices, ["tax_prep", "company_registration"]);
+    assert.equal((await clientRow(b.id)).interestedServices, null);
+    const [task] = await tasksOf("service_interest");
+    assert.equal(task.clientId, a.id);
+    assert.equal(task.caseId, null);
+    assert.ok(task.title.includes("Company Registration") && task.title.includes("Necesito abrir una LLC"));
+  });
+  await ok("services: unknown, legacy or empty requests are rejected", async () => {
+    for (const services of [["not_a_service"], ["online_notary"], "tax_prep", [{ x: 1 }]]) {
+      await assert.rejects(acct.requestPortalServices(db, { clientId: a.id, services, comment: "" }), acct.PortalValidationError);
+    }
+    await assert.rejects(acct.requestPortalServices(db, { clientId: a.id, services: [], comment: "  " }), acct.PortalValidationError);
+    assert.equal((await tasksOf("service_interest")).length, 1);
+  });
+  await ok("services: no case or invoice is created", async () => {
+    assert.equal((await db.select().from(cases).where(eq(cases.clientId, a.id))).length, 1);
+  });
+
+  const allOff = Object.fromEntries(acct.PORTAL_AUTHORIZATIONS.map((x) => [x, false]));
+  const texts = Object.fromEntries(acct.PORTAL_AUTHORIZATIONS.map((x) => [x, `TEXT ${x}`])) as Record<
+    (typeof acct.PORTAL_AUTHORIZATIONS)[number],
+    string
+  >;
+  const save = (clientId: string, choices: unknown, signatureName: unknown = "") =>
+    acct.savePortalAuthorizations(db, { clientId, choices, signatureName, texts, ipAddress: "203.0.113.7", userAgent: "test" });
+
+  await ok("authorizations: document authorization without a typed name is refused, nothing written", async () => {
+    await assert.rejects(save(a.id, { ...allOff, document_processing: true }, " "), acct.PortalValidationError);
+    assert.equal((await db.select().from(clientConsentEvents).where(eq(clientConsentEvents.consentType, "document_processing"))).length, 0);
+  });
+  await ok("authorizations: A's choices go to A's Communication Preferences + A's evidence only", async () => {
+    const { changed } = await save(
+      a.id,
+      { ...allOff, phone_calls: true, email: true, whatsapp: true, document_processing: true, privacy_notice: true },
+      "Client A",
+    );
+    assert.equal(changed.length, 5);
+    const [prefsA] = await db.select().from(clientCommunicationPreferences).where(eq(clientCommunicationPreferences.clientId, a.id));
+    assert.ok(prefsA.phoneCallConsent && prefsA.emailConsent && prefsA.whatsappConsent && !prefsA.smsConsent && !prefsA.marketingConsent);
+    assert.equal(prefsA.consentSource, "Client portal");
+    assert.equal((await db.select().from(clientCommunicationPreferences).where(eq(clientCommunicationPreferences.clientId, b.id))).length, 0);
+    const events = await db.select().from(clientConsentEvents).where(eq(clientConsentEvents.ipAddress, "203.0.113.7"));
+    assert.ok(events.every((e) => e.clientId === a.id && e.source === "portal" && e.textShown.startsWith("TEXT ")));
+    const doc = events.find((e) => e.consentType === "document_processing");
+    assert.equal(doc?.signatureName, "Client A");
+    const stateB = await acct.getPortalAuthorizations(db, b.id);
+    assert.ok(acct.PORTAL_AUTHORIZATIONS.every((x) => !stateB[x].granted));
+  });
+  await ok("authorizations: saving the same choices records nothing new", async () => {
+    const before = (await db.select().from(clientConsentEvents)).length;
+    const state = await acct.getPortalAuthorizations(db, a.id);
+    const same = Object.fromEntries(acct.PORTAL_AUTHORIZATIONS.map((x) => [x, state[x].granted]));
+    assert.equal((await save(a.id, same)).changed.length, 0);
+    assert.equal((await db.select().from(clientConsentEvents)).length, before);
+  });
+  await ok("authorizations: withdrawing email marks the channel unsubscribed", async () => {
+    const state = await acct.getPortalAuthorizations(db, a.id);
+    const current = Object.fromEntries(acct.PORTAL_AUTHORIZATIONS.map((x) => [x, state[x].granted]));
+    await save(a.id, { ...current, email: false });
+    const [prefsA] = await db.select().from(clientCommunicationPreferences).where(eq(clientCommunicationPreferences.clientId, a.id));
+    assert.equal(prefsA.emailConsent, false);
+    assert.equal(prefsA.emailStatus, "unsubscribed");
+    assert.equal((await acct.getPortalAuthorizations(db, a.id)).email.granted, false);
+  });
+  await ok("authorizations: malformed choices are rejected", async () => {
+    await assert.rejects(save(a.id, null), acct.PortalValidationError);
+    await assert.rejects(save(a.id, { ...allOff, email: "yes" }), acct.PortalValidationError);
+  });
+
   console.log(`\nisolation.test.ts: all ${passed} client-isolation checks passed.`);
 }
 

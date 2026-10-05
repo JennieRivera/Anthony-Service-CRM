@@ -10,6 +10,8 @@ import { ClientStatusBadge } from "@/components/clients/StatusBadge";
 import { ClientProfileTabs } from "@/components/clients/ClientProfileTabs";
 import { ClientDeleteButton } from "@/components/clients/ClientDeleteButton";
 import { PortalAccessCard } from "@/components/clients/PortalAccessCard";
+import { ClientAuthorizationsCard } from "@/components/clients/ClientAuthorizationsCard";
+import { getLatestConsents, listConsentEvents } from "@/lib/legal/texts";
 import { getDb } from "@/lib/db";
 import { getPortalAccessSummary } from "@/lib/portal/access";
 import type { PortalDb } from "@/lib/portal/db";
@@ -26,10 +28,13 @@ export default async function ClientProfilePage({
   const result = await getClientById(id);
   if (!result) notFound();
 
-  const [highlevelSync, highlevelPreview, portalAccess] = await Promise.all([
+  const portalDb = getDb() as unknown as PortalDb;
+  const [highlevelSync, highlevelPreview, portalAccess, latestConsents, consentHistory] = await Promise.all([
     getClientHighlevelSync(id),
     getHighLevelSyncPreview(id),
-    getPortalAccessSummary(getDb() as unknown as PortalDb, id),
+    getPortalAccessSummary(portalDb, id),
+    getLatestConsents(portalDb, id),
+    listConsentEvents(portalDb, id),
   ]);
 
   const {
@@ -71,6 +76,16 @@ export default async function ClientProfilePage({
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
         <div className="flex items-center gap-3">
+          {client.photoBlobUrl && (
+            // Private photo (added by the client in the portal), streamed
+            // by /api/clients/[id]/photo after a staff auth() check.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/api/clients/${client.id}/photo`}
+              alt={t("profilePhoto")}
+              className="size-14 rounded-full border border-border object-cover"
+            />
+          )}
           <h1 className="font-heading text-2xl text-foreground">
             {client.fullName}
           </h1>
@@ -91,6 +106,16 @@ export default async function ClientProfilePage({
             </p>
             <p className="text-foreground">
               {client.preferredLanguage === "en" ? "English" : "Español"}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("address")}</p>
+            <p className="whitespace-pre-line text-foreground">{client.address ?? "—"}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">{t("bestTimeToCall")}</p>
+            <p className="text-foreground">
+              {client.bestTimeToCall ? t(`bestTimes.${client.bestTimeToCall}`) : "—"}
             </p>
           </div>
           <div>
@@ -136,6 +161,8 @@ export default async function ClientProfilePage({
           lastLoginAt: portalAccess.lastLoginAt ? new Date(portalAccess.lastLoginAt).toISOString() : null,
         }}
       />
+
+      <ClientAuthorizationsCard latest={latestConsents} history={consentHistory} />
 
       <ClientProfileTabs
         clientId={client.id}

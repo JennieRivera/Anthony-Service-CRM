@@ -10,6 +10,19 @@ import {
 } from "@/lib/validation/communicationPreferences";
 import { logAuditEvent } from "@/lib/audit";
 import { requireAuthenticatedUser } from "@/lib/permissions";
+import { recordConsentEvent, type ConsentType } from "@/lib/legal/texts";
+import type { PortalDb } from "@/lib/portal/db";
+
+// The channel switches the client also controls in the portal ("My
+// authorizations"). A staff change is recorded in the same append-only
+// consent history, so both sides read one complete story.
+const PORTAL_SHARED_CONSENTS = [
+  ["phoneCallConsent", "phone_calls"],
+  ["whatsappConsent", "whatsapp"],
+  ["smsConsent", "sms"],
+  ["emailConsent", "email"],
+  ["marketingConsent", "marketing"],
+] as const satisfies readonly (readonly [string, ConsentType])[];
 
 export async function upsertCommunicationPreferencesAction(
   clientId: string,
@@ -30,6 +43,7 @@ export async function upsertCommunicationPreferencesAction(
     smsConsent: values.smsConsent ?? false,
     whatsappConsent: values.whatsappConsent ?? false,
     marketingConsent: values.marketingConsent ?? false,
+    phoneCallConsent: values.phoneCallConsent ?? false,
     partnerReferralConsent: values.partnerReferralConsent ?? false,
     consentDate: values.consentDate || null,
     consentSource: values.consentSource || null,
@@ -64,6 +78,7 @@ export async function upsertCommunicationPreferencesAction(
     existing.smsConsent !== detail.smsConsent ||
     existing.whatsappConsent !== detail.whatsappConsent ||
     existing.marketingConsent !== detail.marketingConsent ||
+    existing.phoneCallConsent !== detail.phoneCallConsent ||
     existing.partnerReferralConsent !== detail.partnerReferralConsent ||
     existing.optOutDate !== detail.optOutDate;
 
@@ -72,7 +87,21 @@ export async function upsertCommunicationPreferencesAction(
       action: "consent.updated",
       entityType: "client_communication_preferences",
       entityId: clientId,
-      summary: `Consent updated — email:${detail.emailConsent} sms:${detail.smsConsent} whatsapp:${detail.whatsappConsent} marketing:${detail.marketingConsent} partnerReferral:${detail.partnerReferralConsent}`,
+      summary: `Consent updated — phone:${detail.phoneCallConsent} email:${detail.emailConsent} sms:${detail.smsConsent} whatsapp:${detail.whatsappConsent} marketing:${detail.marketingConsent} partnerReferral:${detail.partnerReferralConsent}`,
+    });
+  }
+
+  for (const [column, consentType] of PORTAL_SHARED_CONSENTS) {
+    const before = existing?.[column] ?? false;
+    if (before === detail[column]) continue;
+    await recordConsentEvent(getDb() as unknown as PortalDb, {
+      clientId,
+      consentType,
+      granted: detail[column],
+      source: "staff",
+      textShown: "Changed by staff in the CRM (Communication Preferences)",
+      ipAddress: null,
+      userAgent: null,
     });
   }
 

@@ -486,7 +486,17 @@
       "academyIntentBanner": "Después de guardar, continuarás directamente a la inscripción en la Academia para esta persona."
     },
     "email": "Correo",
-    "phone": "Teléfono"
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "bestTimeToCall": "Mejor hora para llamar",
+    "bestTimeNotSet": "Sin indicar",
+    "bestTimes": {
+      "morning": "Mañana",
+      "midday": "Mediodía",
+      "afternoon": "Tarde",
+      "evening": "Noche"
+    },
+    "profilePhoto": "Foto de perfil"
   },
   "Cases": {
     "title": "Casos",
@@ -871,7 +881,9 @@
     "templateUsed": "Plantilla Usada",
     "save": "Guardar Preferencias",
     "saving": "Guardando...",
-    "saved": "Guardado."
+    "saved": "Guardado.",
+    "phoneCallConsent": "Llamadas",
+    "portalSyncNote": "Llamadas, correo, SMS, WhatsApp y marketing son las mismas casillas que el cliente ve en el portal (Mis autorizaciones). Cada cambio, del equipo o del cliente, queda en el historial de autorizaciones."
   },
   "MetaChannelStatus": {
     "not_connected": "No Conectado",
@@ -2032,7 +2044,9 @@
     "appointment_confirmation": "Confirmación de Cita",
     "appointment_reminder": "Recordatorio de Cita",
     "document_review": "Revisar Documento del Cliente",
-    "appointment_change_request": "Solicitud de Cambio de Cita"
+    "appointment_change_request": "Solicitud de Cambio de Cita",
+    "client_info_review": "Revisar Cambio de Datos del Cliente",
+    "service_interest": "El Cliente Pidió Información"
   },
   "Tasks": {
     "title": "Tareas",
@@ -3705,7 +3719,10 @@
       "home": "Inicio",
       "cases": "Mis casos",
       "appointments": "Mis citas",
-      "documents": "Documentos"
+      "documents": "Documentos",
+      "services": "Servicios",
+      "profile": "Mi perfil",
+      "authorizations": "Autorizaciones"
     },
     "questions": "¿Preguntas? Llámanos al {phone}.",
     "access": {
@@ -3807,6 +3824,130 @@
       "requestSent": "Recibimos tu solicitud. Te llamaremos para confirmarla.",
       "alreadyRequested": "Ya tenemos una solicitud para esta cita. Te llamaremos pronto.",
       "requestError": "No pudimos enviar tu solicitud. Inténtalo de nuevo o llámanos."
+    },
+    "privacyLink": "Aviso de Privacidad",
+    "profile": {
+      "title": "Mi perfil",
+      "intro": "Mantenga sus datos de contacto al día para que podamos comunicarnos con usted.",
+      "contactTitle": "Datos de contacto",
+      "fullName": "Nombre completo",
+      "fullNameHelp": "Para cambiar su nombre, llámenos.",
+      "phone": "Teléfono",
+      "email": "Correo (opcional)",
+      "address": "Dirección postal (opcional)",
+      "language": "Idioma preferido",
+      "bestTime": "Mejor hora para llamarle",
+      "bestTimeAny": "Cualquier hora",
+      "bestTimes": {
+        "morning": "Mañana",
+        "midday": "Mediodía",
+        "afternoon": "Tarde",
+        "evening": "Noche"
+      },
+      "reviewNote": "Nuestro equipo revisa cada cambio.",
+      "save": "Guardar cambios",
+      "saving": "Guardando…",
+      "saved": "Sus cambios se guardaron.",
+      "unchanged": "No hubo cambios.",
+      "errors": {
+        "phone": "Escriba un teléfono de EE. UU. de 10 dígitos.",
+        "email": "Escriba un correo válido.",
+        "address": "La dirección es muy larga o tiene caracteres no permitidos.",
+        "language": "Elija un idioma.",
+        "limit_reached": "Hizo muchos cambios hoy. Intente mañana o llámenos.",
+        "generic": "Algo salió mal. Intente de nuevo."
+      },
+      "photo": {
+        "title": "Foto de perfil (opcional)",
+        "alt": "Su foto de perfil",
+        "choose": "Agregar foto",
+        "change": "Cambiar foto",
+        "take": "Tomar foto",
+        "remove": "Quitar",
+        "rules": "JPG, PNG o WEBP, máximo 5 MB. Se recorta en cuadrado.",
+        "cropHelp": "Arrastre la foto para moverla y use la barra para acercar.",
+        "cropLabel": "Área para recortar la foto",
+        "zoom": "Acercar",
+        "cancel": "Cancelar",
+        "use": "Usar esta foto",
+        "saving": "Guardando…",
+        "errors": {
+          "size": "La foto pesa más de 5 MB.",
+          "type": "Use una foto JPG, PNG o WEBP.",
+          "generic": "No se pudo guardar la foto. Intente de nuevo."
+        }
+      }
+    },
+    "services": {
+      "title": "Servicios que me interesan",
+      "intro": "Marque los servicios sobre los que quiere información o escríbanos un comentario. Le llamaremos.",
+      "descriptions": {
+        "document_prep": "Preparación de documentos y cartas según sus instrucciones, incluida la apostilla.",
+        "tax_prep": "Preparación de impuestos personales y de negocio, y contabilidad.",
+        "company_registration": "Registro de LLC o corporación en Florida y trámites anuales.",
+        "credit_financing": "Orientación para mejorar su crédito y conocer opciones de financiamiento.",
+        "leadership": "Ayuda para organizar y hacer crecer su negocio.",
+        "notary": "Certificación de firmas por un Notary Public de Florida (no es asesoría legal).",
+        "bookkeeping": "Registro mensual de los ingresos y gastos de su negocio.",
+        "immigration": "Llenado de formularios de inmigración según sus instrucciones. No damos asesoría legal.",
+        "academy": "Cursos y capacitación.",
+        "marketing": "Marca, redes sociales, IA y automatización para su negocio.",
+        "sales_tax": "Registro y declaraciones de Sales Tax en Florida.",
+        "irs_administrative": "Solicitud de EIN o ITIN y otros trámites administrativos ante el IRS.",
+        "insurance_compliance": "Seguros y requisitos de cumplimiento para su negocio."
+      },
+      "onYourList": "Ya en su lista",
+      "bookThis": "Pedir cita para este servicio",
+      "commentLabel": "Comentario (opcional)",
+      "commentPlaceholder": "Por ejemplo: Necesito abrir una LLC",
+      "note": "Esto solo nos envía su solicitud: no abre un caso ni genera ningún cobro.",
+      "send": "Enviar solicitud",
+      "sending": "Enviando…",
+      "sent": "¡Gracias! Recibimos su solicitud y le llamaremos.",
+      "errors": {
+        "empty": "Marque al menos un servicio o escriba un comentario.",
+        "limit": "Ya envió varias solicitudes hoy. Por favor, llámenos.",
+        "generic": "Algo salió mal. Intente de nuevo."
+      }
+    },
+    "authorizations": {
+      "title": "Mis autorizaciones",
+      "intro": "Elija cómo podemos comunicarnos con usted. Puede cambiarlo cuando quiera.",
+      "items": {
+        "phone_calls": {
+          "label": "Acepto que me llamen por teléfono."
+        },
+        "whatsapp": {
+          "label": "Acepto recibir mensajes por WhatsApp."
+        },
+        "sms": {
+          "label": "Acepto recibir mensajes de texto (SMS)."
+        },
+        "email": {
+          "label": "Acepto recibir correos (email)."
+        },
+        "marketing": {
+          "label": "Acepto recibir promociones y marketing.",
+          "help": "Aparte de los mensajes sobre su caso y sus citas."
+        },
+        "privacy_notice": {
+          "label": "He leído y acepto el Aviso de Privacidad.",
+          "labelWithLink": "He leído y acepto el <link>Aviso de Privacidad</link>."
+        }
+      },
+      "signedAs": "Firmado como: {name}",
+      "lastChanged": "Último cambio: {date}, {time}",
+      "signatureLabel": "Escriba su nombre completo como firma",
+      "signatureHelp": "Su nombre escrito sirve como firma simple para esta autorización.",
+      "note": "Cada cambio se guarda con la fecha, la hora y la dirección IP.",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "saved": "Sus autorizaciones se guardaron.",
+      "errors": {
+        "signature": "Escriba su nombre completo para firmar la autorización de documentos.",
+        "limit": "Demasiados cambios hoy. Intente mañana.",
+        "generic": "Algo salió mal. Intente de nuevo."
+      }
     }
   },
   "PortalAccess": {
@@ -3852,7 +3993,7 @@
     "keys": {
       "not_a_law_firm": {
         "title": "Aviso: \"No somos abogados\"",
-        "help": "Pie de página de /book y del portal, página de inicio del portal, y destacado en /book para Inmigración y Notary Public."
+        "help": "Pie de página de /book, del portal y del Aviso de Privacidad, y destacado en /book para Inmigración y Notary Public."
       },
       "not_a_law_firm_ack": {
         "title": "Casilla obligatoria",
@@ -3861,6 +4002,14 @@
       "florida_notary_disclosure": {
         "title": "Aviso de Notary Public de Florida (sección 117.05(10))",
         "help": "Texto exigido por la sección 117.05(10) de Florida. El texto en español debe ser revisado por un abogado. Se muestra una vez por página, en inglés y en español juntos, en el pie de /book y del portal, con el mismo tamaño que el texto del pie (nunca más pequeño)."
+      },
+      "document_processing_authorization": {
+        "title": "Autorización de documentos (portal)",
+        "help": "La casilla \"Autorizo a Anthony Multiservice a revisar y procesar mis documentos\" en Mis autorizaciones del portal. El cliente también escribe su nombre como firma simple."
+      },
+      "privacy_notice": {
+        "title": "Aviso de Privacidad",
+        "help": "Página pública /privacy (con link desde el portal). El texto original es solo un BORRADOR: un abogado debe revisarlo antes de usarlo. Las líneas que empiezan con \"## \" son títulos, las que empiezan con \"- \" son listas, y una línea en blanco empieza un párrafo nuevo."
       }
     },
     "pendingAttorneyReview": "Traducción — pendiente de revisión de un abogado",
@@ -3870,6 +4019,39 @@
     "portalUpload": "Documento subido por el cliente: ",
     "portalUploadSensitive": "Documento del cliente (puede contener datos sensibles): ",
     "portalCancelRequest": "El cliente pidió cancelar: ",
-    "portalRescheduleRequest": "El cliente pidió cambiar la cita: "
+    "portalRescheduleRequest": "El cliente pidió cambiar la cita: ",
+    "portalInfoChangePhone": "Revisar cambio de datos del cliente (cambió el teléfono — verificar antes de un nuevo link del portal): ",
+    "portalInfoChange": "Revisar cambio de datos del cliente: ",
+    "portalServiceInterest": "El cliente pidió información sobre: "
+  },
+  "Privacy": {
+    "metaTitle": "Aviso de Privacidad | Anthony Multiservice",
+    "title": "Aviso de Privacidad"
+  },
+  "ClientAuthorizations": {
+    "title": "Autorizaciones",
+    "description": "Lo que el cliente aceptó o quitó (portal, reserva en línea o equipo), con fecha e IP.",
+    "types": {
+      "not_a_law_firm": "Entiende que no somos abogados",
+      "phone_calls": "Llamadas",
+      "whatsapp": "WhatsApp",
+      "sms": "Mensajes de texto (SMS)",
+      "email": "Correo",
+      "marketing": "Promociones / marketing",
+      "document_processing": "Revisar y procesar documentos",
+      "privacy_notice": "Aceptó el Aviso de Privacidad"
+    },
+    "grantedOn": "Aceptado {date} · {source}",
+    "withdrawnOn": "Quitado {date} · {source}",
+    "never": "Sin registro",
+    "signature": "Firma: {name}",
+    "history": "Historial completo ({count})",
+    "granted": "aceptado",
+    "withdrawn": "quitado",
+    "sources": {
+      "portal": "Portal del cliente",
+      "online_booking": "Reserva en línea",
+      "staff": "Equipo (CRM)"
+    }
   }
 }

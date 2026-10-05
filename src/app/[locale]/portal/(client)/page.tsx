@@ -1,8 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { CalendarPlus, ChevronRight, Scale, Upload } from "lucide-react";
+import { CalendarPlus, ChevronRight, Upload } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { getLegalTexts, pickLocale } from "@/lib/legal/texts";
 import { requirePortalPage } from "@/lib/portal/page";
 import { getPortalClient, listPortalAppointments, listPortalCases } from "@/lib/portal/queries";
 import { formatPortalDate, formatPortalTime, isActiveCaseStatus } from "@/lib/portal/display";
@@ -14,11 +13,10 @@ export default async function PortalHomePage({ params }: { params: Promise<{ loc
   const ctx = await requirePortalPage(locale);
   if (!ctx) return null;
 
-  const [client, cases, appointments, texts] = await Promise.all([
+  const [client, cases, appointments] = await Promise.all([
     getPortalClient(ctx.db, ctx.clientId),
     listPortalCases(ctx.db, ctx.clientId),
     listPortalAppointments(ctx.db, ctx.clientId),
-    getLegalTexts(ctx.db),
   ]);
   const t = await getTranslations("Portal");
   const tService = await getTranslations("PublicServiceType");
@@ -95,11 +93,8 @@ export default async function PortalHomePage({ params }: { params: Promise<{ loc
           {t("home.allAppointments")}
         </Link>
       </section>
-
-      <p className="flex items-start gap-2 rounded-xl border border-border bg-card p-4 text-sm text-foreground">
-        <Scale className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
-        <span>{pickLocale(texts.not_a_law_firm, locale)}</span>
-      </p>
+      {/* The "not a law firm" notice is in the footer of every portal page
+          (LegalFooter) — shown once, not repeated here. */}
     </div>
   );
 }

@@ -7,8 +7,15 @@ export const LEGAL_TEXT_KEYS = [
   "not_a_law_firm",
   "not_a_law_firm_ack",
   "florida_notary_disclosure",
+  "document_processing_authorization",
+  "privacy_notice",
 ] as const;
 export type LegalTextKey = (typeof LEGAL_TEXT_KEYS)[number];
+
+// Long texts get a bigger editor and a higher length limit.
+export const LONG_LEGAL_TEXT_KEYS: readonly LegalTextKey[] = ["privacy_notice"];
+export const legalTextMaxLength = (key: LegalTextKey) =>
+  LONG_LEGAL_TEXT_KEYS.includes(key) ? 20000 : 4000;
 
 export type LegalText = { en: string; es: string };
 
@@ -30,6 +37,73 @@ export const DEFAULT_LEGAL_TEXTS: Record<LegalTextKey, LegalText> = {
   florida_notary_disclosure: {
     en: "I AM NOT AN ATTORNEY LICENSED TO PRACTICE LAW IN THE STATE OF FLORIDA, AND I MAY NOT GIVE LEGAL ADVICE OR ACCEPT FEES FOR LEGAL ADVICE.",
     es: "NO SOY ABOGADO CON LICENCIA PARA EJERCER LA ABOGACÍA EN EL ESTADO DE FLORIDA, Y NO PUEDO DAR ASESORÍA LEGAL NI ACEPTAR HONORARIOS POR ASESORÍA LEGAL.",
+  },
+  // Client portal → My authorizations. The client also types their name
+  // as a simple signature; both are stored with the consent event.
+  document_processing_authorization: {
+    en: "I authorize Anthony Multiservice to review and process the documents I provide, only for the services I request.",
+    es: "Autorizo a Anthony Multiservice a revisar y procesar los documentos que yo entregue, solo para los servicios que yo solicite.",
+  },
+  // DRAFT ONLY (Step 2B, 2026-10-05) — a starting point written in plain
+  // language, NOT reviewed by an attorney. Shown at /privacy. Lines
+  // starting with "## " render as headings; blank lines split paragraphs.
+  privacy_notice: {
+    en: `This privacy notice explains what information Anthony Multiservice, LLC ("we") collects from clients and visitors, how we use it, and the choices you have. This is a draft pending review by an attorney.
+
+## Information we collect
+- Contact details you give us: name, phone, email, mailing address, preferred language and best time to call.
+- Information and documents you provide for the services you request (for example tax, company-registration or immigration forms), which may include identification numbers.
+- Records of your appointments, requests and authorizations, including the date, time and IP address of each authorization.
+- An optional profile photo, if you add one in the client portal.
+
+## How we use your information
+- To provide the services you request, at your direction.
+- To contact you about your case and your appointments, using only the channels you have authorized (phone, WhatsApp, text messages, email).
+- To send promotions only if you have accepted marketing messages. You can withdraw that at any time.
+- To meet our legal and record-keeping obligations.
+
+## How we protect your information
+Your documents are stored in private storage and are only available to our staff and, through the client portal, to you. We do not sell your personal information.
+
+## Sharing
+We share information only when it is needed to provide the service you requested (for example, submitting a form to a government agency at your direction), when you authorize it, or when the law requires it.
+
+## Your choices
+In the client portal ("My authorizations") you can accept or withdraw your contact and marketing preferences at any time, and update your contact details ("My profile"). You can also call us to ask about the information we keep about you.
+
+## Not a law firm
+Anthony Multiservice is not a law firm and does not provide legal advice.
+
+## Contact
+Questions about this notice: call us at (689) 342-6309.`,
+    es: `Este aviso de privacidad explica qué información recopila Anthony Multiservice, LLC ("nosotros") de sus clientes y visitantes, cómo la usamos y qué opciones tiene usted. Es un borrador pendiente de revisión por un abogado.
+
+## Información que recopilamos
+- Datos de contacto que usted nos da: nombre, teléfono, correo, dirección postal, idioma preferido y mejor hora para llamarle.
+- Información y documentos que usted entrega para los servicios que solicita (por ejemplo, formularios de impuestos, de registro de compañía o de inmigración), que pueden incluir números de identificación.
+- Registros de sus citas, solicitudes y autorizaciones, incluidas la fecha, la hora y la dirección IP de cada autorización.
+- Una foto de perfil opcional, si usted la agrega en el portal del cliente.
+
+## Cómo usamos su información
+- Para prestar los servicios que usted solicita, según sus instrucciones.
+- Para comunicarnos con usted sobre su caso y sus citas, solo por los medios que usted haya autorizado (teléfono, WhatsApp, mensajes de texto, correo).
+- Para enviarle promociones solo si usted aceptó recibir mensajes de marketing. Puede quitar ese permiso cuando quiera.
+- Para cumplir nuestras obligaciones legales y de registro.
+
+## Cómo protegemos su información
+Sus documentos se guardan en un almacenamiento privado y solo los pueden ver nuestro personal y, a través del portal del cliente, usted. No vendemos su información personal.
+
+## Con quién la compartimos
+Compartimos información solo cuando es necesario para prestar el servicio que usted pidió (por ejemplo, presentar un formulario ante una agencia del gobierno según sus instrucciones), cuando usted lo autoriza o cuando la ley lo exige.
+
+## Sus opciones
+En el portal del cliente ("Mis autorizaciones") puede aceptar o quitar en cualquier momento sus preferencias de contacto y de marketing, y actualizar sus datos de contacto ("Mi perfil"). También puede llamarnos para preguntar qué información guardamos sobre usted.
+
+## No somos una firma de abogados
+Anthony Multiservice no es una firma de abogados y no da asesoría legal.
+
+## Contacto
+Preguntas sobre este aviso: llámenos al (689) 342-6309.`,
   },
 };
 

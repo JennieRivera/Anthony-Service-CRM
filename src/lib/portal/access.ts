@@ -19,6 +19,7 @@ import {
   hashPortalToken,
   isWellFormedPortalToken,
   lastFourDigits,
+  phoneLast4Hash,
   safeEqual,
 } from "./tokens";
 
@@ -46,8 +47,10 @@ export async function createPortalAccessLink(
     .where(eq(clients.id, params.clientId))
     .limit(1);
   if (!client) throw new PortalAccessError("Client not found");
-  // The link is confirmed with the last 4 digits of this phone.
-  if (!lastFourDigits(client.phone)) throw new PortalAccessError("Client has no phone number");
+  // The link is confirmed with the last 4 digits of this phone — frozen
+  // into the link now, so a later phone change can't alter it.
+  const lastFour = lastFourDigits(client.phone);
+  if (!lastFour) throw new PortalAccessError("Client has no phone number");
 
   await db
     .update(portalAccessLinks)
@@ -68,6 +71,7 @@ export async function createPortalAccessLink(
     expiresAt,
     createdAt: now,
     createdByEmail: params.createdByEmail,
+    phoneLast4Hash: phoneLast4Hash(params.clientId, lastFour),
   });
   return { token, expiresAt };
 }
@@ -131,6 +135,7 @@ export async function redeemPortalAccessLink(
       usedAt: portalAccessLinks.usedAt,
       revokedAt: portalAccessLinks.revokedAt,
       failedAttempts: portalAccessLinks.failedAttempts,
+      phoneLast4Hash: portalAccessLinks.phoneLast4Hash,
       phone: clients.phone,
     })
     .from(portalAccessLinks)
@@ -141,8 +146,14 @@ export async function redeemPortalAccessLink(
   if (!link || link.usedAt || link.revokedAt || link.expiresAt <= now) return fail();
   if (link.failedAttempts >= PORTAL_MAX_LINK_ATTEMPTS) return fail("locked");
 
-  const expected = lastFourDigits(link.phone);
-  if (!expected || lastFour.length !== 4 || !safeEqual(lastFour, expected)) {
+  // Links from before Step 2B have no stored hash: use the current phone.
+  const legacyExpected = lastFourDigits(link.phone);
+  const matches =
+    lastFour.length === 4 &&
+    (link.phoneLast4Hash
+      ? safeEqual(phoneLast4Hash(link.clientId, lastFour), link.phoneLast4Hash)
+      : legacyExpected !== null && safeEqual(lastFour, legacyExpected));
+  if (!matches) {
     const [updated] = await db
       .update(portalAccessLinks)
       .set({ failedAttempts: sql`${portalAccessLinks.failedAttempts} + 1` })

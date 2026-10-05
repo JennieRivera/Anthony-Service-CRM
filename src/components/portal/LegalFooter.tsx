@@ -1,4 +1,5 @@
 import { Phone, Scale } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { businessInfo } from "@/lib/business-info";
 import { bothLanguages, type LegalText } from "@/lib/legal/keys";
 
@@ -11,10 +12,14 @@ export function LegalFooter({
   notALawFirm,
   floridaNotaryDisclosure,
   questionsLabel,
+  privacyLabel,
 }: {
   notALawFirm: string;
   floridaNotaryDisclosure: LegalText;
   questionsLabel: string;
+  // The portal and the privacy page link the Privacy Notice (/book's
+  // footer is left as it is).
+  privacyLabel?: string;
 }) {
   const disclosure = bothLanguages(floridaNotaryDisclosure);
   return (
@@ -38,6 +43,11 @@ export function LegalFooter({
           <Phone className="size-4" aria-hidden />
           {questionsLabel}
         </a>
+        {privacyLabel && (
+          <Link href="/privacy" className="underline">
+            {privacyLabel}
+          </Link>
+        )}
       </div>
     </footer>
   );

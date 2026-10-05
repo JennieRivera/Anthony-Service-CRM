@@ -7,13 +7,16 @@ import { getDb } from "@/lib/db";
 import { legalTexts } from "@/lib/db/schema";
 import { logAuditEvent } from "@/lib/audit";
 import { requireAccessArea } from "@/lib/permissions";
-import { LEGAL_TEXT_KEYS } from "@/lib/legal/texts";
+import { LEGAL_TEXT_KEYS, legalTextMaxLength } from "@/lib/legal/texts";
 
 const legalTextsFormSchema = z.object(
   Object.fromEntries(
     LEGAL_TEXT_KEYS.map((key) => [
       key,
-      z.object({ en: z.string().trim().max(4000), es: z.string().trim().max(4000) }),
+      z.object({
+        en: z.string().trim().max(legalTextMaxLength(key)),
+        es: z.string().trim().max(legalTextMaxLength(key)),
+      }),
     ]),
   ) as Record<(typeof LEGAL_TEXT_KEYS)[number], z.ZodObject<{ en: z.ZodString; es: z.ZodString }>>,
 );
@@ -53,4 +56,5 @@ export async function saveLegalTextsAction(rawValues: LegalTextsFormValues) {
   revalidatePath("/settings/legal-texts");
   revalidatePath("/book");
   revalidatePath("/portal");
+  revalidatePath("/privacy");
 }

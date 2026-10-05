@@ -38,7 +38,7 @@ export default async function PortalClientLayout({
 
   return (
     <>
-      <PortalHeader signedIn firstName={firstName} />
+      <PortalHeader signedIn firstName={firstName} hasPhoto={client!.hasPhoto} />
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-6">
         {acknowledged ? (
           children
@@ -53,6 +53,7 @@ export default async function PortalClientLayout({
         notALawFirm={pickLocale(texts.not_a_law_firm, locale)}
         floridaNotaryDisclosure={texts.florida_notary_disclosure}
         questionsLabel={t("questions", { phone: businessInfo.phone })}
+        privacyLabel={t("privacyLink")}
       />
     </>
   );

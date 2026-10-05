@@ -55,6 +55,7 @@ export function CommunicationPreferencesPanel({
       smsConsent: preferences?.smsConsent ?? false,
       whatsappConsent: preferences?.whatsappConsent ?? false,
       marketingConsent: preferences?.marketingConsent ?? false,
+      phoneCallConsent: preferences?.phoneCallConsent ?? false,
       partnerReferralConsent: preferences?.partnerReferralConsent ?? false,
       consentDate: preferences?.consentDate ?? "",
       consentSource: preferences?.consentSource ?? "",
@@ -173,6 +174,19 @@ export function CommunicationPreferencesPanel({
             <label className="flex items-center gap-2 text-sm">
               <Controller
                 control={control}
+                name="phoneCallConsent"
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              {t("phoneCallConsent")}
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <Controller
+                control={control}
                 name="emailConsent"
                 render={({ field }) => (
                   <Checkbox
@@ -236,6 +250,7 @@ export function CommunicationPreferencesPanel({
               {t("partnerReferralConsent")}
             </label>
           </div>
+          <p className="text-xs text-muted-foreground">{t("portalSyncNote")}</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

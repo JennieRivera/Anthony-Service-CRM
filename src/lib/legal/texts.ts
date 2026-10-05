@@ -22,7 +22,20 @@ export async function getLegalTexts(db: PortalDb): Promise<LegalTexts> {
 
 // ── consent / acknowledgment evidence ────────────────────────────────
 
-export const CONSENT_TYPES = ["not_a_law_firm"] as const;
+// not_a_law_firm: the mandatory acknowledgment (2A). The rest are the
+// portal's "My authorizations" page (2B); the five channel ones mirror the
+// switches in client_communication_preferences — see
+// src/lib/portal/authorizations.ts.
+export const CONSENT_TYPES = [
+  "not_a_law_firm",
+  "phone_calls",
+  "whatsapp",
+  "sms",
+  "email",
+  "marketing",
+  "document_processing",
+  "privacy_notice",
+] as const;
 export type ConsentType = (typeof CONSENT_TYPES)[number];
 
 export async function recordConsentEvent(
@@ -32,10 +45,12 @@ export async function recordConsentEvent(
     appointmentId?: string | null;
     consentType: ConsentType;
     granted: boolean;
-    source: "portal" | "online_booking";
+    source: "portal" | "online_booking" | "staff";
     textShown: string;
     ipAddress: string | null;
     userAgent: string | null;
+    signatureName?: string | null;
+    now?: Date;
   },
 ) {
   const [client] = await db
@@ -53,6 +68,8 @@ export async function recordConsentEvent(
     textShown: params.textShown,
     ipAddress: params.ipAddress?.slice(0, 64) ?? null,
     userAgent: params.userAgent?.slice(0, 400) ?? null,
+    signatureName: params.signatureName?.slice(0, 200) ?? null,
+    ...(params.now ? { createdAt: params.now } : {}),
   });
 }
 
@@ -65,4 +82,53 @@ export async function hasGrantedConsent(db: PortalDb, clientId: string, consentT
     .orderBy(desc(clientConsentEvents.createdAt))
     .limit(1);
   return latest?.granted === true;
+}
+
+export type LatestConsent = {
+  granted: boolean;
+  createdAt: Date;
+  source: "portal" | "online_booking" | "staff";
+  signatureName: string | null;
+};
+
+// Latest event per consent type for one client (types never recorded are
+// simply absent).
+export async function getLatestConsents(
+  db: PortalDb,
+  clientId: string,
+): Promise<Partial<Record<ConsentType, LatestConsent>>> {
+  const rows = await db
+    .selectDistinctOn([clientConsentEvents.consentType], {
+      consentType: clientConsentEvents.consentType,
+      granted: clientConsentEvents.granted,
+      createdAt: clientConsentEvents.createdAt,
+      source: clientConsentEvents.source,
+      signatureName: clientConsentEvents.signatureName,
+    })
+    .from(clientConsentEvents)
+    .where(eq(clientConsentEvents.clientId, clientId))
+    .orderBy(clientConsentEvents.consentType, desc(clientConsentEvents.createdAt));
+  const out: Partial<Record<ConsentType, LatestConsent>> = {};
+  for (const { consentType, ...rest } of rows) {
+    if ((CONSENT_TYPES as readonly string[]).includes(consentType)) out[consentType as ConsentType] = rest;
+  }
+  return out;
+}
+
+// Full history (newest first) for the staff view on the client record.
+export async function listConsentEvents(db: PortalDb, clientId: string, limit = 50) {
+  return db
+    .select({
+      id: clientConsentEvents.id,
+      createdAt: clientConsentEvents.createdAt,
+      consentType: clientConsentEvents.consentType,
+      granted: clientConsentEvents.granted,
+      source: clientConsentEvents.source,
+      ipAddress: clientConsentEvents.ipAddress,
+      signatureName: clientConsentEvents.signatureName,
+    })
+    .from(clientConsentEvents)
+    .where(eq(clientConsentEvents.clientId, clientId))
+    .orderBy(desc(clientConsentEvents.createdAt))
+    .limit(limit);
 }

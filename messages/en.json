@@ -486,7 +486,17 @@
       "academyIntentBanner": "After saving, you'll continue directly to Academy enrollment for this person."
     },
     "email": "Email",
-    "phone": "Phone"
+    "phone": "Phone",
+    "address": "Address",
+    "bestTimeToCall": "Best time to call",
+    "bestTimeNotSet": "Not set",
+    "bestTimes": {
+      "morning": "Morning",
+      "midday": "Midday",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "profilePhoto": "Profile photo"
   },
   "Cases": {
     "title": "Cases",
@@ -871,7 +881,9 @@
     "templateUsed": "Template Used",
     "save": "Save Preferences",
     "saving": "Saving...",
-    "saved": "Saved."
+    "saved": "Saved.",
+    "phoneCallConsent": "Phone calls",
+    "portalSyncNote": "Phone calls, email, SMS, WhatsApp and marketing are the same switches the client sees in the portal (My authorizations). Every change, by staff or by the client, is kept in the authorization history."
   },
   "MetaChannelStatus": {
     "not_connected": "Not Connected",
@@ -2032,7 +2044,9 @@
     "appointment_confirmation": "Appointment Confirmation",
     "appointment_reminder": "Appointment Reminder",
     "document_review": "Review Client Document",
-    "appointment_change_request": "Appointment Change Request"
+    "appointment_change_request": "Appointment Change Request",
+    "client_info_review": "Review Client Info Change",
+    "service_interest": "Client Asked About Services"
   },
   "Tasks": {
     "title": "Tasks",
@@ -3705,7 +3719,10 @@
       "home": "Home",
       "cases": "My cases",
       "appointments": "My appointments",
-      "documents": "Documents"
+      "documents": "Documents",
+      "services": "Services",
+      "profile": "My profile",
+      "authorizations": "Authorizations"
     },
     "questions": "Questions? Call us at {phone}.",
     "access": {
@@ -3807,6 +3824,130 @@
       "requestSent": "We received your request. We'll call you to confirm.",
       "alreadyRequested": "We already have a request for this appointment. We'll call you soon.",
       "requestError": "We couldn't send your request. Please try again or call us."
+    },
+    "privacyLink": "Privacy Notice",
+    "profile": {
+      "title": "My profile",
+      "intro": "Keep your contact details up to date so we can reach you.",
+      "contactTitle": "Contact details",
+      "fullName": "Full name",
+      "fullNameHelp": "To change your name, please call us.",
+      "phone": "Phone",
+      "email": "Email (optional)",
+      "address": "Mailing address (optional)",
+      "language": "Preferred language",
+      "bestTime": "Best time to call",
+      "bestTimeAny": "Any time",
+      "bestTimes": {
+        "morning": "Morning",
+        "midday": "Midday",
+        "afternoon": "Afternoon",
+        "evening": "Evening"
+      },
+      "reviewNote": "Our team will review every change.",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "saved": "Your changes were saved.",
+      "unchanged": "Nothing changed.",
+      "errors": {
+        "phone": "Enter a 10-digit US phone number.",
+        "email": "Enter a valid email.",
+        "address": "The address is too long or has characters that aren't allowed.",
+        "language": "Choose a language.",
+        "limit_reached": "You've made many changes today. Please try again tomorrow or call us.",
+        "generic": "Something went wrong. Please try again."
+      },
+      "photo": {
+        "title": "Profile photo (optional)",
+        "alt": "Your profile photo",
+        "choose": "Add photo",
+        "change": "Change photo",
+        "take": "Take photo",
+        "remove": "Remove",
+        "rules": "JPG, PNG or WEBP, up to 5 MB. It will be cropped to a square.",
+        "cropHelp": "Drag the photo to move it, and use the slider to zoom.",
+        "cropLabel": "Photo crop area",
+        "zoom": "Zoom",
+        "cancel": "Cancel",
+        "use": "Use this photo",
+        "saving": "Saving…",
+        "errors": {
+          "size": "The photo is larger than 5 MB.",
+          "type": "Use a JPG, PNG or WEBP photo.",
+          "generic": "The photo couldn't be saved. Please try again."
+        }
+      }
+    },
+    "services": {
+      "title": "Services that interest me",
+      "intro": "Mark the services you'd like information about, or write us a comment. We'll call you.",
+      "descriptions": {
+        "document_prep": "Preparing documents and letters at your direction, including apostilles.",
+        "tax_prep": "Personal and business tax preparation, and accounting.",
+        "company_registration": "Registering an LLC or corporation in Florida, and annual filings.",
+        "credit_financing": "Guidance to improve your credit and explore financing options.",
+        "leadership": "Help organizing and growing your business.",
+        "notary": "Signature certification by a Florida Notary Public (not legal advice).",
+        "bookkeeping": "Monthly record of your business income and expenses.",
+        "immigration": "Filling out immigration forms at your direction. We do not give legal advice.",
+        "academy": "Courses and training.",
+        "marketing": "Branding, social media, AI and automation for your business.",
+        "sales_tax": "Florida sales tax registration and filings.",
+        "irs_administrative": "EIN or ITIN applications and other administrative IRS paperwork.",
+        "insurance_compliance": "Insurance and compliance requirements for your business."
+      },
+      "onYourList": "On your list",
+      "bookThis": "Book an appointment for this service",
+      "commentLabel": "Comment (optional)",
+      "commentPlaceholder": "For example: I need to open an LLC",
+      "note": "This only sends us your request — it doesn't open a case or create any charge.",
+      "send": "Send request",
+      "sending": "Sending…",
+      "sent": "Thank you! We received your request and will call you.",
+      "errors": {
+        "empty": "Mark at least one service or write a comment.",
+        "limit": "You've sent several requests today. Please call us.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "authorizations": {
+      "title": "My authorizations",
+      "intro": "Choose how we may contact you. You can change these at any time.",
+      "items": {
+        "phone_calls": {
+          "label": "I agree to receive phone calls."
+        },
+        "whatsapp": {
+          "label": "I agree to receive WhatsApp messages."
+        },
+        "sms": {
+          "label": "I agree to receive text messages (SMS)."
+        },
+        "email": {
+          "label": "I agree to receive emails."
+        },
+        "marketing": {
+          "label": "I agree to receive promotions and marketing.",
+          "help": "Separate from messages about your case and appointments."
+        },
+        "privacy_notice": {
+          "label": "I have read and accept the Privacy Notice.",
+          "labelWithLink": "I have read and accept the <link>Privacy Notice</link>."
+        }
+      },
+      "signedAs": "Signed as: {name}",
+      "lastChanged": "Last changed {date} at {time}",
+      "signatureLabel": "Type your full name as your signature",
+      "signatureHelp": "Your typed name works as a simple signature for this authorization.",
+      "note": "Each change is saved with the date, time and IP address.",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Your authorizations were saved.",
+      "errors": {
+        "signature": "Type your full name to sign the document authorization.",
+        "limit": "Too many changes today. Please try again tomorrow.",
+        "generic": "Something went wrong. Please try again."
+      }
     }
   },
   "PortalAccess": {
@@ -3852,7 +3993,7 @@
     "keys": {
       "not_a_law_firm": {
         "title": "Notice: \"We are not attorneys\"",
-        "help": "Footer of /book and of the client portal, the portal home page, and highlighted on /book for Immigration and Notary Public services."
+        "help": "Footer of /book, of the client portal and of the Privacy Notice, and highlighted on /book for Immigration and Notary Public services."
       },
       "not_a_law_firm_ack": {
         "title": "Mandatory acknowledgment",
@@ -3861,6 +4002,14 @@
       "florida_notary_disclosure": {
         "title": "Florida Notary Public disclosure (section 117.05(10))",
         "help": "Text required by Florida Statutes section 117.05(10). The Spanish text must be reviewed by an attorney. Shown once per page, in English and Spanish together, in the footer of /book and the portal, at the same size as the footer text (never smaller)."
+      },
+      "document_processing_authorization": {
+        "title": "Document authorization (portal)",
+        "help": "The \"I authorize Anthony Multiservice to review and process my documents\" box in the portal's My authorizations. The client also types their name as a simple signature."
+      },
+      "privacy_notice": {
+        "title": "Privacy Notice",
+        "help": "Public page /privacy (linked from the portal). The default is only a DRAFT: it must be reviewed by an attorney before use. Lines starting with \"## \" are headings, lines starting with \"- \" are lists, and a blank line starts a new paragraph."
       }
     },
     "pendingAttorneyReview": "Translation — pending attorney review",
@@ -3870,6 +4019,39 @@
     "portalUpload": "Client upload: ",
     "portalUploadSensitive": "Client upload (may contain sensitive data): ",
     "portalCancelRequest": "Client requested cancellation: ",
-    "portalRescheduleRequest": "Client requested reschedule: "
+    "portalRescheduleRequest": "Client requested reschedule: ",
+    "portalInfoChangePhone": "Review client info change (phone changed — verify before a new portal link): ",
+    "portalInfoChange": "Review client info change: ",
+    "portalServiceInterest": "Client requested information about: "
+  },
+  "Privacy": {
+    "metaTitle": "Privacy Notice | Anthony Multiservice",
+    "title": "Privacy Notice"
+  },
+  "ClientAuthorizations": {
+    "title": "Authorizations",
+    "description": "What the client accepted or withdrew (portal, online booking or staff), with date and IP.",
+    "types": {
+      "not_a_law_firm": "Understands we are not a law firm",
+      "phone_calls": "Phone calls",
+      "whatsapp": "WhatsApp",
+      "sms": "Text messages (SMS)",
+      "email": "Email",
+      "marketing": "Promotions / marketing",
+      "document_processing": "Review and process documents",
+      "privacy_notice": "Privacy Notice accepted"
+    },
+    "grantedOn": "Accepted {date} · {source}",
+    "withdrawnOn": "Withdrawn {date} · {source}",
+    "never": "Not recorded",
+    "signature": "Signature: {name}",
+    "history": "Full history ({count})",
+    "granted": "accepted",
+    "withdrawn": "withdrawn",
+    "sources": {
+      "portal": "Client portal",
+      "online_booking": "Online booking",
+      "staff": "Staff (CRM)"
+    }
   }
 }

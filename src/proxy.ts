@@ -9,7 +9,8 @@ const handleI18nRouting = createMiddleware(routing);
 // The ONLY routes reachable without signing in: the login page, and the
 // public online-booking page (/book, plus the bare locale-less /book so
 // next-intl can redirect it to /en/book or /es/book). Exact match for
-// /book — no sub-paths. Its data comes from /api/public/booking/*.
+// /book — no sub-paths. Its data comes from /api/public/booking/*. Also
+// the public Privacy Notice (/privacy, same exact-match rule).
 // The client portal (/en/portal, /es/portal and sub-routes) is NOT a
 // staff route: it has its own session (cookie PORTAL_SESSION_COOKIE,
 // never Auth.js), enforced by every portal page and /api/portal route.
@@ -19,6 +20,8 @@ const isPortalAccessPath = (pathname: string) => /^\/(en|es)\/portal\/access\/?$
 const isPublicPath = (pathname: string) =>
   /^\/(en|es)\/login(\/.*)?$/.test(pathname) ||
   /^(\/(en|es))?\/book\/?$/.test(pathname) ||
+  // The public Privacy Notice — exact match, no sub-paths (Step 2B).
+  /^(\/(en|es))?\/privacy\/?$/.test(pathname) ||
   isPortalPath(pathname);
 
 export default auth((req) => {

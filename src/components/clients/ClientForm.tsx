@@ -111,6 +111,8 @@ export function ClientForm({
       notes: client?.notes ?? "",
       companyId: client?.companyId ?? "",
       folderNumber: client?.folderNumber ?? "",
+      address: client?.address ?? "",
+      bestTimeToCall: client?.bestTimeToCall ?? "",
     },
   });
 
@@ -276,6 +278,37 @@ export function ClientForm({
             id="folderNumber"
             placeholder={t("folderNumberPlaceholder")}
             {...register("folderNumber")}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="address">{t("address")}</Label>
+          <Input id="address" maxLength={300} {...register("address")} />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label>{t("bestTimeToCall")}</Label>
+          <Controller
+            control={control}
+            name="bestTimeToCall"
+            render={({ field }) => (
+              <Select
+                value={field.value || "none"}
+                onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("bestTimeNotSet")}</SelectItem>
+                  {(["morning", "midday", "afternoon", "evening"] as const).map((v) => (
+                    <SelectItem key={v} value={v}>
+                      {t(`bestTimes.${v}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
         </div>
 

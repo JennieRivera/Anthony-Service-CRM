@@ -91,6 +91,10 @@ const PORTAL_PREFIXES = {
   "Client upload: ": "portalUpload",
   "Client requested cancellation: ": "portalCancelRequest",
   "Client requested reschedule: ": "portalRescheduleRequest",
+  // Step 2B
+  "Review client info change (phone changed — verify before a new portal link): ": "portalInfoChangePhone",
+  "Review client info change: ": "portalInfoChange",
+  "Client requested information about: ": "portalServiceInterest",
 } as const;
 
 export function buildPortalUploadTitle(fileName: string, mayBeSensitive: boolean): string {
@@ -121,6 +125,33 @@ export function buildPortalChangeRequestTitle(
   const prefix = kind === "cancel" ? "Client requested cancellation: " : "Client requested reschedule: ";
   const note = message.trim() ? ` — "${message.trim()}"` : "";
   return `${prefix}${when} ${time}${note}`;
+}
+
+// ── Client portal task titles (Step 2B) ───────────────────────────────
+
+const clip = (value: string, max = 120) => (value.length > max ? `${value.slice(0, max - 1)}…` : value);
+
+// e.g. 'Review client info change: Phone: (555) 555-0101 → (555) 555-0199;
+// Email: (empty) → ana@example.com'. A phone change gets its own prefix so
+// staff verify it before sending a new portal link (the link is confirmed
+// with the phone's last 4 digits).
+export function buildPortalProfileChangeTitle(
+  changes: { label: string; before: string; after: string }[],
+  phoneChanged: boolean,
+): string {
+  const prefix = phoneChanged
+    ? "Review client info change (phone changed — verify before a new portal link): "
+    : "Review client info change: ";
+  const show = (v: string) => (v ? clip(v) : "(empty)");
+  return `${prefix}${changes.map((c) => `${c.label}: ${show(c.before)} → ${show(c.after)}`).join("; ")}`;
+}
+
+// e.g. 'Client requested information about: Tax & Accounting, Company
+// Registration — "I need to open an LLC"'.
+export function buildPortalServiceInterestTitle(services: ServiceType[], comment: string): string {
+  const list = services.length ? services.map((s) => SERVICE_LABELS_EN[s]).join(", ") : "(see comment)";
+  const note = comment.trim() ? ` — "${comment.trim()}"` : "";
+  return `Client requested information about: ${list}${note}`;
 }
 
 // Translator functions come from next-intl (getTranslations on the

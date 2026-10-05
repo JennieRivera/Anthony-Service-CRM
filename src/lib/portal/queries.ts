@@ -25,7 +25,12 @@ export const isUuid = (value: unknown): value is string =>
 
 export async function getPortalClient(db: PortalDb, clientId: string) {
   const [row] = await db
-    .select({ fullName: clients.fullName, preferredLanguage: clients.preferredLanguage })
+    .select({
+      fullName: clients.fullName,
+      preferredLanguage: clients.preferredLanguage,
+      // Only whether a photo exists — never its blob URL.
+      hasPhoto: sql<boolean>`${clients.photoBlobUrl} is not null`,
+    })
     .from(clients)
     .where(eq(clients.id, clientId))
     .limit(1);

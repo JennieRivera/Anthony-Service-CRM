@@ -34,6 +34,7 @@ export const communicationPreferencesFormSchema = z.object({
   smsConsent: z.boolean().optional(),
   whatsappConsent: z.boolean().optional(),
   marketingConsent: z.boolean().optional(),
+  phoneCallConsent: z.boolean().optional(),
   partnerReferralConsent: z.boolean().optional(),
   consentDate: optionalString,
   consentSource: optionalString,

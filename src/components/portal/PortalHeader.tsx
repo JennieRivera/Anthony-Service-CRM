@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarClock, LogOut } from "lucide-react";
+import { CalendarClock, LogOut, UserRound } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -11,9 +11,20 @@ const NAV = [
   { href: "/portal/cases", key: "cases" },
   { href: "/portal/appointments", key: "appointments" },
   { href: "/portal/documents", key: "documents" },
+  { href: "/portal/services", key: "services" },
+  { href: "/portal/profile", key: "profile" },
+  { href: "/portal/authorizations", key: "authorizations" },
 ] as const;
 
-export function PortalHeader({ signedIn, firstName }: { signedIn: boolean; firstName?: string }) {
+export function PortalHeader({
+  signedIn,
+  firstName,
+  hasPhoto = false,
+}: {
+  signedIn: boolean;
+  firstName?: string;
+  hasPhoto?: boolean;
+}) {
   const t = useTranslations("Portal");
   const locale = useLocale();
   const pathname = usePathname();
@@ -31,9 +42,25 @@ export function PortalHeader({ signedIn, firstName }: { signedIn: boolean; first
     <header className="border-b border-border bg-card">
       <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <CalendarClock className="size-5" aria-hidden />
-          </span>
+          {signedIn && hasPhoto ? (
+            <Link href="/portal/profile" aria-label={t("nav.profile")} className="shrink-0">
+              {/* The client's own private photo, streamed by our API route. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/api/portal/profile/photo" alt="" className="size-9 rounded-full border border-border object-cover" />
+            </Link>
+          ) : signedIn ? (
+            <Link
+              href="/portal/profile"
+              aria-label={t("nav.profile")}
+              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
+            >
+              <UserRound className="size-5" aria-hidden />
+            </Link>
+          ) : (
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <CalendarClock className="size-5" aria-hidden />
+            </span>
+          )}
           <div className="flex min-w-0 flex-col leading-tight">
             <span className="font-heading text-base text-foreground">Anthony Multiservice</span>
             {firstName && <span className="truncate text-xs text-muted-foreground">{t("hello", { name: firstName })}</span>}

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { saveLegalTextsAction } from "@/app/[locale]/(app)/settings/legal-texts/actions";
-import { LEGAL_TEXT_KEYS, type LegalTexts } from "@/lib/legal/keys";
+import { LEGAL_TEXT_KEYS, LONG_LEGAL_TEXT_KEYS, legalTextMaxLength, type LegalTexts } from "@/lib/legal/keys";
 
 export function LegalTextsManager({ texts, defaults }: { texts: LegalTexts; defaults: LegalTexts }) {
   const t = useTranslations("LegalTexts");
@@ -54,8 +54,8 @@ export function LegalTextsManager({ texts, defaults }: { texts: LegalTexts; defa
                 </Label>
                 <Textarea
                   id={`${key}-${lang}`}
-                  rows={key === "not_a_law_firm_ack" ? 2 : 5}
-                  maxLength={4000}
+                  rows={key === "not_a_law_firm_ack" ? 2 : LONG_LEGAL_TEXT_KEYS.includes(key) ? 18 : 5}
+                  maxLength={legalTextMaxLength(key)}
                   value={draft[key][lang]}
                   onChange={(e) => update(key, lang, e.target.value)}
                 />

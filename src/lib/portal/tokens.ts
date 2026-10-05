@@ -32,6 +32,12 @@ export function lastFourDigits(phone: string | null | undefined): string | null 
   return digits.length >= 4 ? digits.slice(-4) : null;
 }
 
+// What a link stores instead of the phone's last 4 digits (Step 2B):
+// bound to the client, so the same 4 digits hash differently per client.
+export function phoneLast4Hash(clientId: string, lastFour: string): string {
+  return createHmac("sha256", secret()).update(`portal-last4:${clientId}:${lastFour}`).digest("hex");
+}
+
 export function safeEqual(a: string, b: string): boolean {
   const ab = Buffer.from(a);
   const bb = Buffer.from(b);
