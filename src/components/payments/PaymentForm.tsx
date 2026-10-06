@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { formatDate } from "@/lib/dates";
 
 import { useState } from "react";
@@ -116,7 +117,7 @@ export function PaymentForm({
           />
           {errors.invoiceId && (
             <p className="text-sm text-destructive">
-              {errors.invoiceId.message}
+              <FieldErrorText message={errors.invoiceId.message} />
             </p>
           )}
         </div>
@@ -162,7 +163,7 @@ export function PaymentForm({
           />
           {errors.amountPaid && (
             <p className="text-sm text-destructive">
-              {errors.amountPaid.message}
+              <FieldErrorText message={errors.amountPaid.message} />
             </p>
           )}
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -107,7 +108,7 @@ export function InvoiceForm({
           />
           {errors.clientId && (
             <p className="text-sm text-destructive">
-              {errors.clientId.message}
+              <FieldErrorText message={errors.clientId.message} />
             </p>
           )}
         </div>
@@ -212,7 +213,7 @@ export function InvoiceForm({
         </div>
         {errors.items && (
           <p className="text-sm text-destructive">
-            {errors.items.message ?? errors.items.root?.message}
+            <FieldErrorText message={errors.items.message ?? errors.items.root?.message} />
           </p>
         )}
 

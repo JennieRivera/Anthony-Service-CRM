@@ -1,6 +1,8 @@
-import { desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
+  appointments,
+  tasks,
   corporateEventDetails,
   remodelingDetails,
   strategicAlliances,
@@ -264,4 +266,16 @@ export async function getCaseAlly(caseId: string, serviceType: string) {
     .where(eq(table.caseId, caseId))
     .limit(1);
   return row ?? null;
+}
+
+// For the "Delete case" confirmation: open tasks are deleted with the case;
+// documents and appointments stay on the client's record (unlinked).
+export async function getCaseDeletionImpact(caseId: string) {
+  const db = getDb();
+  const [[openTasks], [docs], [appts]] = await Promise.all([
+    db.select({ n: count() }).from(tasks).where(and(eq(tasks.caseId, caseId), eq(tasks.status, "open"))),
+    db.select({ n: count() }).from(documents).where(eq(documents.caseId, caseId)),
+    db.select({ n: count() }).from(appointments).where(eq(appointments.caseId, caseId)),
+  ]);
+  return { openTasks: openTasks?.n ?? 0, documents: docs?.n ?? 0, appointments: appts?.n ?? 0 };
 }

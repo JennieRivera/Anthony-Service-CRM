@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -124,7 +125,7 @@ export function AiAgentProfileForm({
           <Label htmlFor="name">{t("name")}</Label>
           <Input id="name" {...register("name")} />
           {errors.name && (
-            <p className="text-sm text-destructive">{errors.name.message}</p>
+            <p className="text-sm text-destructive"><FieldErrorText message={errors.name.message} /></p>
           )}
         </div>
 
@@ -132,7 +133,7 @@ export function AiAgentProfileForm({
           <Label htmlFor="title">{t("title")}</Label>
           <Input id="title" {...register("title")} />
           {errors.title && (
-            <p className="text-sm text-destructive">{errors.title.message}</p>
+            <p className="text-sm text-destructive"><FieldErrorText message={errors.title.message} /></p>
           )}
         </div>
 

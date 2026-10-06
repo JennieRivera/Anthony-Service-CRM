@@ -4,7 +4,7 @@ import { dataAccess } from "@/lib/export/access";
 import { notFound } from "next/navigation";
 import { Pencil, FileText, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { getCaseAlly, getCaseById } from "@/lib/queries/cases";
+import { getCaseAlly, getCaseById, getCaseDeletionImpact } from "@/lib/queries/cases";
 import { isPartnerService } from "@/lib/validation/case";
 import { findActiveTemplate } from "@/lib/queries/messageTemplates";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
@@ -88,6 +88,7 @@ export default async function CaseDetailPage({
   const companiesForSelect = await listCompaniesForSelect();
   const partner = isPartnerService(result.case.serviceType) ? result.case.serviceType : null;
   const ally = partner ? await getCaseAlly(id, partner) : null;
+  const deletionImpact = await getCaseDeletionImpact(id);
   const tPartner = await getTranslations(`Cases.partners.${partner ?? "remodeling"}`);
 
   const {
@@ -218,7 +219,7 @@ export default async function CaseDetailPage({
             <Pencil className="h-4 w-4" />
             {t("editCase")}
           </Button>
-          <CaseDeleteButton caseId={id} />
+          <CaseDeleteButton caseId={id} impact={deletionImpact} />
           {escalationAgent && (
             <Button
               variant="outline"

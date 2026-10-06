@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -97,7 +98,7 @@ export function AssociationChamberForm({
           <Input id="organizationName" {...register("organizationName")} />
           {errors.organizationName && (
             <p className="text-sm text-destructive">
-              {errors.organizationName.message}
+              <FieldErrorText message={errors.organizationName.message} />
             </p>
           )}
         </div>

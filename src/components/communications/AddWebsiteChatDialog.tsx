@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -197,7 +198,7 @@ export function AddWebsiteChatDialog({
             <Label htmlFor="message">{t("message")}</Label>
             <Textarea id="message" rows={3} {...register("message")} />
             {errors.message && (
-              <p className="text-sm text-destructive">{errors.message.message}</p>
+              <p className="text-sm text-destructive"><FieldErrorText message={errors.message.message} /></p>
             )}
           </div>
 

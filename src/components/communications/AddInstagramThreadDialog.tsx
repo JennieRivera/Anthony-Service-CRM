@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -82,7 +83,7 @@ export function AddInstagramThreadDialog({
             />
             {errors.instagramUsername && (
               <p className="text-sm text-destructive">
-                {errors.instagramUsername.message}
+                <FieldErrorText message={errors.instagramUsername.message} />
               </p>
             )}
           </div>

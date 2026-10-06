@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -154,7 +155,7 @@ export function LogConversationDialog({ clientId }: { clientId: string }) {
               />
               {errors.occurredAt && (
                 <p className="text-sm text-destructive">
-                  {errors.occurredAt.message}
+                  <FieldErrorText message={errors.occurredAt.message} />
                 </p>
               )}
             </div>
@@ -200,7 +201,7 @@ export function LogConversationDialog({ clientId }: { clientId: string }) {
             />
             {errors.summary && (
               <p className="text-sm text-destructive">
-                {errors.summary.message}
+                <FieldErrorText message={errors.summary.message} />
               </p>
             )}
           </div>

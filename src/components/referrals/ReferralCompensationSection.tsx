@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -258,7 +259,7 @@ export function ReferralCompensationSection({
                     <Label htmlFor="percentageRate">{t("percentageRate")}</Label>
                     <Input id="percentageRate" type="number" step="0.01" {...termsForm.register("percentageRate")} />
                     {termsForm.formState.errors.percentageRate && (
-                      <p className="text-sm text-destructive">{termsForm.formState.errors.percentageRate.message}</p>
+                      <p className="text-sm text-destructive"><FieldErrorText message={termsForm.formState.errors.percentageRate.message} /></p>
                     )}
                   </div>
                 )}
@@ -268,7 +269,7 @@ export function ReferralCompensationSection({
                     <Label htmlFor="fixedAmount">{t("fixedAmount")}</Label>
                     <Input id="fixedAmount" type="number" step="0.01" {...termsForm.register("fixedAmount")} />
                     {termsForm.formState.errors.fixedAmount && (
-                      <p className="text-sm text-destructive">{termsForm.formState.errors.fixedAmount.message}</p>
+                      <p className="text-sm text-destructive"><FieldErrorText message={termsForm.formState.errors.fixedAmount.message} /></p>
                     )}
                   </div>
                 )}
@@ -464,7 +465,7 @@ export function ReferralCompensationSection({
                         <Label htmlFor="approvedAmount">{t("approvedAmount")}</Label>
                         <Input id="approvedAmount" type="number" step="0.01" {...approveForm.register("approvedAmount")} />
                         {approveForm.formState.errors.approvedAmount && (
-                          <p className="text-sm text-destructive">{approveForm.formState.errors.approvedAmount.message}</p>
+                          <p className="text-sm text-destructive"><FieldErrorText message={approveForm.formState.errors.approvedAmount.message} /></p>
                         )}
                       </div>
                       <div className="flex flex-col gap-1.5">
@@ -498,14 +499,14 @@ export function ReferralCompensationSection({
                           <Label htmlFor="amountPaid">{t("amountPaid")}</Label>
                           <Input id="amountPaid" type="number" step="0.01" {...paymentForm.register("amountPaid")} />
                           {paymentForm.formState.errors.amountPaid && (
-                            <p className="text-sm text-destructive">{paymentForm.formState.errors.amountPaid.message}</p>
+                            <p className="text-sm text-destructive"><FieldErrorText message={paymentForm.formState.errors.amountPaid.message} /></p>
                           )}
                         </div>
                         <div className="flex flex-col gap-1.5">
                           <Label htmlFor="paymentDate">{t("paymentDate")}</Label>
                           <Input id="paymentDate" type="date" {...paymentForm.register("paymentDate")} />
                           {paymentForm.formState.errors.paymentDate && (
-                            <p className="text-sm text-destructive">{paymentForm.formState.errors.paymentDate.message}</p>
+                            <p className="text-sm text-destructive"><FieldErrorText message={paymentForm.formState.errors.paymentDate.message} /></p>
                           )}
                         </div>
                         <div className="flex flex-col gap-1.5">
@@ -570,7 +571,7 @@ export function ReferralCompensationSection({
                               <Textarea id="reversalReason" rows={2} {...reverseForm.register("reversalReason")} />
                               {reverseForm.formState.errors.reversalReason && (
                                 <p className="text-sm text-destructive">
-                                  {reverseForm.formState.errors.reversalReason.message}
+                                  <FieldErrorText message={reverseForm.formState.errors.reversalReason.message} />
                                 </p>
                               )}
                             </div>

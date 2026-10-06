@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState, useTransition, useEffect } from "react";
 import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -315,7 +316,7 @@ export function AllianceMembershipSection({
                       <Label htmlFor="waivedReason">{t("waivedReason")}</Label>
                       <Textarea id="waivedReason" rows={2} {...assignForm.register("waivedReason")} />
                       {assignForm.formState.errors.waivedReason && (
-                        <p className="text-sm text-destructive">{assignForm.formState.errors.waivedReason.message}</p>
+                        <p className="text-sm text-destructive"><FieldErrorText message={assignForm.formState.errors.waivedReason.message} /></p>
                       )}
                     </div>
                   )}

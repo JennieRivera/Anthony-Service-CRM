@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -155,7 +156,7 @@ export function ReferralForm({
           />
           {errors.clientId && (
             <p className="text-sm text-destructive">
-              {errors.clientId.message}
+              <FieldErrorText message={errors.clientId.message} />
             </p>
           )}
         </div>
@@ -193,7 +194,7 @@ export function ReferralForm({
           <Input id="referralDate" type="date" {...register("referralDate")} />
           {errors.referralDate && (
             <p className="text-sm text-destructive">
-              {errors.referralDate.message}
+              <FieldErrorText message={errors.referralDate.message} />
             </p>
           )}
         </div>
@@ -330,7 +331,7 @@ export function ReferralForm({
             )}
           />
           {errors.referrerClientId && (
-            <p className="text-sm text-destructive">{errors.referrerClientId.message}</p>
+            <p className="text-sm text-destructive"><FieldErrorText message={errors.referrerClientId.message} /></p>
           )}
         </div>
 
@@ -349,7 +350,7 @@ export function ReferralForm({
           <Input id="referredBy" {...register("referredBy")} />
           {errors.referredBy && (
             <p className="text-sm text-destructive">
-              {errors.referredBy.message}
+              <FieldErrorText message={errors.referredBy.message} />
             </p>
           )}
         </div>
@@ -359,7 +360,7 @@ export function ReferralForm({
           <Input id="receivingParty" {...register("receivingParty")} />
           {errors.receivingParty && (
             <p className="text-sm text-destructive">
-              {errors.receivingParty.message}
+              <FieldErrorText message={errors.receivingParty.message} />
             </p>
           )}
         </div>

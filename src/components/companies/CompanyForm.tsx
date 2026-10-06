@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -105,7 +106,7 @@ export function CompanyForm({
             <Input id="legalBusinessName" {...register("legalBusinessName")} />
             {errors.legalBusinessName && (
               <p className="text-sm text-destructive">
-                {errors.legalBusinessName.message}
+                <FieldErrorText message={errors.legalBusinessName.message} />
               </p>
             )}
           </div>
@@ -175,7 +176,7 @@ export function CompanyForm({
             <Label htmlFor="einLast4">{t("einLast4")}</Label>
             <Input id="einLast4" maxLength={4} placeholder="1234" {...register("einLast4")} />
             {errors.einLast4 && (
-              <p className="text-sm text-destructive">{errors.einLast4.message}</p>
+              <p className="text-sm text-destructive"><FieldErrorText message={errors.einLast4.message} /></p>
             )}
           </div>
           <div className="flex flex-col gap-1.5">

@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -118,7 +119,7 @@ export function AiEscalationResolutionForm({
         <Label htmlFor="resolution">{t("resolution")}</Label>
         <Textarea id="resolution" rows={3} {...register("resolution")} />
         {errors.resolution && (
-          <p className="text-sm text-destructive">{errors.resolution.message}</p>
+          <p className="text-sm text-destructive"><FieldErrorText message={errors.resolution.message} /></p>
         )}
       </div>
 

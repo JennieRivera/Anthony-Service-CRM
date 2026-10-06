@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -208,7 +209,7 @@ export function ClientForm({
           <Input id="fullName" {...register("fullName")} />
           {errors.fullName && (
             <p className="text-sm text-destructive">
-              {errors.fullName.message}
+              <FieldErrorText message={errors.fullName.message} />
             </p>
           )}
         </div>
@@ -217,7 +218,7 @@ export function ClientForm({
           <Label htmlFor="email">{t("email")}</Label>
           <Input id="email" type="email" {...register("email")} />
           {errors.email && (
-            <p className="text-sm text-destructive">{errors.email.message}</p>
+            <p className="text-sm text-destructive"><FieldErrorText message={errors.email.message} /></p>
           )}
         </div>
 

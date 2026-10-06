@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -126,7 +127,7 @@ export function AppointmentForm({
         <Label htmlFor="title">{t("title")}</Label>
         <Input id="title" {...register("title")} />
         {errors.title && (
-          <p className="text-sm text-destructive">{errors.title.message}</p>
+          <p className="text-sm text-destructive"><FieldErrorText message={errors.title.message} /></p>
         )}
       </div>
 
@@ -140,7 +141,7 @@ export function AppointmentForm({
           clients={clients}
         />
         {errors.clientId && (
-          <p className="text-sm text-destructive">{errors.clientId.message}</p>
+          <p className="text-sm text-destructive"><FieldErrorText message={errors.clientId.message} /></p>
         )}
       </div>
 
@@ -250,7 +251,7 @@ export function AppointmentForm({
           <Input id="startAt" type="datetime-local" {...register("startAt")} />
           {errors.startAt && (
             <p className="text-sm text-destructive">
-              {errors.startAt.message}
+              <FieldErrorText message={errors.startAt.message} />
             </p>
           )}
         </div>
@@ -259,7 +260,7 @@ export function AppointmentForm({
           <Label htmlFor="endAt">{t("endAt")}</Label>
           <Input id="endAt" type="datetime-local" {...register("endAt")} />
           {errors.endAt && (
-            <p className="text-sm text-destructive">{errors.endAt.message}</p>
+            <p className="text-sm text-destructive"><FieldErrorText message={errors.endAt.message} /></p>
           )}
         </div>
 

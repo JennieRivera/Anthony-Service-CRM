@@ -1058,16 +1058,26 @@ export async function deleteCaseAction(id: string) {
     .limit(1);
   if (!existing) return;
 
+  // Open tasks only make sense with their case (a "Follow up: <case>"
+  // with no case is an orphan on /tasks), so they go with it. Done and
+  // dismissed tasks stay as history; documents, appointments and invoices
+  // stay on the client's record, unlinked (FKs are "set null").
+  const removedTasks = await db
+    .delete(tasks)
+    .where(and(eq(tasks.caseId, id), eq(tasks.status, "open")))
+    .returning({ id: tasks.id });
+
   await db.delete(cases).where(eq(cases.id, id));
 
   await logAuditEvent({
     action: "case.deleted",
     entityType: "case",
     entityId: id,
-    summary: `Deleted case: ${existing.title}`,
+    summary: `Deleted case: ${existing.title} (and ${removedTasks.length} open task${removedTasks.length === 1 ? "" : "s"})`,
   });
 
   revalidatePath("/cases");
+  revalidatePath("/tasks");
   revalidatePath(`/clients/${existing.clientId}`);
   const locale = await getLocale();
   redirect({ href: "/cases", locale });

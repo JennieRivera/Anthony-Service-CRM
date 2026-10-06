@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -112,7 +113,7 @@ export function AiEscalationForm({
             )}
           />
           {errors.agentId && (
-            <p className="text-sm text-destructive">{errors.agentId.message}</p>
+            <p className="text-sm text-destructive"><FieldErrorText message={errors.agentId.message} /></p>
           )}
         </div>
 
@@ -137,7 +138,7 @@ export function AiEscalationForm({
             )}
           />
           {errors.clientId && (
-            <p className="text-sm text-destructive">{errors.clientId.message}</p>
+            <p className="text-sm text-destructive"><FieldErrorText message={errors.clientId.message} /></p>
           )}
         </div>
 
@@ -194,7 +195,7 @@ export function AiEscalationForm({
         <Label htmlFor="reason">{t("reason")}</Label>
         <Textarea id="reason" rows={4} {...register("reason")} />
         {errors.reason && (
-          <p className="text-sm text-destructive">{errors.reason.message}</p>
+          <p className="text-sm text-destructive"><FieldErrorText message={errors.reason.message} /></p>
         )}
       </div>
 

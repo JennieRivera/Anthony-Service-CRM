@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -166,7 +167,7 @@ export function CommunicationForm({
           />
           {errors.clientId && (
             <p className="text-sm text-destructive">
-              {errors.clientId.message}
+              <FieldErrorText message={errors.clientId.message} />
             </p>
           )}
         </div>
@@ -369,7 +370,7 @@ export function CommunicationForm({
           />
           {errors.occurredAt && (
             <p className="text-sm text-destructive">
-              {errors.occurredAt.message}
+              <FieldErrorText message={errors.occurredAt.message} />
             </p>
           )}
         </div>
@@ -474,7 +475,7 @@ export function CommunicationForm({
                 </div>
               )}
             />
-            {errors.reviewStars && <p className="text-sm text-destructive">{errors.reviewStars.message}</p>}
+            {errors.reviewStars && <p className="text-sm text-destructive"><FieldErrorText message={errors.reviewStars.message} /></p>}
           </div>
         )}
 
@@ -510,7 +511,7 @@ export function CommunicationForm({
           {...register("summary")}
         />
         {errors.summary && (
-          <p className="text-sm text-destructive">{errors.summary.message}</p>
+          <p className="text-sm text-destructive"><FieldErrorText message={errors.summary.message} /></p>
         )}
       </div>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -119,7 +120,7 @@ export function SocialMediaContentForm({
           <Label htmlFor="title">{t("title")}</Label>
           <Input id="title" {...register("title")} />
           {errors.title && (
-            <p className="text-sm text-destructive">{errors.title.message}</p>
+            <p className="text-sm text-destructive"><FieldErrorText message={errors.title.message} /></p>
           )}
         </div>
 
@@ -287,7 +288,7 @@ export function SocialMediaContentForm({
             )}
           />
           {statusError && (
-            <p className="text-sm text-destructive">{statusError.message}</p>
+            <p className="text-sm text-destructive"><FieldErrorText message={statusError.message} /></p>
           )}
         </div>
 

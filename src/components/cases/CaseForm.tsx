@@ -1,5 +1,6 @@
 "use client";
 
+import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -444,7 +445,7 @@ export function CaseForm({
           <Label htmlFor="title">{t("title")}</Label>
           <Input id="title" {...register("title")} />
           {errors.title && (
-            <p className="text-sm text-destructive">{errors.title.message}</p>
+            <p className="text-sm text-destructive"><FieldErrorText message={errors.title.message} /></p>
           )}
         </div>
 
@@ -470,7 +471,7 @@ export function CaseForm({
           />
           {errors.clientId && (
             <p className="text-sm text-destructive">
-              {errors.clientId.message}
+              <FieldErrorText message={errors.clientId.message} />
             </p>
           )}
         </div>
@@ -589,7 +590,7 @@ export function CaseForm({
             <Input id="startDate" type="date" {...register("startDate")} />
             {errors.startDate && (
               <p className="text-sm text-destructive">
-                {errors.startDate.message}
+                <FieldErrorText message={errors.startDate.message} />
               </p>
             )}
           </div>
