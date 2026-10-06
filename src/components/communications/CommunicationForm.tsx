@@ -27,6 +27,7 @@ import {
   type CommunicationFormValues,
 } from "@/lib/validation/communication";
 import { ClientPickerWithLead } from "./ClientPickerWithLead";
+import { addDays, businessDateString } from "@/lib/dates";
 import { containsLikelySsnOrItin } from "@/lib/sensitiveDataCheck";
 import type { ConversationMessage, MessageTemplate } from "@/lib/db/schema";
 
@@ -535,10 +536,7 @@ export function CommunicationForm({
                   field.onChange(checked);
                   // The follow-up task gets a due date: tomorrow unless set.
                   if (checked && !getValues("followUpDate")) {
-                    const d = new Date();
-                    d.setDate(d.getDate() + 1);
-                    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-                    setValue("followUpDate", local.toISOString().slice(0, 10));
+                    setValue("followUpDate", addDays(businessDateString(), 1));
                   }
                 }}
               />

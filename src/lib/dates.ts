@@ -9,11 +9,20 @@ export const BUSINESS_TIME_ZONE = "America/New_York";
 
 type DateInput = Date | string | number;
 
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+
 export function formatDate(
   value: DateInput | null | undefined = new Date(),
   locale?: string,
 ): string {
   if (value == null) return "—";
+  // A date-only value ("2026-10-01", a Postgres `date` column) is already a
+  // calendar date: show it as-is. new Date("2026-10-01") is midnight UTC,
+  // which in Florida is still the evening of Sept 30 — one day early.
+  if (typeof value === "string" && DATE_ONLY.test(value)) {
+    const [y, m, d] = value.split("-").map(Number);
+    return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(locale, { timeZone: "UTC" });
+  }
   return new Date(value).toLocaleDateString(locale, {
     timeZone: BUSINESS_TIME_ZONE,
   });
@@ -59,6 +68,16 @@ export function businessDateString(value: DateInput = new Date()): string {
     string
   >;
   return `${lookup.year}-${lookup.month}-${lookup.day}`;
+}
+
+/**
+ * Calendar arithmetic on a "YYYY-MM-DD" date: addDays("2026-10-31", 1) is
+ * "2026-11-01". Pure date math (no time of day, no DST), so the result is
+ * the same in every timezone.
+ */
+export function addDays(date: string, days: number): string {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
 }
 
 function timeZoneOffsetMinutes(date: Date, timeZone: string): number {

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import { taskNotes, tasks } from "@/lib/db/schema";
-import { businessDateString } from "@/lib/dates";
+import { addDays, businessDateString } from "@/lib/dates";
 import { requireAuthenticatedUser } from "@/lib/permissions";
 
 export async function markTaskDoneAction(id: string) {
@@ -38,8 +38,7 @@ export async function postponeTaskAction(id: string, days: number) {
   await requireAuthenticatedUser();
   const parsedId = taskId.parse(id);
   const parsedDays = z.union([z.literal(1), z.literal(3), z.literal(7)]).parse(days);
-  const [y, m, d] = businessDateString().split("-").map(Number);
-  const next = new Date(Date.UTC(y, m - 1, d + parsedDays)).toISOString().slice(0, 10);
+  const next = addDays(businessDateString(), parsedDays);
   await getDb().update(tasks).set({ dueDate: next }).where(eq(tasks.id, parsedId));
   revalidatePath("/tasks");
   return next;

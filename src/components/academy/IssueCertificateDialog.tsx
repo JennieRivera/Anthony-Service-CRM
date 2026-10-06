@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { issueCertificateAction } from "@/app/[locale]/(app)/academy/certificates/actions";
 import type { CertificateEligibilityVerdict, CertificateRequirements } from "@/lib/queries/academyCertificates";
+import { businessDateString } from "@/lib/dates";
 
 // Issuance is one explicit admin action, gated on this dialog's own
 // confirmation step — nothing here submits without the admin reviewing
@@ -39,7 +40,7 @@ export function IssueCertificateDialog({
   const [open, setOpen] = useState(false);
   const [issuedBy, setIssuedBy] = useState(defaultIssuedBy);
   const [completionDate, setCompletionDate] = useState(
-    () => new Date().toISOString().slice(0, 10),
+    () => businessDateString(),
   );
   const [notes, setNotes] = useState("");
   const [overrideUsed, setOverrideUsed] = useState(false);

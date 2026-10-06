@@ -11,6 +11,7 @@ import {
 } from "@/lib/db/schema";
 import { getCourseReadinessSummary } from "@/lib/queries/academyEvaluationResults";
 import type { IssueCertificateFormValues, RevokeCertificateFormValues } from "@/lib/validation/academyCertificate";
+import { businessDateString } from "@/lib/dates";
 
 // Display number is always derived from the one true unique sequence value
 // — never stored as its own column (see the comment on academyCertificates
@@ -226,7 +227,7 @@ export async function issueCertificate(params: {
       courseNameSnapshot: params.courseName,
       programNameSnapshot: params.programName,
       status: "issued",
-      issueDate: new Date().toISOString().slice(0, 10),
+      issueDate: businessDateString(),
       completionDate: params.values.completionDate || null,
       issuedBy: params.values.issuedBy,
       notes: params.values.notes || null,
