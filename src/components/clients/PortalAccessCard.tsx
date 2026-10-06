@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Copy, KeyRound, Mail, MessageSquare, ShieldOff } from "lucide-react";
+import { openClientTab } from "./ClientProfileTabs";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { formatDateTime } from "@/lib/dates";
@@ -11,6 +12,9 @@ import {
   revokePortalAccessAction,
   sendPortalLinkAction,
 } from "@/app/[locale]/(app)/clients/portal-actions";
+
+// Why a send button is off (null = ready). See portalLinkSendBlocks.
+export type SendBlock = "provider_off" | "no_contact" | "no_consent" | "blocked" | "notices_off" | null;
 
 export type PortalAccessSummaryView = {
   pendingLink: { createdAt: string; expiresAt: string; locked: boolean } | null;
@@ -26,15 +30,15 @@ export function PortalAccessCard({
   clientId,
   hasPhone,
   summary,
-  sendChannels = [],
+  sendBlocks,
   noticesTestMode = false,
 }: {
   clientId: string;
   hasPhone: boolean;
   summary: PortalAccessSummaryView;
-  // Step 3B: channels the link can be sent through right now (authorized
-  // by the client, contact data present, provider connected).
-  sendChannels?: ("sms" | "email")[];
+  // Step 3B: per channel, why the link can't be sent through it right now
+  // (null = authorized by the client, contact data present, provider on).
+  sendBlocks: { sms: SendBlock; email: SendBlock };
   noticesTestMode?: boolean;
 }) {
   const t = useTranslations("PortalAccess");
@@ -117,22 +121,54 @@ export function PortalAccessCard({
       </div>
 
       {hasPhone && (
+        <p className="rounded-md border border-primary/40 bg-secondary/40 p-3 text-sm font-medium text-foreground">
+          {t("whatsappTip")}
+        </p>
+      )}
+
+      {hasPhone && (
         <div className="flex flex-col gap-2 rounded-md border border-border p-3">
           <p className="text-sm font-medium text-foreground">{t("sendTitle")}</p>
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" size="sm" variant="outline" disabled={isPending || !sendChannels.includes("sms")} onClick={() => send("sms")}>
-              <MessageSquare className="h-4 w-4" />
-              {t("sendSms")}
-            </Button>
-            <Button type="button" size="sm" variant="outline" disabled={isPending || !sendChannels.includes("email")} onClick={() => send("email")}>
-              <Mail className="h-4 w-4" />
-              {t("sendEmail")}
-            </Button>
+          <div className="flex flex-col gap-2">
+            {(["sms", "email"] as const).map((channel) => {
+              const block = sendBlocks[channel];
+              return (
+                <div key={channel} className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={isPending || block !== null}
+                    onClick={() => send(channel)}
+                  >
+                    {channel === "sms" ? <MessageSquare className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
+                    {t(channel === "sms" ? "sendSms" : "sendEmail")}
+                  </Button>
+                  {block && (
+                    <span className="text-xs text-muted-foreground">
+                      {t(`sendBlocked.${channel}.${block}`)}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
           <p className="text-xs text-muted-foreground">
-            {sendChannels.length === 0 ? t("sendUnavailable") : t("sendHelp")}
+            {t("sendHelp")}
             {noticesTestMode && ` ${t("sendTestModeNote")}`}
           </p>
+          {(sendBlocks.sms === "no_consent" || sendBlocks.email === "no_consent") && (
+            <p className="text-xs text-muted-foreground">
+              <button
+                type="button"
+                onClick={() => openClientTab("preferences")}
+                className="cursor-pointer font-medium text-primary underline"
+              >
+                {t("markAuthorization")}
+              </button>{" "}
+              {t("markAuthorizationNote")}
+            </p>
+          )}
         </div>
       )}
 

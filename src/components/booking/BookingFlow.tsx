@@ -94,7 +94,34 @@ function StepTitle({ children }: { children: React.ReactNode }) {
 }
 
 // Services whose page shows the "not a law firm" notice prominently.
-const LEGAL_NOTICE_SERVICES = new Set(["immigration", "notary", "online_notary"]);
+// The SMS consent text (editable in Settings → Legal texts) already ends
+// with "See our Privacy Notice." — link those words in place instead of
+// repeating them. If an edited text no longer mentions it, the link is
+// appended after it.
+function SmsConsentText({ text, linkLabel, href }: { text: string; linkLabel: string; href: string }) {
+  const link = (label: string) => (
+    <a href={href} target="_blank" rel="noopener" className="text-primary underline">
+      {label}
+    </a>
+  );
+  const at = text.toLowerCase().lastIndexOf(linkLabel.toLowerCase());
+  if (at < 0) {
+    return (
+      <span>
+        {text} {link(linkLabel)}
+      </span>
+    );
+  }
+  return (
+    <span>
+      {text.slice(0, at)}
+      {link(text.slice(at, at + linkLabel.length))}
+      {text.slice(at + linkLabel.length)}
+    </span>
+  );
+}
+
+const LEGAL_NOTICE_SERVICES =new Set(["immigration", "notary", "online_notary"]);
 
 export type BookingLegalTexts = {
   notALawFirm: string;
@@ -551,12 +578,11 @@ export function BookingFlow({
                       onCheckedChange={(checked) => field.onChange(checked === true)}
                       className="mt-0.5 size-5"
                     />
-                    <span>
-                      {legal.smsConsent}{" "}
-                      <a href={`/${locale}/privacy`} target="_blank" rel="noopener" className="text-primary underline">
-                        {t("privacyLink")}
-                      </a>
-                    </span>
+                    <SmsConsentText
+                      text={legal.smsConsent}
+                      linkLabel={t("privacyLink")}
+                      href={`/${locale}/privacy`}
+                    />
                   </label>
                 )}
               />

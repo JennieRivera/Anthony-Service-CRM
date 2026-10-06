@@ -1556,6 +1556,11 @@ export const clientConsentEvents = pgTable(
     signatureName: text("signature_name"),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
+    // Source "staff" marked from the Authorizations card: who marked it
+    // (staff email), how the client gave permission, and an optional note.
+    recordedBy: text("recorded_by"),
+    staffMethod: text("staff_method", { enum: ["in_person", "phone", "written", "message"] }),
+    note: text("note"),
   },
   (table) => [
     index("client_consent_events_client_type_idx").on(

@@ -133,3 +133,7 @@ export function pickLocale(text: LegalText, locale: string): string {
 export function bothLanguages(text: LegalText): string[] {
   return [text.en, text.es].map((t) => t.trim()).filter(Boolean);
 }
+
+// How the client gave a permission that staff marked by hand.
+export const STAFF_CONSENT_METHODS = ["in_person", "phone", "written", "message"] as const;
+export type StaffConsentMethod = (typeof STAFF_CONSENT_METHODS)[number];

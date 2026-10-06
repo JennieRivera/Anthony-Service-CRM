@@ -95,7 +95,7 @@ export function usPhoneE164(phone: string | null | undefined): string | null {
   return digits.length === 10 ? `+1${digits}` : null;
 }
 
-const looksLikeEmail = (email: string | null | undefined) => !!email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+export const looksLikeEmail = (email: string | null | undefined) => !!email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export function usableChannels(f: ChannelFacts): Channel[] {
   const out: Channel[] = [];

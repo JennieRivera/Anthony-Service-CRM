@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { formatDate, formatDateTime } from "@/lib/dates";
 
 import { useTranslations } from "next-intl";
@@ -38,6 +39,14 @@ import type {
 import type { TimelineEntry } from "@/lib/queries/clients";
 import type { getHighLevelSyncPreview } from "@/lib/queries/highlevel";
 import { useBookingTitle } from "@/components/booking/useBookingTitle";
+
+// Other cards on the client record (e.g. "Mark authorization" on the portal
+// access card) open a tab here and scroll to it.
+const OPEN_CLIENT_TAB_EVENT = "client-profile-tabs:open";
+
+export function openClientTab(tab: string) {
+  window.dispatchEvent(new CustomEvent(OPEN_CLIENT_TAB_EVENT, { detail: tab }));
+}
 
 function formatMoney(value: string | null) {
   if (!value) return "—";
@@ -98,6 +107,19 @@ export function ClientProfileTabs({
   const tReferrals = useTranslations("Referrals");
   const tTaskType = useTranslations("TaskType");
   const bookingTitle = useBookingTitle();
+  const [tab, setTab] = useState("timeline");
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onOpen(e: Event) {
+      const requested = (e as CustomEvent<unknown>).detail;
+      if (typeof requested !== "string") return;
+      setTab(requested);
+      rootRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    window.addEventListener(OPEN_CLIENT_TAB_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_CLIENT_TAB_EVENT, onOpen);
+  }, []);
 
   // Calendar enhancement, Session 6 (section 9) — every appointment lands
   // in exactly one bucket (including "rescheduled", a real status this
@@ -137,7 +159,7 @@ export function ClientProfileTabs({
   ];
 
   return (
-    <Tabs defaultValue="timeline">
+    <Tabs ref={rootRef} value={tab} onValueChange={(v) => setTab(String(v))} className="scroll-mt-4">
       {/* Ten tabs: wrap onto more lines on narrow screens instead of
           pushing the page sideways. */}
       <TabsList className="h-auto max-w-full flex-wrap justify-start group-data-horizontal/tabs:h-auto">

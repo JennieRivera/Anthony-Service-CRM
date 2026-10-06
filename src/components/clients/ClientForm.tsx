@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
@@ -32,6 +32,7 @@ import {
 } from "@/lib/validation/client";
 import { selectableDocumentCategoryValues } from "@/lib/validation/documentCategory";
 import { DOCUMENT_ACCEPT, uploadErrorKey } from "@/components/documents/documentUploadShared";
+import { FilePickerButton } from "@/components/documents/FilePickerButton";
 import { DuplicateMatchList } from "@/components/clients/DuplicateMatchList";
 import { findPossibleDuplicateClientsAction } from "@/app/[locale]/(app)/clients/actions";
 import type { ClientDuplicateMatch } from "@/lib/queries/clients";
@@ -70,7 +71,7 @@ export function ClientForm({
   const router = useRouter();
   const locale = useLocale();
   const [submitting, setSubmitting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [category, setCategory] = useState("other");
   const [uploadErrorKeyState, setUploadErrorKeyState] = useState<string | null>(null);
   // Set once the client has been created so a retry-after-upload-failure
@@ -145,7 +146,6 @@ export function ClientForm({
         const id = createdClientId ?? (await onCreateWithDocument(values));
         setCreatedClientId(id);
 
-        const file = fileInputRef.current?.files?.[0];
         if (file) {
           const formData = new FormData();
           formData.append("file", file);
@@ -384,11 +384,14 @@ export function ClientForm({
           <Label>{t("attachDocument")}</Label>
           <p className="text-sm text-muted-foreground">{t("attachDocumentHint")}</p>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <Input
-              ref={fileInputRef}
-              type="file"
+            <FilePickerButton
               accept={DOCUMENT_ACCEPT}
-              className="sm:max-w-xs"
+              file={file}
+              onFileChange={(next) => {
+                setFile(next);
+                setUploadErrorKeyState(null);
+              }}
+              disabled={submitting}
             />
             <Select value={category} onValueChange={(v) => setCategory(v ?? "other")}>
               <SelectTrigger className="sm:max-w-xs">

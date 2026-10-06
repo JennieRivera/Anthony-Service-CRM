@@ -12,7 +12,7 @@ import {
   buildPortalServiceInterestTitle,
 } from "@/lib/booking/titles";
 import type { ServiceType } from "@/lib/booking/config";
-import { getLatestConsents, recordConsentEvent } from "@/lib/legal/texts";
+import { getLatestConsents, recordConsentEvent, type StaffConsentMethod } from "@/lib/legal/texts";
 import type { PortalDb } from "./db";
 import { PORTAL_AUTHORIZATIONS, type PortalAuthorization } from "./authorizationTypes";
 
@@ -264,6 +264,7 @@ const CHANNEL_COLUMNS = {
   marketing: "marketingConsent",
 } as const;
 type ChannelAuthorization = keyof typeof CHANNEL_COLUMNS;
+export const STAFF_CHANNEL_AUTHORIZATIONS = Object.keys(CHANNEL_COLUMNS) as ChannelAuthorization[];
 const isChannel = (a: PortalAuthorization): a is ChannelAuthorization => a in CHANNEL_COLUMNS;
 
 export type PortalAuthorizationState = Record<
@@ -312,13 +313,19 @@ type ChannelStatuses = {
 // marks the channel opted out / unsubscribed, so the CRM never shows it as
 // usable; consenting again reactivates only a channel that was opted out
 // (a bounced or invalid address stays as staff marked it).
-function channelPatch(a: ChannelAuthorization, granted: boolean, today: string, statuses: ChannelStatuses) {
+function channelPatch(
+  a: ChannelAuthorization,
+  granted: boolean,
+  today: string,
+  statuses: ChannelStatuses,
+  consentSource = "Client portal",
+) {
   const patch: Partial<typeof clientCommunicationPreferences.$inferInsert> = {
     [CHANNEL_COLUMNS[a]]: granted,
   };
   if (granted) {
     patch.consentDate = today;
-    patch.consentSource = "Client portal";
+    patch.consentSource = consentSource;
   } else {
     patch.optOutDate = today;
   }
@@ -427,4 +434,60 @@ export async function savePortalAuthorizations(
     });
   }
   return { changed };
+}
+
+// Staff marked one channel permission by hand from the client record's
+// Authorizations card ("the client gave permission by phone"). Same mirror
+// into Communication Preferences as the portal, and the same append-only
+// consent history — source "staff", plus who marked it, how the client
+// gave it, and an optional note.
+export async function recordStaffChannelConsent(
+  db: PortalDb,
+  params: {
+    clientId: string;
+    type: ChannelAuthorization;
+    granted: boolean;
+    method: StaffConsentMethod;
+    note: string | null;
+    recordedBy: string | null;
+    now?: Date;
+  },
+) {
+  const now = params.now ?? new Date();
+  const [statuses] = await db
+    .select({
+      emailStatus: clientCommunicationPreferences.emailStatus,
+      smsStatus: clientCommunicationPreferences.smsStatus,
+      whatsappContactStatus: clientCommunicationPreferences.whatsappContactStatus,
+    })
+    .from(clientCommunicationPreferences)
+    .where(eq(clientCommunicationPreferences.clientId, params.clientId))
+    .limit(1);
+  const patch = channelPatch(
+    params.type,
+    params.granted,
+    businessDateString(now),
+    statuses ?? null,
+    `Staff (${params.method})`,
+  );
+  await db
+    .insert(clientCommunicationPreferences)
+    .values({ clientId: params.clientId, ...patch, updatedAt: now })
+    .onConflictDoUpdate({
+      target: clientCommunicationPreferences.clientId,
+      set: { ...patch, updatedAt: now },
+    });
+  await recordConsentEvent(db, {
+    clientId: params.clientId,
+    consentType: params.type,
+    granted: params.granted,
+    source: "staff",
+    textShown: `Marked by staff in the CRM (Authorizations) — client gave permission: ${params.method}`,
+    ipAddress: null,
+    userAgent: null,
+    recordedBy: params.recordedBy,
+    staffMethod: params.method,
+    note: params.note,
+    now,
+  });
 }

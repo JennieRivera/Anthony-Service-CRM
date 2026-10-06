@@ -1433,11 +1433,13 @@
     "columnStatus": "Status",
     "columnUploaded": "Uploaded",
     "uploadLabel": "Upload a document",
-    "chooseFile": "Choose File",
+    "chooseFile": "Choose file",
     "noFileChosen": "No file chosen",
+    "chooseFileFirst": "First choose a file",
     "documentTypePlaceholder": "Document type (optional)",
     "upload": "Upload",
     "uploading": "Uploading...",
+    "uploadSuccess": "Document uploaded",
     "notConfigured": "File storage isn't connected yet. Add BLOB_READ_WRITE_TOKEN to .env.local (create a Blob store in your Vercel project's Storage tab) to enable uploads.",
     "uploadError": "Upload failed. Please try again.",
     "uploadErrorUnsupportedType": "That file type isn't supported. Please upload a PDF, image, Word, or Excel file.",
@@ -1510,6 +1512,7 @@
     "subtitle": "Your library of marketing/social media photos and videos — organized by service, date, and where it was posted.",
     "upload": "Upload content",
     "uploading": "Uploading...",
+    "chooseFileFirst": "First choose a file",
     "uploadDialogTitle": "Upload marketing content",
     "file": "File (image or video)",
     "service": "Service",
@@ -2912,6 +2915,8 @@
     "documents": {
       "upload": "Upload",
       "uploading": "Uploading...",
+      "chooseFileFirst": "First choose a file",
+      "uploadSuccess": "Document uploaded",
       "empty": "No documents yet.",
       "download": "Download",
       "selectType": "Document type",
@@ -3389,6 +3394,7 @@
       "cancel": "Cancel",
       "uploadAvatar": "Upload Image",
       "uploading": "Uploading...",
+      "uploadSuccess": "Image uploaded",
       "knowledgeBaseTitle": "Knowledge Base",
       "knowledgeBaseEmpty": "No knowledge base entries yet.",
       "addEntry": "Add Entry",
@@ -3996,6 +4002,25 @@
       "outside_sms_hours": "SMS can only be sent between 8:00 AM and 8:00 PM (Florida time). Send it by email or try later.",
       "send_failed": "The message couldn't be sent. See Settings → Automatic notices.",
       "test_contact_missing": "Test mode is on but your test phone/email isn't set in Settings."
+    },
+    "whatsappTip": "Easiest way: press “Generate new link”, copy it, and send it to the client by WhatsApp yourself. That always works.",
+    "markAuthorization": "Mark authorization",
+    "markAuthorizationNote": "(only if the client gave you permission)",
+    "sendBlocked": {
+      "sms": {
+        "provider_off": "Waiting on Twilio approval",
+        "no_contact": "The client's phone isn't a valid US number",
+        "no_consent": "The client hasn't authorized SMS",
+        "blocked": "The client opted out of SMS (or the number is invalid)",
+        "notices_off": "Automatic notices are off in Settings"
+      },
+      "email": {
+        "provider_off": "Email service isn't connected yet",
+        "no_contact": "The client has no email",
+        "no_consent": "The client hasn't authorized email",
+        "blocked": "The client unsubscribed (or the email bounced)",
+        "notices_off": "Automatic notices are off in Settings"
+      }
     }
   },
   "LegalTexts": {
@@ -4100,7 +4125,42 @@
     "sources": {
       "portal": "Client portal",
       "online_booking": "Online booking",
-      "staff": "Staff (CRM)"
+      "staff": "Staff (CRM)",
+      "staffMethod": "Staff ({method})",
+      "sms_reply": "SMS reply"
+    },
+    "clickHint": "Click a line to mark or change it.",
+    "noteInline": "Note: {note}",
+    "methods": {
+      "in_person": "In person",
+      "phone": "By phone",
+      "written": "In writing / signed",
+      "message": "By WhatsApp / message"
+    },
+    "methodsInline": {
+      "in_person": "in person",
+      "phone": "by phone",
+      "written": "in writing",
+      "message": "by WhatsApp/message"
+    },
+    "dialog": {
+      "title": "Did the client give you permission?",
+      "granted": "Accepted",
+      "withdrawn": "Withdrew permission",
+      "howLabel": "How they gave it",
+      "noteLabel": "Note (optional)",
+      "writtenNotice": "For text messages and promotions, the law requires written permission. Ideally the client marks it in their portal or in the online booking.",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "chooseMethod": "Choose how the client gave it.",
+      "error": "Couldn't save. Please try again.",
+      "saved": "Authorization saved"
+    },
+    "clientOnly": {
+      "title": "Only the client can accept this, in their portal",
+      "description": "This one carries the client's own signature or confirmation. Send them their portal link so they can accept it there.",
+      "generateLink": "Generate portal link"
     }
   },
   "Notices": {

@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Upload } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AiAgentAvatar } from "./AiAgentAvatar";
 import type { AiAgent } from "@/lib/db/schema";
@@ -33,6 +34,7 @@ export function AiAgentAvatarUploader({ agent }: { agent: AiAgent }) {
         throw new Error(body.error || "Upload failed");
       }
       router.refresh();
+      toast.success(t("uploadSuccess"));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {

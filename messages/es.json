@@ -1433,11 +1433,13 @@
     "columnStatus": "Estado",
     "columnUploaded": "Subido",
     "uploadLabel": "Subir un documento",
-    "chooseFile": "Elegir Archivo",
+    "chooseFile": "Elegir archivo",
     "noFileChosen": "Ningún archivo seleccionado",
+    "chooseFileFirst": "Primero elija un archivo",
     "documentTypePlaceholder": "Tipo de documento (opcional)",
     "upload": "Subir",
     "uploading": "Subiendo...",
+    "uploadSuccess": "Documento subido",
     "notConfigured": "El almacenamiento de archivos aún no está conectado. Agrega BLOB_READ_WRITE_TOKEN a .env.local (crea un almacén Blob en la pestaña Storage de tu proyecto de Vercel) para habilitar las subidas.",
     "uploadError": "Error al subir. Inténtalo de nuevo.",
     "uploadErrorUnsupportedType": "Ese tipo de archivo no es compatible. Sube un PDF, imagen, Word o Excel.",
@@ -1510,6 +1512,7 @@
     "subtitle": "Tu banco de fotos y videos de marketing/redes sociales — organizado por servicio, fecha, y dónde se publicó.",
     "upload": "Subir contenido",
     "uploading": "Subiendo...",
+    "chooseFileFirst": "Primero elija un archivo",
     "uploadDialogTitle": "Subir contenido de marketing",
     "file": "Archivo (imagen o video)",
     "service": "Servicio",
@@ -2912,6 +2915,8 @@
     "documents": {
       "upload": "Subir",
       "uploading": "Subiendo...",
+      "chooseFileFirst": "Primero elija un archivo",
+      "uploadSuccess": "Documento subido",
       "empty": "Aún no hay documentos.",
       "download": "Descargar",
       "selectType": "Tipo de documento",
@@ -3389,6 +3394,7 @@
       "cancel": "Cancelar",
       "uploadAvatar": "Subir Imagen",
       "uploading": "Subiendo...",
+      "uploadSuccess": "Imagen subida",
       "knowledgeBaseTitle": "Base de Conocimiento",
       "knowledgeBaseEmpty": "Aún no hay entradas en la base de conocimiento.",
       "addEntry": "Agregar Entrada",
@@ -3996,6 +4002,25 @@
       "outside_sms_hours": "Los SMS solo se envían entre 8:00 AM y 8:00 PM (hora de Florida). Envíelo por correo o intente más tarde.",
       "send_failed": "No se pudo enviar el mensaje. Revise Configuración → Avisos automáticos.",
       "test_contact_missing": "El modo prueba está encendido pero falta su teléfono/correo de prueba en Configuración."
+    },
+    "whatsappTip": "Lo más fácil: presione «Generar link nuevo», cópielo y envíelo usted por WhatsApp. Eso siempre funciona.",
+    "markAuthorization": "Marcar autorización",
+    "markAuthorizationNote": "(solo si el cliente le dio permiso)",
+    "sendBlocked": {
+      "sms": {
+        "provider_off": "Falta la aprobación de Twilio",
+        "no_contact": "El teléfono del cliente no es un número válido de EE. UU.",
+        "no_consent": "El cliente no ha autorizado SMS",
+        "blocked": "El cliente pidió no recibir SMS (o el número no es válido)",
+        "notices_off": "Los avisos automáticos están apagados en Configuración"
+      },
+      "email": {
+        "provider_off": "El servicio de correo aún no está conectado",
+        "no_contact": "El cliente no tiene correo",
+        "no_consent": "El cliente no ha autorizado correo",
+        "blocked": "El cliente se dio de baja (o el correo rebotó)",
+        "notices_off": "Los avisos automáticos están apagados en Configuración"
+      }
     }
   },
   "LegalTexts": {
@@ -4100,7 +4125,42 @@
     "sources": {
       "portal": "Portal del cliente",
       "online_booking": "Reserva en línea",
-      "staff": "Equipo (CRM)"
+      "staff": "Equipo (CRM)",
+      "staffMethod": "Equipo ({method})",
+      "sms_reply": "Respuesta por SMS"
+    },
+    "clickHint": "Haga clic en una línea para marcarla o cambiarla.",
+    "noteInline": "Nota: {note}",
+    "methods": {
+      "in_person": "En persona",
+      "phone": "Por teléfono",
+      "written": "Por escrito/firmado",
+      "message": "Por WhatsApp/mensaje"
+    },
+    "methodsInline": {
+      "in_person": "en persona",
+      "phone": "por teléfono",
+      "written": "por escrito",
+      "message": "por WhatsApp/mensaje"
+    },
+    "dialog": {
+      "title": "¿El cliente le dio permiso?",
+      "granted": "Aceptó",
+      "withdrawn": "Quitó el permiso",
+      "howLabel": "Cómo lo dio",
+      "noteLabel": "Nota (opcional)",
+      "writtenNotice": "Para mensajes de texto y promociones, la ley pide permiso por escrito. Lo ideal es que el cliente lo marque en su portal o en la reserva en línea.",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "cancel": "Cancelar",
+      "chooseMethod": "Elija cómo lo dio el cliente.",
+      "error": "No se pudo guardar. Intente de nuevo.",
+      "saved": "Autorización guardada"
+    },
+    "clientOnly": {
+      "title": "Solo el cliente puede aceptar esto, en su portal",
+      "description": "Esta lleva la firma o confirmación del propio cliente. Envíele el link de su portal para que la acepte allí.",
+      "generateLink": "Generar link del portal"
     }
   },
   "Notices": {

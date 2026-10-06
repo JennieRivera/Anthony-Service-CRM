@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Upload, Download, Video, Image as ImageIcon } from "lucide-react";
@@ -31,6 +31,7 @@ import {
 } from "@/lib/validation/marketingContent";
 import { assetViewHref, assetDownloadHref } from "./assetHref";
 import { marketingUploadErrorKey } from "./uploadErrorKey";
+import { FilePickerButton } from "@/components/documents/FilePickerButton";
 import type { listMarketingContentAssets } from "@/lib/queries/marketingContent";
 
 type Asset = Awaited<ReturnType<typeof listMarketingContentAssets>>[number];
@@ -155,7 +156,7 @@ function UploadDialog() {
   const tService = useTranslations("ServiceType");
   const tChannel = useTranslations("MarketingChannel");
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [open, setOpen] = useState(false);
   const [service, setService] = useState("general");
   const [publishedDate, setPublishedDate] = useState(
@@ -172,12 +173,14 @@ function UploadDialog() {
     setChannel("");
     setCaption("");
     setErrorKey(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    setFile(null);
   }
 
   async function handleUpload() {
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) return;
+    if (!file) {
+      setErrorKey("chooseFileFirst");
+      return;
+    }
 
     setUploading(true);
     setErrorKey(null);
@@ -229,7 +232,15 @@ function UploadDialog() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <Label>{t("file")}</Label>
-            <Input ref={fileInputRef} type="file" accept={MARKETING_CONTENT_ACCEPT} />
+            <FilePickerButton
+              accept={MARKETING_CONTENT_ACCEPT}
+              file={file}
+              onFileChange={(next) => {
+                setFile(next);
+                setErrorKey(null);
+              }}
+              disabled={uploading}
+            />
           </div>
 
           <div className="flex flex-col gap-1.5">

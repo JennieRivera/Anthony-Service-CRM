@@ -1,7 +1,7 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { clientConsentEvents, clients, legalTexts } from "@/lib/db/schema";
 import type { PortalDb } from "@/lib/portal/db";
-import { DEFAULT_LEGAL_TEXTS, LEGAL_TEXT_KEYS, type LegalTexts } from "./keys";
+import { DEFAULT_LEGAL_TEXTS, LEGAL_TEXT_KEYS, type LegalTexts, type StaffConsentMethod } from "./keys";
 
 export * from "./keys";
 
@@ -50,6 +50,9 @@ export async function recordConsentEvent(
     ipAddress: string | null;
     userAgent: string | null;
     signatureName?: string | null;
+    recordedBy?: string | null;
+    staffMethod?: StaffConsentMethod | null;
+    note?: string | null;
     now?: Date;
   },
 ) {
@@ -69,6 +72,9 @@ export async function recordConsentEvent(
     ipAddress: params.ipAddress?.slice(0, 64) ?? null,
     userAgent: params.userAgent?.slice(0, 400) ?? null,
     signatureName: params.signatureName?.slice(0, 200) ?? null,
+    recordedBy: params.recordedBy?.slice(0, 200) ?? null,
+    staffMethod: params.staffMethod ?? null,
+    note: params.note?.slice(0, 500) ?? null,
     ...(params.now ? { createdAt: params.now } : {}),
   });
 }
@@ -89,6 +95,9 @@ export type LatestConsent = {
   createdAt: Date;
   source: "portal" | "online_booking" | "staff" | "sms_reply";
   signatureName: string | null;
+  recordedBy: string | null;
+  staffMethod: StaffConsentMethod | null;
+  note: string | null;
 };
 
 // Latest event per consent type for one client (types never recorded are
@@ -104,6 +113,9 @@ export async function getLatestConsents(
       createdAt: clientConsentEvents.createdAt,
       source: clientConsentEvents.source,
       signatureName: clientConsentEvents.signatureName,
+      recordedBy: clientConsentEvents.recordedBy,
+      staffMethod: clientConsentEvents.staffMethod,
+      note: clientConsentEvents.note,
     })
     .from(clientConsentEvents)
     .where(eq(clientConsentEvents.clientId, clientId))
@@ -126,6 +138,9 @@ export async function listConsentEvents(db: PortalDb, clientId: string, limit = 
       source: clientConsentEvents.source,
       ipAddress: clientConsentEvents.ipAddress,
       signatureName: clientConsentEvents.signatureName,
+      recordedBy: clientConsentEvents.recordedBy,
+      staffMethod: clientConsentEvents.staffMethod,
+      note: clientConsentEvents.note,
     })
     .from(clientConsentEvents)
     .where(eq(clientConsentEvents.clientId, clientId))

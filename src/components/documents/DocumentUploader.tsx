@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Upload, Paperclip } from "lucide-react";
+import { Upload } from "lucide-react";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ import {
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 import { selectableDocumentCategoryValues } from "@/lib/validation/documentCategory";
 import { DOCUMENT_ACCEPT, uploadErrorKey } from "./documentUploadShared";
+import { FilePickerButton } from "./FilePickerButton";
 
 export function DocumentUploader({
   clientId,
@@ -38,17 +40,18 @@ export function DocumentUploader({
   const tFolder = useTranslations("ImmigrationDocumentFolder");
   const tCategory = useTranslations("DocumentCategory");
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [documentType, setDocumentType] = useState("");
   const [folder, setFolder] = useState("");
   const [category, setCategory] = useState(defaultCategory ?? "other");
   const [uploading, setUploading] = useState(false);
   const [errorKey, setErrorKey] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   async function handleUpload() {
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) return;
+    if (!file) {
+      setErrorKey("chooseFileFirst");
+      return;
+    }
 
     setUploading(true);
     setErrorKey(null);
@@ -76,12 +79,12 @@ export function DocumentUploader({
         return;
       }
 
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      setFileName(null);
+      setFile(null);
       setDocumentType("");
       setFolder("");
       setCategory(defaultCategory ?? "other");
       router.refresh();
+      toast.success(t("uploadSuccess"));
     } catch {
       setErrorKey("uploadError");
     } finally {
@@ -92,27 +95,15 @@ export function DocumentUploader({
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-2">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={DOCUMENT_ACCEPT}
-            className="sr-only"
-            onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Paperclip className="h-4 w-4" />
-            {t("chooseFile")}
-          </Button>
-          <span className="max-w-[10rem] truncate text-sm text-muted-foreground">
-            {fileName ?? t("noFileChosen")}
-          </span>
-        </div>
+        <FilePickerButton
+          accept={DOCUMENT_ACCEPT}
+          file={file}
+          onFileChange={(next) => {
+            setFile(next);
+            setErrorKey(null);
+          }}
+          disabled={uploading}
+        />
         <Input
           value={documentType}
           onChange={(e) => setDocumentType(e.target.value)}

@@ -22,6 +22,9 @@ import {
   isWithinSmsHours,
   nextSmsSendTime,
   usPhoneE164,
+  looksLikeEmail,
+  SMS_BLOCKED_STATUSES,
+  EMAIL_BLOCKED_STATUSES,
   type Channel,
   type ClientNoticeType,
   type NoticeType,
@@ -764,4 +767,49 @@ export async function availableChannelsForClient(db: PortalDb, clientId: string,
     phone: c.phone,
     email: c.email,
   });
+}
+
+// Why a "Send portal link" button is off, so staff sees a reason instead of
+// a dead button. null = the channel can be used.
+export type SendBlockReason = "provider_off" | "no_contact" | "no_consent" | "blocked";
+
+export async function portalLinkSendBlocks(
+  db: PortalDb,
+  clientId: string,
+  deps: NoticeDeps,
+): Promise<Record<Channel, SendBlockReason | null>> {
+  const [c] = await db
+    .select({
+      email: clients.email,
+      phone: clients.phone,
+      smsConsent: clientCommunicationPreferences.smsConsent,
+      emailConsent: clientCommunicationPreferences.emailConsent,
+      smsStatus: clientCommunicationPreferences.smsStatus,
+      emailStatus: clientCommunicationPreferences.emailStatus,
+    })
+    .from(clients)
+    .leftJoin(clientCommunicationPreferences, eq(clientCommunicationPreferences.clientId, clients.id))
+    .where(eq(clients.id, clientId))
+    .limit(1);
+  if (!c) return { sms: "no_contact", email: "no_contact" };
+  // SMS: the Twilio approval comes first — until it's on, nothing else matters.
+  const sms: SendBlockReason | null = !deps.senders.configured("sms")
+    ? "provider_off"
+    : !usPhoneE164(c.phone)
+      ? "no_contact"
+      : !c.smsConsent
+        ? "no_consent"
+        : SMS_BLOCKED_STATUSES.includes(c.smsStatus ?? "")
+          ? "blocked"
+          : null;
+  const email: SendBlockReason | null = !looksLikeEmail(c.email)
+    ? "no_contact"
+    : !c.emailConsent
+      ? "no_consent"
+      : EMAIL_BLOCKED_STATUSES.includes(c.emailStatus ?? "")
+        ? "blocked"
+        : !deps.senders.configured("email")
+          ? "provider_off"
+          : null;
+  return { sms, email };
 }

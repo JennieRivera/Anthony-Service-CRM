@@ -1,11 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Upload } from "lucide-react";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -14,20 +14,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DOCUMENT_ACCEPT, uploadErrorKey } from "@/components/documents/documentUploadShared";
+import { FilePickerButton } from "@/components/documents/FilePickerButton";
 import { allianceDocumentTypeValues } from "@/lib/validation/allianceDocument";
 
 export function AllianceDocumentUploader({ allianceId }: { allianceId: string }) {
   const t = useTranslations("Alliances");
   const tDocType = useTranslations("AllianceDocumentType");
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [errorKey, setErrorKey] = useState<string | null>(null);
   const [documentType, setDocumentType] = useState("");
 
   async function handleUpload() {
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) return;
+    if (!file) {
+      setErrorKey("chooseFileFirst");
+      return;
+    }
 
     setUploading(true);
     setErrorKey(null);
@@ -47,9 +50,10 @@ export function AllianceDocumentUploader({ allianceId }: { allianceId: string })
         setErrorKey(uploadErrorKey(body));
         return;
       }
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      setFile(null);
       setDocumentType("");
       router.refresh();
+      toast.success(t("documents.uploadSuccess"));
     } catch {
       setErrorKey("uploadError");
     } finally {
@@ -60,7 +64,15 @@ export function AllianceDocumentUploader({ allianceId }: { allianceId: string })
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <Input ref={fileInputRef} type="file" accept={DOCUMENT_ACCEPT} className="sm:max-w-xs" />
+        <FilePickerButton
+          accept={DOCUMENT_ACCEPT}
+          file={file}
+          onFileChange={(next) => {
+            setFile(next);
+            setErrorKey(null);
+          }}
+          disabled={uploading}
+        />
         <Select value={documentType || "none"} onValueChange={(v) => setDocumentType(!v || v === "none" ? "" : v)}>
           <SelectTrigger className="sm:w-56">
             <SelectValue placeholder={t("documents.selectType")} />

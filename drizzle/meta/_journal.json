@@ -470,6 +470,13 @@
       "when": 1791221662847,
       "tag": "0066_automatic_notices",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1791300902705,
+      "tag": "0067_staff_consent_details",
+      "breakpoints": true
     }
   ]
 }

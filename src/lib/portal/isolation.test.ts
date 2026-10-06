@@ -393,6 +393,27 @@ async function main() {
     await assert.rejects(save(a.id, null), acct.PortalValidationError);
     await assert.rejects(save(a.id, { ...allOff, email: "yes" }), acct.PortalValidationError);
   });
+  await ok("authorizations: staff-marked permission updates A's preferences + evidence (who, how, note)", async () => {
+    await acct.recordStaffChannelConsent(db, {
+      clientId: a.id,
+      type: "email",
+      granted: true,
+      method: "phone",
+      note: "Called on Monday",
+      recordedBy: "staff@example.com",
+    });
+    const [prefsA] = await db.select().from(clientCommunicationPreferences).where(eq(clientCommunicationPreferences.clientId, a.id));
+    assert.equal(prefsA.emailConsent, true);
+    assert.equal(prefsA.emailStatus, "active");
+    assert.equal(prefsA.consentSource, "Staff (phone)");
+    const [event] = await db.select().from(clientConsentEvents).where(eq(clientConsentEvents.recordedBy, "staff@example.com"));
+    assert.equal(event.clientId, a.id);
+    assert.equal(event.source, "staff");
+    assert.equal(event.staffMethod, "phone");
+    assert.equal(event.note, "Called on Monday");
+    assert.equal((await acct.getPortalAuthorizations(db, a.id)).email.granted, true);
+    assert.equal((await db.select().from(clientCommunicationPreferences).where(eq(clientCommunicationPreferences.clientId, b.id))).length, 0);
+  });
 
   console.log(`\nisolation.test.ts: all ${passed} client-isolation checks passed.`);
 }
