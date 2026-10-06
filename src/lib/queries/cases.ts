@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
+  corporateEventDetails,
   remodelingDetails,
   strategicAlliances,
   cases,
@@ -247,16 +248,20 @@ export async function getCaseById(id: string) {
   };
 }
 
-// Remodeling cases: the allied contractor picked on the case (if any).
-export async function getRemodelingDetails(caseId: string) {
+// Partner-based cases (Remodeling, Corporate Events): the ally picked on
+// the case, if any. null for every other service.
+export async function getCaseAlly(caseId: string, serviceType: string) {
+  const table =
+    serviceType === "remodeling" ? remodelingDetails : serviceType === "corporate_events" ? corporateEventDetails : null;
+  if (!table) return null;
   const [row] = await getDb()
     .select({
-      allianceId: remodelingDetails.allianceId,
+      allianceId: table.allianceId,
       allianceName: strategicAlliances.organizationName,
     })
-    .from(remodelingDetails)
-    .leftJoin(strategicAlliances, eq(remodelingDetails.allianceId, strategicAlliances.id))
-    .where(eq(remodelingDetails.caseId, caseId))
+    .from(table)
+    .leftJoin(strategicAlliances, eq(table.allianceId, strategicAlliances.id))
+    .where(eq(table.caseId, caseId))
     .limit(1);
   return row ?? null;
 }

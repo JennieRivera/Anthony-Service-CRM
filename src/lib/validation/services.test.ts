@@ -17,6 +17,8 @@ import {
 import { SERVICES_DRAWER_SECTIONS } from "@/components/shell/nav-drawers";
 import { PORTAL_SERVICE_TYPES } from "@/lib/portal/account";
 import { DEFAULT_BOOKABLE_SERVICE_DURATIONS } from "@/lib/booking/config";
+import { PARTNER_SERVICES } from "./case";
+import { organizationTypeValues } from "./alliance";
 
 const messages = (locale: string) =>
   JSON.parse(fs.readFileSync(path.join(process.cwd(), "messages", `${locale}.json`), "utf8"));
@@ -60,6 +62,21 @@ assert.deepEqual([...PORTAL_SERVICE_TYPES], [...activeServiceTypeValues]);
 for (const s of ["crm_technology", "corporate_events", "remodeling"] as const) {
   assert.ok(PORTAL_SERVICE_TYPES.includes(s));
   assert.equal(DEFAULT_BOOKABLE_SERVICE_DURATIONS[s], undefined);
+}
+
+// Partner-based services pick their ally from the matching alliance type.
+assert.deepEqual(PARTNER_SERVICES.remodeling.allianceType, "contractor_remodeling");
+assert.deepEqual(PARTNER_SERVICES.corporate_events.allianceType, "chef_culinary");
+for (const { allianceType } of Object.values(PARTNER_SERVICES)) {
+  assert.ok((organizationTypeValues as readonly string[]).includes(allianceType));
+  for (const locale of ["en", "es"]) assert.ok(messages(locale).OrganizationType[allianceType]);
+}
+for (const locale of ["en", "es"]) {
+  for (const service of Object.keys(PARTNER_SERVICES)) {
+    for (const key of ["title", "hint", "field", "none", "noAlly", "noneOfType", "showAll", "onlyType", "createReferral"]) {
+      assert.ok(messages(locale).Cases.partners[service][key], `${locale} Cases.partners.${service}.${key}`);
+    }
+  }
 }
 
 console.log("services.test.ts: all services-list assertions passed.");

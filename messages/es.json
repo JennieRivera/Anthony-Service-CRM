@@ -750,12 +750,7 @@
       "insuranceComplianceNotes": "Notas de Cumplimiento",
       "visibleInPortalHint": "Visible para el cliente en el portal.",
       "chooseService": "Elija un servicio",
-      "chooseServiceError": "Elija un servicio antes de guardar.",
-      "remodelingAlliance": "Contratista aliado",
-      "remodelingAllianceNone": "Sin elegir todavía",
-      "remodelingNoContractors": "Todavía no hay alianzas de tipo «Contratista / Remodelación». Puede marcar ese tipo en la alianza (Alianzas → Editar) o ver todas las alianzas.",
-      "remodelingShowAllAlliances": "Ver todas las alianzas",
-      "remodelingOnlyContractors": "Ver solo contratistas"
+      "chooseServiceError": "Elija un servicio antes de guardar."
     },
     "salesTaxCaseDetails": "Detalles de Registro de Sales Tax",
     "irsCaseDetails": "Detalles de Caso IRS / EIN / ITIN",
@@ -763,10 +758,30 @@
     "expiredBadge": "Vencido",
     "expiringInDaysBadge": "{count, plural, =0 {Vence hoy} one {Vence en 1 día} other {Vence en # días}}",
     "chooseNotaryOrDocuments": "¿Para qué servicio es este caso?",
-    "remodelingDetails": "Remodelación y Alianzas de Remodelación",
-    "remodelingHint": "Conectamos al cliente con un contratista aliado; el contratista hace la obra y contrata directamente con el cliente.",
-    "remodelingNoAlliance": "Todavía no se eligió un contratista aliado.",
-    "createReferralToAlliance": "Crear referido al aliado"
+    "partners": {
+      "remodeling": {
+        "title": "Remodelación y Alianzas de Remodelación",
+        "hint": "Conectamos al cliente con un contratista aliado; el contratista hace la obra y contrata directamente con el cliente.",
+        "field": "Contratista aliado",
+        "none": "Sin elegir todavía",
+        "noAlly": "Todavía no se eligió un contratista aliado.",
+        "noneOfType": "Todavía no hay alianzas de tipo «Contratista / Remodelación». Puede marcar ese tipo en la alianza (Alianzas → Editar) o ver todas las alianzas.",
+        "showAll": "Ver todas las alianzas",
+        "onlyType": "Ver solo contratistas",
+        "createReferral": "Crear referido al aliado"
+      },
+      "corporate_events": {
+        "title": "Eventos Corporativos y Alianzas Culinarias",
+        "hint": "Conectamos al cliente con un chef o servicio de comida aliado para su evento.",
+        "field": "Aliado culinario",
+        "none": "Sin elegir todavía",
+        "noAlly": "Todavía no se eligió un aliado culinario.",
+        "noneOfType": "Todavía no hay alianzas de tipo «Chef / Culinaria». Puede marcar ese tipo en la alianza (Alianzas → Editar) o ver todas las alianzas.",
+        "showAll": "Ver todas las alianzas",
+        "onlyType": "Ver solo chefs / culinaria",
+        "createReferral": "Crear referido al aliado"
+      }
+    }
   },
   "NotarialActType": {
     "jurat": "Jurat",
@@ -2817,7 +2832,8 @@
     "training_partner": "Socio de Capacitación",
     "university": "Universidad",
     "business_organization": "Organización Empresarial",
-    "contractor_remodeling": "Contratista / Remodelación"
+    "contractor_remodeling": "Contratista / Remodelación",
+    "chef_culinary": "Chef / Culinaria"
   },
   "AllianceStatus": {
     "prospect": "Prospecto",

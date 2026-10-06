@@ -750,12 +750,7 @@
       "insuranceComplianceNotes": "Compliance Notes",
       "visibleInPortalHint": "Visible to the client in the portal.",
       "chooseService": "Choose a service",
-      "chooseServiceError": "Choose a service before saving.",
-      "remodelingAlliance": "Allied contractor",
-      "remodelingAllianceNone": "Not chosen yet",
-      "remodelingNoContractors": "No “Contractor / Remodeling” alliances yet. Set that type on the alliance (Alliances → Edit), or see all alliances.",
-      "remodelingShowAllAlliances": "See all alliances",
-      "remodelingOnlyContractors": "Contractors only"
+      "chooseServiceError": "Choose a service before saving."
     },
     "salesTaxCaseDetails": "Sales Tax Registration Details",
     "irsCaseDetails": "IRS / EIN / ITIN Case Details",
@@ -763,10 +758,30 @@
     "expiredBadge": "Expired",
     "expiringInDaysBadge": "{count, plural, =0 {Expires today} one {Expires in 1 day} other {Expires in # days}}",
     "chooseNotaryOrDocuments": "Which service is this case for?",
-    "remodelingDetails": "Remodeling & Remodeling Partnerships",
-    "remodelingHint": "We connect the client with an allied contractor; the contractor does the work and contracts with the client directly.",
-    "remodelingNoAlliance": "No allied contractor chosen yet.",
-    "createReferralToAlliance": "Create referral to the ally"
+    "partners": {
+      "remodeling": {
+        "title": "Remodeling & Remodeling Partnerships",
+        "hint": "We connect the client with an allied contractor; the contractor does the work and contracts with the client directly.",
+        "field": "Allied contractor",
+        "none": "Not chosen yet",
+        "noAlly": "No allied contractor chosen yet.",
+        "noneOfType": "No “Contractor / Remodeling” alliances yet. Set that type on the alliance (Alliances → Edit), or see all alliances.",
+        "showAll": "See all alliances",
+        "onlyType": "Contractors only",
+        "createReferral": "Create referral to the ally"
+      },
+      "corporate_events": {
+        "title": "Corporate Events & Culinary Partnerships",
+        "hint": "We connect the client with an allied chef or caterer for their event.",
+        "field": "Culinary ally",
+        "none": "Not chosen yet",
+        "noAlly": "No culinary ally chosen yet.",
+        "noneOfType": "No “Chef / Culinary” alliances yet. Set that type on the alliance (Alliances → Edit), or see all alliances.",
+        "showAll": "See all alliances",
+        "onlyType": "Chefs / culinary only",
+        "createReferral": "Create referral to the ally"
+      }
+    }
   },
   "NotarialActType": {
     "jurat": "Jurat",
@@ -2817,7 +2832,8 @@
     "training_partner": "Training Partner",
     "university": "University",
     "business_organization": "Business Organization",
-    "contractor_remodeling": "Contractor / Remodeling"
+    "contractor_remodeling": "Contractor / Remodeling",
+    "chef_culinary": "Chef / Culinary"
   },
   "AllianceStatus": {
     "prospect": "Prospect",

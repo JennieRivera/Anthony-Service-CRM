@@ -4,7 +4,8 @@ import { dataAccess } from "@/lib/export/access";
 import { notFound } from "next/navigation";
 import { Pencil, FileText, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { getCaseById, getRemodelingDetails } from "@/lib/queries/cases";
+import { getCaseAlly, getCaseById } from "@/lib/queries/cases";
+import { isPartnerService } from "@/lib/validation/case";
 import { findActiveTemplate } from "@/lib/queries/messageTemplates";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { getAcademyCourseById } from "@/lib/queries/academyCourses";
@@ -85,7 +86,9 @@ export default async function CaseDetailPage({
   const result = await getCaseById(id);
   if (!result) notFound();
   const companiesForSelect = await listCompaniesForSelect();
-  const remodeling = result.case.serviceType === "remodeling" ? await getRemodelingDetails(id) : null;
+  const partner = isPartnerService(result.case.serviceType) ? result.case.serviceType : null;
+  const ally = partner ? await getCaseAlly(id, partner) : null;
+  const tPartner = await getTranslations(`Cases.partners.${partner ?? "remodeling"}`);
 
   const {
     case: c,
@@ -1491,18 +1494,18 @@ export default async function CaseDetailPage({
         </div>
       )}
 
-      {c.serviceType === "remodeling" && (
+      {partner && (
         <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
-          <h2 className="font-heading text-lg text-foreground">{t("remodelingDetails")}</h2>
-          <p className="text-sm text-muted-foreground">{t("remodelingHint")}</p>
+          <h2 className="font-heading text-lg text-foreground">{tPartner("title")}</h2>
+          <p className="text-sm text-muted-foreground">{tPartner("hint")}</p>
           <div className="text-sm">
-            <p className="text-muted-foreground">{t("form.remodelingAlliance")}</p>
-            {remodeling?.allianceId ? (
-              <Link href={`/alliances/${remodeling.allianceId}`} className="text-primary underline">
-                {remodeling.allianceName}
+            <p className="text-muted-foreground">{tPartner("field")}</p>
+            {ally?.allianceId ? (
+              <Link href={`/alliances/${ally.allianceId}`} className="text-primary underline">
+                {ally.allianceName}
               </Link>
             ) : (
-              <p className="text-foreground">{t("remodelingNoAlliance")}</p>
+              <p className="text-foreground">{tPartner("noAlly")}</p>
             )}
           </div>
           <div className="flex flex-wrap gap-2">
@@ -1510,11 +1513,11 @@ export default async function CaseDetailPage({
               variant="outline"
               render={
                 <Link
-                  href={`/referrals/new?clientId=${c.clientId}&caseId=${c.id}${remodeling?.allianceId ? `&allianceId=${remodeling.allianceId}` : ""}`}
+                  href={`/referrals/new?clientId=${c.clientId}&caseId=${c.id}${ally?.allianceId ? `&allianceId=${ally.allianceId}` : ""}`}
                 />
               }
             >
-              {t("createReferralToAlliance")}
+              {tPartner("createReferral")}
             </Button>
           </div>
         </div>

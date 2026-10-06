@@ -1,5 +1,5 @@
 {
-  "id": "2f23cac7-ad2a-4c33-80ce-67a96b321727",
+  "id": "f669342e-45cd-4877-8fa8-1a41cfc9e8ab",
   "prevId": "4154f852-feeb-4f5d-ad33-8558586d5a28",
   "version": "7",
   "dialect": "postgresql",
@@ -5760,6 +5760,65 @@
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.corporate_event_details": {
+      "name": "corporate_event_details",
+      "schema": "",
+      "columns": {
+        "case_id": {
+          "name": "case_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "alliance_id": {
+          "name": "alliance_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "corporate_event_details_case_id_cases_id_fk": {
+          "name": "corporate_event_details_case_id_cases_id_fk",
+          "tableFrom": "corporate_event_details",
+          "tableTo": "cases",
+          "columnsFrom": [
+            "case_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "corporate_event_details_alliance_id_strategic_alliances_id_fk": {
+          "name": "corporate_event_details_alliance_id_strategic_alliances_id_fk",
+          "tableFrom": "corporate_event_details",
+          "tableTo": "strategic_alliances",
+          "columnsFrom": [
+            "alliance_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -12815,7 +12874,8 @@
         "training_partner",
         "university",
         "business_organization",
-        "contractor_remodeling"
+        "contractor_remodeling",
+        "chef_culinary"
       ]
     },
     "public.payment_status": {

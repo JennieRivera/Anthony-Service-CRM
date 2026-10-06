@@ -62,13 +62,15 @@ import {
   irsItinStatusValues,
   irsApplicationStatusValues,
   insuranceComplianceServiceTypes,
-  remodelingServiceTypes,
+  PARTNER_SERVICES,
+  isPartnerService,
   insuranceComplianceTypeValues,
   insuranceComplianceStatusValues,
   documentPrepCaseStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { LEGACY_SERVICE_TYPES, serviceTypeValues } from "@/lib/validation/client";
+import { CaseAllyPicker } from "./CaseAllyPicker";
 import { paymentStatusValues } from "@/lib/validation/payment";
 import type {
   Case,
@@ -102,7 +104,7 @@ export function CaseForm({
   salesTaxDetails,
   irsDetails,
   insuranceDetails,
-  remodelingDetails,
+  allyDetails,
   apostille,
   clients,
   alliances = [],
@@ -127,7 +129,8 @@ export function CaseForm({
   salesTaxDetails?: SalesTaxCaseDetails | null;
   irsDetails?: IrsCaseDetails | null;
   insuranceDetails?: InsuranceComplianceDetails | null;
-  remodelingDetails?: { allianceId: string | null } | null;
+  // Remodeling / Corporate Events: the ally already chosen on the case.
+  allyDetails?: { allianceId: string | null } | null;
   apostille?: ApostilleDetails | null;
   // Remodeling: allied contractors to pick from (Alliances).
   alliances?: { id: string; organizationName: string; organizationType?: string | null }[];
@@ -389,7 +392,9 @@ export function CaseForm({
       insuranceStatus: insuranceDetails?.status ?? "not_started",
       insuranceLastRenewedDate: insuranceDetails?.lastRenewedDate ?? "",
       insuranceComplianceNotes: insuranceDetails?.complianceNotes ?? "",
-      remodelingAllianceId: remodelingDetails?.allianceId ?? "",
+      remodelingAllianceId: caseRecord?.serviceType === "remodeling" ? (allyDetails?.allianceId ?? "") : "",
+      corporateEventsAllianceId:
+        caseRecord?.serviceType === "corporate_events" ? (allyDetails?.allianceId ?? "") : "",
     },
   });
 
@@ -410,15 +415,8 @@ export function CaseForm({
   const isIrs = irsServiceTypes.includes(serviceType);
   const irsCaseType = watch("irsCaseType");
   const isInsurance = insuranceComplianceServiceTypes.includes(serviceType);
-  const isRemodeling = remodelingServiceTypes.includes(serviceType);
-  // Remodeling: contractor/remodeling alliances only, unless staff asks
-  // for every alliance (the one already chosen always stays listed).
-  const [showAllAlliances, setShowAllAlliances] = useState(false);
-  const chosenAllianceId = watch("remodelingAllianceId");
-  const contractorAlliances = alliances.filter((a) => a.organizationType === "contractor_remodeling");
-  const allianceOptions = showAllAlliances
-    ? alliances
-    : alliances.filter((a) => a.organizationType === "contractor_remodeling" || a.id === chosenAllianceId);
+  const partnerService = isPartnerService(serviceType) ? serviceType : null;
+  const partnerAllyValue = watch(partnerService ? PARTNER_SERVICES[partnerService].field : "remodelingAllianceId");
   // New cases only offer current services; an existing case on a legacy
   // type (e.g. Online Notary) keeps showing it, marked "(legacy)".
   const serviceOptions = (serviceTypeValues as readonly string[]).filter(
@@ -2985,46 +2983,14 @@ export function CaseForm({
         </div>
       )}
 
-      {isRemodeling && (
-        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
-          <h3 className="font-heading text-base text-foreground">{tCases("remodelingDetails")}</h3>
-          <p className="text-sm text-muted-foreground">{tCases("remodelingHint")}</p>
-          <div className="flex flex-col gap-1.5 sm:max-w-md">
-            <Label>{t("remodelingAlliance")}</Label>
-            <Controller
-              control={control}
-              name="remodelingAllianceId"
-              render={({ field }) => (
-                <Select
-                  value={field.value || "none"}
-                  onValueChange={(v) => field.onChange(!v || v === "none" ? "" : v)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">{t("remodelingAllianceNone")}</SelectItem>
-                    {allianceOptions.map((a) => (
-                      <SelectItem key={a.id} value={a.id}>
-                        {a.organizationName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {contractorAlliances.length === 0 && !showAllAlliances && (
-              <p className="text-xs text-muted-foreground">{t("remodelingNoContractors")}</p>
-            )}
-            <button
-              type="button"
-              className="w-fit cursor-pointer text-sm text-primary underline"
-              onClick={() => setShowAllAlliances((v) => !v)}
-            >
-              {showAllAlliances ? t("remodelingOnlyContractors") : t("remodelingShowAllAlliances")}
-            </button>
-          </div>
-        </div>
+      {partnerService && (
+        <CaseAllyPicker
+          key={partnerService}
+          service={partnerService}
+          control={control}
+          value={partnerAllyValue}
+          alliances={alliances}
+        />
       )}
 
       <div className="flex justify-end gap-3">

@@ -554,8 +554,9 @@ export const caseFormSchema = z.object({
     .or(z.literal("")),
   insuranceLastRenewedDate: optionalString,
   insuranceComplianceNotes: optionalString,
-  // Remodeling: the allied contractor (a strategic alliance).
+  // Partner-based services: the allied contractor / chef (an alliance).
   remodelingAllianceId: optionalString,
+  corporateEventsAllianceId: optionalString,
 });
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
@@ -574,3 +575,12 @@ export const irsServiceTypes = ["irs_administrative"];
 export const insuranceComplianceServiceTypes = ["insurance_compliance"];
 export const documentPrepServiceTypes = ["document_prep"];
 export const remodelingServiceTypes = ["remodeling"];
+
+// Services worked through an allied partner from Alliances: which form
+// field holds the ally, and which alliance type is offered first.
+export const PARTNER_SERVICES = {
+  remodeling: { field: "remodelingAllianceId", allianceType: "contractor_remodeling" },
+  corporate_events: { field: "corporateEventsAllianceId", allianceType: "chef_culinary" },
+} as const;
+export type PartnerService = keyof typeof PARTNER_SERVICES;
+export const isPartnerService = (s: string): s is PartnerService => s in PARTNER_SERVICES;

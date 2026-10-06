@@ -2970,6 +2970,20 @@ export const remodelingDetails = pgTable("remodeling_details", {
     .defaultNow(),
 });
 
+// Corporate Events & Culinary Partnerships — the allied chef / caterer
+// (a strategic alliance) for the event. Same pattern as remodelingDetails.
+export const corporateEventDetails = pgTable("corporate_event_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  allianceId: uuid("alliance_id").references(() => strategicAlliances.id, {
+    onDelete: "set null",
+  }),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const insuranceComplianceDetails = pgTable("insurance_compliance_details", {
   caseId: uuid("case_id")
     .primaryKey()
@@ -3631,6 +3645,8 @@ export const organizationTypeEnum = pgEnum("organization_type", [
   "business_organization",
   // Allied contractors for Remodeling & Remodeling Partnerships cases.
   "contractor_remodeling",
+  // Chefs / caterers for Corporate Events & Culinary Partnerships cases.
+  "chef_culinary",
 ]);
 
 export const allianceStatusEnum = pgEnum("alliance_status", [
