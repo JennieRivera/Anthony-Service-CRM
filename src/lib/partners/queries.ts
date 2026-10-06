@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gt, inArray, or, sql } from "drizzle-orm";
+import { aliasedTable, and, count, desc, eq, gt, inArray, isNotNull, or, sql } from "drizzle-orm";
 import {
   allianceDocuments,
   clientCommunicationPreferences,
@@ -6,6 +6,8 @@ import {
   marketingAssetPartnerShares,
   marketingContentAssets,
   partnerConsentEvents,
+  partnerContactDocuments,
+  partnerContacts,
   partnerPhotos,
   partnerProfiles,
   referrals,
@@ -344,7 +346,11 @@ export async function isPartnerUploadLimitReached(db: PortalDb, allianceId: stri
     .select({ n: count() })
     .from(marketingContentAssets)
     .where(and(eq(marketingContentAssets.submittedByAllianceId, allianceId), gt(marketingContentAssets.createdAt, since)));
-  return (docs?.n ?? 0) + (assets?.n ?? 0) >= PARTNER_MAX_UPLOADS_PER_DAY;
+  const [contactDocs] = await db
+    .select({ n: count() })
+    .from(partnerContactDocuments)
+    .where(and(eq(partnerContactDocuments.ownerAllianceId, allianceId), gt(partnerContactDocuments.createdAt, since)));
+  return (docs?.n ?? 0) + (assets?.n ?? 0) + (contactDocs?.n ?? 0) >= PARTNER_MAX_UPLOADS_PER_DAY;
 }
 
 export const PARTNER_DOCUMENT_TYPES = ["contract", "w9", "license", "insurance", "alliance_agreement", "other"] as const;
@@ -463,6 +469,9 @@ const OPEN = ["new_referral", "registered", "consent_pending", "sent_to_partner"
 const CONTACTED = ["under_review", "documents_pending", "qualified", "service_in_progress"];
 const CLOSED = ["closed_funded", "commission_due", "commission_paid"];
 export type PartnerReferralStage = "new" | "contacted" | "closed" | "not_closed";
+// What the SENDER of a network referral (option A) sees: sent to AMS, then
+// assigned to an ally, then the usual stages.
+export type PartnerSentStage = "sent" | "assigned" | PartnerReferralStage;
 
 export function partnerReferralStage(pipelineStatus: string): PartnerReferralStage {
   if (OPEN.includes(pipelineStatus)) return "new";
@@ -472,9 +481,11 @@ export function partnerReferralStage(pipelineStatus: string): PartnerReferralSta
 }
 
 export async function listPartnerReferrals(db: PortalDb, allianceId: string) {
-  // Sent TO the alliance: client name/phone only with the client's
-  // partner-sharing consent.
-  const toPartner = await db
+  // Sent TO the alliance — by AMS, or another ally's referral that AMS
+  // assigned to it (option A): only the service and the note meant for it,
+  // and the client's name/phone only with the client's partner-sharing
+  // consent. Never the sending ally or its note.
+  const toPartnerRows = await db
     .select({
       id: referrals.id,
       referralSeq: referrals.referralSeq,
@@ -482,6 +493,9 @@ export async function listPartnerReferrals(db: PortalDb, allianceId: string) {
       pipelineStatus: referrals.pipelineStatus,
       partnerNote: referrals.partnerNote,
       partnerService: referrals.partnerService,
+      assignedAllianceId: referrals.assignedAllianceId,
+      requestedService: referrals.requestedService,
+      assigneeNote: referrals.assigneeNote,
       consent: clientCommunicationPreferences.partnerReferralConsent,
       clientName: clients.fullName,
       clientPhone: clients.phone,
@@ -489,8 +503,20 @@ export async function listPartnerReferrals(db: PortalDb, allianceId: string) {
     .from(referrals)
     .innerJoin(clients, eq(clients.id, referrals.clientId))
     .leftJoin(clientCommunicationPreferences, eq(clientCommunicationPreferences.clientId, referrals.clientId))
-    .where(and(eq(referrals.allianceId, allianceId), eq(referrals.createdByPartner, false)))
+    .where(
+      or(
+        and(eq(referrals.allianceId, allianceId), eq(referrals.createdByPartner, false)),
+        eq(referrals.assignedAllianceId, allianceId),
+      ),
+    )
     .orderBy(desc(referrals.referralDate));
+  const toPartner = toPartnerRows.map(({ assignedAllianceId, requestedService, assigneeNote, partnerNote, partnerService, ...r }) =>
+    assignedAllianceId === allianceId
+      ? { ...r, partnerNote: assigneeNote, partnerService: null, requestedService }
+      : { ...r, partnerNote, partnerService, requestedService: null },
+  );
+
+  const assignee = aliasedTable(strategicAlliances, "assignee");
 
   const fromPartner = await db
     .select({
@@ -503,8 +529,14 @@ export async function listPartnerReferrals(db: PortalDb, allianceId: string) {
       email: referrals.partnerContactEmail,
       service: referrals.partnerService,
       note: referrals.partnerNote,
+      networkRouting: referrals.networkRouting,
+      requestedService: referrals.requestedService,
+      assignedAllianceId: referrals.assignedAllianceId,
+      showAssignee: referrals.showAssigneeToSender,
+      assigneeName: assignee.organizationName,
     })
     .from(referrals)
+    .leftJoin(assignee, eq(assignee.id, referrals.assignedAllianceId))
     .where(and(eq(referrals.allianceId, allianceId), eq(referrals.createdByPartner, true)))
     .orderBy(desc(referrals.referralDate));
 
@@ -516,7 +548,18 @@ export async function listPartnerReferrals(db: PortalDb, allianceId: string) {
       name: consent === true ? clientName : null,
       phone: consent === true ? clientPhone : null,
     })),
-    fromPartner: fromPartner.map(({ pipelineStatus, ...r }) => ({ ...r, stage: partnerReferralStage(pipelineStatus) })),
+    fromPartner: fromPartner.map(({ pipelineStatus, assignedAllianceId, showAssignee, assigneeName, ...r }) => {
+      const base = partnerReferralStage(pipelineStatus);
+      const stage: PartnerSentStage = !r.networkRouting
+        ? base
+        : !assignedAllianceId
+          ? "sent"
+          : base === "new"
+            ? "assigned"
+            : base;
+      // Who received it: only when staff ticked "show who it was assigned to".
+      return { ...r, stage, assignedTo: r.networkRouting && assignedAllianceId && showAssignee ? assigneeName : null };
+    }),
   };
 }
 
@@ -527,7 +570,8 @@ const STAGE_TO_STATUS = {
   not_closed: { pipelineStatus: "declined", status: "closed_lost" },
 } as const;
 
-// The alliance updates a referral that was sent TO it (never one it sent).
+// The alliance updates a referral that was sent TO it (by AMS, or assigned
+// to it from another ally) — never one it sent.
 export async function setPartnerReferralStage(
   db: PortalDb,
   params: { allianceId: string; referralId: unknown; stage: unknown; now?: Date },
@@ -546,8 +590,10 @@ export async function setPartnerReferralStage(
     .where(
       and(
         eq(referrals.id, params.referralId),
-        eq(referrals.allianceId, params.allianceId),
-        eq(referrals.createdByPartner, false),
+        or(
+          and(eq(referrals.allianceId, params.allianceId), eq(referrals.createdByPartner, false)),
+          and(isNotNull(referrals.assignedAllianceId), eq(referrals.assignedAllianceId, params.allianceId)),
+        ),
       ),
     )
     .returning({ id: referrals.id, referralSeq: referrals.referralSeq });
@@ -586,6 +632,10 @@ export async function createPartnerReferral(
       ? (input.service as ServiceTypeValue)
       : null;
   const note = clean(input.note, 1000);
+  // Option A: "send this referral to another ally of the AMS network".
+  const network = input.network === true;
+  const requestedService = clean(input.requestedService, 200);
+  if (network && requestedService.length < 2) throw new PartnerValidationError("requestedService");
 
   const [recent] = await db
     .select({ n: count() })
@@ -638,9 +688,28 @@ export async function createPartnerReferral(
       partnerContactEmail: email || null,
       partnerService: service,
       partnerNote: note || null,
+      networkRouting: network,
+      requestedService: network ? requestedService : null,
       createdAt: now,
     })
     .returning({ id: referrals.id, referralSeq: referrals.referralSeq });
+
+  // "My allies and contacts": what the ally typed, for its own list.
+  const [contact] = await db
+    .insert(partnerContacts)
+    .values({
+      ownerAllianceId: params.allianceId,
+      kind: "person",
+      name,
+      phone,
+      email: email || null,
+      services: network ? requestedService : null,
+      note: note || null,
+      clientId: lead.id,
+      referralId: referral.id,
+      createdAt: now,
+    })
+    .returning({ id: partnerContacts.id });
 
   await recordPartnerConsent(db, {
     allianceId: params.allianceId,
@@ -655,11 +724,14 @@ export async function createPartnerReferral(
   await db.insert(tasks).values({
     clientId: lead.id,
     allianceId: params.allianceId,
-    type: "partner_referral",
-    title: `New referral from ${ally}: ${name}${dup ? ` — possible duplicate of ${dup.name}` : ""}`,
+    referralId: referral.id,
+    type: network ? "partner_referral_assign" : "partner_referral",
+    title: network
+      ? `Assign referral to an ally: ${name} needs "${requestedService}" (from ${ally})${dup ? ` — possible duplicate of ${dup.name}` : ""}`
+      : `New referral from ${ally}: ${name}${dup ? ` — possible duplicate of ${dup.name}` : ""}`,
     createdAt: now,
   });
-  return referral;
+  return { ...referral, clientId: lead.id, contactId: contact.id };
 }
 
 // ── contractor license / insurance alerts (daily cron) ───────────────

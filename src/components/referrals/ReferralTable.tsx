@@ -60,7 +60,11 @@ export async function ReferralTable({
                 <Badge variant="outline">{tCategory(referral.category)}</Badge>
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {referral.direction ? tDirection(referral.direction) : "—"}
+                {referral.networkRouting
+                  ? t("network.fromTo", { from: referral.senderName ?? "—", to: referral.assigneeName ?? t("network.unassigned") })
+                  : referral.direction
+                    ? tDirection(referral.direction)
+                    : "—"}
               </TableCell>
               <TableCell className="text-muted-foreground">
                 {formatDate(referral.referralDate)}

@@ -9,6 +9,7 @@ import {
   ExternalLink,
   FileText,
   FolderOpen,
+  Handshake,
   User,
   Network,
 } from "lucide-react";
@@ -78,13 +79,15 @@ type DirectAction =
   | { kind: "document"; href: string }
   | { kind: "client"; href: string }
   | { kind: "case"; href: string }
-  | { kind: "alliance"; href: string };
+  | { kind: "alliance"; href: string }
+  | { kind: "referral"; href: string };
 
 const PARTNER_TYPES = new Set([
   "partner_profile_review",
   "partner_document_review",
   "partner_marketing_review",
   "partner_license_expiring",
+  "partner_network_review",
 ]);
 
 function directAction(task: TaskBoardRow): DirectAction {
@@ -92,6 +95,7 @@ function directAction(task: TaskBoardRow): DirectAction {
     ? { kind: "client", href: `/clients/${task.clientId}` }
     : { kind: "alliance", href: `/alliances/${task.allianceId}` };
   if (task.type === "partner_marketing_review") return { kind: "alliance", href: "/marketing-content" };
+  if (task.type === "partner_referral_assign" && task.referralId) return { kind: "referral", href: `/referrals/${task.referralId}` };
   if (PARTNER_TYPES.has(task.type) && task.allianceId) return { kind: "alliance", href: `/alliances/${task.allianceId}` };
   if (APPOINTMENT_TYPES.has(task.type)) {
     return task.appointmentId ? { kind: "appointment", href: `/appointments/${task.appointmentId}` } : client;
@@ -116,8 +120,9 @@ function DirectButton({ action, size = "sm" }: { action: DirectAction; size?: "s
     client: t("openClient"),
     case: t("openCase"),
     alliance: t("openAlliance"),
+    referral: t("openReferral"),
   }[action.kind];
-  const Icon = { appointment: CalendarClock, document: FileText, client: User, case: FolderOpen, alliance: Network }[action.kind];
+  const Icon = { appointment: CalendarClock, document: FileText, client: User, case: FolderOpen, alliance: Network, referral: Handshake }[action.kind];
   if (action.kind === "document") {
     return (
       <Button

@@ -40,11 +40,16 @@ export async function createPartnerAccessLink(
 ): Promise<{ token: string; expiresAt: Date }> {
   const now = params.now ?? new Date();
   const [alliance] = await db
-    .select({ phone: strategicAlliances.phone })
+    .select({ phone: strategicAlliances.phone, status: strategicAlliances.status, addedBy: strategicAlliances.addedByAllianceId })
     .from(strategicAlliances)
     .where(eq(strategicAlliances.id, params.allianceId))
     .limit(1);
   if (!alliance) throw new PartnerAccessError("Alliance not found");
+  // A business another ally added (Phase B) gets portal access only after
+  // staff converts it into an active AMS ally.
+  if (alliance.addedBy && alliance.status !== "active_partner" && alliance.status !== "member") {
+    throw new PartnerAccessError("Alliance is not active yet");
+  }
   const lastFour = lastFourDigits(alliance.phone);
   if (!lastFour) throw new PartnerAccessError("Alliance has no phone number");
 

@@ -1,6 +1,6 @@
 import { del, get, head } from "@vercel/blob";
 import { or, eq } from "drizzle-orm";
-import { allianceDocuments, marketingContentAssets, partnerPhotos, partnerProfiles } from "@/lib/db/schema";
+import { allianceDocuments, marketingContentAssets, partnerContactDocuments, partnerPhotos, partnerProfiles } from "@/lib/db/schema";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { logAuditEvent } from "@/lib/audit";
 import { scanFileForSensitiveData } from "@/lib/documents/fileValidation";
@@ -10,6 +10,7 @@ import { partnerUploadKindFor } from "@/lib/partners/tokens";
 import {
   PARTNER_DOCUMENT_TYPES,
   PartnerLimitError,
+  PartnerNotFoundError,
   addPartnerPhoto,
   getPartnerLogoUrl,
   isPartnerUploadLimitReached,
@@ -19,6 +20,7 @@ import {
   type PartnerDocumentType,
 } from "@/lib/partners/queries";
 import { partnerDb, requirePartnerSessionForApi } from "@/lib/partners/session";
+import { recordPartnerContactDocument } from "@/lib/partners/network";
 import { badRequest, forbiddenOrigin, isSameOrigin, json, notFound, readSmallJson } from "@/lib/portal/http";
 
 // Step 3 of a partner upload. Nothing the browser sends is trusted: the
@@ -66,6 +68,7 @@ export async function POST(request: Request) {
     fileName?: unknown;
     documentType?: unknown;
     caption?: unknown;
+    contactId?: unknown;
   } | null;
   if (!body || typeof body.pathname !== "string" || typeof body.fileName !== "string") return badRequest();
   const kind = partnerUploadKindFor(body.pathname, session.allianceId);
@@ -105,7 +108,12 @@ export async function POST(request: Request) {
     .from(partnerProfiles)
     .where(or(eq(partnerProfiles.logoBlobUrl, blob.url)))
     .limit(1);
-  const existing = existingDoc ?? existingAsset ?? existingPhoto ?? existingLogo;
+  const [existingContactDoc] = await db
+    .select({ allianceId: partnerContactDocuments.ownerAllianceId })
+    .from(partnerContactDocuments)
+    .where(eq(partnerContactDocuments.blobUrl, blob.url))
+    .limit(1);
+  const existing = existingDoc ?? existingAsset ?? existingPhoto ?? existingLogo ?? existingContactDoc;
   if (existing) return existing.allianceId === session.allianceId ? json({ ok: true }) : notFound();
 
   const reject = async (error: string, status = 400) => {
@@ -137,6 +145,16 @@ export async function POST(request: Request) {
         sensitiveDataReason,
       });
       await logAuditEvent({ action: "partner.document_uploaded", entityType: "alliance_document", entityId: id, summary: `Alliance uploaded "${fileName}" (${documentType})`, actor });
+    } else if (kind === "contact_document") {
+      const sensitiveDataReason = await scanFileForSensitiveData(new File([bytes as BlobPart], fileName, { type: check.contentType }));
+      const id = await recordPartnerContactDocument(db, {
+        allianceId: session.allianceId,
+        contactId: body.contactId,
+        fileName,
+        blobUrl: blob.url,
+        sensitiveDataReason,
+      });
+      await logAuditEvent({ action: "partner.contact_document_uploaded", entityType: "alliance", entityId: session.allianceId, summary: `Alliance uploaded "${fileName}" for a contact in its network (${id})`, actor });
     } else if (kind === "marketing") {
       const id = await recordPartnerMarketingSubmission(db, {
         allianceId: session.allianceId,
@@ -156,6 +174,7 @@ export async function POST(request: Request) {
     }
   } catch (err) {
     if (err instanceof PartnerLimitError) return reject("photo_limit", 429);
+    if (err instanceof PartnerNotFoundError) return reject("not_found", 404);
     throw err;
   }
   return json({ ok: true });

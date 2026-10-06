@@ -8,6 +8,7 @@ import {
   documents,
   invoices,
   partnerAccessLinks,
+  partnerContactDocuments,
   partnerPhotos,
   partnerProfiles,
   partnerSessions,
@@ -107,8 +108,9 @@ export type AllianceDeleteResult =
 
 // Deletes the alliance and, with it (cascade): portal access, sessions,
 // partner profile and photos, alliance documents, contacts, network
-// links, memberships, status history and its tasks. Stays: clients it
-// added ("Added by…" is cleared), referrals (alliance cleared), and
+// links, memberships, status history, its tasks, and its own network list
+// (with the files it uploaded for its contacts). Stays: clients and
+// alliances it added ("Added by…" is cleared), referrals (alliance cleared), and
 // appointments/communications (alliance cleared). Returns the blob URLs
 // (documents, photos, logo) for the caller to remove.
 export async function deleteAllianceRecord(db: PortalDb, allianceId: string): Promise<AllianceDeleteResult> {
@@ -121,10 +123,11 @@ export async function deleteAllianceRecord(db: PortalDb, allianceId: string): Pr
   const impact = await getAllianceDeletionImpact(db, allianceId);
   if (impact.blockedBy) return { ok: false, reason: impact.blockedBy };
 
-  const [docs, photos, profile] = await Promise.all([
+  const [docs, photos, profile, contactDocs] = await Promise.all([
     db.select({ url: allianceDocuments.blobUrl }).from(allianceDocuments).where(eq(allianceDocuments.allianceId, allianceId)),
     db.select({ url: partnerPhotos.blobUrl }).from(partnerPhotos).where(eq(partnerPhotos.allianceId, allianceId)),
     db.select({ url: partnerProfiles.logoBlobUrl }).from(partnerProfiles).where(eq(partnerProfiles.allianceId, allianceId)),
+    db.select({ url: partnerContactDocuments.blobUrl }).from(partnerContactDocuments).where(eq(partnerContactDocuments.ownerAllianceId, allianceId)),
   ]);
   try {
     // Explicit for clarity (these also cascade).
@@ -138,6 +141,11 @@ export async function deleteAllianceRecord(db: PortalDb, allianceId: string): Pr
   return {
     ok: true,
     name: alliance.name,
-    blobUrls: [...docs.map((d) => d.url), ...photos.map((p) => p.url), ...profile.flatMap((p) => (p.url ? [p.url] : []))],
+    blobUrls: [
+      ...docs.map((d) => d.url),
+      ...photos.map((p) => p.url),
+      ...profile.flatMap((p) => (p.url ? [p.url] : [])),
+      ...contactDocs.map((d) => d.url),
+    ],
   };
 }

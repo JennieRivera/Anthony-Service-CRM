@@ -1026,6 +1026,11 @@ export const taskTypeEnum = pgEnum("task_type", [
   "partner_marketing_review",
   "partner_referral",
   "partner_license_expiring",
+  // Partner portal (Phase B) — an ally asked AMS to pass a referral to
+  // another ally (staff assigns it), and an ally added a business or a
+  // document to its network.
+  "partner_referral_assign",
+  "partner_network_review",
 ]);
 
 export const taskStatusEnum = pgEnum("task_status", [
@@ -1065,6 +1070,11 @@ export const tasks = pgTable("tasks", {
   // The document a "Review client document" task is about (portal upload),
   // so the task can open it directly.
   documentId: uuid("document_id").references(() => documents.id, {
+    onDelete: "set null",
+  }),
+  // Partner portal (Phase B) — the referral a "partner_referral_assign"
+  // task is about, so the task opens it directly.
+  referralId: uuid("referral_id").references((): AnyPgColumn => referrals.id, {
     onDelete: "set null",
   }),
 }, (table) => [
@@ -3450,6 +3460,20 @@ export const referrals = pgTable("referrals", {
   partnerContactName: text("partner_contact_name"),
   partnerContactPhone: text("partner_contact_phone"),
   partnerContactEmail: text("partner_contact_email"),
+  // Partner portal (Phase B, option A): an alliance asks AMS to pass this
+  // referral to ANOTHER ally of the AMS network. It never sees the list of
+  // allies; staff picks the receiving ally (assignedAllianceId) and
+  // approves it. The receiving ally sees only requestedService/assigneeNote
+  // (and the client's name/phone with the client's consent); the sender
+  // sees who received it only if showAssigneeToSender.
+  networkRouting: boolean("network_routing").notNull().default(false),
+  requestedService: text("requested_service"),
+  assignedAllianceId: uuid("assigned_alliance_id").references((): AnyPgColumn => strategicAlliances.id, {
+    onDelete: "set null",
+  }),
+  assignedAt: timestamp("assigned_at", { withTimezone: true }),
+  assigneeNote: text("assignee_note"),
+  showAssigneeToSender: boolean("show_assignee_to_sender").notNull().default(false),
 });
 
 export const referralStatusHistory = pgTable("referral_status_history", {
@@ -3786,6 +3810,12 @@ export const strategicAlliances = pgTable("strategic_alliances", {
   // committed to.
   amsResponsibilities: text("ams_responsibilities"),
   partnerResponsibilities: text("partner_responsibilities"),
+  // Partner portal (Phase B): a business an ally added in "My allies and
+  // contacts" enters as a Prospect "Added by [ally]". It can get its own
+  // portal access only after staff converts it to an active ally.
+  addedByAllianceId: uuid("added_by_alliance_id").references((): AnyPgColumn => strategicAlliances.id, {
+    onDelete: "set null",
+  }),
 });
 
 // Phase 1.5B — B2B Alliances enhancement. One alliance can have several
@@ -4828,6 +4858,53 @@ export const partnerServices = pgTable(
     priceFrom: numeric("price_from", { precision: 12, scale: 2 }),
   },
   (table) => [index("partner_services_alliance_idx").on(table.allianceId)],
+);
+
+// "My allies and contacts" (partner portal, Phase B): what an ally added
+// to ITS network, exactly as it typed it. A person becomes a Lead in
+// Clients (with a referral to AMS); a business becomes a Prospect alliance.
+// The ally lists only its own rows from here and never sees the CRM
+// records they became; staff sees them in "Ally network" on the alliance.
+export const partnerContacts = pgTable(
+  "partner_contacts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    ownerAllianceId: uuid("owner_alliance_id")
+      .notNull()
+      .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+    kind: text("kind", { enum: ["person", "business"] }).notNull(),
+    name: text("name").notNull(),
+    businessName: text("business_name"),
+    phone: text("phone"),
+    email: text("email"),
+    services: text("services"),
+    note: text("note"),
+    clientId: uuid("client_id").references(() => clients.id, { onDelete: "set null" }),
+    referralId: uuid("referral_id").references(() => referrals.id, { onDelete: "set null" }),
+    introducedAllianceId: uuid("introduced_alliance_id").references(() => strategicAlliances.id, { onDelete: "set null" }),
+  },
+  (table) => [index("partner_contacts_owner_idx").on(table.ownerAllianceId, table.createdAt)],
+);
+
+// Files an ally uploads for one of its contacts (e.g. that ally's
+// contract). Private Blob; only the owning ally and staff can open them.
+export const partnerContactDocuments = pgTable(
+  "partner_contact_documents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    contactId: uuid("contact_id")
+      .notNull()
+      .references(() => partnerContacts.id, { onDelete: "cascade" }),
+    ownerAllianceId: uuid("owner_alliance_id")
+      .notNull()
+      .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+    fileName: text("file_name").notNull(),
+    blobUrl: text("blob_url").notNull(),
+    sensitiveDataReason: text("sensitive_data_reason"),
+  },
+  (table) => [index("partner_contact_documents_contact_idx").on(table.contactId)],
 );
 
 // The alliance's business photo gallery (private Blob, max 12).

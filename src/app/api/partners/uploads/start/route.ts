@@ -4,6 +4,7 @@ import { PARTNER_MAX_PHOTOS } from "@/lib/partners/config";
 import { PARTNER_UPLOAD_KINDS, createPartnerUploadPathname, type PartnerUploadKind } from "@/lib/partners/tokens";
 import { countPartnerPhotos, isPartnerUploadLimitReached } from "@/lib/partners/queries";
 import { partnerDb, requirePartnerSessionForApi } from "@/lib/partners/session";
+import { isOwnPartnerContact } from "@/lib/partners/network";
 import { badRequest, forbiddenOrigin, isSameOrigin, json, readSmallJson } from "@/lib/portal/http";
 
 // Logo and gallery photos must be web images (shown in the CRM).
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
   if (response) return response;
   if (!isBlobConfigured()) return json({ error: "unavailable" }, 503);
 
-  const body = (await readSmallJson(request)) as { fileName?: unknown; kind?: unknown } | null;
+  const body = (await readSmallJson(request)) as { fileName?: unknown; kind?: unknown; contactId?: unknown } | null;
   if (!body || typeof body.fileName !== "string" || body.fileName.length > 255) return badRequest();
   if (!(PARTNER_UPLOAD_KINDS as readonly unknown[]).includes(body.kind)) return badRequest();
   const kind = body.kind as PartnerUploadKind;
@@ -31,6 +32,8 @@ export async function POST(request: Request) {
 
   const db = partnerDb();
   if (await isPartnerUploadLimitReached(db, session.allianceId)) return json({ error: "limit_reached" }, 429);
+  // A contact document must be for one of this ally's OWN contacts.
+  if (kind === "contact_document" && !(await isOwnPartnerContact(db, session.allianceId, body.contactId))) return badRequest();
   if (kind === "photo" && (await countPartnerPhotos(db, session.allianceId)) >= PARTNER_MAX_PHOTOS) {
     return json({ error: "photo_limit" }, 429);
   }

@@ -12,6 +12,11 @@ import { ReferralCompensationSection } from "@/components/referrals/ReferralComp
 import AccessDenied from "@/components/AccessDenied";
 import { getCurrentRole, hasAccessArea, hasReferralViewAccess } from "@/lib/permissions";
 import { FinanceLegalNotice } from "@/components/legal/FinanceLegalNotice";
+import { NetworkReferralAssign } from "@/components/referrals/NetworkReferralAssign";
+import { listAlliancesForSelect } from "@/lib/queries/alliances";
+import { getDb } from "@/lib/db";
+import { strategicAlliances } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import {
   setCompensationTermsAction,
   markCompensationEarnedAction,
@@ -52,6 +57,21 @@ export default async function ReferralDetailPage({
 
   const { referral, client, caseTitle, allianceName, referrerClient, rriDetails, statusHistory, compensation } = result;
   const referralNumber = `REF-${String(referral.referralSeq).padStart(5, "0")}`;
+  // Ally-network referral (option A): who received it, and the allies staff
+  // can pick from.
+  const [assignedAllianceName, allianceOptions] = referral.networkRouting
+    ? await Promise.all([
+        referral.assignedAllianceId
+          ? getDb()
+              .select({ name: strategicAlliances.organizationName })
+              .from(strategicAlliances)
+              .where(eq(strategicAlliances.id, referral.assignedAllianceId))
+              .limit(1)
+              .then((r) => r[0]?.name ?? null)
+          : Promise.resolve(null),
+        listAlliancesForSelect(),
+      ])
+    : [null, []];
 
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
@@ -164,6 +184,52 @@ export default async function ReferralDetailPage({
           <p className="text-foreground">{referral.receivingParty}</p>
         </div>
       </div>
+
+      {referral.networkRouting && (
+        <div className="flex flex-col gap-4 rounded-lg border-2 border-primary/40 bg-card p-6">
+          <div className="flex flex-col gap-1">
+            <h2 className="font-heading text-lg text-foreground">{t("network.title")}</h2>
+            <p className="text-sm text-muted-foreground">{t("network.hint")}</p>
+          </div>
+          <p className="text-sm text-foreground">
+            {t("network.from")}{" "}
+            {referral.allianceId ? (
+              <Link href={`/alliances/${referral.allianceId}`} className="font-medium hover:underline">
+                {allianceName ?? referral.referredBy}
+              </Link>
+            ) : (
+              referral.referredBy
+            )}{" "}
+            → {t("network.to")}{" "}
+            {referral.assignedAllianceId ? (
+              <Link href={`/alliances/${referral.assignedAllianceId}`} className="font-medium hover:underline">
+                {assignedAllianceName ?? "—"}
+              </Link>
+            ) : (
+              <span className="font-medium">{t("network.unassigned")}</span>
+            )}
+          </p>
+          <p className="text-sm text-foreground">
+            <span className="text-muted-foreground">{t("network.requestedService")}:</span> {referral.requestedService ?? "—"}
+          </p>
+          {referral.partnerNote && (
+            <p className="text-sm whitespace-pre-line text-foreground">
+              <span className="text-muted-foreground">{t("network.senderNote")}:</span> {referral.partnerNote}
+            </p>
+          )}
+          {canEditReferral && (
+            <NetworkReferralAssign
+              referralId={id}
+              alliances={allianceOptions.filter((a) => a.id !== referral.allianceId)}
+              current={{
+                assignedAllianceId: referral.assignedAllianceId,
+                assigneeNote: referral.assigneeNote,
+                showAssigneeToSender: referral.showAssigneeToSender,
+              }}
+            />
+          )}
+        </div>
+      )}
 
       {(referral.grossRevenue ||
         referral.commissionPercentage ||

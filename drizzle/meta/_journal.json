@@ -526,6 +526,13 @@
       "when": 1791324226471,
       "tag": "0074_partner_services_installer",
       "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1791328322806,
+      "tag": "0075_partner_network",
+      "breakpoints": true
     }
   ]
 }

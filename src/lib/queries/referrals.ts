@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { aliasedTable, desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
   referrals,
@@ -25,6 +25,9 @@ export async function listReferralsForSelect() {
 }
 
 export async function listReferralsWithClient() {
+  // Ally-network referrals (partner portal, option A) show "From → To".
+  const sender = aliasedTable(strategicAlliances, "sender");
+  const assignee = aliasedTable(strategicAlliances, "assignee");
   return getDb()
     .select({
       id: referrals.id,
@@ -39,9 +42,14 @@ export async function listReferralsWithClient() {
       allianceId: referrals.allianceId,
       clientId: clients.id,
       clientName: clients.fullName,
+      networkRouting: referrals.networkRouting,
+      senderName: sender.organizationName,
+      assigneeName: assignee.organizationName,
     })
     .from(referrals)
     .innerJoin(clients, eq(referrals.clientId, clients.id))
+    .leftJoin(sender, eq(sender.id, referrals.allianceId))
+    .leftJoin(assignee, eq(assignee.id, referrals.assignedAllianceId))
     .orderBy(desc(referrals.createdAt));
 }
 

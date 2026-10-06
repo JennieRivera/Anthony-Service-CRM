@@ -42,7 +42,7 @@ export function PartnerAccessCard({
     startTransition(async () => {
       const result = await createPartnerLinkAction(allianceId, locale);
       if (result.ok) setLink({ url: result.url, expiresAt: result.expiresAt });
-      else setError(result.error === "no_phone" ? t("needsPhone") : t("error"));
+      else setError(result.error === "no_phone" ? t("needsPhone") : result.error === "not_active" ? t("needsActive") : t("error"));
     });
   }
 

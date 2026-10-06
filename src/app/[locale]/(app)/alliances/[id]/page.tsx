@@ -21,6 +21,10 @@ import { getPartnerStaffView } from "@/lib/partners/staff";
 import { AllianceDeleteButton } from "@/components/alliances/AllianceDeleteButton";
 import { getAllianceDeletionImpact } from "@/lib/deletion";
 import { formatPriceFrom } from "@/lib/partners/format";
+import { ACTIVE_ALLY_STATUSES, getAllianceNetworkForStaff } from "@/lib/partners/network";
+import { strategicAlliances as allianceTable } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { AllianceConvertButton } from "@/components/alliances/AllianceConvertButton";
 import { getDb } from "@/lib/db";
 import type { PortalDb } from "@/lib/portal/db";
 import AccessDenied from "@/components/AccessDenied";
@@ -80,7 +84,24 @@ export default async function AllianceDetailPage({
   ]);
   if (!result) notFound();
   const tPartner = await getTranslations("PartnerAccess");
+  const tNetwork = await getTranslations("AllyNetwork");
+  const tStatus = await getTranslations("AllianceStatus");
   const locale = await getLocale();
+  // Partner portal (Phase B): who added this alliance, and what this
+  // alliance added to ITS network.
+  const [addedBy, allyNetwork] = await Promise.all([
+    result.alliance.addedByAllianceId
+      ? getDb()
+          .select({ id: allianceTable.id, name: allianceTable.organizationName })
+          .from(allianceTable)
+          .where(eq(allianceTable.id, result.alliance.addedByAllianceId))
+          .limit(1)
+          .then((r) => r[0] ?? null)
+      : Promise.resolve(null),
+    getAllianceNetworkForStaff(getDb() as unknown as PortalDb, id),
+  ]);
+  const needsConversion =
+    Boolean(result.alliance.addedByAllianceId) && !(ACTIVE_ALLY_STATUSES as readonly string[]).includes(result.alliance.status);
 
   const {
     alliance,
@@ -119,6 +140,19 @@ export default async function AllianceDetailPage({
           {deletionImpact && <AllianceDeleteButton allianceId={id} impact={deletionImpact} />}
         </div>
       </div>
+
+      {addedBy && (
+        <div className="flex flex-col gap-3 rounded-lg border-2 border-primary/40 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-foreground">
+            {tNetwork("addedBy")}{" "}
+            <Link href={`/alliances/${addedBy.id}`} className="font-medium underline">
+              {addedBy.name}
+            </Link>
+            {needsConversion && <span className="text-muted-foreground"> · {tNetwork("needsConversion")}</span>}
+          </p>
+          {needsConversion && canEditAlliance && <AllianceConvertButton allianceId={id} />}
+        </div>
+      )}
 
       {/* Alliance information */}
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
@@ -315,6 +349,61 @@ export default async function AllianceDetailPage({
               </ul>
             </div>
           )}
+        </div>
+      )}
+
+      {allyNetwork.length > 0 && (
+        <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6">
+          <div className="flex flex-col gap-1">
+            <h2 className="font-heading text-lg text-foreground">{tNetwork("title", { count: allyNetwork.length })}</h2>
+            <p className="text-sm text-muted-foreground">{tNetwork("hint")}</p>
+          </div>
+          <ul className="flex flex-col divide-y divide-border">
+            {allyNetwork.map((c) => (
+              <li key={c.id} className="flex flex-col gap-1 py-3 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-medium text-foreground">
+                    {c.kind === "business" ? (
+                      c.allianceId ? (
+                        <Link href={`/alliances/${c.allianceId}`} className="underline">
+                          {c.allianceName ?? c.businessName}
+                        </Link>
+                      ) : (
+                        c.businessName
+                      )
+                    ) : c.clientId ? (
+                      <Link href={`/clients/${c.clientId}`} className="underline">
+                        {c.clientName ?? c.name}
+                      </Link>
+                    ) : (
+                      c.name
+                    )}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {tNetwork(`kind.${c.kind}`)}
+                    {c.kind === "business" && c.allianceStatus ? ` · ${tStatus(c.allianceStatus)}` : ""} · {formatDate(c.createdAt)}
+                  </span>
+                </div>
+                <span className="text-muted-foreground">
+                  {[c.kind === "business" && c.name !== c.businessName ? c.name : null, c.phone, c.email].filter(Boolean).join(" · ")}
+                </span>
+                {c.services && <span className="text-foreground">{tNetwork("services", { services: c.services })}</span>}
+                {c.note && <span className="whitespace-pre-line text-foreground">{c.note}</span>}
+                {c.documents.length > 0 && (
+                  <ul className="flex flex-wrap gap-x-4 gap-y-1">
+                    {c.documents.map((d) => (
+                      <li key={d.id}>
+                        <a href={`/api/alliances/${id}/partner-file?contactDoc=${d.id}`} target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                          {d.fileName}
+                        </a>
+                        {d.sensitive && <span className="text-xs text-amber-800"> · {tNetwork("sensitive")}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 

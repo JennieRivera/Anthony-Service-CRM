@@ -243,6 +243,97 @@ async function main() {
     assert.ok(reviewTasks.some((t) => t.title.includes("added Kitchen remodel")) && reviewTasks.some((t) => t.title.includes("removed Kitchen remodel")));
   });
 
+  // ── Phase B: each ally's own network, option A ───────────────────────
+  const net = await import("./network");
+  const evidence = { permissionText: "I have permission", ipAddress: "203.0.113.9", userAgent: "test" };
+  let aBusinessContactId = "";
+  let introducedId = "";
+  await ok("network: A's business becomes a Prospect 'added by A'; only A lists it", async () => {
+    const c = await net.createPartnerContact(db, {
+      allianceId: allyA.id,
+      input: { kind: "business", businessName: "J Tile LLC", name: "Jose", phone: "(555) 555-0401", services: "Tile", permission: true },
+      ...evidence,
+    });
+    aBusinessContactId = c.id;
+    const listA = await net.listPartnerContacts(db, allyA.id);
+    assert.ok(listA.some((x) => x.id === c.id && x.businessName === "J Tile LLC"));
+    assert.ok(!(await net.listPartnerContacts(db, allyB.id)).some((x) => x.id === c.id));
+    const [introduced] = await db.select().from(strategicAlliances).where(eq(strategicAlliances.organizationName, "J Tile LLC"));
+    introducedId = introduced.id;
+    assert.equal(introduced.status, "prospect");
+    assert.equal(introduced.addedByAllianceId, allyA.id);
+    await assert.rejects(
+      net.createPartnerContact(db, { allianceId: allyA.id, input: { kind: "business", businessName: "No permission", phone: "(555) 555-0402" }, ...evidence }),
+      q.PartnerValidationError,
+    );
+  });
+  await ok("network: a prospect an ally added gets portal access only after conversion", async () => {
+    await assert.rejects(access.createPartnerAccessLink(db, { allianceId: introducedId, createdByEmail: "owner@example.com" }), /not active/);
+    assert.equal(await net.convertAllianceToActive(db, { allianceId: introducedId, staffEmail: "owner@example.com" }), true);
+    const { token } = await access.createPartnerAccessLink(db, { allianceId: introducedId, createdByEmail: "owner@example.com" });
+    assert.ok(token);
+  });
+  await ok("network: contact documents only for and visible to the owning ally", async () => {
+    const docId = await net.recordPartnerContactDocument(db, {
+      allianceId: allyA.id,
+      contactId: aBusinessContactId,
+      fileName: "contract.pdf",
+      blobUrl: "https://blob.example/contract.pdf",
+      sensitiveDataReason: null,
+    });
+    assert.ok(await net.getPartnerContactDocumentUrl(db, allyA.id, docId));
+    assert.equal(await net.getPartnerContactDocumentUrl(db, allyB.id, docId), null);
+    await assert.rejects(
+      net.recordPartnerContactDocument(db, { allianceId: allyB.id, contactId: aBusinessContactId, fileName: "x.pdf", blobUrl: "https://blob.example/x.pdf", sensitiveDataReason: null }),
+      q.PartnerNotFoundError,
+    );
+  });
+  await ok("option A: A's referral for the network goes to AMS first, then only to the ally AMS picks", async () => {
+    await assert.rejects(
+      q.createPartnerReferral(db, { allianceId: allyA.id, input: { name: "Maria Net", phone: "(555) 555-0501", permission: true, network: true }, ...evidence }),
+      q.PartnerValidationError,
+    );
+    const r = await q.createPartnerReferral(db, {
+      allianceId: allyA.id,
+      input: { name: "Maria Net", phone: "(555) 555-0501", permission: true, network: true, requestedService: "Kitchen tile", note: "SENDER-ONLY NOTE" },
+      ...evidence,
+    });
+    const [task] = await db.select().from(tasks).where(eq(tasks.referralId, r.id));
+    assert.equal(task.type, "partner_referral_assign");
+    assert.ok(!(await q.listPartnerReferrals(db, allyB.id)).toPartner.some((x) => x.id === r.id));
+    let sent = (await q.listPartnerReferrals(db, allyA.id)).fromPartner.find((x) => x.id === r.id)!;
+    assert.equal(sent.stage, "sent");
+
+    await assert.rejects(
+      net.assignNetworkReferral(db, { referralId: r.id, assignedAllianceId: allyA.id, assigneeNote: "", showAssigneeToSender: false }),
+      net.NetworkAssignError,
+    );
+    await net.assignNetworkReferral(db, { referralId: r.id, assignedAllianceId: allyB.id, assigneeNote: "Call after 5", showAssigneeToSender: false });
+    const received = (await q.listPartnerReferrals(db, allyB.id)).toPartner.find((x) => x.id === r.id)!;
+    assert.equal(received.partnerNote, "Call after 5");
+    assert.equal(received.requestedService, "Kitchen tile");
+    assert.equal(received.name, null);
+    assert.ok(!JSON.stringify(received).includes("SENDER-ONLY NOTE") && !JSON.stringify(received).includes(allyA.organizationName));
+    sent = (await q.listPartnerReferrals(db, allyA.id)).fromPartner.find((x) => x.id === r.id)!;
+    assert.equal(sent.stage, "assigned");
+    assert.equal(sent.assignedTo, null);
+    const [doneTask] = await db.select().from(tasks).where(eq(tasks.id, task.id));
+    assert.equal(doneTask.status, "done");
+
+    // The sender can't move it; the receiving ally can.
+    await assert.rejects(q.setPartnerReferralStage(db, { allianceId: allyA.id, referralId: r.id, stage: "contacted" }), q.PartnerNotFoundError);
+    await q.setPartnerReferralStage(db, { allianceId: allyB.id, referralId: r.id, stage: "contacted" });
+    sent = (await q.listPartnerReferrals(db, allyA.id)).fromPartner.find((x) => x.id === r.id)!;
+    assert.equal(sent.stage, "contacted");
+
+    await net.assignNetworkReferral(db, { referralId: r.id, assignedAllianceId: allyB.id, assigneeNote: "Call after 5", showAssigneeToSender: true });
+    sent = (await q.listPartnerReferrals(db, allyA.id)).fromPartner.find((x) => x.id === r.id)!;
+    assert.equal(sent.assignedTo, allyB.organizationName);
+    // The person shows up in A's own network list (what A typed), not B's.
+    assert.ok((await net.listPartnerContacts(db, allyA.id)).some((x) => x.kind === "person" && x.name === "Maria Net"));
+    assert.ok(!(await net.listPartnerContacts(db, allyB.id)).some((x) => x.name === "Maria Net"));
+  });
+
   // ── tasks invariant ──────────────────────────────────────────────────
   await ok("tasks: every task has a client or an alliance (database check)", async () => {
     await assert.rejects(db.insert(tasks).values({ type: "follow_up", title: "orphan" }));

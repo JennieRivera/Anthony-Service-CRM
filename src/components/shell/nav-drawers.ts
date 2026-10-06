@@ -140,6 +140,7 @@ export const ECOSYSTEM_DRAWER_SECTIONS: DrawerSection[] = [
       { href: "/academy", navLabelKey: "academy", icon: GraduationCap },
       { href: "/diamond-community", navLabelKey: "diamondCommunity", icon: Gem },
       { href: "/community", navLabelKey: "community", icon: Network },
+      { href: "/alliance-directory", navLabelKey: "allianceDirectory", icon: Share2 },
       { href: "/latino-business-map", navLabelKey: "latinoBusinessMap", icon: Map },
     ],
   },

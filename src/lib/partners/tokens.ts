@@ -32,7 +32,7 @@ export function partnerLast4Hash(allianceId: string, lastFour: string): string {
 // Upload pathnames: partner-uploads/<kind>/<nonce>.<mac>/<file>, the MAC
 // bound to the alliance AND the kind, so /complete can trust neither the
 // browser's alliance nor its claimed purpose.
-export const PARTNER_UPLOAD_KINDS = ["document", "marketing", "logo", "photo"] as const;
+export const PARTNER_UPLOAD_KINDS = ["document", "marketing", "logo", "photo", "contact_document"] as const;
 export type PartnerUploadKind = (typeof PARTNER_UPLOAD_KINDS)[number];
 const PREFIX = "partner-uploads/";
 

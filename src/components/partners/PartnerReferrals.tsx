@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatDate } from "@/lib/dates";
 
 type Stage = "new" | "contacted" | "closed" | "not_closed";
+type SentStage = "sent" | "assigned" | Stage;
 type ToPartner = {
   id: string;
   referralSeq: number;
@@ -23,17 +24,23 @@ type ToPartner = {
   phone: string | null;
   partnerNote: string | null;
   partnerService: string | null;
+  // Another ally's referral that AMS assigned to this ally: what's needed.
+  requestedService: string | null;
 };
 type FromPartner = {
   id: string;
   referralSeq: number;
   referralDate: string;
-  stage: Stage;
+  stage: SentStage;
   name: string | null;
   phone: string | null;
   email: string | null;
   service: string | null;
   note: string | null;
+  networkRouting: boolean;
+  requestedService: string | null;
+  // Shown only when AMS chose to show who received it.
+  assignedTo: string | null;
 };
 
 const seq = (n: number) => `R-${String(n).padStart(3, "0")}`;
@@ -91,6 +98,7 @@ export function PartnerReferrals({
                   </p>
                 )}
                 {r.partnerService && <p className="text-sm text-muted-foreground">{tService(r.partnerService)}</p>}
+                {r.requestedService && <p className="text-sm text-muted-foreground">{t("needs", { service: r.requestedService })}</p>}
                 {r.partnerNote && <p className="text-sm whitespace-pre-line text-foreground">{r.partnerNote}</p>}
                 <div className="flex flex-wrap items-center gap-2">
                   <Label htmlFor={`stage-${r.id}`} className="text-sm">
@@ -129,9 +137,17 @@ export function PartnerReferrals({
           <ul className="flex flex-col divide-y divide-border rounded-xl border border-border bg-card">
             {fromPartner.map((r) => (
               <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 p-4 text-sm">
-                <span className="text-foreground">
-                  {seq(r.referralSeq)} · {r.name}
-                  {r.service ? ` · ${tService(r.service)}` : ""}
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-foreground">
+                    {seq(r.referralSeq)} · {r.name}
+                    {r.service ? ` · ${tService(r.service)}` : ""}
+                  </span>
+                  {r.networkRouting && (
+                    <span className="text-muted-foreground">
+                      {t("toAnotherAlly", { service: r.requestedService ?? "" })}
+                      {r.assignedTo ? ` · ${t("assignedTo", { name: r.assignedTo })}` : ""}
+                    </span>
+                  )}
                 </span>
                 <span className="flex items-center gap-3 text-muted-foreground">
                   <Badge variant="outline">{t(`stage.${r.stage}`)}</Badge>
@@ -146,13 +162,25 @@ export function PartnerReferrals({
   );
 }
 
-function SendReferralForm({ services }: { services: readonly string[] }) {
+// "Send us a referral" — also used for a person in "My allies and
+// contacts". Option A: "send it to another ally of the AMS network" (the
+// ally writes the service the person needs; AMS picks the ally).
+export function SendReferralForm({
+  services,
+  endpoint = "/api/partners/referrals",
+  title,
+}: {
+  services: readonly string[];
+  endpoint?: string;
+  title?: string;
+}) {
   const t = useTranslations("Partners.referrals");
   const tService = useTranslations("PublicServiceType");
   const router = useRouter();
-  const empty = { name: "", phone: "", email: "", service: "", note: "" };
+  const empty = { name: "", phone: "", email: "", service: "", note: "", requestedService: "" };
   const [form, setForm] = useState(empty);
   const [permission, setPermission] = useState(false);
+  const [network, setNetwork] = useState(false);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
 
@@ -161,10 +189,10 @@ function SendReferralForm({ services }: { services: readonly string[] }) {
     setSending(true);
     setMessage(null);
     try {
-      const res = await fetch("/api/partners/referrals", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ referral: { ...form, permission }, permissionText: t("permission") }),
+        body: JSON.stringify({ referral: { ...form, kind: "person", permission, network }, permissionText: t("permission") }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
@@ -173,6 +201,7 @@ function SendReferralForm({ services }: { services: readonly string[] }) {
       }
       setForm(empty);
       setPermission(false);
+      setNetwork(false);
       setMessage({ kind: "ok", text: t("sent") });
       router.refresh();
     } catch {
@@ -187,7 +216,7 @@ function SendReferralForm({ services }: { services: readonly string[] }) {
 
   return (
     <form onSubmit={send} className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:p-5">
-      <h2 className="font-heading text-lg text-foreground">{t("sendTitle")}</h2>
+      <h2 className="font-heading text-lg text-foreground">{title ?? t("sendTitle")}</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="r-name">{t("name")}</Label>
@@ -216,6 +245,21 @@ function SendReferralForm({ services }: { services: readonly string[] }) {
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="r-note">{t("note")}</Label>
         <Textarea id="r-note" rows={3} maxLength={1000} value={form.note} onChange={set("note")} />
+      </div>
+      <div className="flex flex-col gap-3 rounded-lg border border-border p-3">
+        <label htmlFor="r-network" className="flex cursor-pointer items-start gap-3 text-sm text-foreground">
+          <Checkbox id="r-network" checked={network} onCheckedChange={(v) => setNetwork(v === true)} className="mt-0.5 size-5" />
+          <span className="flex flex-col gap-0.5">
+            <span>{t("network")}</span>
+            <span className="text-muted-foreground">{t("networkHint")}</span>
+          </span>
+        </label>
+        {network && (
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="r-requested">{t("requestedService")}</Label>
+            <Input id="r-requested" value={form.requestedService} onChange={set("requestedService")} maxLength={200} placeholder={t("requestedServicePlaceholder")} className="h-11" />
+          </div>
+        )}
       </div>
       <label htmlFor="r-permission" className="flex cursor-pointer items-start gap-3 text-sm text-foreground">
         <Checkbox id="r-permission" checked={permission} onCheckedChange={(v) => setPermission(v === true)} className="mt-0.5 size-5" />

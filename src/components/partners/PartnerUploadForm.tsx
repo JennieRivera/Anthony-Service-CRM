@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { PORTAL_UPLOAD_ACCEPT } from "@/lib/portal/fileTypes";
 import { PARTNER_MAX_UPLOAD_BYTES } from "@/lib/partners/config";
 
-type Kind = "document" | "marketing" | "logo" | "photo";
+type Kind = "document" | "marketing" | "logo" | "photo" | "contact_document";
 type Status = { kind: "idle" } | { kind: "uploading"; name: string; percent: number } | { kind: "done" } | { kind: "error"; message: string };
 
 const IMAGE_ACCEPT = ".jpg,.jpeg,.png,.webp";
@@ -23,11 +23,14 @@ export function PartnerUploadForm({
   documentTypes,
   withCaption = false,
   label,
+  contactId,
 }: {
   kind: Kind;
   documentTypes?: readonly string[];
   withCaption?: boolean;
   label: string;
+  // "contact_document": which of the ally's contacts the file is for.
+  contactId?: string;
 }) {
   const t = useTranslations("Partners.upload");
   const tDocType = useTranslations("AllianceDocumentType");
@@ -56,7 +59,7 @@ export function PartnerUploadForm({
       const start = await fetch("/api/partners/uploads/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileName: file.name, kind }),
+        body: JSON.stringify({ fileName: file.name, kind, contactId }),
       });
       const started = (await start.json().catch(() => ({}))) as { pathname?: string; contentType?: string; error?: string };
       if (!start.ok || !started.pathname) throw new Error(started.error);
@@ -71,7 +74,7 @@ export function PartnerUploadForm({
       const done = await fetch("/api/partners/uploads/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pathname: blob.pathname, fileName: file.name, documentType, caption }),
+        body: JSON.stringify({ pathname: blob.pathname, fileName: file.name, documentType, caption, contactId }),
       });
       if (!done.ok) {
         const data = (await done.json().catch(() => ({}))) as { error?: string };

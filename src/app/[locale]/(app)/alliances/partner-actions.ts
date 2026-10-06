@@ -15,6 +15,7 @@ import { getLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { deleteAllianceRecord } from "@/lib/deletion";
+import { convertAllianceToActive } from "@/lib/partners/network";
 
 // Staff controls for an alliance's partner portal (CRM side). The raw link
 // token is returned exactly once, to be copied and sent by WhatsApp.
@@ -24,14 +25,16 @@ const db = () => getDb() as unknown as PortalDb;
 export async function createPartnerLinkAction(
   allianceId: string,
   locale: "en" | "es",
-): Promise<{ ok: true; url: string; expiresAt: string } | { ok: false; error: "no_phone" | "not_found" }> {
+): Promise<{ ok: true; url: string; expiresAt: string } | { ok: false; error: "no_phone" | "not_active" | "not_found" }> {
   await requireAccessArea("alliances");
   const staffEmail = (await auth())?.user?.email ?? null;
   let link;
   try {
     link = await createPartnerAccessLink(db(), { allianceId, createdByEmail: staffEmail });
   } catch (err) {
-    if (err instanceof PartnerAccessError) return { ok: false, error: err.message.includes("phone") ? "no_phone" : "not_found" };
+    if (err instanceof PartnerAccessError) {
+      return { ok: false, error: err.message.includes("phone") ? "no_phone" : err.message.includes("not active") ? "not_active" : "not_found" };
+    }
     throw err;
   }
   const h = await headers();
@@ -110,5 +113,25 @@ export async function deleteAllianceAction(
   revalidatePath("/tasks");
   const locale = await getLocale();
   redirect({ href: "/community", locale });
+  return { ok: true };
+}
+
+// An alliance another ally added (a Prospect "Added by [ally]") becomes an
+// active AMS ally — only then can it get its own portal access.
+export async function convertAllianceToActiveAction(allianceId: string): Promise<{ ok: boolean }> {
+  await requireAccessArea("alliances");
+  const staffEmail = (await auth())?.user?.email ?? null;
+  const changed = await convertAllianceToActive(db(), { allianceId, staffEmail });
+  if (changed) {
+    await logAuditEvent({
+      action: "alliance.converted_to_active",
+      entityType: "alliance",
+      entityId: allianceId,
+      summary: "Converted an ally-added prospect into an active ally",
+    });
+  }
+  revalidatePath(`/alliances/${allianceId}`);
+  revalidatePath("/alliance-directory");
+  revalidatePath("/community");
   return { ok: true };
 }

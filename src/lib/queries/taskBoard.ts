@@ -29,6 +29,7 @@ export async function listTaskBoard() {
       appointmentTitle: appointments.title,
       appointmentStartAt: appointments.startAt,
       documentId: tasks.documentId,
+      referralId: tasks.referralId,
     })
     .from(tasks)
     .leftJoin(clients, eq(tasks.clientId, clients.id))

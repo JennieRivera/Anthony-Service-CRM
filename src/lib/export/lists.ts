@@ -13,6 +13,7 @@ import {
 } from "@/lib/db/schema";
 import { landscapeFor, money, text, usDate, usDateTime, type ExportTable } from "./document";
 import type { ExportT } from "./translator";
+import { listAllianceDirectory } from "@/lib/queries/allianceDirectory";
 
 // "Export" on a list exports exactly the rows the person is looking at:
 // the page sends the visible ids in display order (after its own filters,
@@ -31,6 +32,7 @@ export const EXPORT_LISTS = [
   "payments",
   "tasks",
   "communications",
+  "alliance_directory",
 ] as const;
 export type ExportList = (typeof EXPORT_LISTS)[number];
 
@@ -253,6 +255,24 @@ export async function buildListTable(list: ExportList, ids: string[], tr: Export
           text(r.paymentMethod),
           text(r.receiptNumber),
           label("RefundStatus", r.refundStatus),
+        ]),
+      };
+    }
+    case "alliance_directory": {
+      const rows = inOrder(ids, await listAllianceDirectory(ids));
+      return {
+        columns: [c("name"), c("type"), c("services"), c("city"), c("contact"), c("phone"), c("email"), c("status"), c("addedBy"), c("added")],
+        rows: rows.map((r) => [
+          r.organizationName,
+          r.organizationType ? label("OrganizationType", r.organizationType) : "",
+          text(r.services.join("; ")),
+          [r.city, r.state].filter(Boolean).join(", "),
+          text(r.contactPerson),
+          r.phone ?? "",
+          r.email ?? "",
+          label("AllianceStatus", r.status),
+          r.addedByName ?? "Anthony Multiservice",
+          usDate(r.createdAt),
         ]),
       };
     }

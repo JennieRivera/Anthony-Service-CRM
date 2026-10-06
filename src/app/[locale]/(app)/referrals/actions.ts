@@ -38,6 +38,8 @@ import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { requireAccessArea } from "@/lib/permissions";
 import { logAuditEvent } from "@/lib/audit";
+import { NetworkAssignError, assignNetworkReferral } from "@/lib/partners/network";
+import type { PortalDb } from "@/lib/portal/db";
 
 function computeRevenue(values: ReferralFormValues) {
   const gross = Number(values.grossRevenue) || 0;
@@ -378,4 +380,34 @@ export async function reverseCompensationPaymentAction(
   });
 
   revalidatePath(`/referrals/${referralId}`);
+}
+
+// Partner portal (Phase B, option A): an ally asked AMS to pass this
+// referral to another ally. Staff picks the receiving ally and approves.
+export async function assignNetworkReferralAction(
+  referralId: string,
+  values: { assignedAllianceId: string; assigneeNote: string; showAssigneeToSender: boolean },
+): Promise<{ ok: true } | { ok: false; error: "invalid" | "not_network" | "same_ally" }> {
+  await requireAccessArea("referrals");
+  try {
+    await assignNetworkReferral(getDb() as unknown as PortalDb, {
+      referralId,
+      assignedAllianceId: values.assignedAllianceId,
+      assigneeNote: values.assigneeNote ?? "",
+      showAssigneeToSender: values.showAssigneeToSender === true,
+    });
+  } catch (err) {
+    if (err instanceof NetworkAssignError) return { ok: false, error: err.message as "invalid" | "not_network" | "same_ally" };
+    throw err;
+  }
+  await logAuditEvent({
+    action: "referral.assigned_to_ally",
+    entityType: "referral",
+    entityId: referralId,
+    summary: `Assigned an ally-network referral to alliance ${values.assignedAllianceId}${values.showAssigneeToSender ? " (shown to the sender)" : ""}`,
+  });
+  revalidatePath(`/referrals/${referralId}`);
+  revalidatePath("/referrals");
+  revalidatePath("/tasks");
+  return { ok: true };
 }

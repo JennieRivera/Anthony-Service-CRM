@@ -382,7 +382,8 @@
     "aiAutomationHeading": "AI & Automation Center",
     "professionalResourceCenterHeading": "Professional Resource Center",
     "servicesNotaryDocuments": "Notary Public & Documents",
-    "servicesCommercialFinance": "Commercial Finance Referrals"
+    "servicesCommercialFinance": "Commercial Finance Referrals",
+    "allianceDirectory": "Alliance Directory"
   },
   "ServiceType": {
     "company_registration": "Business Formation & Corporate Services",
@@ -2112,6 +2113,30 @@
       "partnerService": "Requested service",
       "partnerServiceNone": "Not specified",
       "partnerNote": "Note for the partner"
+    },
+    "network": {
+      "title": "Ally-to-ally referral",
+      "hint": "An ally asked to pass this referral to another ally in the network. Choose the ally who receives it and approve it.",
+      "from": "From:",
+      "to": "To:",
+      "unassigned": "Not assigned yet",
+      "fromTo": "From: {from} → To: {to}",
+      "requestedService": "Service needed",
+      "senderNote": "Note from the sending ally (the receiving ally does not see it)",
+      "ally": "Receiving ally",
+      "chooseAlly": "Choose an ally",
+      "noteForAlly": "Note for the receiving ally (optional)",
+      "noteForAllyHint": "The receiving ally sees only the service needed, this note and, with the client’s permission, their name and phone.",
+      "showAssignee": "Show the sending ally who it was assigned to",
+      "assign": "Assign and approve",
+      "reassign": "Save changes",
+      "assigning": "Saving…",
+      "assigned": "Referral assigned.",
+      "errors": {
+        "invalid": "Please check the details.",
+        "not_network": "This is not an ally-to-ally referral.",
+        "same_ally": "It can’t be assigned to the same ally who sent it."
+      }
     }
   },
   "PaymentStatus": {
@@ -2177,7 +2202,9 @@
     "partner_document_review": "Review Partner Document",
     "partner_marketing_review": "Approve Partner Material",
     "partner_referral": "Referral from a Partner",
-    "partner_license_expiring": "Partner License/Insurance Expiring"
+    "partner_license_expiring": "Partner License/Insurance Expiring",
+    "partner_referral_assign": "Assign Referral to an Ally",
+    "partner_network_review": "Review Ally Network"
   },
   "Tasks": {
     "title": "Tasks",
@@ -2222,7 +2249,8 @@
     "addNote": "Add note",
     "noteAdded": "Note added",
     "openAlliance": "Open alliance",
-    "fromAlliance": "Sent by {name}"
+    "fromAlliance": "Sent by {name}",
+    "openReferral": "Open referral"
   },
   "NotaryModality": {
     "in_person": "In Person",
@@ -4511,7 +4539,8 @@
       "invoices": "Invoices",
       "payments": "Payments",
       "tasks": "Tasks",
-      "communications": "Communications"
+      "communications": "Communications",
+      "alliance_directory": "Alliance directory"
     },
     "files": {
       "clients": "clients",
@@ -4525,7 +4554,8 @@
       "client": "client",
       "case": "case",
       "appointment": "appointment",
-      "company": "company"
+      "company": "company",
+      "alliance_directory": "alliance-directory"
     },
     "records": {
       "client": "Client record",
@@ -4614,7 +4644,10 @@
       "bestTime": "Best time to call",
       "nextAction": "Next action",
       "website": "Website",
-      "mailingAddress": "Mailing address"
+      "mailingAddress": "Mailing address",
+      "city": "City",
+      "contact": "Contact",
+      "addedBy": "Added by"
     }
   },
   "Import": {
@@ -4754,7 +4787,8 @@
       "documents": "Documents",
       "marketing": "Marketing",
       "referrals": "Referrals",
-      "more": "More"
+      "more": "More",
+      "network": "My network"
     },
     "access": {
       "title": "Your partner portal",
@@ -4886,7 +4920,9 @@
         "new": "New",
         "contacted": "Contacted",
         "closed": "Closed",
-        "not_closed": "Didn't close"
+        "not_closed": "Didn't close",
+        "sent": "Sent to AMS",
+        "assigned": "Assigned to an ally"
       },
       "fromYouTitle": "Referrals you sent",
       "fromYouEmpty": "You haven't sent referrals yet.",
@@ -4908,8 +4944,17 @@
         "email": "Enter a valid email.",
         "contact": "Enter a phone or an email.",
         "limit_reached": "You reached today's referral limit.",
-        "generic": "Couldn't send. Please try again."
-      }
+        "generic": "Couldn't send. Please try again.",
+        "requestedService": "Write what service the person needs.",
+        "kind": "Choose whether it's a person or a business."
+      },
+      "needs": "Needs: {service}",
+      "toAnotherAlly": "For another ally in the network: {service}",
+      "assignedTo": "Assigned to {name}",
+      "network": "Send this referral to another ally in the Anthony Multiservice network",
+      "networkHint": "Anthony Multiservice chooses the ally and passes it on. You'll see the referral's status.",
+      "requestedService": "What service does the person need?",
+      "requestedServicePlaceholder": "For example: install kitchen tile"
     },
     "services": {
       "title": "My services",
@@ -4938,6 +4983,37 @@
         "limit_reached": "You made many changes today. Please try again tomorrow.",
         "invalid": "Please check the details.",
         "generic": "Couldn't save. Please try again."
+      }
+    },
+    "network": {
+      "title": "My allies and contacts",
+      "intro": "Your own network: people who need a service and businesses you know. Only you and Anthony Multiservice see this list.",
+      "addTitle": "Add to my network",
+      "kindQuestion": "What do you want to add?",
+      "kind": {
+        "person": "Person who needs a service",
+        "business": "Business / ally"
+      },
+      "kindHint": {
+        "person": "Goes to Anthony Multiservice as a referral.",
+        "business": "Goes to Anthony Multiservice as a possible ally."
+      },
+      "personTitle": "Person who needs a service",
+      "businessTitle": "Business / ally",
+      "fields": {
+        "businessName": "Business name",
+        "name": "Contact person (optional)",
+        "services": "Services they offer"
+      },
+      "addBusiness": "Add business",
+      "businessSent": "Thank you! We added the business to your network.",
+      "listTitle": "My network ({count})",
+      "empty": "You haven't added anyone yet.",
+      "servicesValue": "Services: {services}",
+      "addDocument": "Upload a document for this contact",
+      "chooseFile": "Choose file",
+      "errors": {
+        "businessName": "Enter the business name."
       }
     }
   },
@@ -4984,9 +5060,62 @@
     "addedClients": "{count, plural, one {1 person added by this partner} other {# people added by this partner}}",
     "servicesTitle": "Services ({count})",
     "noServices": "No services added in the portal yet.",
-    "priceFrom": "from {price}"
+    "priceFrom": "from {price}",
+    "needsActive": "Another ally added this alliance: convert it into an active ally first."
   },
   "OrganizationTypeHint": {
     "installer_remodeling": "Floors, tile and other installations"
+  },
+  "AllyNetwork": {
+    "title": "Ally network ({count})",
+    "hint": "What this ally added in its portal: people (they enter as Leads in Clients) and businesses (they enter as Prospect alliances). The ally only sees its own network.",
+    "kind": {
+      "person": "Person",
+      "business": "Business / ally"
+    },
+    "services": "Services: {services}",
+    "sensitive": "may contain sensitive data",
+    "addedBy": "Added by",
+    "needsConversion": "Prospect added by an ally: convert it into an active ally to give it portal access.",
+    "convert": "Convert to active ally",
+    "converting": "Converting…",
+    "converted": "It's now an active ally.",
+    "convertConfirmTitle": "Convert to active ally?",
+    "convertConfirmDescription": "Sets the status to Active Partner. You can then give it its own portal access. Who added it is still shown.",
+    "cancel": "Cancel"
+  },
+  "AllianceDirectory": {
+    "title": "Alliance Directory",
+    "intro": "Every ally: the ones you added and the ones your allies added in their portal. Only the Anthony Multiservice team sees it.",
+    "search": "Search by name, service, contact or city",
+    "filters": {
+      "type": "Type",
+      "allTypes": "All types",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "active": "Active",
+      "other": "Other statuses",
+      "city": "City",
+      "allCities": "All cities",
+      "addedBy": "Added by",
+      "anyone": "Added by anyone"
+    },
+    "ams": "Anthony Multiservice",
+    "view": "View",
+    "views": {
+      "table": "Table",
+      "tree": "Tree"
+    },
+    "count": "{count, plural, one {1 ally} other {# allies}}",
+    "columns": {
+      "name": "Business",
+      "type": "Type",
+      "services": "Services",
+      "city": "City",
+      "contact": "Contact",
+      "status": "Status",
+      "addedBy": "Added by",
+      "date": "Date"
+    }
   }
 }

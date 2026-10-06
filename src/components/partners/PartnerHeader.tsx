@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Ellipsis, FileText, Handshake, House, LogOut, Megaphone, Network, UserRound } from "lucide-react";
+import { Ellipsis, FileText, Handshake, House, LogOut, Megaphone, Network, UserRound, Users } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +15,10 @@ const MAIN_NAV = [
   { href: "/partners/documents", key: "documents", icon: FileText },
   { href: "/partners/marketing", key: "marketing", icon: Megaphone },
 ] as const;
-const MORE_NAV = [{ href: "/partners/profile", key: "profile", icon: UserRound }] as const;
+const MORE_NAV = [
+  { href: "/partners/network", key: "network", icon: Users },
+  { href: "/partners/profile", key: "profile", icon: UserRound },
+] as const;
 const NAV = [...MAIN_NAV, ...MORE_NAV];
 
 const isActive = (pathname: string, href: string) =>

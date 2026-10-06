@@ -382,7 +382,8 @@
     "aiAutomationHeading": "Centro de IA y Automatización",
     "professionalResourceCenterHeading": "Centro de Recursos Profesionales",
     "servicesNotaryDocuments": "Notary Public y Documentos",
-    "servicesCommercialFinance": "Referidos de Financiamiento Comercial"
+    "servicesCommercialFinance": "Referidos de Financiamiento Comercial",
+    "allianceDirectory": "Directorio de Aliados"
   },
   "ServiceType": {
     "company_registration": "Formación de Negocios y Servicios Corporativos",
@@ -2112,6 +2113,30 @@
       "partnerService": "Servicio pedido",
       "partnerServiceNone": "Sin indicar",
       "partnerNote": "Nota para el aliado"
+    },
+    "network": {
+      "title": "Referido entre aliados",
+      "hint": "Un aliado pidió pasar este referido a otro aliado de la red. Elija el aliado que lo recibe y apruébelo.",
+      "from": "De:",
+      "to": "A:",
+      "unassigned": "Sin asignar todavía",
+      "fromTo": "De: {from} → A: {to}",
+      "requestedService": "Servicio que necesita",
+      "senderNote": "Nota del aliado que lo envió (el aliado que lo recibe no la ve)",
+      "ally": "Aliado que lo recibe",
+      "chooseAlly": "Elija un aliado",
+      "noteForAlly": "Nota para el aliado que lo recibe (opcional)",
+      "noteForAllyHint": "El aliado que lo recibe ve solo el servicio que se necesita, esta nota y, con permiso del cliente, su nombre y teléfono.",
+      "showAssignee": "Mostrar al aliado que lo envió a quién se asignó",
+      "assign": "Asignar y aprobar",
+      "reassign": "Guardar cambios",
+      "assigning": "Guardando…",
+      "assigned": "Referido asignado.",
+      "errors": {
+        "invalid": "Revise los datos.",
+        "not_network": "Este referido no es entre aliados.",
+        "same_ally": "No se puede asignar al mismo aliado que lo envió."
+      }
     }
   },
   "PaymentStatus": {
@@ -2177,7 +2202,9 @@
     "partner_document_review": "Revisar Documento del Aliado",
     "partner_marketing_review": "Aprobar Material del Aliado",
     "partner_referral": "Referido de un Aliado",
-    "partner_license_expiring": "Licencia/Seguro del Aliado por Vencer"
+    "partner_license_expiring": "Licencia/Seguro del Aliado por Vencer",
+    "partner_referral_assign": "Asignar Referido a un Aliado",
+    "partner_network_review": "Revisar Red del Aliado"
   },
   "Tasks": {
     "title": "Tareas",
@@ -2222,7 +2249,8 @@
     "addNote": "Agregar nota",
     "noteAdded": "Nota agregada",
     "openAlliance": "Abrir alianza",
-    "fromAlliance": "Enviado por {name}"
+    "fromAlliance": "Enviado por {name}",
+    "openReferral": "Abrir referido"
   },
   "NotaryModality": {
     "in_person": "En Persona",
@@ -4511,7 +4539,8 @@
       "invoices": "Facturas",
       "payments": "Pagos",
       "tasks": "Tareas",
-      "communications": "Comunicaciones"
+      "communications": "Comunicaciones",
+      "alliance_directory": "Directorio de aliados"
     },
     "files": {
       "clients": "clientes",
@@ -4525,7 +4554,8 @@
       "client": "cliente",
       "case": "caso",
       "appointment": "cita",
-      "company": "compania"
+      "company": "compania",
+      "alliance_directory": "directorio-aliados"
     },
     "records": {
       "client": "Ficha del cliente",
@@ -4614,7 +4644,10 @@
       "bestTime": "Mejor hora para llamar",
       "nextAction": "Próxima acción",
       "website": "Sitio web",
-      "mailingAddress": "Dirección postal"
+      "mailingAddress": "Dirección postal",
+      "city": "Ciudad",
+      "contact": "Contacto",
+      "addedBy": "Agregado por"
     }
   },
   "Import": {
@@ -4754,7 +4787,8 @@
       "documents": "Documentos",
       "marketing": "Marketing",
       "referrals": "Referidos",
-      "more": "Más"
+      "more": "Más",
+      "network": "Mi red"
     },
     "access": {
       "title": "Su portal de aliado",
@@ -4886,7 +4920,9 @@
         "new": "Nuevo",
         "contacted": "Contactado",
         "closed": "Cerrado",
-        "not_closed": "No se concretó"
+        "not_closed": "No se concretó",
+        "sent": "Enviado a AMS",
+        "assigned": "Asignado a un aliado"
       },
       "fromYouTitle": "Referidos que usted envió",
       "fromYouEmpty": "Todavía no ha enviado referidos.",
@@ -4908,8 +4944,17 @@
         "email": "Escriba un correo válido.",
         "contact": "Escriba un teléfono o un correo.",
         "limit_reached": "Llegó al límite de referidos por hoy.",
-        "generic": "No se pudo enviar. Inténtelo de nuevo."
-      }
+        "generic": "No se pudo enviar. Inténtelo de nuevo.",
+        "requestedService": "Escriba qué servicio necesita la persona.",
+        "kind": "Elija si es una persona o un negocio."
+      },
+      "needs": "Necesita: {service}",
+      "toAnotherAlly": "Para otro aliado de la red: {service}",
+      "assignedTo": "Asignado a {name}",
+      "network": "Mandar este referido a otro aliado de la red de Anthony Multiservice",
+      "networkHint": "Anthony Multiservice elige al aliado y se lo pasa. Usted verá el estado del referido.",
+      "requestedService": "¿Qué servicio necesita la persona?",
+      "requestedServicePlaceholder": "Por ejemplo: instalar losas en la cocina"
     },
     "services": {
       "title": "Mis servicios",
@@ -4938,6 +4983,37 @@
         "limit_reached": "Hizo muchos cambios hoy. Inténtelo mañana.",
         "invalid": "Revise los datos.",
         "generic": "No se pudo guardar. Inténtelo de nuevo."
+      }
+    },
+    "network": {
+      "title": "Mis aliados y contactos",
+      "intro": "Su propia red: las personas que necesitan un servicio y los negocios que usted conoce. Solo usted y Anthony Multiservice ven esta lista.",
+      "addTitle": "Agregar a mi red",
+      "kindQuestion": "¿Qué quiere agregar?",
+      "kind": {
+        "person": "Persona que necesita un servicio",
+        "business": "Negocio / aliado"
+      },
+      "kindHint": {
+        "person": "Le llega a Anthony Multiservice como referido.",
+        "business": "Le llega a Anthony Multiservice como posible aliado."
+      },
+      "personTitle": "Persona que necesita un servicio",
+      "businessTitle": "Negocio / aliado",
+      "fields": {
+        "businessName": "Nombre del negocio",
+        "name": "Persona de contacto (opcional)",
+        "services": "Servicios que ofrece"
+      },
+      "addBusiness": "Agregar negocio",
+      "businessSent": "¡Gracias! Agregamos el negocio a su red.",
+      "listTitle": "Mi red ({count})",
+      "empty": "Todavía no ha agregado a nadie.",
+      "servicesValue": "Servicios: {services}",
+      "addDocument": "Subir un documento de este contacto",
+      "chooseFile": "Elegir archivo",
+      "errors": {
+        "businessName": "Escriba el nombre del negocio."
       }
     }
   },
@@ -4984,9 +5060,62 @@
     "addedClients": "{count, plural, one {1 persona agregada por este aliado} other {# personas agregadas por este aliado}}",
     "servicesTitle": "Servicios ({count})",
     "noServices": "Todavía no agregó servicios en su portal.",
-    "priceFrom": "desde {price}"
+    "priceFrom": "desde {price}",
+    "needsActive": "Esta alianza la agregó otro aliado: primero conviértala en aliado activo."
   },
   "OrganizationTypeHint": {
     "installer_remodeling": "Pisos, losas y otras instalaciones"
+  },
+  "AllyNetwork": {
+    "title": "Red del aliado ({count})",
+    "hint": "Lo que este aliado agregó en su portal: personas (entran como Lead en Clientes) y negocios (entran como Alianza Prospecto). El aliado solo ve su propia red.",
+    "kind": {
+      "person": "Persona",
+      "business": "Negocio / aliado"
+    },
+    "services": "Servicios: {services}",
+    "sensitive": "puede tener datos sensibles",
+    "addedBy": "Agregado por",
+    "needsConversion": "Prospecto agregado por un aliado: conviértalo en aliado activo para darle acceso al portal.",
+    "convert": "Convertir en aliado Activo",
+    "converting": "Convirtiendo…",
+    "converted": "Ahora es un aliado activo.",
+    "convertConfirmTitle": "¿Convertir en aliado Activo?",
+    "convertConfirmDescription": "Cambia el estado a Socio Activo. Después podrá darle su propio acceso al portal. Se sigue viendo quién lo agregó.",
+    "cancel": "Cancelar"
+  },
+  "AllianceDirectory": {
+    "title": "Directorio de Aliados",
+    "intro": "Todos los aliados: los que usted agregó y los que fueron agregando sus aliados en su portal. Solo lo ve el equipo de Anthony Multiservice.",
+    "search": "Buscar por nombre, servicio, contacto o ciudad",
+    "filters": {
+      "type": "Tipo",
+      "allTypes": "Todos los tipos",
+      "status": "Estado",
+      "allStatuses": "Todos los estados",
+      "active": "Activo",
+      "other": "Otros estados",
+      "city": "Ciudad",
+      "allCities": "Todas las ciudades",
+      "addedBy": "Agregado por",
+      "anyone": "Agregado por cualquiera"
+    },
+    "ams": "Anthony Multiservice",
+    "view": "Vista",
+    "views": {
+      "table": "Tabla",
+      "tree": "Árbol"
+    },
+    "count": "{count, plural, one {1 aliado} other {# aliados}}",
+    "columns": {
+      "name": "Negocio",
+      "type": "Tipo",
+      "services": "Servicios",
+      "city": "Ciudad",
+      "contact": "Contacto",
+      "status": "Estado",
+      "addedBy": "Agregado por",
+      "date": "Fecha"
+    }
   }
 }
