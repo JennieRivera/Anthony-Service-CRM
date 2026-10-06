@@ -202,6 +202,8 @@ export type TimelineEntry = {
     | "task";
   label: string;
   href?: string;
+  // Conversations: the channel, shown next to the label.
+  channel?: (typeof conversationMessages.channel.enumValues)[number];
 };
 
 export async function listClients() {
@@ -345,6 +347,8 @@ export async function getClientById(id: string) {
       date: c.createdAt,
       type: "conversation" as const,
       label: c.subject || c.summary.slice(0, 60),
+      href: `/communications/${c.id}`,
+      channel: c.channel,
     })),
     ...clientDocuments.map((d) => ({
       date: d.createdAt,

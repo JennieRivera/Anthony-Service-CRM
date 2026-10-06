@@ -106,6 +106,7 @@ export function ClientProfileTabs({
   const tService = useTranslations("ServiceType");
   const tReferrals = useTranslations("Referrals");
   const tTaskType = useTranslations("TaskType");
+  const tChannel = useTranslations("ConversationChannel");
   const bookingTitle = useBookingTitle();
   const [tab, setTab] = useState("timeline");
   const rootRef = useRef<HTMLDivElement>(null);
@@ -202,7 +203,12 @@ export function ClientProfileTabs({
             <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
               <div className="flex items-center gap-3">
                 <span aria-hidden>{timelineIcon[entry.type]}</span>
-                <span className="text-sm text-foreground">{bookingTitle(entry.label)}</span>
+                <span className="text-sm text-foreground">
+                  {entry.channel && (
+                    <span className="text-muted-foreground">{tChannel(entry.channel)} · </span>
+                  )}
+                  {bookingTitle(entry.label)}
+                </span>
               </div>
               <span className="text-xs text-muted-foreground">
                 {formatDateTime(entry.date)}

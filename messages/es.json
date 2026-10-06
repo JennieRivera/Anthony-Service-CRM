@@ -784,7 +784,8 @@
     "website_chat": "Chat del Sitio Web",
     "highlevel": "HighLevel",
     "in_person": "En Persona",
-    "other": "Otro"
+    "other": "Otro",
+    "google_business": "Google (Perfil de Negocio)"
   },
   "ConversationDirection": {
     "inbound": "Entrante",
@@ -1414,7 +1415,43 @@
       "sensitiveDataWarning": "Esto parece contener un número de Seguro Social o ITIN. Los registros de comunicación no son el lugar para eso — elimínalo antes de guardar.",
       "save": "Guardar Comunicación",
       "saving": "Guardando...",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "callOutcome": "Resultado de la llamada",
+      "callOutcomeUnset": "Sin indicar",
+      "googleKind": "Tipo",
+      "reviewStars": "Estrellas",
+      "searchClient": "Buscar cliente por nombre…",
+      "noClientFound": "No hay ningún cliente con ese nombre.",
+      "createLead": "Crear Lead",
+      "newLead": "Nuevo Lead",
+      "leadName": "Nombre completo",
+      "leadPhone": "Teléfono (opcional)",
+      "leadEmail": "Correo (opcional)",
+      "saveLead": "Guardar Lead",
+      "leadNameRequired": "Escriba el nombre.",
+      "leadError": "No se pudo crear el Lead. Revise el correo e intente de nuevo.",
+      "changeClient": "Cambiar"
+    },
+    "automatic": "Automático",
+    "register": "Registrar",
+    "manualForNow": "Registro manual por ahora — conexión automática más adelante.",
+    "automaticHere": "Los avisos automáticos que manda el CRM aparecen aquí solos, marcados «Automático».",
+    "filterClient": "Cliente",
+    "filterAllClients": "Todos los clientes",
+    "filterFrom": "Desde",
+    "filterTo": "Hasta",
+    "filterFollowUp": "Requiere seguimiento",
+    "filterClear": "Quitar filtros",
+    "minutes": "{minutes} min",
+    "callOutcomes": {
+      "answered": "Contestó",
+      "no_answer": "No contestó",
+      "left_message": "Dejó mensaje",
+      "call_back": "Volver a llamar"
+    },
+    "googleKinds": {
+      "message": "Mensaje",
+      "review": "Reseña"
     }
   },
   "DocumentStatus": {

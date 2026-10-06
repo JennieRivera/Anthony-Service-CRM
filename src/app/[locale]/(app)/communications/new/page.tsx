@@ -7,15 +7,18 @@ import { listAppointmentsForSelect } from "@/lib/queries/appointments";
 import { listAlliancesForSelect } from "@/lib/queries/alliances";
 import { listAssociationsChambersForSelect } from "@/lib/queries/associationsChambers";
 import { getMessageTemplateById } from "@/lib/queries/messageTemplates";
+import { communicationChannelValues } from "@/lib/validation/communication";
 import { createCommunicationAction } from "../actions";
 
 export default async function NewCommunicationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ clientId?: string; caseId?: string; templateId?: string }>;
+  searchParams: Promise<{ clientId?: string; caseId?: string; templateId?: string; channel?: string }>;
 }) {
   const t = await getTranslations("Communications");
-  const { clientId, caseId, templateId } = await searchParams;
+  const { clientId, caseId, templateId, channel } = await searchParams;
+  // "Register" on a channel tab opens the form with that channel picked.
+  const defaultChannel = communicationChannelValues.find((c) => c === channel);
   const [clients, cases, referrals, appointments, alliances, associations, template] =
     await Promise.all([
       listClientsForSelect(),
@@ -34,7 +37,7 @@ export default async function NewCommunicationPage({
           {t("newCommunication")}
         </h1>
         <Link
-          href="/communications"
+          href={defaultChannel ? `/communications?tab=${defaultChannel}` : "/communications"}
           className="text-sm text-muted-foreground underline"
         >
           &larr; {t("backToCommunications")}
@@ -50,6 +53,7 @@ export default async function NewCommunicationPage({
         associations={associations}
         defaultClientId={clientId}
         defaultCaseId={caseId}
+        defaultChannel={defaultChannel}
         template={template}
         onSubmit={createCommunicationAction}
       />

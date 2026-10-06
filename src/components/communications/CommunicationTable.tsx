@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CommunicationStatusBadge } from "./CommunicationStatusBadge";
+import { AUTOMATIC_NOTICE_AUTHOR, CHANNEL_META } from "./channelMeta";
 import type { listCommunicationsWithClient } from "@/lib/queries/communications";
 
 export async function CommunicationTable({
@@ -23,7 +24,7 @@ export async function CommunicationTable({
   const tDirection = await getTranslations("ConversationDirection");
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-card">
+    <div className="overflow-x-auto rounded-lg border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow>
@@ -60,13 +61,34 @@ export async function CommunicationTable({
                 </Link>
               </TableCell>
               <TableCell>
-                <Badge variant="outline">{tChannel(comm.channel)}</Badge>
+                <span className="flex flex-wrap items-center gap-1.5">
+                  {(() => {
+                    const { icon: Icon, color } = CHANNEL_META[comm.channel];
+                    return <Icon className={`h-4 w-4 shrink-0 ${color}`} aria-hidden />;
+                  })()}
+                  <Badge variant="outline">{tChannel(comm.channel)}</Badge>
+                  {comm.createdByEmail === AUTOMATIC_NOTICE_AUTHOR && (
+                    <Badge variant="secondary">{t("automatic")}</Badge>
+                  )}
+                </span>
               </TableCell>
               <TableCell className="text-muted-foreground">
                 {tDirection(comm.direction)}
               </TableCell>
-              <TableCell className="max-w-xs truncate text-foreground">
-                {comm.subject || comm.summary}
+              <TableCell className="max-w-xs text-foreground">
+                <span className="block truncate">{comm.subject || comm.summary}</span>
+                {(comm.callOutcome || comm.durationMinutes != null || comm.googleKind) && (
+                  <span className="block text-xs text-muted-foreground">
+                    {[
+                      comm.callOutcome ? t(`callOutcomes.${comm.callOutcome}`) : null,
+                      comm.durationMinutes != null ? t("minutes", { minutes: comm.durationMinutes }) : null,
+                      comm.googleKind ? t(`googleKinds.${comm.googleKind}`) : null,
+                      comm.reviewStars ? "★".repeat(comm.reviewStars) : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </span>
+                )}
               </TableCell>
               <TableCell>
                 <CommunicationStatusBadge status={comm.status} />

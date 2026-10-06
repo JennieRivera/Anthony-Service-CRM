@@ -22,8 +22,11 @@ import {
   communicationChannelValues,
   communicationDirectionValues,
   communicationStatusValues,
+  callOutcomeValues,
+  googleKindValues,
   type CommunicationFormValues,
 } from "@/lib/validation/communication";
+import { ClientPickerWithLead } from "./ClientPickerWithLead";
 import { containsLikelySsnOrItin } from "@/lib/sensitiveDataCheck";
 import type { ConversationMessage, MessageTemplate } from "@/lib/db/schema";
 
@@ -51,6 +54,7 @@ export function CommunicationForm({
   associations,
   defaultClientId,
   defaultCaseId,
+  defaultChannel,
   template,
   onSubmit,
 }: {
@@ -63,6 +67,7 @@ export function CommunicationForm({
   associations: { id: string; organizationName: string }[];
   defaultClientId?: string;
   defaultCaseId?: string;
+  defaultChannel?: CommunicationFormValues["channel"];
   template?: MessageTemplate | null;
   onSubmit: (values: CommunicationFormValues) => Promise<void>;
 }) {
@@ -70,6 +75,7 @@ export function CommunicationForm({
   const tChannel = useTranslations("ConversationChannel");
   const tDirection = useTranslations("ConversationDirection");
   const tStatus = useTranslations("CommunicationStatus");
+  const tComm = useTranslations("Communications");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +85,8 @@ export function CommunicationForm({
     handleSubmit,
     control,
     watch,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm<CommunicationFormValues>({
     resolver: zodResolver(communicationFormSchema),
@@ -90,7 +98,7 @@ export function CommunicationForm({
       allianceId: communication?.allianceId ?? "",
       associationId: communication?.associationId ?? "",
       businessName: communication?.businessName ?? "",
-      channel: communication?.channel ?? template?.channel ?? "email",
+      channel: communication?.channel ?? template?.channel ?? defaultChannel ?? "email",
       direction: communication?.direction ?? "outbound",
       occurredAt: communication
         ? toInputDateTime(communication.occurredAt)
@@ -103,11 +111,15 @@ export function CommunicationForm({
       status: communication?.status ?? "new",
       followUpRequired: communication?.followUpRequired ?? false,
       followUpDate: communication?.followUpDate ?? "",
+      callOutcome: communication?.callOutcome ?? "",
+      googleKind: communication?.googleKind ?? (defaultChannel === "google_business" ? "message" : ""),
+      reviewStars: communication?.reviewStars?.toString() ?? "",
     },
   });
 
   const channel = watch("channel");
   const followUpRequired = watch("followUpRequired");
+  const googleKind = watch("googleKind");
   const summaryValue = watch("summary");
   const fullMessageValue = watch("fullMessage");
   const showSensitiveDataWarning =
@@ -148,18 +160,7 @@ export function CommunicationForm({
             control={control}
             name="clientId"
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t("selectClient")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map((client) => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.fullName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ClientPickerWithLead clients={clients} value={field.value} onChange={field.onChange} />
             )}
           />
           {errors.clientId && (
@@ -396,6 +397,86 @@ export function CommunicationForm({
           </div>
         )}
 
+        {channel === "call" && (
+          <div className="flex flex-col gap-1.5">
+            <Label>{t("callOutcome")}</Label>
+            <Controller
+              control={control}
+              name="callOutcome"
+              render={({ field }) => (
+                <Select value={field.value || "none"} onValueChange={(v) => field.onChange(v === "none" ? "" : v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t("callOutcomeUnset")}</SelectItem>
+                    {callOutcomeValues.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {tComm(`callOutcomes.${value}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+        )}
+
+        {channel === "google_business" && (
+          <div className="flex flex-col gap-1.5">
+            <Label>{t("googleKind")}</Label>
+            <Controller
+              control={control}
+              name="googleKind"
+              render={({ field }) => (
+                <Select value={field.value || "message"} onValueChange={(v) => field.onChange(v ?? "message")}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {googleKindValues.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {tComm(`googleKinds.${value}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+        )}
+
+        {channel === "google_business" && googleKind === "review" && (
+          <div className="flex flex-col gap-1.5">
+            <Label>{t("reviewStars")}</Label>
+            <Controller
+              control={control}
+              name="reviewStars"
+              render={({ field }) => (
+                <div className="flex gap-1" role="radiogroup" aria-label={t("reviewStars")}>
+                  {[1, 2, 3, 4, 5].map((n) => {
+                    const active = Number(field.value || 0) >= n;
+                    return (
+                      <button
+                        key={n}
+                        type="button"
+                        role="radio"
+                        aria-checked={field.value === String(n)}
+                        aria-label={String(n)}
+                        onClick={() => field.onChange(String(n))}
+                        className={`cursor-pointer text-2xl leading-none ${active ? "text-amber-500" : "text-muted-foreground/40"}`}
+                      >
+                        ★
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            />
+            {errors.reviewStars && <p className="text-sm text-destructive">{errors.reviewStars.message}</p>}
+          </div>
+        )}
+
         <div className="flex flex-col gap-1.5">
           <Label>{t("status")}</Label>
           <Controller
@@ -450,7 +531,16 @@ export function CommunicationForm({
             render={({ field }) => (
               <Checkbox
                 checked={field.value}
-                onCheckedChange={field.onChange}
+                onCheckedChange={(checked) => {
+                  field.onChange(checked);
+                  // The follow-up task gets a due date: tomorrow unless set.
+                  if (checked && !getValues("followUpDate")) {
+                    const d = new Date();
+                    d.setDate(d.getDate() + 1);
+                    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+                    setValue("followUpDate", local.toISOString().slice(0, 10));
+                  }
+                }}
               />
             )}
           />

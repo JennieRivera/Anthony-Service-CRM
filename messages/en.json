@@ -784,7 +784,8 @@
     "website_chat": "Website Chat",
     "highlevel": "HighLevel",
     "in_person": "In-Person",
-    "other": "Other"
+    "other": "Other",
+    "google_business": "Google (Business Profile)"
   },
   "ConversationDirection": {
     "inbound": "Incoming",
@@ -1414,7 +1415,43 @@
       "sensitiveDataWarning": "This looks like it may contain a Social Security or ITIN number. Communication records are not the place for that — please remove it before saving.",
       "save": "Save Communication",
       "saving": "Saving...",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "callOutcome": "Call result",
+      "callOutcomeUnset": "Not set",
+      "googleKind": "Type",
+      "reviewStars": "Stars",
+      "searchClient": "Search client by name…",
+      "noClientFound": "No client with that name.",
+      "createLead": "Create Lead",
+      "newLead": "New Lead",
+      "leadName": "Full name",
+      "leadPhone": "Phone (optional)",
+      "leadEmail": "Email (optional)",
+      "saveLead": "Save Lead",
+      "leadNameRequired": "Enter the name.",
+      "leadError": "Couldn't create the Lead. Check the email and try again.",
+      "changeClient": "Change"
+    },
+    "automatic": "Automatic",
+    "register": "Register",
+    "manualForNow": "Manual log for now — automatic connection later.",
+    "automaticHere": "The automatic notices the CRM sends show up here on their own, marked “Automatic”.",
+    "filterClient": "Client",
+    "filterAllClients": "All clients",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "filterFollowUp": "Needs follow-up",
+    "filterClear": "Clear filters",
+    "minutes": "{minutes} min",
+    "callOutcomes": {
+      "answered": "Answered",
+      "no_answer": "No answer",
+      "left_message": "Left a message",
+      "call_back": "Call back"
+    },
+    "googleKinds": {
+      "message": "Message",
+      "review": "Review"
     }
   },
   "DocumentStatus": {

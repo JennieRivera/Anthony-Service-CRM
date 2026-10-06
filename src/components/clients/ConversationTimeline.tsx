@@ -4,23 +4,7 @@ import { formatDateTime } from "@/lib/dates";
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import {
-  Mail,
-  Phone,
-  MessageCircle,
-  MessageSquare,
-  MessageSquareText,
-  Camera,
-  Globe,
-  Zap,
-  MapPin,
-  MoreHorizontal,
-  ArrowDownLeft,
-  ArrowUpRight,
-  Clapperboard,
-  Music2,
-  Briefcase,
-} from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -33,27 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CommunicationStatusBadge } from "@/components/communications/CommunicationStatusBadge";
 import { communicationChannelValues } from "@/lib/validation/communication";
+import { AUTOMATIC_NOTICE_AUTHOR, CHANNEL_META } from "@/components/communications/channelMeta";
 import type { ConversationMessage, Case } from "@/lib/db/schema";
-
-// Phase 4, Session 1 — every conversation_channel enum value needs an entry
-// here or this Record indexing fails to type-check. lucide-react doesn't
-// ship trademarked brand logos (no Facebook/Instagram/YouTube/TikTok/LinkedIn
-// icon), so those use generic stand-ins instead.
-const channelIcons = {
-  email: Mail,
-  call: Phone,
-  whatsapp: MessageCircle,
-  sms: MessageSquare,
-  facebook_messenger: MessageSquareText,
-  instagram_dm: Camera,
-  youtube: Clapperboard,
-  tiktok: Music2,
-  linkedin: Briefcase,
-  website_chat: Globe,
-  highlevel: Zap,
-  in_person: MapPin,
-  other: MoreHorizontal,
-} as const;
 
 export function ConversationTimeline({
   conversations,
@@ -64,6 +29,7 @@ export function ConversationTimeline({
 }) {
   const t = useTranslations("Conversations");
   const tChannel = useTranslations("ConversationChannel");
+  const tComm = useTranslations("Communications");
 
   const [channelFilter, setChannelFilter] = useState("all");
   const [caseFilter, setCaseFilter] = useState("all");
@@ -201,7 +167,7 @@ export function ConversationTimeline({
       ) : (
         <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">
           {filtered.map((entry) => {
-            const ChannelIcon = channelIcons[entry.channel];
+            const { icon: ChannelIcon, color } = CHANNEL_META[entry.channel];
             const DirectionIcon =
               entry.direction === "inbound" ? ArrowDownLeft : ArrowUpRight;
             const relatedCase = entry.caseId
@@ -211,8 +177,11 @@ export function ConversationTimeline({
               <li key={entry.id} className="flex flex-col gap-1.5 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <ChannelIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <ChannelIcon className={`h-4 w-4 shrink-0 ${color}`} />
                     <Badge variant="outline">{tChannel(entry.channel)}</Badge>
+                    {entry.createdByEmail === AUTOMATIC_NOTICE_AUTHOR && (
+                      <Badge variant="secondary">{tComm("automatic")}</Badge>
+                    )}
                     <DirectionIcon className="h-3.5 w-3.5 text-muted-foreground" />
                     {entry.subject && (
                       <span className="font-medium text-foreground">
@@ -233,6 +202,13 @@ export function ConversationTimeline({
                 <p className="text-sm text-foreground">{entry.summary}</p>
                 <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                   {entry.counterpart && <span>{entry.counterpart}</span>}
+                  {entry.callOutcome && <span>{tComm(`callOutcomes.${entry.callOutcome}`)}</span>}
+                  {entry.googleKind && (
+                    <span>
+                      {tComm(`googleKinds.${entry.googleKind}`)}
+                      {entry.reviewStars ? ` · ${"★".repeat(entry.reviewStars)}` : ""}
+                    </span>
+                  )}
                   {entry.durationMinutes != null && (
                     <span>
                       {t("durationMinutesValue", {

@@ -484,6 +484,13 @@
       "when": 1791302462627,
       "tag": "0068_task_details",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1791304371919,
+      "tag": "0069_communication_channels",
+      "breakpoints": true
     }
   ]
 }

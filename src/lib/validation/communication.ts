@@ -13,6 +13,7 @@ export const communicationChannelValues = [
   "youtube",
   "tiktok",
   "linkedin",
+  "google_business",
   "website_chat",
   "highlevel",
   "in_person",
@@ -29,6 +30,9 @@ export const communicationStatusValues = [
   "completed",
   "archived",
 ] as const;
+
+export const callOutcomeValues = ["answered", "no_answer", "left_message", "call_back"] as const;
+export const googleKindValues = ["message", "review"] as const;
 
 const optionalString = z.string().trim().optional().or(z.literal(""));
 
@@ -56,6 +60,11 @@ export const communicationFormSchema = z.object({
   status: z.enum(communicationStatusValues),
   followUpRequired: z.boolean().optional(),
   followUpDate: optionalString,
+  // Calls only.
+  callOutcome: z.enum(callOutcomeValues).optional().or(z.literal("")),
+  // Google Business Profile only; stars only for a review.
+  googleKind: z.enum(googleKindValues).optional().or(z.literal("")),
+  reviewStars: optionalString.refine((v) => !v || /^[1-5]$/.test(v), "Stars must be 1–5"),
 });
 
 export type CommunicationFormValues = z.infer<typeof communicationFormSchema>;

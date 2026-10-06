@@ -156,6 +156,8 @@ export const conversationChannelEnum = pgEnum("conversation_channel", [
   "youtube",
   "tiktok",
   "linkedin",
+  // Google Business Profile (messages and reviews) — manual log for now.
+  "google_business",
 ]);
 
 export const conversationDirectionEnum = pgEnum("conversation_direction", [
@@ -3226,6 +3228,11 @@ export const conversationMessages = pgTable("conversation_messages", {
     onDelete: "set null",
   }),
   fullMessage: text("full_message"),
+  // Calls: how the call went. Google Business Profile: a message or a
+  // review, and the review's stars (1–5). Null on every other channel.
+  callOutcome: text("call_outcome", { enum: ["answered", "no_answer", "left_message", "call_back"] }),
+  googleKind: text("google_kind", { enum: ["message", "review"] }),
+  reviewStars: integer("review_stars"),
   followUpRequired: boolean("follow_up_required").notNull().default(false),
   followUpDate: date("follow_up_date"),
   status: conversationStatusEnum("status").notNull().default("new"),

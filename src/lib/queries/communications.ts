@@ -1,4 +1,5 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte, lt } from "drizzle-orm";
+import { businessLocalToUtc } from "@/lib/dates";
 import { getDb } from "@/lib/db";
 import {
   conversationMessages,
@@ -15,7 +16,19 @@ export type CommunicationListFilters = {
   channel?: string;
   status?: string;
   direction?: string;
+  clientId?: string;
+  // YYYY-MM-DD, Florida business dates, both inclusive.
+  from?: string;
+  to?: string;
+  followUp?: string;
 };
+
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+function nextDay(date: string) {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
+}
 
 export async function listCommunicationsWithClient(
   filters: CommunicationListFilters = {},
@@ -39,6 +52,16 @@ export async function listCommunicationsWithClient(
           filters.direction as (typeof conversationMessages.direction.enumValues)[number],
         )
       : undefined,
+    filters.clientId && /^[0-9a-f-]{36}$/i.test(filters.clientId)
+      ? eq(conversationMessages.clientId, filters.clientId)
+      : undefined,
+    filters.from && DAY.test(filters.from)
+      ? gte(conversationMessages.occurredAt, businessLocalToUtc(filters.from))
+      : undefined,
+    filters.to && DAY.test(filters.to)
+      ? lt(conversationMessages.occurredAt, businessLocalToUtc(nextDay(filters.to)))
+      : undefined,
+    filters.followUp === "1" ? eq(conversationMessages.followUpRequired, true) : undefined,
   ].filter((c): c is NonNullable<typeof c> => c !== undefined);
 
   return getDb()
@@ -53,6 +76,11 @@ export async function listCommunicationsWithClient(
       status: conversationMessages.status,
       followUpRequired: conversationMessages.followUpRequired,
       followUpDate: conversationMessages.followUpDate,
+      durationMinutes: conversationMessages.durationMinutes,
+      callOutcome: conversationMessages.callOutcome,
+      googleKind: conversationMessages.googleKind,
+      reviewStars: conversationMessages.reviewStars,
+      createdByEmail: conversationMessages.createdByEmail,
       clientId: clients.id,
       clientName: clients.fullName,
       caseTitle: cases.title,

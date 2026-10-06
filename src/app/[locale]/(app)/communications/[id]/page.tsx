@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CommunicationStatusBadge } from "@/components/communications/CommunicationStatusBadge";
+import { AUTOMATIC_NOTICE_AUTHOR } from "@/components/communications/channelMeta";
 
 export default async function CommunicationDetailPage({
   params,
@@ -58,6 +59,9 @@ export default async function CommunicationDetailPage({
             <Badge variant="outline">
               {tDirection(communication.direction)}
             </Badge>
+            {communication.createdByEmail === AUTOMATIC_NOTICE_AUTHOR && (
+              <Badge variant="secondary">{t("automatic")}</Badge>
+            )}
           </div>
           <CommunicationStatusBadge status={communication.status} />
         </div>
@@ -146,6 +150,21 @@ export default async function CommunicationDetailPage({
               </p>
               <p className="text-foreground">
                 {communication.durationMinutes}
+              </p>
+            </div>
+          )}
+          {communication.callOutcome && (
+            <div>
+              <p className="text-muted-foreground">{t("form.callOutcome")}</p>
+              <p className="text-foreground">{t(`callOutcomes.${communication.callOutcome}`)}</p>
+            </div>
+          )}
+          {communication.googleKind && (
+            <div>
+              <p className="text-muted-foreground">{t("form.googleKind")}</p>
+              <p className="text-foreground">
+                {t(`googleKinds.${communication.googleKind}`)}
+                {communication.reviewStars ? ` · ${"★".repeat(communication.reviewStars)}` : ""}
               </p>
             </div>
           )}

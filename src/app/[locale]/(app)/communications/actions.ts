@@ -17,6 +17,7 @@ import { getLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { logAuditEvent } from "@/lib/audit";
 import { requireAuthenticatedUser } from "@/lib/permissions";
+import { businessLocalToUtc } from "@/lib/dates";
 
 function normalize(values: CommunicationFormValues) {
   return {
@@ -29,7 +30,9 @@ function normalize(values: CommunicationFormValues) {
     businessName: values.businessName || null,
     channel: values.channel,
     direction: values.direction,
-    occurredAt: new Date(values.occurredAt),
+    // The form's datetime-local value is Florida wall-clock time; read on
+    // a UTC server it would otherwise shift by 4–5 hours.
+    occurredAt: businessLocalToUtc(values.occurredAt),
     subject: values.subject || null,
     summary: values.summary,
     fullMessage: values.fullMessage || null,
@@ -40,6 +43,13 @@ function normalize(values: CommunicationFormValues) {
     status: values.status,
     followUpRequired: values.followUpRequired ?? false,
     followUpDate: values.followUpDate || null,
+    // Channel-specific details are kept only on their own channel.
+    callOutcome: values.channel === "call" ? values.callOutcome || null : null,
+    googleKind: values.channel === "google_business" ? values.googleKind || null : null,
+    reviewStars:
+      values.channel === "google_business" && values.googleKind === "review" && values.reviewStars
+        ? Number(values.reviewStars)
+        : null,
     updatedAt: new Date(),
   };
 }
