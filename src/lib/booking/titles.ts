@@ -176,6 +176,26 @@ export function buildPortalServiceInterestTitle(services: ServiceType[], comment
   return `Client requested information about: ${list}${note}`;
 }
 
+// ── Automatic task titles (cases, appointments, crons) ────────────────
+// Same idea: a fixed English prefix, translated at display time. The text
+// after it (a case or appointment title) is localized again, so
+// "24h reminder: Online booking — …" reads fully in Spanish.
+const TASK_PREFIXES = {
+  "Follow up: ": "taskFollowUp",
+  "No-show follow-up: ": "taskNoShowFollowUp",
+  "24h reminder: ": "taskReminder24h",
+  "2h reminder: ": "taskReminder2h",
+  "Inactivity alert: ": "taskInactivity",
+  "Renewal due soon: ": "taskRenewalDue",
+  "Payment check: ": "taskPaymentCheck",
+  "Documents pending: ": "taskDocumentsPending",
+  "Close out: ": "taskCloseOut",
+  "Confirm: ": "taskConfirm",
+} as const;
+const TASK_EXACT = {
+  "No communication logged recently": "taskNoCommunication",
+} as const;
+
 // Translator functions come from next-intl (getTranslations on the
 // server, useTranslations in client components), so this file stays free
 // of any next-intl import and works in both.
@@ -251,7 +271,14 @@ export function localizeBookingTitle(title: string, t: BookingTitleTranslators):
     return `${t.system(key)}${body}`;
   }
   const parsed = parseBookingTitle(title);
-  if (!parsed) return title;
+  if (!parsed) {
+    const exact = TASK_EXACT[title as keyof typeof TASK_EXACT];
+    if (exact) return t.system(exact);
+    for (const [prefix, key] of Object.entries(TASK_PREFIXES)) {
+      if (title.startsWith(prefix)) return `${t.system(key)}${localizeBookingTitle(title.slice(prefix.length), t)}`;
+    }
+    return title;
+  }
   let out = `${t.source("online_booking")} — ${t.service(parsed.serviceType)}: ${parsed.name}`;
   if (parsed.confirm) out = `${t.source("confirmPrefix")}${out}`;
   if (parsed.requestedLanguage) {

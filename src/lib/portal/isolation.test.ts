@@ -157,6 +157,7 @@ async function main() {
     const reviewTasks = await db.select().from(tasks).where(eq(tasks.type, "document_review"));
     assert.equal(reviewTasks.length, 1);
     assert.equal(reviewTasks[0].clientId, a.id);
+    assert.equal(reviewTasks[0].documentId, documentId);
     assert.equal(await q.getPortalDocumentFile(db, b.id, documentId), null);
   });
 

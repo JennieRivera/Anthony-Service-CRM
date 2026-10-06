@@ -220,6 +220,7 @@ export async function recordClientUpload(
     caseId: params.caseId,
     type: "document_review",
     title: buildPortalUploadTitle(params.fileName, params.sensitiveDataReason !== null),
+    documentId: doc.id,
   });
   return { documentId: doc.id };
 }

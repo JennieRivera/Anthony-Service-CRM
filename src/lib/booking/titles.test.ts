@@ -70,8 +70,9 @@ for (const key of Object.keys(SERVICE_LABELS_EN) as (keyof typeof SERVICE_LABELS
   assert.equal(parseBookingTitle(buildBookingTitle(key, "X"))?.serviceType, key);
 }
 
-// Staff-written titles are never touched.
-for (const t of ["Consulta fiscal", "Confirm: Notary visit", "Online booking — Unknown: X", "Online booking — Notary"]) {
+// Staff-written titles are never touched (the automatic "Confirm: " prefix
+// is translated — see the task-title checks below).
+for (const t of ["Consulta fiscal", "Online booking — Unknown: X", "Online booking — Notary"]) {
   assert.equal(localizeBookingTitle(t, translators(es)), t);
 }
 
@@ -132,5 +133,22 @@ assert.equal(
   localizeBookingTitle("Call client (no authorized channel for an automatic notice): Appointment confirmed", translators(es)),
   `${es.SystemTitles.callClientNotice}${es.SystemTitles.notice_appointment_confirmed}`,
 );
+
+// Automatic task titles (cases, appointments, crons).
+const booking = buildBookingTitle("tax_prep", "Ana Pérez");
+for (const [stored, expected] of [
+  ["Follow up: Renovar pasaporte", "Seguimiento: Renovar pasaporte"],
+  [`24h reminder: ${booking}`, "Recordatorio 24 h: Reserva en línea — Impuestos y Contabilidad: Ana Pérez"],
+  ["2h reminder: Cita", "Recordatorio 2 h: Cita"],
+  ["Inactivity alert: LLC Ana", "Alerta de inactividad: LLC Ana"],
+  ["No communication logged recently", "Sin comunicación reciente"],
+  ["Confirm: Llamada con Ana", "Confirmar: Llamada con Ana"],
+  ["Follow up: Inactivity alert: X", "Seguimiento: Alerta de inactividad: X"],
+  ["Followup sin formato", "Followup sin formato"],
+] as const) {
+  const want = expected.replace("Impuestos y Contabilidad", es.ServiceType.tax_prep);
+  assert.equal(localizeBookingTitle(stored, translators(es)), want);
+  assert.equal(localizeBookingTitle(stored, translators(en)), stored);
+}
 
 console.log("titles.test.ts: all title assertions passed.");

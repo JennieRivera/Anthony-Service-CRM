@@ -1038,7 +1038,29 @@ export const tasks = pgTable("tasks", {
   appointmentId: uuid("appointment_id").references(() => appointments.id, {
     onDelete: "set null",
   }),
+  // The document a "Review client document" task is about (portal upload),
+  // so the task can open it directly.
+  documentId: uuid("document_id").references(() => documents.id, {
+    onDelete: "set null",
+  }),
 });
+
+// Notes staff add to a task from its detail panel on /tasks. Append-only.
+export const taskNotes = pgTable(
+  "task_notes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    taskId: uuid("task_id")
+      .notNull()
+      .references(() => tasks.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdByEmail: text("created_by_email"),
+  },
+  (table) => [index("task_notes_task_idx").on(table.taskId, table.createdAt)],
+);
 
 // Phase 5, Session 6 — Immigration Client Document Folders (spec section
 // 6). A fixed folder taxonomy for documents attached to an Immigration

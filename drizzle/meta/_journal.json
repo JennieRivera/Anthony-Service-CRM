@@ -477,6 +477,13 @@
       "when": 1791300902705,
       "tag": "0067_staff_consent_details",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1791302462627,
+      "tag": "0068_task_details",
+      "breakpoints": true
     }
   ]
 }
