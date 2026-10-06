@@ -5,6 +5,9 @@
 
 export const LEGAL_TEXT_KEYS = [
   "not_a_law_firm",
+  // Short one-line version for the bottom of automatic emails; the full
+  // text above stays on /book, the portal and the Privacy Notice.
+  "not_a_law_firm_email",
   "not_a_law_firm_ack",
   "florida_notary_disclosure",
   "document_processing_authorization",
@@ -24,6 +27,10 @@ export const DEFAULT_LEGAL_TEXTS: Record<LegalTextKey, LegalText> = {
   not_a_law_firm: {
     en: "Anthony Multiservice is not a law firm. We are not attorneys and do not provide legal or immigration advice. We provide administrative and document-preparation services at the client's direction. If you need legal advice, please consult a licensed attorney or an accredited representative.",
     es: "Anthony Multiservice no es una firma de abogados. No somos abogados y no damos asesoría legal ni de inmigración. Ofrecemos servicios administrativos y de preparación de documentos según las instrucciones del cliente. Si necesita asesoría legal, consulte a un abogado licenciado o a un representante acreditado.",
+  },
+  not_a_law_firm_email: {
+    en: "Anthony Multiservice is not a law firm and does not provide legal advice.",
+    es: "Anthony Multiservice no es una firma de abogados y no ofrece asesoría legal.",
   },
   not_a_law_firm_ack: {
     en: "I understand that Anthony Multiservice is not a law firm and does not give me legal advice.",

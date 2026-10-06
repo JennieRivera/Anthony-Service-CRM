@@ -191,7 +191,10 @@
     "columnAgreedFee": "Tarifa Acordada",
     "columnLinkedInvoice": "Factura Vinculada",
     "noInvoiceLinked": "Sin factura vinculada",
-    "membershipFeeHelp": "Las membresías Cortesía, Exoneradas y Patrocinadas nunca contribuyen a ningún total en dólares anterior — no generan ingresos de membresía."
+    "membershipFeeHelp": "Las membresías Cortesía, Exoneradas y Patrocinadas nunca contribuyen a ningún total en dólares anterior — no generan ingresos de membresía.",
+    "rangeLabel": "Del {from} al {to}",
+    "applying": "Cargando…",
+    "invalidRange": "La fecha «Desde» debe ser antes de «Hasta»."
   },
   "Permissions": {
     "accessDenied": "No tienes permiso para ver esta página."
@@ -749,7 +752,10 @@
       "chooseService": "Elija un servicio",
       "chooseServiceError": "Elija un servicio antes de guardar.",
       "remodelingAlliance": "Contratista aliado",
-      "remodelingAllianceNone": "Sin elegir todavía"
+      "remodelingAllianceNone": "Sin elegir todavía",
+      "remodelingNoContractors": "Todavía no hay alianzas de tipo «Contratista / Remodelación». Puede marcar ese tipo en la alianza (Alianzas → Editar) o ver todas las alianzas.",
+      "remodelingShowAllAlliances": "Ver todas las alianzas",
+      "remodelingOnlyContractors": "Ver solo contratistas"
     },
     "salesTaxCaseDetails": "Detalles de Registro de Sales Tax",
     "irsCaseDetails": "Detalles de Caso IRS / EIN / ITIN",
@@ -1801,6 +1807,20 @@
       "locationPlaceholder": "Ubicación...",
       "referralSourcePlaceholder": "Fuente de referido...",
       "clear": "Limpiar"
+    },
+    "calendar": {
+      "previous": "Atrás",
+      "next": "Siguiente",
+      "month": "Mes",
+      "week": "Semana",
+      "day": "Día",
+      "agenda": "Agenda",
+      "date": "Fecha",
+      "time": "Hora",
+      "event": "Cita",
+      "allDay": "Todo el día",
+      "noEventsInRange": "No hay citas en este periodo.",
+      "showMore": "+{total} más"
     }
   },
   "AppointmentType": {
@@ -2796,7 +2816,8 @@
     "referral_partner": "Socio de Referidos",
     "training_partner": "Socio de Capacitación",
     "university": "Universidad",
-    "business_organization": "Organización Empresarial"
+    "business_organization": "Organización Empresarial",
+    "contractor_remodeling": "Contratista / Remodelación"
   },
   "AllianceStatus": {
     "prospect": "Prospecto",
@@ -4123,6 +4144,10 @@
         "title": "Aviso: \"No somos abogados\"",
         "help": "Pie de página de /book, del portal y del Aviso de Privacidad, y destacado en /book para Inmigración y Notary Public."
       },
+      "not_a_law_firm_email": {
+        "title": "Aviso corto para correos",
+        "help": "Una línea al final de los correos automáticos, en letra pequeña gris debajo de la firma. El aviso completo de arriba se sigue mostrando en /book, el portal y el Aviso de Privacidad."
+      },
       "not_a_law_firm_ack": {
         "title": "Casilla obligatoria",
         "help": "La casilla que el cliente debe marcar en /book y la primera vez que entra al portal. Cada aceptación se guarda con fecha, hora, IP y el texto exacto."
@@ -4358,6 +4383,14 @@
       "missing_credentials": "Faltan TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN en Vercel.",
       "missing_sender": "Agregue TWILIO_MESSAGING_SERVICE_SID (o TWILIO_FROM_NUMBER) en Vercel.",
       "not_enabled": "Listo para encender: cuando aprueben la Toll-Free Verification, agregue TWILIO_SMS_ENABLED=true en Vercel y vuelva a publicar."
+    },
+    "testErrors": {
+      "sms_missing_credentials": "No se puede enviar: faltan TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN en Vercel.",
+      "sms_missing_sender": "No se puede enviar: falta TWILIO_MESSAGING_SERVICE_SID (o TWILIO_FROM_NUMBER) en Vercel.",
+      "sms_not_enabled": "Los SMS están apagados hasta que Twilio apruebe la verificación (falta TWILIO_SMS_ENABLED=true en Vercel).",
+      "test_phone_missing": "Primero guarde su teléfono de prueba (arriba) y presione Guardar.",
+      "email_not_configured": "El correo no está conectado: falta RESEND_API_KEY en Vercel.",
+      "test_email_missing": "Primero guarde su correo de prueba (arriba) y presione Guardar."
     }
   },
   "Export": {

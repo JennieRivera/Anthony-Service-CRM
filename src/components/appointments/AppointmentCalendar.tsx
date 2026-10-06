@@ -82,7 +82,23 @@ export function AppointmentCalendar({
         endAccessor="end"
         style={{ height: 650 }}
         views={["month", "week", "day", "agenda"]}
-        messages={{ today: t("today") }}
+        // Every toolbar/view label (react-big-calendar defaults to English).
+        // Day and month names come from the date-fns locale via culture.
+        messages={{
+          today: t("today"),
+          previous: t("calendar.previous"),
+          next: t("calendar.next"),
+          month: t("calendar.month"),
+          week: t("calendar.week"),
+          day: t("calendar.day"),
+          agenda: t("calendar.agenda"),
+          date: t("calendar.date"),
+          time: t("calendar.time"),
+          event: t("calendar.event"),
+          allDay: t("calendar.allDay"),
+          noEventsInRange: t("calendar.noEventsInRange"),
+          showMore: (total: number) => t("calendar.showMore", { total }),
+        }}
         components={{ event: CalendarEventCard }}
         eventPropGetter={(event) => {
           const serviceType = (event as unknown as AppointmentEvent).serviceType;

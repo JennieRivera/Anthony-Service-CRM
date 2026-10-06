@@ -109,27 +109,42 @@ const EMAIL_FOOTER = {
     `This is an automatic notice from Anthony Multiservice. To change how we contact you, use "My authorizations" in your portal or call us at ${phone}.`,
 };
 
+// notALawFirm: the SHORT email version (legal text "not_a_law_firm_email").
+// Client emails end with a signature (name + phone), then the "automatic
+// notice" line and the legal line in small gray type.
 export function renderEmail(
   body: string,
   language: "en" | "es",
   notALawFirm: string,
   audience: "client" | "owner",
 ): { html: string; text: string } {
+  const signature = [
+    businessInfo.name.replace(/, LLC$/, ""),
+    `${language === "es" ? "Tel." : "Phone"} ${businessInfo.phone}`,
+  ];
   const footer = audience === "client" ? [EMAIL_FOOTER[language](businessInfo.phone), notALawFirm].filter(Boolean) : [];
-  const text = [body, ...footer.map((f) => `—\n${f}`)].join("\n\n");
+  const text = [
+    body,
+    ...(audience === "client" ? [signature.join("\n")] : []),
+    ...footer.map((f) => `—\n${f}`),
+  ].join("\n\n");
   const linkify = (s: string) =>
     escapeHtml(s).replace(/https?:\/\/[^\s<]+/g, (url) => `<a href="${url}" style="color:#1f5c4c">${url}</a>`);
   const paragraphs = body
     .split(/\n{2,}/)
     .map((p) => `<p style="margin:0 0 14px">${linkify(p).replace(/\n/g, "<br>")}</p>`)
     .join("");
+  const sign =
+    audience === "client"
+      ? `<p style="margin:16px 0 0;font-size:14px;line-height:1.4">${signature.map(escapeHtml).join("<br>")}</p>`
+      : "";
   const foot = footer
-    .map((f) => `<p style="margin:0 0 8px;color:#5b6b66;font-size:12px">${escapeHtml(f)}</p>`)
+    .map((f) => `<p style="margin:0 0 6px;color:#6b7a75;font-size:11px;line-height:1.4">${escapeHtml(f)}</p>`)
     .join("");
   const html = `<!doctype html><html><body style="margin:0;background:#f4f8f6;font-family:Arial,Helvetica,sans-serif;color:#17332c">
 <div style="max-width:560px;margin:0 auto;padding:24px">
 <p style="margin:0 0 16px;font-size:18px;font-weight:bold;color:#1f5c4c">Anthony Multiservice</p>
-<div style="background:#ffffff;border-radius:10px;padding:20px;font-size:15px;line-height:1.5">${paragraphs}</div>
+<div style="background:#ffffff;border-radius:10px;padding:20px;font-size:15px;line-height:1.5">${paragraphs}${sign}</div>
 <div style="padding:16px 4px 0">${foot}</div>
 </div></body></html>`;
   return { html, text };
@@ -179,7 +194,8 @@ export async function dispatchNotice(
   if (row.channel === "sms") {
     result = await deps.senders.sms({ to: row.recipient, body: secret?.body ?? row.body });
   } else {
-    const notALawFirm = row.audience === "client" ? pickLocale((await getLegalTexts(db)).not_a_law_firm, row.language) : "";
+    const notALawFirm =
+      row.audience === "client" ? pickLocale((await getLegalTexts(db)).not_a_law_firm_email, row.language) : "";
     const rendered = renderEmail(secret?.body ?? row.body, row.language, notALawFirm, row.audience);
     result = await deps.senders.email({
       to: row.recipient,

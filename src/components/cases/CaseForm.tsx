@@ -130,7 +130,7 @@ export function CaseForm({
   remodelingDetails?: { allianceId: string | null } | null;
   apostille?: ApostilleDetails | null;
   // Remodeling: allied contractors to pick from (Alliances).
-  alliances?: { id: string; organizationName: string }[];
+  alliances?: { id: string; organizationName: string; organizationType?: string | null }[];
   clients: { id: string; fullName: string }[];
   companies: { id: string; legalBusinessName: string }[];
   serviceCatalogItems?: ServiceCatalogItem[];
@@ -411,6 +411,14 @@ export function CaseForm({
   const irsCaseType = watch("irsCaseType");
   const isInsurance = insuranceComplianceServiceTypes.includes(serviceType);
   const isRemodeling = remodelingServiceTypes.includes(serviceType);
+  // Remodeling: contractor/remodeling alliances only, unless staff asks
+  // for every alliance (the one already chosen always stays listed).
+  const [showAllAlliances, setShowAllAlliances] = useState(false);
+  const chosenAllianceId = watch("remodelingAllianceId");
+  const contractorAlliances = alliances.filter((a) => a.organizationType === "contractor_remodeling");
+  const allianceOptions = showAllAlliances
+    ? alliances
+    : alliances.filter((a) => a.organizationType === "contractor_remodeling" || a.id === chosenAllianceId);
   // New cases only offer current services; an existing case on a legacy
   // type (e.g. Online Notary) keeps showing it, marked "(legacy)".
   const serviceOptions = (serviceTypeValues as readonly string[]).filter(
@@ -2996,7 +3004,7 @@ export function CaseForm({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">{t("remodelingAllianceNone")}</SelectItem>
-                    {alliances.map((a) => (
+                    {allianceOptions.map((a) => (
                       <SelectItem key={a.id} value={a.id}>
                         {a.organizationName}
                       </SelectItem>
@@ -3005,6 +3013,16 @@ export function CaseForm({
                 </Select>
               )}
             />
+            {contractorAlliances.length === 0 && !showAllAlliances && (
+              <p className="text-xs text-muted-foreground">{t("remodelingNoContractors")}</p>
+            )}
+            <button
+              type="button"
+              className="w-fit cursor-pointer text-sm text-primary underline"
+              onClick={() => setShowAllAlliances((v) => !v)}
+            >
+              {showAllAlliances ? t("remodelingOnlyContractors") : t("remodelingShowAllAlliances")}
+            </button>
           </div>
         </div>
       )}

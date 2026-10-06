@@ -17,7 +17,7 @@ import { formatUsPhone, usPhoneDigits } from "@/lib/validation/onlineBooking";
 import { getNotificationSettings, renderEmail } from "@/lib/notifications/engine";
 import { usPhoneE164 } from "@/lib/notifications/config";
 import { renderSms } from "@/lib/notifications/texts";
-import { realSenders } from "@/lib/notifications/providers";
+import { realSenders, smsSetupStatus } from "@/lib/notifications/providers";
 import { getLegalTexts, pickLocale } from "@/lib/legal/texts";
 import type { PortalDb } from "@/lib/portal/db";
 
@@ -116,7 +116,10 @@ export async function sendTestNoticeAction(channel: "sms" | "email", language: "
       : "This is a test message from the CRM's automatic notices.";
 
   if (channel === "sms") {
-    if (!realSenders.configured("sms")) return { ok: false, error: "sms_not_configured" };
+    // The reason is shown to the owner: e.g. "SMS stay off until Twilio
+    // approves the verification (TWILIO_SMS_ENABLED missing)".
+    const setup = smsSetupStatus();
+    if (setup !== "ready") return { ok: false, error: `sms_${setup}` };
     const to = usPhoneE164(settings.testPhone);
     if (!to) return { ok: false, error: "test_phone_missing" };
     const result = await realSenders.sms({ to, body: renderSms(sample, lang, {}) });
@@ -132,7 +135,7 @@ export async function sendTestNoticeAction(channel: "sms" | "email", language: "
   if (!realSenders.configured("email")) return { ok: false, error: "email_not_configured" };
   const to = settings.testEmail.trim();
   if (!to) return { ok: false, error: "test_email_missing" };
-  const notALawFirm = pickLocale((await getLegalTexts(db)).not_a_law_firm, lang);
+  const notALawFirm = pickLocale((await getLegalTexts(db)).not_a_law_firm_email, lang);
   const { html, text } = renderEmail(sample, lang, notALawFirm, "client");
   const result = await realSenders.email({
     to,

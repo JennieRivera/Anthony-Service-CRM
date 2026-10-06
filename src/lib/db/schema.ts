@@ -3629,6 +3629,8 @@ export const organizationTypeEnum = pgEnum("organization_type", [
   "training_partner",
   "university",
   "business_organization",
+  // Allied contractors for Remodeling & Remodeling Partnerships cases.
+  "contractor_remodeling",
 ]);
 
 export const allianceStatusEnum = pgEnum("alliance_status", [

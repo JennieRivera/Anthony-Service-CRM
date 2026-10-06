@@ -84,7 +84,14 @@ export function NotificationSettingsManager({
       setMessage(
         result.ok
           ? { kind: "ok", text: t(channel === "sms" ? "testSmsSent" : "testEmailSent") }
-          : { kind: "error", text: t("testFailed", { error: result.error }) },
+          : {
+              kind: "error",
+              // Known reasons get a plain sentence; anything else (a
+              // provider error) is shown as-is.
+              text: t.has(`testErrors.${result.error}`)
+                ? t(`testErrors.${result.error}`)
+                : t("testFailed", { error: result.error }),
+            },
       );
     });
   }
@@ -206,11 +213,11 @@ export function NotificationSettingsManager({
         <CardContent className="flex flex-col gap-3">
           <p className="text-sm text-muted-foreground">{t("testHelp")}</p>
           <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="outline" disabled={isPending || !providers.sms} onClick={() => test("sms")}>
+            <Button type="button" variant="outline" disabled={isPending} onClick={() => test("sms")}>
               <Send className="h-4 w-4" />
               {t("testSms")}
             </Button>
-            <Button type="button" variant="outline" disabled={isPending || !providers.email} onClick={() => test("email")}>
+            <Button type="button" variant="outline" disabled={isPending} onClick={() => test("email")}>
               <Send className="h-4 w-4" />
               {t("testEmailButton")}
             </Button>

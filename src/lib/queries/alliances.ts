@@ -78,7 +78,11 @@ export async function listAlliances() {
 
 export async function listAlliancesForSelect() {
   return getDb()
-    .select({ id: strategicAlliances.id, organizationName: strategicAlliances.organizationName })
+    .select({
+      id: strategicAlliances.id,
+      organizationName: strategicAlliances.organizationName,
+      organizationType: strategicAlliances.organizationType,
+    })
     .from(strategicAlliances)
     .orderBy(strategicAlliances.organizationName);
 }

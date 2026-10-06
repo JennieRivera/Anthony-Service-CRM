@@ -19,6 +19,7 @@ export const organizationTypeValues = [
   "training_partner",
   "university",
   "business_organization",
+  "contractor_remodeling",
 ] as const;
 
 export const allianceStatusValues = [

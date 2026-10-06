@@ -3,6 +3,7 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { auth } from "@/auth";
 import { getReportData } from "@/lib/queries/reports";
 import { ReportPdf } from "@/components/reports/ReportPdf";
+import { addDays, businessLocalToUtc } from "@/lib/dates";
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -14,9 +15,12 @@ export async function GET(request: Request) {
   const from = searchParams.get("from") ?? "";
   const to = searchParams.get("to") ?? "";
 
-  const fromDate = new Date(from);
-  const toDate = new Date(to);
-  toDate.setHours(23, 59, 59, 999);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
+    return NextResponse.json({ error: "Invalid date range" }, { status: 400 });
+  }
+  // Whole Florida days, same range as the Reports page.
+  const fromDate = businessLocalToUtc(from);
+  const toDate = new Date(businessLocalToUtc(addDays(to, 1)).getTime() - 1);
 
   const data = await getReportData(fromDate, toDate);
 

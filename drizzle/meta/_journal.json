@@ -498,6 +498,13 @@
       "when": 1791308723313,
       "tag": "0070_services_list",
       "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1791311562225,
+      "tag": "0071_contractor_alliance_type",
+      "breakpoints": true
     }
   ]
 }

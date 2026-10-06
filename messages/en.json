@@ -191,7 +191,10 @@
     "columnAgreedFee": "Agreed Fee",
     "columnLinkedInvoice": "Linked Invoice",
     "noInvoiceLinked": "No invoice linked",
-    "membershipFeeHelp": "Complimentary, Waived, and Sponsored memberships never contribute to any dollar total above — they generate no membership revenue."
+    "membershipFeeHelp": "Complimentary, Waived, and Sponsored memberships never contribute to any dollar total above — they generate no membership revenue.",
+    "rangeLabel": "{from} to {to}",
+    "applying": "Loading…",
+    "invalidRange": "“From” must be before “To”."
   },
   "Permissions": {
     "accessDenied": "You do not have permission to view this page."
@@ -749,7 +752,10 @@
       "chooseService": "Choose a service",
       "chooseServiceError": "Choose a service before saving.",
       "remodelingAlliance": "Allied contractor",
-      "remodelingAllianceNone": "Not chosen yet"
+      "remodelingAllianceNone": "Not chosen yet",
+      "remodelingNoContractors": "No “Contractor / Remodeling” alliances yet. Set that type on the alliance (Alliances → Edit), or see all alliances.",
+      "remodelingShowAllAlliances": "See all alliances",
+      "remodelingOnlyContractors": "Contractors only"
     },
     "salesTaxCaseDetails": "Sales Tax Registration Details",
     "irsCaseDetails": "IRS / EIN / ITIN Case Details",
@@ -1801,6 +1807,20 @@
       "locationPlaceholder": "Location...",
       "referralSourcePlaceholder": "Referral source...",
       "clear": "Clear"
+    },
+    "calendar": {
+      "previous": "Back",
+      "next": "Next",
+      "month": "Month",
+      "week": "Week",
+      "day": "Day",
+      "agenda": "Agenda",
+      "date": "Date",
+      "time": "Time",
+      "event": "Appointment",
+      "allDay": "All day",
+      "noEventsInRange": "No appointments in this range.",
+      "showMore": "+{total} more"
     }
   },
   "AppointmentType": {
@@ -2796,7 +2816,8 @@
     "referral_partner": "Referral Partner",
     "training_partner": "Training Partner",
     "university": "University",
-    "business_organization": "Business Organization"
+    "business_organization": "Business Organization",
+    "contractor_remodeling": "Contractor / Remodeling"
   },
   "AllianceStatus": {
     "prospect": "Prospect",
@@ -4123,6 +4144,10 @@
         "title": "Notice: \"We are not attorneys\"",
         "help": "Footer of /book, of the client portal and of the Privacy Notice, and highlighted on /book for Immigration and Notary Public services."
       },
+      "not_a_law_firm_email": {
+        "title": "Short notice for emails",
+        "help": "One line at the bottom of automatic emails, in small gray type under the signature. The full notice above still shows on /book, the portal and the Privacy Notice."
+      },
       "not_a_law_firm_ack": {
         "title": "Mandatory acknowledgment",
         "help": "The checkbox clients must tick on /book and the first time they open the portal. Each acceptance is saved with date, time, IP and the exact text."
@@ -4358,6 +4383,14 @@
       "missing_credentials": "TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN missing in Vercel.",
       "missing_sender": "Add TWILIO_MESSAGING_SERVICE_SID (or TWILIO_FROM_NUMBER) in Vercel.",
       "not_enabled": "Ready to turn on: once Toll-Free Verification is approved, add TWILIO_SMS_ENABLED=true in Vercel and redeploy."
+    },
+    "testErrors": {
+      "sms_missing_credentials": "Can't send: TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN are missing in Vercel.",
+      "sms_missing_sender": "Can't send: TWILIO_MESSAGING_SERVICE_SID (or TWILIO_FROM_NUMBER) is missing in Vercel.",
+      "sms_not_enabled": "SMS stay off until Twilio approves the verification (TWILIO_SMS_ENABLED=true is missing in Vercel).",
+      "test_phone_missing": "First save your test phone (above) and press Save.",
+      "email_not_configured": "Email isn't connected: RESEND_API_KEY is missing in Vercel.",
+      "test_email_missing": "First save your test email (above) and press Save."
     }
   },
   "Export": {

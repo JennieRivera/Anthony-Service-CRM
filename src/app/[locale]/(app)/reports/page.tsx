@@ -18,7 +18,7 @@ import { ExportButtons } from "@/components/reports/ExportButtons";
 import { SeasonalityChart } from "@/components/reports/SeasonalityChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { businessDateString, formatDate } from "@/lib/dates";
+import { addDays, businessDateString, businessLocalToUtc, formatDate } from "@/lib/dates";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -59,7 +59,11 @@ export default async function ReportsPage({
   const tMembershipStatus = await getTranslations("AllianceMembershipStatus");
   const configured = isDatabaseConfigured();
   const defaults = defaultRange();
-  const { from = defaults.from, to = defaults.to, tab } = await searchParams;
+  const params = await searchParams;
+  const isDay = (v?: string) => !!v && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  const from = isDay(params.from) ? params.from! : defaults.from;
+  const to = isDay(params.to) ? params.to! : defaults.to;
+  const tab = params.tab;
 
   if (!configured) {
     return (
@@ -82,9 +86,10 @@ export default async function ReportsPage({
     );
   }
 
-  const fromDate = new Date(from);
-  const toDateEnd = new Date(to);
-  toDateEnd.setHours(23, 59, 59, 999);
+  // Whole Florida days: from 12:00 AM on "from" to 11:59:59 PM on "to"
+  // (the server runs in UTC, so new Date("YYYY-MM-DD") would be 4–5 h off).
+  const fromDate = businessLocalToUtc(from);
+  const toDateEnd = new Date(businessLocalToUtc(addDays(to, 1)).getTime() - 1);
   const range = { from: fromDate, to: toDateEnd };
 
   const [
@@ -113,7 +118,13 @@ export default async function ReportsPage({
   return (
     <div className="flex w-full flex-col gap-6 px-8 py-10">
       <div className="flex items-center justify-between">
-        <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
+        <div className="flex flex-col gap-1">
+          <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
+          {/* Shows which range is loaded — changes as soon as "Apply" finishes. */}
+          <p className="text-sm text-muted-foreground" data-testid="report-range">
+            {t("rangeLabel", { from: formatDate(from), to: formatDate(to) })}
+          </p>
+        </div>
         {visibility.full && overviewData && (
           <ExportButtons
             revenueByService={overviewData.revenueByService}
@@ -123,7 +134,7 @@ export default async function ReportsPage({
         )}
       </div>
 
-      <DateRangeForm from={from} to={to} />
+      <DateRangeForm key={`${from}_${to}`} from={from} to={to} tab={tab} />
 
       <Tabs defaultValue={activeTab}>
         <TabsList>

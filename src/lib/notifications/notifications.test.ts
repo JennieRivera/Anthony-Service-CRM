@@ -24,6 +24,8 @@ import {
   type ChannelFacts,
 } from "./config";
 import { renderSms } from "./texts";
+import { renderEmail } from "./engine";
+import { DEFAULT_LEGAL_TEXTS } from "@/lib/legal/keys";
 import { isValidTwilioSignature, twilioSignature } from "./twilioSignature";
 import { smsSetupStatus, type Senders } from "./providers";
 
@@ -49,6 +51,20 @@ const facts = (over: Partial<ChannelFacts> = {}): ChannelFacts => ({
 });
 
 async function pureTests() {
+  await ok("email: short legal line + signature with phone; the long notice is not in the email", () => {
+    const short = DEFAULT_LEGAL_TEXTS.not_a_law_firm_email.es;
+    const { html, text } = renderEmail("Hola", "es", short, "client");
+    for (const out of [html, text]) {
+      assert.ok(out.includes("Anthony Multiservice no es una firma de abogados y no ofrece asesoría legal."));
+      assert.ok(out.includes("Tel. (689) 342-6309"));
+      assert.ok(!out.includes(DEFAULT_LEGAL_TEXTS.not_a_law_firm.es));
+    }
+    // Small gray type, after the signature.
+    assert.ok(html.indexOf("Tel. (689) 342-6309") < html.indexOf("no ofrece asesoría legal"));
+    assert.ok(/font-size:11px[^>]*>Anthony Multiservice no es una firma/.test(html));
+    // Owner emails carry no client footer.
+    assert.ok(!renderEmail("Hi", "en", "", "owner").html.includes("(689) 342-6309"));
+  });
   await ok("channel: preferred if authorized, else SMS, else email, else none", () => {
     assert.equal(chooseChannel(facts({ smsConsent: true, emailConsent: true, preferredChannel: "email" })), "email");
     assert.equal(chooseChannel(facts({ smsConsent: true, emailConsent: true })), "sms");
