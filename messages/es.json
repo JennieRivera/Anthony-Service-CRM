@@ -494,7 +494,8 @@
       "afternoon": "Tarde",
       "evening": "Noche"
     },
-    "profilePhoto": "Foto de perfil"
+    "profilePhoto": "Foto de perfil",
+    "addedByAlliance": "Agregado por {name}"
   },
   "Cases": {
     "title": "Casos",
@@ -1599,7 +1600,30 @@
     "uploadErrorUnsupportedType": "Ese tipo de archivo no es compatible. Sube una imagen o un video.",
     "uploadErrorSensitiveSsn": "Esto parece contener un SSN o ITIN completo y no se puede subir.",
     "uploadErrorSensitiveCard": "Esto parece contener un número de tarjeta completo y no se puede subir.",
-    "uploadErrorSensitivePassword": "Esto parece contener una contraseña y no se puede subir."
+    "uploadErrorSensitivePassword": "Esto parece contener una contraseña y no se puede subir.",
+    "partners": {
+      "submittedBy": "Enviado por {name}",
+      "status": {
+        "approved": "Aprobado",
+        "pending": "Pendiente de aprobar",
+        "rejected": "No aprobado"
+      },
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "sharedAll": "Compartido con todos los aliados",
+      "sharedSome": "{count, plural, one {Compartido con 1 aliado} other {Compartido con # aliados}}",
+      "notShared": "Compartir con aliados",
+      "shareTitle": "Compartir con aliados",
+      "shareHint": "Los aliados elegidos lo podrán descargar en su portal.",
+      "mode": {
+        "none": "No compartir",
+        "all": "Todos los aliados",
+        "selected": "Solo los aliados que elija"
+      },
+      "noAlliances": "Todavía no hay alianzas.",
+      "cancel": "Cancelar",
+      "save": "Guardar"
+    }
   },
   "MarketingChannel": {
     "facebook": "Facebook",
@@ -2070,7 +2094,12 @@
       "rriStatus": "Estado RRI",
       "save": "Guardar Referido",
       "saving": "Guardando...",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "partnerVisibleTitle": "Lo que verá el aliado",
+      "partnerVisibleHint": "En su portal, el aliado solo ve este servicio y esta nota (y el nombre y teléfono del cliente, solo si el cliente autorizó compartir con aliados). Nunca ve las notas internas, casos ni documentos.",
+      "partnerService": "Servicio pedido",
+      "partnerServiceNone": "Sin indicar",
+      "partnerNote": "Nota para el aliado"
     }
   },
   "PaymentStatus": {
@@ -2131,7 +2160,12 @@
     "appointment_change_request": "Solicitud de Cambio de Cita",
     "client_info_review": "Revisar Cambio de Datos del Cliente",
     "service_interest": "El Cliente Pidió Información",
-    "call_client": "Llamar al Cliente"
+    "call_client": "Llamar al Cliente",
+    "partner_profile_review": "Revisar Perfil del Aliado",
+    "partner_document_review": "Revisar Documento del Aliado",
+    "partner_marketing_review": "Aprobar Material del Aliado",
+    "partner_referral": "Referido de un Aliado",
+    "partner_license_expiring": "Licencia/Seguro del Aliado por Vencer"
   },
   "Tasks": {
     "title": "Tareas",
@@ -2174,7 +2208,9 @@
     "noNotes": "Todavía no hay notas.",
     "notePlaceholder": "Escriba una nota…",
     "addNote": "Agregar nota",
-    "noteAdded": "Nota agregada"
+    "noteAdded": "Nota agregada",
+    "openAlliance": "Abrir alianza",
+    "fromAlliance": "Enviado por {name}"
   },
   "NotaryModality": {
     "in_person": "En Persona",
@@ -3064,7 +3100,11 @@
     "contract": "Contrato / Acuerdo",
     "addendum": "Adenda",
     "supporting_document": "Documento de Soporte",
-    "other": "Otro"
+    "other": "Otro",
+    "w9": "W-9",
+    "license": "Licencia",
+    "insurance": "Seguro",
+    "alliance_agreement": "Acuerdo de alianza"
   },
   "ProjectType": {
     "marketing": "Marketing",
@@ -4170,6 +4210,10 @@
         "title": "Casilla obligatoria",
         "help": "La casilla que el cliente debe marcar en /book y la primera vez que entra al portal. Cada aceptación se guarda con fecha, hora, IP y el texto exacto."
       },
+      "partner_terms": {
+        "title": "Términos de la alianza (portal de aliados)",
+        "help": "BORRADOR — pendiente de revisión de un abogado. Lo acepta cada aliado la primera vez que entra a su portal."
+      },
       "florida_notary_disclosure": {
         "title": "Aviso de Notary Public de Florida (sección 117.05(10))",
         "help": "Texto exigido por la sección 117.05(10) de Florida. El texto en español debe ser revisado por un abogado. Se muestra una vez por página, en inglés y en español juntos, en el pie de /book y del portal, con el mismo tamaño que el texto del pie (nunca más pequeño)."
@@ -4230,7 +4274,12 @@
     "taskDocumentsPending": "Documentos pendientes: ",
     "taskCloseOut": "Cerrar caso: ",
     "taskConfirm": "Confirmar: ",
-    "taskNoCommunication": "Sin comunicación reciente"
+    "taskNoCommunication": "Sin comunicación reciente",
+    "taskPartnerProfile": "Revisar cambio de perfil del aliado: ",
+    "taskPartnerDocument": "Revisar documento del aliado ",
+    "taskPartnerMarketing": "Aprobar material de marketing del aliado: ",
+    "taskPartnerExpiring": "Licencia/seguro del contratista por vencer: ",
+    "taskPartnerReferral": "Referido nuevo de "
   },
   "Privacy": {
     "metaTitle": "Aviso de Privacidad | Anthony Multiservice",
@@ -4666,5 +4715,211 @@
     "this_content_requires_partner_approval_before_it_can_be_published": "Este contenido necesita la aprobación del aliado antes de publicarse.",
     "this_content_requires_approval_before_it_can_be_published_set_approved_by_and_ap": "Este contenido necesita aprobación antes de publicarse: primero llene «Aprobado por» y «Fecha de aprobación».",
     "check_this_field": "Revise este campo."
+  },
+  "Partners": {
+    "title": "Portal de Aliados",
+    "signOut": "Salir",
+    "questions": "¿Preguntas? Llámenos al {phone}",
+    "nav": {
+      "home": "Inicio",
+      "profile": "Mi perfil",
+      "documents": "Documentos",
+      "marketing": "Marketing",
+      "referrals": "Referidos"
+    },
+    "access": {
+      "title": "Su portal de aliado",
+      "intro": "Para proteger su información, escriba los últimos 4 dígitos del teléfono de su negocio que tenemos registrado.",
+      "lastFourLabel": "Últimos 4 dígitos del teléfono",
+      "continue": "Continuar",
+      "checking": "Verificando…",
+      "noLink": "Para abrir su portal necesita el link personal que le enviamos. Si venció o no funciona, pídanos uno nuevo.",
+      "callUs": "Llámenos al {phone}",
+      "errors": {
+        "format": "Escriba 4 dígitos.",
+        "invalid": "Los dígitos no coinciden o este link ya no es válido.",
+        "locked": "Este link se bloqueó por demasiados intentos. Llámenos al {phone} para recibir uno nuevo.",
+        "rateLimited": "Demasiados intentos. Espere unos minutos e inténtelo de nuevo.",
+        "generic": "Algo salió mal. Inténtelo de nuevo."
+      }
+    },
+    "gate": {
+      "title": "Bienvenido al Portal de Aliados",
+      "acceptTerms": "He leído y acepto los Términos de la alianza.",
+      "continue": "Aceptar y continuar",
+      "error": "No se pudo guardar. Inténtelo de nuevo."
+    },
+    "home": {
+      "welcome": "Hola, {name}",
+      "intro": "Aquí comparte con Anthony Multiservice su perfil, documentos, materiales y referidos.",
+      "referrals": "Referidos",
+      "referralsText": "{count, plural, =0 {No hay referidos nuevos} one {1 referido nuevo} other {# referidos nuevos}}",
+      "documents": "Documentos",
+      "documentsText": "{count, plural, =0 {Todavía no hay documentos} one {1 documento} other {# documentos}}",
+      "marketing": "Marketing",
+      "marketingText": "{count, plural, =0 {Todavía no hay materiales} one {1 material para descargar} other {# materiales para descargar}}",
+      "profile": "Mi perfil",
+      "profileText": "Su negocio, servicios, fotos y licencias."
+    },
+    "upload": {
+      "documentType": "Tipo de documento",
+      "caption": "Descripción (opcional)",
+      "rules": "PDF, foto (JPG, PNG, WEBP, HEIC) o Word, hasta 10 MB.",
+      "imageRules": "Foto JPG, PNG o WEBP, hasta 10 MB.",
+      "uploading": "Subiendo {name}…",
+      "done": "Listo, lo recibimos.",
+      "errors": {
+        "type": "Ese tipo de archivo no se acepta.",
+        "size": "El archivo es muy grande (máximo 10 MB).",
+        "limit": "Llegó al límite de archivos por hoy. Inténtelo mañana.",
+        "photoLimit": "Llegó al máximo de fotos. Borre una para subir otra.",
+        "generic": "No se pudo subir. Inténtelo de nuevo."
+      }
+    },
+    "documents": {
+      "title": "Documentos",
+      "intro": "Suba sus contratos firmados y documentos (W-9, licencia, seguro, acuerdo de alianza). Abajo también están los documentos que Anthony Multiservice compartió con usted.",
+      "upload": "Subir un documento",
+      "empty": "Todavía no hay documentos.",
+      "fromYou": "Subido por usted",
+      "fromAms": "De Anthony Multiservice",
+      "download": "Descargar"
+    },
+    "marketing": {
+      "title": "Marketing y publicidad",
+      "intro": "Descargue los materiales que Anthony Multiservice comparte con usted, y envíe los suyos para que los promocionemos.",
+      "sharedTitle": "Materiales para usted",
+      "sharedEmpty": "Todavía no hay materiales compartidos.",
+      "download": "Descargar",
+      "submitTitle": "Enviar sus materiales",
+      "submitIntro": "Su flyer, logo o publicación. Lo revisamos antes de usarlo.",
+      "submit": "Enviar un material",
+      "status": {
+        "approved": "Aprobado",
+        "pending": "En revisión",
+        "rejected": "No aprobado"
+      }
+    },
+    "profile": {
+      "title": "Mi perfil",
+      "intro": "Así conocemos a {name}. Los cambios se guardan al momento y Anthony Multiservice los revisa.",
+      "logoTitle": "Logo",
+      "changeLogo": "Cambiar logo",
+      "addLogo": "Subir logo",
+      "galleryTitle": "Fotos de su negocio (máximo {max})",
+      "addPhoto": "Subir una foto",
+      "noPhotos": "Todavía no hay fotos.",
+      "removePhoto": "Quitar foto",
+      "fields": {
+        "contactPerson": "Persona de contacto",
+        "phone": "Teléfono",
+        "email": "Correo",
+        "website": "Sitio web",
+        "city": "Ciudad",
+        "state": "Estado (ej. FL)",
+        "description": "Descripción del negocio",
+        "servicesOffered": "Servicios que ofrece",
+        "serviceArea": "Área de servicio",
+        "socialLinks": "Redes sociales (un enlace por línea)",
+        "licenseNumber": "Número de licencia",
+        "licenseExpiration": "Vencimiento de la licencia",
+        "insuranceProvider": "Compañía de seguro",
+        "insuranceExpiration": "Vencimiento del seguro"
+      },
+      "licenseTitle": "Licencia y seguro",
+      "licenseHint": "Si aplica a su negocio.",
+      "licenseHintContractor": "Como contratista, escriba su licencia de Florida y su seguro. Le avisaremos antes de que venzan.",
+      "licenseConfirm": "Confirmo que tengo licencia vigente del estado de Florida y seguro, y que los datos que escribí son correctos.",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "saved": "Guardado. Anthony Multiservice revisará los cambios.",
+      "noChanges": "No había cambios.",
+      "errors": {
+        "license_confirmation": "Marque la confirmación de licencia y seguro.",
+        "phone": "Escriba un teléfono válido de EE. UU.",
+        "email": "Escriba un correo válido.",
+        "date": "Revise las fechas.",
+        "limit_reached": "Hizo muchos cambios hoy. Inténtelo mañana.",
+        "invalid": "Revise los datos.",
+        "generic": "No se pudo guardar. Inténtelo de nuevo."
+      }
+    },
+    "referrals": {
+      "title": "Referidos",
+      "intro": "Los referidos que Anthony Multiservice le envía y los que usted nos envía.",
+      "toYouTitle": "Referidos para usted",
+      "toYouEmpty": "Todavía no hay referidos para usted.",
+      "hidden": "Datos de contacto ocultos hasta que el cliente dé permiso.",
+      "updateStage": "Estado:",
+      "stage": {
+        "new": "Nuevo",
+        "contacted": "Contactado",
+        "closed": "Cerrado",
+        "not_closed": "No se concretó"
+      },
+      "fromYouTitle": "Referidos que usted envió",
+      "fromYouEmpty": "Todavía no ha enviado referidos.",
+      "sendTitle": "Enviarnos un referido",
+      "name": "Nombre completo",
+      "phone": "Teléfono",
+      "email": "Correo (opcional)",
+      "service": "Servicio que necesita",
+      "serviceNone": "No sé / otro",
+      "note": "Nota (opcional)",
+      "permission": "Confirmo que tengo permiso de esta persona para compartir sus datos con Anthony Multiservice.",
+      "send": "Enviar referido",
+      "sending": "Enviando…",
+      "sent": "¡Gracias! Recibimos el referido.",
+      "errors": {
+        "permission": "Marque que tiene permiso de la persona.",
+        "name": "Escriba el nombre.",
+        "phone": "Escriba un teléfono válido de EE. UU.",
+        "email": "Escriba un correo válido.",
+        "contact": "Escriba un teléfono o un correo.",
+        "limit_reached": "Llegó al límite de referidos por hoy.",
+        "generic": "No se pudo enviar. Inténtelo de nuevo."
+      }
+    }
+  },
+  "PartnerAccess": {
+    "title": "Acceso al portal del aliado",
+    "description": "Genere un link personal y envíelo al aliado por WhatsApp. El aliado lo confirma con los últimos 4 dígitos del teléfono de la alianza. El link vence en 7 días y funciona una sola vez; la sesión dura 30 días.",
+    "generate": "Generar link",
+    "generateNew": "Generar link nuevo",
+    "revoke": "Revocar acceso",
+    "revoking": "Revocando…",
+    "revokeConfirmTitle": "¿Revocar el acceso al portal del aliado?",
+    "revokeConfirmDescription": "Cualquier link sin usar deja de funcionar y se cierra la sesión del aliado en todos sus dispositivos.",
+    "cancel": "Cancelar",
+    "needsPhone": "Primero agregue un teléfono a la alianza: el link se confirma con sus últimos 4 dígitos.",
+    "error": "Algo salió mal",
+    "linkReady": "Link personal listo. Cópielo y envíelo por WhatsApp:",
+    "copy": "Copiar link",
+    "copied": "Copiado",
+    "expires": "Vence {date}",
+    "shownOnce": "Por seguridad, este link solo se muestra ahora. Si lo pierde, genere uno nuevo.",
+    "status": "Estado",
+    "statusActive": "{count, plural, one {Con sesión activa (1)} other {Con sesiones activas (#)}}",
+    "statusLocked": "Link bloqueado por demasiados intentos",
+    "statusPending": "Link enviado, todavía sin usar (vence {date})",
+    "statusNone": "Sin acceso",
+    "lastLogin": "Último ingreso",
+    "lastSeen": "Última actividad",
+    "termsAccepted": "Aceptó los términos",
+    "uploadedByPartner": "Subido por el aliado",
+    "visibleToPartner": "Visible para el aliado",
+    "mayContainSensitiveData": "Puede contener datos sensibles",
+    "profileTitle": "Perfil del aliado (portal)",
+    "profileHint": "Lo que el aliado escribió en su portal. Cada cambio le crea una tarea para revisarlo.",
+    "expiryAlert": "La licencia o el seguro de este contratista vence pronto o ya venció. Revise su perfil.",
+    "fields": {
+      "description": "Descripción",
+      "servicesOffered": "Servicios que ofrece",
+      "serviceArea": "Área de servicio",
+      "socialLinks": "Redes sociales",
+      "license": "Licencia (número · vence)",
+      "insurance": "Seguro (compañía · vence)"
+    },
+    "addedClients": "{count, plural, one {1 persona agregada por este aliado} other {# personas agregadas por este aliado}}"
   }
 }

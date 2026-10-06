@@ -8,8 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { businessInfo } from "@/lib/business-info";
 
-export function PortalAccessForm() {
-  const t = useTranslations("Portal.access");
+// Shared by the client portal and the partner portal: each passes its own
+// sign-in endpoint, home page and texts.
+export function PortalAccessForm({
+  endpoint = "/api/portal/login",
+  home = "/portal",
+  namespace = "Portal.access",
+}: {
+  endpoint?: "/api/portal/login" | "/api/partners/login";
+  home?: "/portal" | "/partners";
+  namespace?: "Portal.access" | "Partners.access";
+} = {}) {
+  const t = useTranslations(namespace);
   const router = useRouter();
   const [token, setToken] = useState<string | null | undefined>(undefined);
   const [lastFour, setLastFour] = useState("");
@@ -35,13 +45,13 @@ export function PortalAccessForm() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/portal/login", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, lastFour }),
       });
       if (res.ok) {
-        router.replace("/portal");
+        router.replace(home);
         router.refresh();
         return;
       }

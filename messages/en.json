@@ -494,7 +494,8 @@
       "afternoon": "Afternoon",
       "evening": "Evening"
     },
-    "profilePhoto": "Profile photo"
+    "profilePhoto": "Profile photo",
+    "addedByAlliance": "Added by {name}"
   },
   "Cases": {
     "title": "Cases",
@@ -1599,7 +1600,30 @@
     "uploadErrorUnsupportedType": "That file type isn't supported. Please upload an image or a video.",
     "uploadErrorSensitiveSsn": "This appears to contain a full SSN or ITIN and can't be uploaded.",
     "uploadErrorSensitiveCard": "This appears to contain a full card number and can't be uploaded.",
-    "uploadErrorSensitivePassword": "This appears to contain a password and can't be uploaded."
+    "uploadErrorSensitivePassword": "This appears to contain a password and can't be uploaded.",
+    "partners": {
+      "submittedBy": "Sent by {name}",
+      "status": {
+        "approved": "Approved",
+        "pending": "Pending approval",
+        "rejected": "Not approved"
+      },
+      "approve": "Approve",
+      "reject": "Reject",
+      "sharedAll": "Shared with all partners",
+      "sharedSome": "{count, plural, one {Shared with 1 partner} other {Shared with # partners}}",
+      "notShared": "Share with partners",
+      "shareTitle": "Share with partners",
+      "shareHint": "The chosen partners can download it in their portal.",
+      "mode": {
+        "none": "Don't share",
+        "all": "All partners",
+        "selected": "Only the partners I choose"
+      },
+      "noAlliances": "No alliances yet.",
+      "cancel": "Cancel",
+      "save": "Save"
+    }
   },
   "MarketingChannel": {
     "facebook": "Facebook",
@@ -2070,7 +2094,12 @@
       "rriStatus": "RRI Status",
       "save": "Save Referral",
       "saving": "Saving...",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "partnerVisibleTitle": "What the partner will see",
+      "partnerVisibleHint": "In its portal, the partner only sees this service and this note (and the client's name and phone, only if the client allowed sharing with partners). It never sees internal notes, cases or documents.",
+      "partnerService": "Requested service",
+      "partnerServiceNone": "Not specified",
+      "partnerNote": "Note for the partner"
     }
   },
   "PaymentStatus": {
@@ -2131,7 +2160,12 @@
     "appointment_change_request": "Appointment Change Request",
     "client_info_review": "Review Client Info Change",
     "service_interest": "Client Asked About Services",
-    "call_client": "Call Client"
+    "call_client": "Call Client",
+    "partner_profile_review": "Review Partner Profile",
+    "partner_document_review": "Review Partner Document",
+    "partner_marketing_review": "Approve Partner Material",
+    "partner_referral": "Referral from a Partner",
+    "partner_license_expiring": "Partner License/Insurance Expiring"
   },
   "Tasks": {
     "title": "Tasks",
@@ -2174,7 +2208,9 @@
     "noNotes": "No notes yet.",
     "notePlaceholder": "Write a note…",
     "addNote": "Add note",
-    "noteAdded": "Note added"
+    "noteAdded": "Note added",
+    "openAlliance": "Open alliance",
+    "fromAlliance": "Sent by {name}"
   },
   "NotaryModality": {
     "in_person": "In Person",
@@ -3064,7 +3100,11 @@
     "contract": "Contract / Agreement",
     "addendum": "Addendum",
     "supporting_document": "Supporting Document",
-    "other": "Other"
+    "other": "Other",
+    "w9": "W-9",
+    "license": "License",
+    "insurance": "Insurance",
+    "alliance_agreement": "Alliance agreement"
   },
   "ProjectType": {
     "marketing": "Marketing",
@@ -4170,6 +4210,10 @@
         "title": "Mandatory acknowledgment",
         "help": "The checkbox clients must tick on /book and the first time they open the portal. Each acceptance is saved with date, time, IP and the exact text."
       },
+      "partner_terms": {
+        "title": "Alliance terms (partner portal)",
+        "help": "DRAFT — pending attorney review. Each alliance accepts it the first time it signs in to its portal."
+      },
       "florida_notary_disclosure": {
         "title": "Florida Notary Public disclosure (section 117.05(10))",
         "help": "Text required by Florida Statutes section 117.05(10). The Spanish text must be reviewed by an attorney. Shown once per page, in English and Spanish together, in the footer of /book and the portal, at the same size as the footer text (never smaller)."
@@ -4230,7 +4274,12 @@
     "taskDocumentsPending": "Documents pending: ",
     "taskCloseOut": "Close out: ",
     "taskConfirm": "Confirm: ",
-    "taskNoCommunication": "No communication logged recently"
+    "taskNoCommunication": "No communication logged recently",
+    "taskPartnerProfile": "Review partner profile change: ",
+    "taskPartnerDocument": "Review partner document ",
+    "taskPartnerMarketing": "Approve partner marketing material: ",
+    "taskPartnerExpiring": "Contractor license/insurance expiring: ",
+    "taskPartnerReferral": "New referral from "
   },
   "Privacy": {
     "metaTitle": "Privacy Notice | Anthony Multiservice",
@@ -4666,5 +4715,211 @@
     "this_content_requires_partner_approval_before_it_can_be_published": "This content requires partner approval before it can be published.",
     "this_content_requires_approval_before_it_can_be_published_set_approved_by_and_ap": "This content requires approval before it can be published — set Approved By and Approval Date first.",
     "check_this_field": "Please check this field."
+  },
+  "Partners": {
+    "title": "Partner Portal",
+    "signOut": "Sign out",
+    "questions": "Questions? Call us at {phone}",
+    "nav": {
+      "home": "Home",
+      "profile": "My profile",
+      "documents": "Documents",
+      "marketing": "Marketing",
+      "referrals": "Referrals"
+    },
+    "access": {
+      "title": "Your partner portal",
+      "intro": "To protect your information, enter the last 4 digits of your business phone number we have on file.",
+      "lastFourLabel": "Last 4 digits of the phone",
+      "continue": "Continue",
+      "checking": "Checking…",
+      "noLink": "To open your portal you need the personal link we sent you. If it expired or doesn't work, ask us for a new one.",
+      "callUs": "Call us at {phone}",
+      "errors": {
+        "format": "Enter 4 digits.",
+        "invalid": "The digits don't match or this link is no longer valid.",
+        "locked": "This link was locked after too many attempts. Call us at {phone} for a new one.",
+        "rateLimited": "Too many attempts. Wait a few minutes and try again.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "gate": {
+      "title": "Welcome to the Partner Portal",
+      "acceptTerms": "I have read and accept the Alliance terms.",
+      "continue": "Accept and continue",
+      "error": "Couldn't save. Please try again."
+    },
+    "home": {
+      "welcome": "Hello, {name}",
+      "intro": "Here you share your profile, documents, materials and referrals with Anthony Multiservice.",
+      "referrals": "Referrals",
+      "referralsText": "{count, plural, =0 {No new referrals} one {1 new referral} other {# new referrals}}",
+      "documents": "Documents",
+      "documentsText": "{count, plural, =0 {No documents yet} one {1 document} other {# documents}}",
+      "marketing": "Marketing",
+      "marketingText": "{count, plural, =0 {No materials yet} one {1 material to download} other {# materials to download}}",
+      "profile": "My profile",
+      "profileText": "Your business, services, photos and licenses."
+    },
+    "upload": {
+      "documentType": "Document type",
+      "caption": "Description (optional)",
+      "rules": "PDF, photo (JPG, PNG, WEBP, HEIC) or Word, up to 10 MB.",
+      "imageRules": "JPG, PNG or WEBP photo, up to 10 MB.",
+      "uploading": "Uploading {name}…",
+      "done": "Done, we received it.",
+      "errors": {
+        "type": "That file type isn't accepted.",
+        "size": "The file is too large (10 MB max).",
+        "limit": "You reached today's file limit. Try again tomorrow.",
+        "photoLimit": "You reached the photo limit. Remove one to add another.",
+        "generic": "Couldn't upload. Please try again."
+      }
+    },
+    "documents": {
+      "title": "Documents",
+      "intro": "Upload your signed contracts and documents (W-9, license, insurance, alliance agreement). Documents Anthony Multiservice shared with you are below too.",
+      "upload": "Upload a document",
+      "empty": "No documents yet.",
+      "fromYou": "Uploaded by you",
+      "fromAms": "From Anthony Multiservice",
+      "download": "Download"
+    },
+    "marketing": {
+      "title": "Marketing & advertising",
+      "intro": "Download materials Anthony Multiservice shares with you, and send yours for us to promote.",
+      "sharedTitle": "Materials for you",
+      "sharedEmpty": "No shared materials yet.",
+      "download": "Download",
+      "submitTitle": "Send your materials",
+      "submitIntro": "Your flyer, logo or post. We review it before using it.",
+      "submit": "Send a material",
+      "status": {
+        "approved": "Approved",
+        "pending": "Under review",
+        "rejected": "Not approved"
+      }
+    },
+    "profile": {
+      "title": "My profile",
+      "intro": "This is how we know {name}. Changes save right away and Anthony Multiservice reviews them.",
+      "logoTitle": "Logo",
+      "changeLogo": "Change logo",
+      "addLogo": "Upload logo",
+      "galleryTitle": "Photos of your business ({max} max)",
+      "addPhoto": "Upload a photo",
+      "noPhotos": "No photos yet.",
+      "removePhoto": "Remove photo",
+      "fields": {
+        "contactPerson": "Contact person",
+        "phone": "Phone",
+        "email": "Email",
+        "website": "Website",
+        "city": "City",
+        "state": "State (e.g. FL)",
+        "description": "Business description",
+        "servicesOffered": "Services you offer",
+        "serviceArea": "Service area",
+        "socialLinks": "Social media (one link per line)",
+        "licenseNumber": "License number",
+        "licenseExpiration": "License expiration",
+        "insuranceProvider": "Insurance company",
+        "insuranceExpiration": "Insurance expiration"
+      },
+      "licenseTitle": "License & insurance",
+      "licenseHint": "If it applies to your business.",
+      "licenseHintContractor": "As a contractor, enter your Florida license and your insurance. We'll remind you before they expire.",
+      "licenseConfirm": "I confirm I hold a current State of Florida license and insurance, and that the information I entered is correct.",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved. Anthony Multiservice will review the changes.",
+      "noChanges": "There were no changes.",
+      "errors": {
+        "license_confirmation": "Check the license and insurance confirmation.",
+        "phone": "Enter a valid US phone number.",
+        "email": "Enter a valid email.",
+        "date": "Check the dates.",
+        "limit_reached": "You made many changes today. Try again tomorrow.",
+        "invalid": "Check the information.",
+        "generic": "Couldn't save. Please try again."
+      }
+    },
+    "referrals": {
+      "title": "Referrals",
+      "intro": "Referrals Anthony Multiservice sends you and the ones you send us.",
+      "toYouTitle": "Referrals for you",
+      "toYouEmpty": "No referrals for you yet.",
+      "hidden": "Contact details hidden until the client gives permission.",
+      "updateStage": "Status:",
+      "stage": {
+        "new": "New",
+        "contacted": "Contacted",
+        "closed": "Closed",
+        "not_closed": "Didn't close"
+      },
+      "fromYouTitle": "Referrals you sent",
+      "fromYouEmpty": "You haven't sent referrals yet.",
+      "sendTitle": "Send us a referral",
+      "name": "Full name",
+      "phone": "Phone",
+      "email": "Email (optional)",
+      "service": "Service needed",
+      "serviceNone": "Not sure / other",
+      "note": "Note (optional)",
+      "permission": "I confirm I have this person's permission to share their information with Anthony Multiservice.",
+      "send": "Send referral",
+      "sending": "Sending…",
+      "sent": "Thank you! We received the referral.",
+      "errors": {
+        "permission": "Check that you have the person's permission.",
+        "name": "Enter the name.",
+        "phone": "Enter a valid US phone number.",
+        "email": "Enter a valid email.",
+        "contact": "Enter a phone or an email.",
+        "limit_reached": "You reached today's referral limit.",
+        "generic": "Couldn't send. Please try again."
+      }
+    }
+  },
+  "PartnerAccess": {
+    "title": "Partner portal access",
+    "description": "Generate a personal link and send it to the partner by WhatsApp. The partner confirms it with the last 4 digits of the alliance's phone. The link expires in 7 days and works once; the session lasts 30 days.",
+    "generate": "Generate link",
+    "generateNew": "Generate new link",
+    "revoke": "Revoke access",
+    "revoking": "Revoking…",
+    "revokeConfirmTitle": "Revoke partner portal access?",
+    "revokeConfirmDescription": "Any unused link stops working and the partner is signed out on every device.",
+    "cancel": "Cancel",
+    "needsPhone": "First add a phone to the alliance: the link is confirmed with its last 4 digits.",
+    "error": "Something went wrong",
+    "linkReady": "Personal link ready. Copy it and send it by WhatsApp:",
+    "copy": "Copy link",
+    "copied": "Copied",
+    "expires": "Expires {date}",
+    "shownOnce": "For security, this link is only shown now. If you lose it, generate a new one.",
+    "status": "Status",
+    "statusActive": "{count, plural, one {Active session (1)} other {Active sessions (#)}}",
+    "statusLocked": "Link locked after too many attempts",
+    "statusPending": "Link sent, not used yet (expires {date})",
+    "statusNone": "No access",
+    "lastLogin": "Last sign-in",
+    "lastSeen": "Last activity",
+    "termsAccepted": "Accepted the terms",
+    "uploadedByPartner": "Uploaded by the partner",
+    "visibleToPartner": "Visible to the partner",
+    "mayContainSensitiveData": "May contain sensitive data",
+    "profileTitle": "Partner profile (portal)",
+    "profileHint": "What the partner wrote in its portal. Every change creates a task for you to review.",
+    "expiryAlert": "This contractor's license or insurance expires soon or has expired. Check its profile.",
+    "fields": {
+      "description": "Description",
+      "servicesOffered": "Services offered",
+      "serviceArea": "Service area",
+      "socialLinks": "Social media",
+      "license": "License (number · expires)",
+      "insurance": "Insurance (company · expires)"
+    },
+    "addedClients": "{count, plural, one {1 person added by this partner} other {# people added by this partner}}"
   }
 }

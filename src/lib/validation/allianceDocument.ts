@@ -3,4 +3,8 @@ export const allianceDocumentTypeValues = [
   "addendum",
   "supporting_document",
   "other",
+  "w9",
+  "license",
+  "insurance",
+  "alliance_agreement",
 ] as const;

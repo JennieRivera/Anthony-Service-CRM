@@ -148,7 +148,7 @@ export async function getAiAgentWorkloadStats() {
   for (const department of DEPARTMENTS_WITH_LIVE_SCOPE) {
     const ids = scopedClientIds(department);
     const tasksToday = openTasks.filter(
-      (t) => t.dueDate === todayStr && ids.has(t.clientId),
+      (t) => t.dueDate === todayStr && t.clientId !== null && ids.has(t.clientId),
     ).length;
     byDepartment.set(department, {
       assignedClients: ids.size,

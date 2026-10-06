@@ -33,6 +33,7 @@ import { assetViewHref, assetDownloadHref } from "./assetHref";
 import { marketingUploadErrorKey } from "./uploadErrorKey";
 import { FilePickerButton } from "@/components/documents/FilePickerButton";
 import type { listMarketingContentAssets } from "@/lib/queries/marketingContent";
+import { MarketingPartnerControls } from "./MarketingPartnerControls";
 
 type Asset = Awaited<ReturnType<typeof listMarketingContentAssets>>[number];
 
@@ -40,12 +41,19 @@ function isVideoFile(fileName: string): boolean {
   return /\.(mp4|mov|webm)$/i.test(fileName);
 }
 
+type AllianceOption = { id: string; organizationName: string };
+
 export function MarketingContentLibrary({
   assets,
   blobConfigured,
+  alliances = [],
+  shares = [],
 }: {
   assets: Asset[];
   blobConfigured: boolean;
+  // Partner portal: alliances to share with, and current "selected" shares.
+  alliances?: AllianceOption[];
+  shares?: { assetId: string; allianceId: string }[];
 }) {
   const t = useTranslations("MarketingContent");
   const tService = useTranslations("ServiceType");
@@ -85,7 +93,12 @@ export function MarketingContentLibrary({
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((asset) => (
-            <AssetCard key={asset.id} asset={asset} />
+            <AssetCard
+              key={asset.id}
+              asset={asset}
+              alliances={alliances}
+              sharedWith={shares.filter((s) => s.assetId === asset.id).map((s) => s.allianceId)}
+            />
           ))}
         </div>
       )}
@@ -93,7 +106,15 @@ export function MarketingContentLibrary({
   );
 }
 
-function AssetCard({ asset }: { asset: Asset }) {
+function AssetCard({
+  asset,
+  alliances,
+  sharedWith,
+}: {
+  asset: Asset;
+  alliances: AllianceOption[];
+  sharedWith: string[];
+}) {
   const t = useTranslations("MarketingContent");
   const tService = useTranslations("ServiceType");
   const tChannel = useTranslations("MarketingChannel");
@@ -146,6 +167,18 @@ function AssetCard({ asset }: { asset: Asset }) {
           <Download className="h-4 w-4" />
           {t("download")}
         </Button>
+        <MarketingPartnerControls
+          assetId={asset.id}
+          approvalStatus={asset.approvalStatus}
+          submittedBy={
+            asset.submittedByAllianceId
+              ? (alliances.find((a) => a.id === asset.submittedByAllianceId)?.organizationName ?? "—")
+              : null
+          }
+          share={asset.partnerShare}
+          sharedWith={sharedWith}
+          alliances={alliances}
+        />
       </div>
     </div>
   );

@@ -17,6 +17,8 @@ import { getLatestConsents, listConsentEvents } from "@/lib/legal/texts";
 import { getNotificationSettings, portalLinkSendBlocks } from "@/lib/notifications/engine";
 import { noticeDeps } from "@/lib/notifications/server";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import { strategicAlliances } from "@/lib/db/schema";
 import { getPortalAccessSummary } from "@/lib/portal/access";
 import type { PortalDb } from "@/lib/portal/db";
 
@@ -32,6 +34,14 @@ export default async function ClientProfilePage({
 
   const result = await getClientById(id);
   if (!result) notFound();
+  // Partner portal: a Lead the alliance sent ("Added by [ally]").
+  const [addedBy] = result.client.addedByAllianceId
+    ? await getDb()
+        .select({ id: strategicAlliances.id, organizationName: strategicAlliances.organizationName })
+        .from(strategicAlliances)
+        .where(eq(strategicAlliances.id, result.client.addedByAllianceId))
+        .limit(1)
+    : [];
 
   const portalDb = getDb() as unknown as PortalDb;
   const [highlevelSync, highlevelPreview, portalAccess, latestConsents, consentHistory, sendBlocks, noticeSettings] =
@@ -105,6 +115,11 @@ export default async function ClientProfilePage({
             {client.fullName}
           </h1>
           <ClientStatusBadge status={client.status} />
+          {addedBy && (
+            <Link href={`/alliances/${addedBy.id}`} className="rounded-full bg-secondary px-2.5 py-0.5 text-xs text-foreground hover:underline">
+              {t("addedByAlliance", { name: addedBy.organizationName })}
+            </Link>
+          )}
         </div>
         {/* Long values (e.g. an email) wrap inside their own column instead
             of running into the next one. */}

@@ -215,7 +215,7 @@ export async function getCompany360Data(companyId: string) {
     ...companyTasks.map((task) => ({
       date: task.createdAt,
       type: "task" as const,
-      label: `${task.title} — ${clientNameById.get(task.clientId) ?? ""}`,
+      label: `${task.title} — ${(task.clientId ? clientNameById.get(task.clientId) : undefined) ?? ""}`,
     })),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 

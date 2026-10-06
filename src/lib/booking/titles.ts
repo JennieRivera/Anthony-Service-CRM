@@ -210,6 +210,12 @@ const TASK_PREFIXES = {
   "Documents pending: ": "taskDocumentsPending",
   "Close out: ": "taskCloseOut",
   "Confirm: ": "taskConfirm",
+  // Partner portal (Phase A).
+  "Review partner profile change: ": "taskPartnerProfile",
+  "Review partner document ": "taskPartnerDocument",
+  "Approve partner marketing material: ": "taskPartnerMarketing",
+  "Contractor license/insurance expiring: ": "taskPartnerExpiring",
+  "New referral from ": "taskPartnerReferral",
 } as const;
 const TASK_EXACT = {
   "No communication logged recently": "taskNoCommunication",

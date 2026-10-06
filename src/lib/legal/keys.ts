@@ -9,6 +9,8 @@ export const LEGAL_TEXT_KEYS = [
   // text above stays on /book, the portal and the Privacy Notice.
   "not_a_law_firm_email",
   "not_a_law_firm_ack",
+  // Partner portal: what an alliance accepts the first time it signs in.
+  "partner_terms",
   "florida_notary_disclosure",
   "document_processing_authorization",
   "privacy_notice",
@@ -17,7 +19,7 @@ export const LEGAL_TEXT_KEYS = [
 export type LegalTextKey = (typeof LEGAL_TEXT_KEYS)[number];
 
 // Long texts get a bigger editor and a higher length limit.
-export const LONG_LEGAL_TEXT_KEYS: readonly LegalTextKey[] = ["privacy_notice"];
+export const LONG_LEGAL_TEXT_KEYS: readonly LegalTextKey[] = ["privacy_notice", "partner_terms"];
 export const legalTextMaxLength = (key: LegalTextKey) =>
   LONG_LEGAL_TEXT_KEYS.includes(key) ? 20000 : 4000;
 
@@ -31,6 +33,12 @@ export const DEFAULT_LEGAL_TEXTS: Record<LegalTextKey, LegalText> = {
   not_a_law_firm_email: {
     en: "Anthony Multiservice is not a law firm and does not provide legal advice.",
     es: "Anthony Multiservice no es una firma de abogados y no ofrece asesoría legal.",
+  },
+  // DRAFT written 2026-10-06 at the owner's request — pending review by a
+  // licensed attorney before relying on it (Settings → Legal texts says so).
+  partner_terms: {
+    en: "Alliance terms (draft — pending attorney review).\n1. Anthony Multiservice (AMS) and your business are independent. Neither is the other's employee, agent, or legal representative.\n2. Only share information about people who gave you permission. You are responsible for that permission.\n3. Client information AMS refers to you is confidential: use it only to serve that referral, and do not share it.\n4. You are responsible for your own licenses, insurance, taxes, and the work you perform. AMS does not perform or guarantee that work.\n5. Marketing materials shared through the portal may only be used to promote the alliance, as agreed.\n6. Referral fees or commissions, if any, are governed by your signed alliance agreement.\n7. AMS may suspend portal access at any time.",
+    es: "Términos de la alianza (borrador — pendiente de revisión de un abogado).\n1. Anthony Multiservice (AMS) y su negocio son independientes. Ninguno es empleado, agente ni representante legal del otro.\n2. Solo comparta datos de personas que le dieron permiso. Usted es responsable de ese permiso.\n3. La información de clientes que AMS le refiera es confidencial: úsela solo para atender ese referido y no la comparta.\n4. Usted es responsable de sus propias licencias, seguros, impuestos y del trabajo que realiza. AMS no realiza ni garantiza ese trabajo.\n5. Los materiales de marketing compartidos en el portal solo se pueden usar para promocionar la alianza, según lo acordado.\n6. Las comisiones o pagos por referidos, si los hay, se rigen por su acuerdo de alianza firmado.\n7. AMS puede suspender el acceso al portal en cualquier momento.",
   },
   not_a_law_firm_ack: {
     en: "I understand that Anthony Multiservice is not a law firm and does not give me legal advice.",

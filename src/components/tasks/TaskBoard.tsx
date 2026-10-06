@@ -10,6 +10,7 @@ import {
   FileText,
   FolderOpen,
   User,
+  Network,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -76,10 +77,22 @@ type DirectAction =
   | { kind: "appointment"; href: string }
   | { kind: "document"; href: string }
   | { kind: "client"; href: string }
-  | { kind: "case"; href: string };
+  | { kind: "case"; href: string }
+  | { kind: "alliance"; href: string };
+
+const PARTNER_TYPES = new Set([
+  "partner_profile_review",
+  "partner_document_review",
+  "partner_marketing_review",
+  "partner_license_expiring",
+]);
 
 function directAction(task: TaskBoardRow): DirectAction {
-  const client = { kind: "client", href: `/clients/${task.clientId}` } as const;
+  const client: DirectAction = task.clientId
+    ? { kind: "client", href: `/clients/${task.clientId}` }
+    : { kind: "alliance", href: `/alliances/${task.allianceId}` };
+  if (task.type === "partner_marketing_review") return { kind: "alliance", href: "/marketing-content" };
+  if (PARTNER_TYPES.has(task.type) && task.allianceId) return { kind: "alliance", href: `/alliances/${task.allianceId}` };
   if (APPOINTMENT_TYPES.has(task.type)) {
     return task.appointmentId ? { kind: "appointment", href: `/appointments/${task.appointmentId}` } : client;
   }
@@ -90,6 +103,11 @@ function directAction(task: TaskBoardRow): DirectAction {
   return task.caseId ? { kind: "case", href: `/cases/${task.caseId}` } : client;
 }
 
+// Who a task is about: its client, or (partner portal tasks) its alliance.
+const whoKey = (task: TaskBoardRow) => task.clientId ?? `alliance:${task.allianceId}`;
+const whoName = (task: TaskBoardRow) => task.clientName ?? task.allianceName ?? "—";
+const whoHref = (task: TaskBoardRow) => (task.clientId ? `/clients/${task.clientId}` : `/alliances/${task.allianceId}`);
+
 function DirectButton({ action, size = "sm" }: { action: DirectAction; size?: "sm" | "default" }) {
   const t = useTranslations("Tasks");
   const label = {
@@ -97,8 +115,9 @@ function DirectButton({ action, size = "sm" }: { action: DirectAction; size?: "s
     document: t("viewDocument"),
     client: t("openClient"),
     case: t("openCase"),
+    alliance: t("openAlliance"),
   }[action.kind];
-  const Icon = { appointment: CalendarClock, document: FileText, client: User, case: FolderOpen }[action.kind];
+  const Icon = { appointment: CalendarClock, document: FileText, client: User, case: FolderOpen, alliance: Network }[action.kind];
   if (action.kind === "document") {
     return (
       <Button
@@ -141,7 +160,7 @@ export function TaskBoard({
 
   const types = useMemo(() => [...new Set(tasks.map((task) => task.type))], [tasks]);
   const clientOptions = useMemo(() => {
-    const byId = new Map(tasks.map((task) => [task.clientId, task.clientName]));
+    const byId = new Map(tasks.map((task) => [whoKey(task), whoName(task)]));
     return [...byId.entries()].sort((a, b) => a[1].localeCompare(b[1]));
   }, [tasks]);
 
@@ -149,7 +168,7 @@ export function TaskBoard({
     () =>
       tasks
         .filter((task) => typeFilter === "all" || task.type === typeFilter)
-        .filter((task) => clientFilter === "all" || task.clientId === clientFilter)
+        .filter((task) => clientFilter === "all" || whoKey(task) === clientFilter)
         .filter((task) =>
           dueFilter === "withDue" ? !!task.dueDate : dueFilter === "overdue" ? !!task.dueDate && task.dueDate < today : true,
         )
@@ -269,11 +288,11 @@ export function TaskBoard({
                     </TableCell>
                     <TableCell>
                       <Link
-                        href={`/clients/${task.clientId}`}
+                        href={whoHref(task)}
                         className="text-muted-foreground hover:underline"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        {task.clientName}
+                        {whoName(task)}
                       </Link>
                     </TableCell>
                     <TableCell>
@@ -396,9 +415,12 @@ function TaskDetail({
         <div>
           <dt className="text-muted-foreground">{t("columnClient")}</dt>
           <dd>
-            <Link href={`/clients/${task.clientId}`} className="text-primary underline">
-              {task.clientName}
+            <Link href={whoHref(task)} className="text-primary underline">
+              {whoName(task)}
             </Link>
+            {task.clientId && task.allianceName && (
+              <span className="block text-xs text-muted-foreground">{t("fromAlliance", { name: task.allianceName })}</span>
+            )}
           </dd>
         </div>
         <div>

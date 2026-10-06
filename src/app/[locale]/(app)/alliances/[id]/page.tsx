@@ -15,6 +15,9 @@ import { AllianceContactsSection } from "@/components/alliances/AllianceContacts
 import { AllianceNetworkSection } from "@/components/alliances/AllianceNetworkSection";
 import { AllianceActivitySection } from "@/components/alliances/AllianceActivitySection";
 import { AllianceMembershipSection } from "@/components/alliances/AllianceMembershipSection";
+import { PartnerAccessCard } from "@/components/alliances/PartnerAccessCard";
+import { PartnerDocumentVisibility } from "@/components/alliances/PartnerDocumentVisibility";
+import { getPartnerStaffView } from "@/lib/partners/staff";
 import AccessDenied from "@/components/AccessDenied";
 import { getCurrentRole, hasAccessArea, hasAllianceViewAccess } from "@/lib/permissions";
 import { listActiveMembershipPlansForSelect, listActiveMembershipBenefitsForSelect } from "@/lib/queries/memberships";
@@ -59,14 +62,16 @@ export default async function AllianceDetailPage({
 
   const blobConfigured = isBlobConfigured();
 
-  const [result, clients, allAlliances, membershipPlans, membershipBenefits] = await Promise.all([
+  const [result, clients, allAlliances, membershipPlans, membershipBenefits, partner] = await Promise.all([
     getAllianceById(id),
     listClientsForSelect(),
     listAlliancesForSelect(),
     listActiveMembershipPlansForSelect(),
     listActiveMembershipBenefitsForSelect(),
+    getPartnerStaffView(id),
   ]);
   if (!result) notFound();
+  const tPartner = await getTranslations("PartnerAccess");
 
   const {
     alliance,
@@ -197,6 +202,87 @@ export default async function AllianceDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Partner portal (Phase A): access, and what the alliance added. */}
+      <PartnerAccessCard
+        allianceId={id}
+        canEdit={canEditAlliance}
+        hasPhone={(alliance.phone ?? "").replace(/\D/g, "").length >= 4}
+        summary={{
+          pendingLink: partner.access.pendingLink
+            ? { expiresAt: partner.access.pendingLink.expiresAt.toISOString(), locked: partner.access.pendingLink.locked }
+            : null,
+          activeSessions: partner.access.activeSessions,
+          lastSeenAt: partner.access.lastSeenAt ? new Date(partner.access.lastSeenAt).toISOString() : null,
+          lastLoginAt: partner.access.lastLoginAt ? new Date(partner.access.lastLoginAt).toISOString() : null,
+          termsAcceptedAt: partner.termsAcceptedAt ? partner.termsAcceptedAt.toISOString() : null,
+        }}
+      />
+
+      {(partner.profile || partner.photos.length > 0 || partner.addedClients.length > 0) && (
+        <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6">
+          <h2 className="font-heading text-lg text-foreground">{tPartner("profileTitle")}</h2>
+          <p className="text-sm text-muted-foreground">{tPartner("profileHint")}</p>
+          {(partner.licenseStatus === "soon" ||
+            partner.licenseStatus === "expired" ||
+            partner.insuranceStatus === "soon" ||
+            partner.insuranceStatus === "expired") && (
+            <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900" role="alert">
+              {tPartner("expiryAlert")}
+            </p>
+          )}
+          <div className="flex flex-wrap items-start gap-4">
+            {partner.profile?.logoBlobUrl && (
+              // Private logo, streamed after the staff auth() check.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={`/api/alliances/${id}/partner-file`} alt="" className="size-20 rounded-lg border border-border object-cover" />
+            )}
+            <dl className="grid min-w-0 flex-1 gap-3 text-sm sm:grid-cols-2 [&_dd]:wrap-anywhere [&_dd]:whitespace-pre-line">
+              {(
+                [
+                  ["description", partner.profile?.description],
+                  ["servicesOffered", partner.profile?.servicesOffered],
+                  ["serviceArea", partner.profile?.serviceArea],
+                  ["socialLinks", partner.profile?.socialLinks],
+                  ["license", partner.profile?.licenseNumber ? `${partner.profile.licenseNumber}${partner.profile.licenseExpiration ? ` · ${formatDate(partner.profile.licenseExpiration)}` : ""}` : null],
+                  ["insurance", partner.profile?.insuranceProvider || partner.profile?.insuranceExpiration ? `${partner.profile?.insuranceProvider ?? ""}${partner.profile?.insuranceExpiration ? ` · ${formatDate(partner.profile.insuranceExpiration)}` : ""}` : null],
+                ] as const
+              ).map(([key, value]) => (
+                <div key={key}>
+                  <dt className="text-muted-foreground">{tPartner(`fields.${key}`)}</dt>
+                  <dd className="text-foreground">{value || "—"}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          {partner.photos.length > 0 && (
+            <ul className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+              {partner.photos.map((p) => (
+                <li key={p.id}>
+                  <a href={`/api/alliances/${id}/partner-file?photo=${p.id}`} target="_blank" rel="noopener noreferrer">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`/api/alliances/${id}/partner-file?photo=${p.id}`} alt={p.fileName} className="aspect-square w-full rounded-md border border-border object-cover" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          {partner.addedClients.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <h3 className="text-sm font-medium text-foreground">{tPartner("addedClients", { count: partner.addedClients.length })}</h3>
+              <ul className="flex flex-wrap gap-2">
+                {partner.addedClients.map((c) => (
+                  <li key={c.id}>
+                    <Link href={`/clients/${c.id}`} className="text-sm text-primary underline">
+                      {c.fullName}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Organization/company */}
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
@@ -444,7 +530,9 @@ export default async function AllianceDetailPage({
             {documents.map((doc) => (
               <li key={doc.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
                 <span className="truncate font-medium text-foreground">{doc.fileName}</span>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {doc.sensitiveDataReason && <Badge variant="destructive">{tPartner("mayContainSensitiveData")}</Badge>}
+                  <PartnerDocumentVisibility documentId={doc.id} visible={doc.visibleToPartner} uploadedByPartner={doc.uploadedByPartner} />
                   <AllianceDocumentTypeSelect allianceId={id} document={doc} />
                   <Button
                     variant="outline"

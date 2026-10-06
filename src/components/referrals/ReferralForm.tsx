@@ -27,6 +27,7 @@ import {
   type ReferralFormValues,
 } from "@/lib/validation/referral";
 import type { Referral, RriReferralDetails } from "@/lib/db/schema";
+import { activeServiceTypeValues } from "@/lib/validation/client";
 
 export function ReferralForm({
   referral,
@@ -58,6 +59,7 @@ export function ReferralForm({
   const tCategory = useTranslations("ReferralCategory");
   const tDirection = useTranslations("ReferralDirection");
   const tPipelineStatus = useTranslations("ReferralPipelineStatus");
+  const tService = useTranslations("ServiceType");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -93,6 +95,8 @@ export function ReferralForm({
       paymentMethod: referral?.paymentMethod ?? "",
       paymentConfirmation: referral?.paymentConfirmation ?? "",
       notes: referral?.notes ?? "",
+      partnerNote: referral?.partnerNote ?? "",
+      partnerService: referral?.partnerService ?? "",
       rriBusinessName: rriDetails?.businessName ?? "",
       businessEntity: rriDetails?.businessEntity ?? "",
       industry: rriDetails?.industry ?? "",
@@ -560,6 +564,39 @@ export function ReferralForm({
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="notes">{t("notes")}</Label>
         <Textarea id="notes" rows={3} {...register("notes")} />
+      </div>
+
+      {/* Partner portal: the ONLY referral details the alliance sees (plus
+          the client's name and phone, if the client allowed sharing). */}
+      <div className="flex flex-col gap-3 rounded-md border border-dashed border-border p-4">
+        <p className="text-sm font-medium text-foreground">{t("partnerVisibleTitle")}</p>
+        <p className="text-xs text-muted-foreground">{t("partnerVisibleHint")}</p>
+        <div className="flex flex-col gap-1.5 sm:max-w-md">
+          <Label>{t("partnerService")}</Label>
+          <Controller
+            control={control}
+            name="partnerService"
+            render={({ field }) => (
+              <Select value={field.value || "none"} onValueChange={(v) => field.onChange(!v || v === "none" ? "" : v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">{t("partnerServiceNone")}</SelectItem>
+                  {activeServiceTypeValues.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {tService(s)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="partnerNote">{t("partnerNote")}</Label>
+          <Textarea id="partnerNote" rows={2} maxLength={1000} {...register("partnerNote")} />
+        </div>
       </div>
 
       <div className="flex justify-end gap-3">

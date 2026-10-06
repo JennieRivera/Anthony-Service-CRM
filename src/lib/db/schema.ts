@@ -14,8 +14,10 @@ import {
   uniqueIndex,
   primaryKey,
   index,
+  check,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const serviceTypeEnum = pgEnum("service_type", [
   "online_notary",
@@ -567,6 +569,11 @@ export const clients = pgTable("clients", {
   // streamed through /api/portal/profile/photo (the client) or
   // /api/clients/[id]/photo (staff) — never linked directly.
   photoBlobUrl: text("photo_blob_url"),
+  // Partner portal: the alliance that sent this person as a referral
+  // ("Added by [ally]"). The alliance never sees this client record.
+  addedByAllianceId: uuid("added_by_alliance_id").references((): AnyPgColumn => strategicAlliances.id, {
+    onDelete: "set null",
+  }),
 });
 
 // Phase 4, Session 3 — one optional row per client, the same 1:1-extension
@@ -1012,6 +1019,13 @@ export const taskTypeEnum = pgEnum("task_type", [
   // Automatic notices (Step 3B) — a notice couldn't go out because the
   // client authorized no channel (or has no phone/email for it).
   "call_client",
+  // Partner portal (Phase A) — created by an alliance from its portal.
+  // These tasks belong to the alliance (tasks.allianceId), not a client.
+  "partner_profile_review",
+  "partner_document_review",
+  "partner_marketing_review",
+  "partner_referral",
+  "partner_license_expiring",
 ]);
 
 export const taskStatusEnum = pgEnum("task_status", [
@@ -1025,9 +1039,12 @@ export const tasks = pgTable("tasks", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
-  clientId: uuid("client_id")
-    .notNull()
-    .references(() => clients.id, { onDelete: "cascade" }),
+  // Partner portal (Phase A): a task is about a client OR an alliance
+  // (partner tasks have no client) — the check below requires one of them.
+  clientId: uuid("client_id").references(() => clients.id, { onDelete: "cascade" }),
+  allianceId: uuid("alliance_id").references((): AnyPgColumn => strategicAlliances.id, {
+    onDelete: "cascade",
+  }),
   caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
   type: taskTypeEnum("type").notNull(),
   title: text("title").notNull(),
@@ -1050,7 +1067,9 @@ export const tasks = pgTable("tasks", {
   documentId: uuid("document_id").references(() => documents.id, {
     onDelete: "set null",
   }),
-});
+}, (table) => [
+  check("tasks_client_or_alliance", sql`${table.clientId} is not null or ${table.allianceId} is not null`),
+]);
 
 // Notes staff add to a task from its detail panel on /tasks. Append-only.
 export const taskNotes = pgTable(
@@ -1174,7 +1193,30 @@ export const marketingContentAssets = pgTable("marketing_content_assets", {
   caption: text("caption"),
   fileName: text("file_name").notNull(),
   blobUrl: text("blob_url").notNull(),
+  // Partner portal: "none" | "all" partners | "selected" ones (see
+  // marketingAssetPartnerShares). Material a partner submits stays
+  // "pending" until staff approves it.
+  partnerShare: text("partner_share", { enum: ["none", "all", "selected"] }).notNull().default("none"),
+  submittedByAllianceId: uuid("submitted_by_alliance_id").references((): AnyPgColumn => strategicAlliances.id, {
+    onDelete: "set null",
+  }),
+  approvalStatus: text("approval_status", { enum: ["approved", "pending", "rejected"] })
+    .notNull()
+    .default("approved"),
 });
+
+export const marketingAssetPartnerShares = pgTable(
+  "marketing_asset_partner_shares",
+  {
+    assetId: uuid("asset_id")
+      .notNull()
+      .references(() => marketingContentAssets.id, { onDelete: "cascade" }),
+    allianceId: uuid("alliance_id")
+      .notNull()
+      .references((): AnyPgColumn => strategicAlliances.id, { onDelete: "cascade" }),
+  },
+  (table) => [primaryKey({ columns: [table.assetId, table.allianceId] })],
+);
 
 // SIDEBAR-PLAN.md sections 4-7 — Social Media: planning, scheduling, and
 // publishing preparation, deliberately separate from marketingContentAssets
@@ -3397,6 +3439,17 @@ export const referrals = pgTable("referrals", {
   paymentMethod: text("payment_method"),
   paymentConfirmation: text("payment_confirmation"),
   notes: text("notes"),
+  // Partner portal (Phase A). partnerNote and partnerService are the ONLY
+  // referral details the alliance sees on a referral sent to it (plus the
+  // client's name and phone, and only with the client's partner-sharing
+  // consent). On a referral the alliance sent, partnerContact* keep what
+  // it typed, so it never sees the client record it became.
+  partnerNote: text("partner_note"),
+  partnerService: serviceTypeEnum("partner_service"),
+  createdByPartner: boolean("created_by_partner").notNull().default(false),
+  partnerContactName: text("partner_contact_name"),
+  partnerContactPhone: text("partner_contact_phone"),
+  partnerContactEmail: text("partner_contact_email"),
 });
 
 export const referralStatusHistory = pgTable("referral_status_history", {
@@ -3770,6 +3823,11 @@ export const allianceDocumentTypeEnum = pgEnum("alliance_document_type", [
   "addendum",
   "supporting_document",
   "other",
+  // Partner portal (Phase A): what an alliance uploads itself.
+  "w9",
+  "license",
+  "insurance",
+  "alliance_agreement",
 ]);
 
 // Phase 1 follow-up — files tied to the partnership itself (the signed
@@ -3787,6 +3845,11 @@ export const allianceDocuments = pgTable("alliance_documents", {
   fileName: text("file_name").notNull(),
   blobUrl: text("blob_url").notNull(),
   documentType: allianceDocumentTypeEnum("document_type"),
+  // Partner portal: staff marks what the alliance may download; files the
+  // alliance uploads itself are flagged (and always visible to it).
+  visibleToPartner: boolean("visible_to_partner").notNull().default(false),
+  uploadedByPartner: boolean("uploaded_by_partner").notNull().default(false),
+  sensitiveDataReason: text("sensitive_data_reason"),
 });
 
 export const allianceStatusHistory = pgTable("alliance_status_history", {
@@ -4657,3 +4720,103 @@ export type OnlineBookingServiceRow = typeof onlineBookingServices.$inferSelect;
 export type OnlineBookingBlockedDate = typeof onlineBookingBlockedDates.$inferSelect;
 export type PortalAccessLink = typeof portalAccessLinks.$inferSelect;
 export type PortalSession = typeof portalSessions.$inferSelect;
+
+
+// ── Partner portal (Phase A) ─────────────────────────────────────────
+// Same design as the client portal (portalAccessLinks/portalSessions), but
+// its own tables and cookie: an alliance session can never resolve to a
+// client, and nothing staff-side reads it.
+
+export const partnerAccessLinks = pgTable(
+  "partner_access_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    allianceId: uuid("alliance_id")
+      .notNull()
+      .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    failedAttempts: integer("failed_attempts").notNull().default(0),
+    createdByEmail: text("created_by_email"),
+    phoneLast4Hash: text("phone_last4_hash").notNull(),
+  },
+  (table) => [
+    uniqueIndex("partner_access_links_token_hash_idx").on(table.tokenHash),
+    index("partner_access_links_alliance_idx").on(table.allianceId),
+  ],
+);
+
+export const partnerSessions = pgTable(
+  "partner_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    allianceId: uuid("alliance_id")
+      .notNull()
+      .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+    linkId: uuid("link_id").references(() => partnerAccessLinks.id, { onDelete: "set null" }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  },
+  (table) => [uniqueIndex("partner_sessions_token_hash_idx").on(table.tokenHash)],
+);
+
+// Append-only evidence of what an alliance accepted in its portal:
+// the alliance terms, "not a law firm", the contractor's license/insurance
+// confirmation, and "I have this person's permission" on a referral.
+export const partnerConsentEvents = pgTable(
+  "partner_consent_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    allianceId: uuid("alliance_id").references(() => strategicAlliances.id, { onDelete: "set null" }),
+    allianceNameSnapshot: text("alliance_name_snapshot").notNull(),
+    consentType: text("consent_type", {
+      enum: ["partner_terms", "not_a_law_firm", "license_insurance", "contact_permission"],
+    }).notNull(),
+    granted: boolean("granted").notNull(),
+    textShown: text("text_shown").notNull(),
+    referralId: uuid("referral_id").references(() => referrals.id, { onDelete: "set null" }),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+  },
+  (table) => [index("partner_consent_events_alliance_idx").on(table.allianceId, table.consentType, table.createdAt)],
+);
+
+// What the alliance edits about itself in "My profile" (the CRM's own
+// alliance record keeps the relationship fields staff manage).
+export const partnerProfiles = pgTable("partner_profiles", {
+  allianceId: uuid("alliance_id")
+    .primaryKey()
+    .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  description: text("description"),
+  servicesOffered: text("services_offered"),
+  serviceArea: text("service_area"),
+  socialLinks: text("social_links"),
+  logoBlobUrl: text("logo_blob_url"),
+  licenseNumber: text("license_number"),
+  licenseExpiration: date("license_expiration"),
+  insuranceProvider: text("insurance_provider"),
+  insuranceExpiration: date("insurance_expiration"),
+});
+
+// The alliance's business photo gallery (private Blob, max 12).
+export const partnerPhotos = pgTable(
+  "partner_photos",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    allianceId: uuid("alliance_id")
+      .notNull()
+      .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+    blobUrl: text("blob_url").notNull(),
+    fileName: text("file_name").notNull(),
+  },
+  (table) => [index("partner_photos_alliance_idx").on(table.allianceId)],
+);

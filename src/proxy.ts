@@ -3,6 +3,7 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import { auth } from "@/auth";
 import { PORTAL_SESSION_COOKIE } from "@/lib/portal/config";
+import { PARTNER_SESSION_COOKIE } from "@/lib/partners/config";
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -16,13 +17,19 @@ const handleI18nRouting = createMiddleware(routing);
 // never Auth.js), enforced by every portal page and /api/portal route.
 const isPortalPath = (pathname: string) => /^\/(en|es)\/portal(\/.*)?$/.test(pathname);
 const isPortalAccessPath = (pathname: string) => /^\/(en|es)\/portal\/access\/?$/.test(pathname);
+// The partner (alliance) portal: same idea, its own cookie
+// (PARTNER_SESSION_COOKIE), enforced by every partner page and
+// /api/partners route.
+const isPartnerPath = (pathname: string) => /^\/(en|es)\/partners(\/.*)?$/.test(pathname);
+const isPartnerAccessPath = (pathname: string) => /^\/(en|es)\/partners\/access\/?$/.test(pathname);
 
 const isPublicPath = (pathname: string) =>
   /^\/(en|es)\/login(\/.*)?$/.test(pathname) ||
   /^(\/(en|es))?\/book\/?$/.test(pathname) ||
   // The public Privacy Notice — exact match, no sub-paths (Step 2B).
   /^(\/(en|es))?\/privacy\/?$/.test(pathname) ||
-  isPortalPath(pathname);
+  isPortalPath(pathname) ||
+  isPartnerPath(pathname);
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
@@ -48,6 +55,15 @@ export default auth((req) => {
   ) {
     const locale = pathname.startsWith("/es") ? "es" : "en";
     return NextResponse.redirect(new URL(`/${locale}/portal/access`, req.nextUrl.origin));
+  }
+
+  if (
+    isPartnerPath(pathname) &&
+    !isPartnerAccessPath(pathname) &&
+    !req.cookies.has(PARTNER_SESSION_COOKIE)
+  ) {
+    const locale = pathname.startsWith("/es") ? "es" : "en";
+    return NextResponse.redirect(new URL(`/${locale}/partners/access`, req.nextUrl.origin));
   }
 
   // Must check for an actual signed-in user, not just a truthy req.auth:

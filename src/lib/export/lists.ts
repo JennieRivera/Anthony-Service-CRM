@@ -8,6 +8,7 @@ import {
   conversationMessages,
   invoices,
   payments,
+  strategicAlliances,
   tasks,
 } from "@/lib/db/schema";
 import { landscapeFor, money, text, usDate, usDateTime, type ExportTable } from "./document";
@@ -264,13 +265,15 @@ export async function buildListTable(list: ExportList, ids: string[], tr: Export
             type: tasks.type,
             title: tasks.title,
             clientName: clients.fullName,
+            allianceName: strategicAlliances.organizationName,
             caseTitle: cases.title,
             dueDate: tasks.dueDate,
             status: tasks.status,
             createdAt: tasks.createdAt,
           })
           .from(tasks)
-          .innerJoin(clients, eq(tasks.clientId, clients.id))
+          .leftJoin(clients, eq(tasks.clientId, clients.id))
+          .leftJoin(strategicAlliances, eq(tasks.allianceId, strategicAlliances.id))
           .leftJoin(cases, eq(tasks.caseId, cases.id))
           .where(inArray(tasks.id, ids)),
       );
@@ -279,7 +282,7 @@ export async function buildListTable(list: ExportList, ids: string[], tr: Export
         rows: rows.map((r) => [
           label("TaskType", r.type),
           title(text(r.title)),
-          r.clientName,
+          r.clientName ?? r.allianceName ?? "",
           text(r.caseTitle),
           usDate(r.dueDate),
           usDate(r.createdAt),

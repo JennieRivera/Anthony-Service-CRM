@@ -3,6 +3,9 @@ import { and, eq, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { insuranceComplianceDetails, cases, tasks } from "@/lib/db/schema";
+import { PARTNER_EXPIRY_ALERT_DAYS } from "@/lib/partners/config";
+import { createPartnerExpiryTasks } from "@/lib/partners/queries";
+import type { PortalDb } from "@/lib/portal/db";
 
 // Insurance & Compliance follow-up (its own service, separate from the
 // Documents-cabinet phases). Mirrors /api/cron/inactivity-check exactly: a
@@ -70,5 +73,9 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ checked: dueSoon.length, created });
+  // Partner portal: allied contractors whose Florida license or insurance
+  // expires within 30 days get one open alert task for staff.
+  const partnerAlerts = await createPartnerExpiryTasks(db as unknown as PortalDb, PARTNER_EXPIRY_ALERT_DAYS);
+
+  return NextResponse.json({ checked: dueSoon.length, created, partnerAlerts });
 }

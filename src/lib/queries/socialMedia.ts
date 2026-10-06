@@ -43,5 +43,7 @@ export async function listMarketingContentAssetsForSelect() {
       fileName: marketingContentAssets.fileName,
     })
     .from(marketingContentAssets)
+    // Material a partner sent is usable only once staff approves it.
+    .where(eq(marketingContentAssets.approvalStatus, "approved"))
     .orderBy(desc(marketingContentAssets.createdAt));
 }

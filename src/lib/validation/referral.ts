@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { activeServiceTypeValues } from "./client";
 
 export const referralStatusValues = [
   "submitted",
@@ -84,6 +85,9 @@ export const referralFormSchema = z.object({
   paymentMethod: optionalString,
   paymentConfirmation: optionalString,
   notes: optionalString,
+  // Partner portal: what the alliance sees on a referral sent to it.
+  partnerNote: z.string().trim().max(1000).optional().or(z.literal("")),
+  partnerService: z.enum(activeServiceTypeValues as [string, ...string[]]).optional().or(z.literal("")),
   // Commercial Finance / RRI details (relevant when category is commercial_finance)
   rriBusinessName: optionalString,
   businessEntity: optionalString,

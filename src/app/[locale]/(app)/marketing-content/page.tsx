@@ -1,7 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { isBlobConfigured } from "@/lib/blob/config";
-import { listMarketingContentAssets } from "@/lib/queries/marketingContent";
+import { listMarketingContentAssets, listMarketingPartnerShares } from "@/lib/queries/marketingContent";
+import { listAlliancesForSelect } from "@/lib/queries/alliances";
 import { MarketingContentLibrary } from "@/components/marketing-content/MarketingContentLibrary";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
@@ -11,11 +12,17 @@ export default async function MarketingContentPage() {
   const blobConfigured = isBlobConfigured();
 
   let assets: Awaited<ReturnType<typeof listMarketingContentAssets>> = [];
+  let alliances: Awaited<ReturnType<typeof listAlliancesForSelect>> = [];
+  let shares: Awaited<ReturnType<typeof listMarketingPartnerShares>> = [];
   let error: string | null = null;
 
   if (configured) {
     try {
-      assets = await listMarketingContentAssets();
+      [assets, alliances, shares] = await Promise.all([
+        listMarketingContentAssets(),
+        listAlliancesForSelect(),
+        listMarketingPartnerShares(),
+      ]);
     } catch (err) {
       error = err instanceof Error ? err.message : "Unknown error";
     }
@@ -43,7 +50,12 @@ export default async function MarketingContentPage() {
       )}
 
       {configured && !error && (
-        <MarketingContentLibrary assets={assets} blobConfigured={blobConfigured} />
+        <MarketingContentLibrary
+          assets={assets}
+          blobConfigured={blobConfigured}
+          alliances={alliances.map((a) => ({ id: a.id, organizationName: a.organizationName }))}
+          shares={shares}
+        />
       )}
     </div>
   );

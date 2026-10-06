@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { getDb } from "@/lib/db";
-import { appointments, cases, clients, documents, taskNotes, tasks } from "@/lib/db/schema";
+import { appointments, cases, clients, documents, strategicAlliances, taskNotes, tasks } from "@/lib/db/schema";
 
 // The /tasks page: every open task with what its detail panel and its
 // direct button need (appointment, document, notes). Kept apart from
@@ -18,8 +18,11 @@ export async function listTaskBoard() {
       title: tasks.title,
       dueDate: tasks.dueDate,
       createdAt: tasks.createdAt,
+      // A task is about a client, an alliance (partner portal), or both.
       clientId: clients.id,
       clientName: clients.fullName,
+      allianceId: strategicAlliances.id,
+      allianceName: strategicAlliances.organizationName,
       caseId: cases.id,
       caseTitle: cases.title,
       appointmentId: appointments.id,
@@ -28,7 +31,8 @@ export async function listTaskBoard() {
       documentId: tasks.documentId,
     })
     .from(tasks)
-    .innerJoin(clients, eq(tasks.clientId, clients.id))
+    .leftJoin(clients, eq(tasks.clientId, clients.id))
+    .leftJoin(strategicAlliances, eq(tasks.allianceId, strategicAlliances.id))
     .leftJoin(cases, eq(tasks.caseId, cases.id))
     .leftJoin(appointments, eq(tasks.appointmentId, appointments.id))
     .where(eq(tasks.status, "open"))
@@ -43,7 +47,7 @@ export async function listTaskBoard() {
       .from(documents)
       .where(
         and(
-          inArray(documents.clientId, [...new Set(legacy.map((r) => r.clientId))]),
+          inArray(documents.clientId, [...new Set(legacy.flatMap((r) => (r.clientId ? [r.clientId] : [])))]),
           eq(documents.uploadedByClient, true),
         ),
       )

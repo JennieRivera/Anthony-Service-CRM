@@ -144,6 +144,8 @@ function normalize(values: ReferralFormValues, effectiveStatus: string) {
     paymentMethod: values.paymentMethod || null,
     paymentConfirmation: values.paymentConfirmation || null,
     notes: values.notes || null,
+    partnerNote: values.partnerNote || null,
+    partnerService: (values.partnerService || null) as typeof referrals.$inferInsert.partnerService,
     updatedAt: new Date(),
   };
 }
