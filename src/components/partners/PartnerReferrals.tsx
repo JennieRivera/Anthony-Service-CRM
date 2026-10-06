@@ -38,6 +38,7 @@ type FromPartner = {
   service: string | null;
   note: string | null;
   networkRouting: boolean;
+  directReferral: boolean;
   requestedService: string | null;
   // Shown only when AMS chose to show who received it.
   assignedTo: string | null;
@@ -142,11 +143,15 @@ export function PartnerReferrals({
                     {seq(r.referralSeq)} · {r.name}
                     {r.service ? ` · ${tService(r.service)}` : ""}
                   </span>
-                  {r.networkRouting && (
-                    <span className="text-muted-foreground">
-                      {t("toAnotherAlly", { service: r.requestedService ?? "" })}
-                      {r.assignedTo ? ` · ${t("assignedTo", { name: r.assignedTo })}` : ""}
-                    </span>
+                  {r.directReferral ? (
+                    <span className="text-muted-foreground">{t("directTo", { name: r.assignedTo ?? "", service: r.requestedService ?? "" })}</span>
+                  ) : (
+                    r.networkRouting && (
+                      <span className="text-muted-foreground">
+                        {t("toAnotherAlly", { service: r.requestedService ?? "" })}
+                        {r.assignedTo ? ` · ${t("assignedTo", { name: r.assignedTo })}` : ""}
+                      </span>
+                    )
                   )}
                 </span>
                 <span className="flex items-center gap-3 text-muted-foreground">
@@ -169,10 +174,13 @@ export function SendReferralForm({
   services,
   endpoint = "/api/partners/referrals",
   title,
+  directTo,
 }: {
   services: readonly string[];
   endpoint?: string;
   title?: string;
+  // Option B (network directory): straight to this ally.
+  directTo?: { id: string; name: string };
 }) {
   const t = useTranslations("Partners.referrals");
   const tService = useTranslations("PublicServiceType");
@@ -181,6 +189,7 @@ export function SendReferralForm({
   const [form, setForm] = useState(empty);
   const [permission, setPermission] = useState(false);
   const [network, setNetwork] = useState(false);
+  const permissionText = directTo ? t("permissionDirect", { name: directTo.name }) : t("permission");
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
 
@@ -192,7 +201,10 @@ export function SendReferralForm({
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ referral: { ...form, kind: "person", permission, network }, permissionText: t("permission") }),
+        body: JSON.stringify({
+          referral: { ...form, kind: "person", permission, network: !directTo && network, directTo: directTo?.id },
+          permissionText: permissionText,
+        }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
@@ -246,6 +258,12 @@ export function SendReferralForm({
         <Label htmlFor="r-note">{t("note")}</Label>
         <Textarea id="r-note" rows={3} maxLength={1000} value={form.note} onChange={set("note")} />
       </div>
+      {directTo ? (
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="r-requested">{t("requestedService")}</Label>
+          <Input id="r-requested" value={form.requestedService} onChange={set("requestedService")} maxLength={200} placeholder={t("requestedServicePlaceholder")} className="h-11" />
+        </div>
+      ) : (
       <div className="flex flex-col gap-3 rounded-lg border border-border p-3">
         <label htmlFor="r-network" className="flex cursor-pointer items-start gap-3 text-sm text-foreground">
           <Checkbox id="r-network" checked={network} onCheckedChange={(v) => setNetwork(v === true)} className="mt-0.5 size-5" />
@@ -261,9 +279,10 @@ export function SendReferralForm({
           </div>
         )}
       </div>
+      )}
       <label htmlFor="r-permission" className="flex cursor-pointer items-start gap-3 text-sm text-foreground">
         <Checkbox id="r-permission" checked={permission} onCheckedChange={(v) => setPermission(v === true)} className="mt-0.5 size-5" />
-        <span>{t("permission")}</span>
+        <span>{permissionText}</span>
       </label>
       {message && (
         <p className={message.kind === "ok" ? "flex items-center gap-2 text-sm text-foreground" : "text-sm text-destructive"} role={message.kind === "ok" ? "status" : "alert"}>

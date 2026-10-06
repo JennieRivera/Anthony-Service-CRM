@@ -2136,7 +2136,10 @@
         "invalid": "Revise los datos.",
         "not_network": "Este referido no es entre aliados.",
         "same_ally": "No se puede asignar al mismo aliado que lo envió."
-      }
+      },
+      "directTitle": "Referido directo entre aliados",
+      "directHint": "Un aliado autorizado mandó este referido directo a otro aliado desde el Directorio de la Red. Esta es su copia.",
+      "direct": "directo"
     }
   },
   "PaymentStatus": {
@@ -4788,7 +4791,8 @@
       "marketing": "Marketing",
       "referrals": "Referidos",
       "more": "Más",
-      "network": "Mi red"
+      "network": "Mi red",
+      "directory": "Directorio"
     },
     "access": {
       "title": "Su portal de aliado",
@@ -4946,7 +4950,8 @@
         "limit_reached": "Llegó al límite de referidos por hoy.",
         "generic": "No se pudo enviar. Inténtelo de nuevo.",
         "requestedService": "Escriba qué servicio necesita la persona.",
-        "kind": "Elija si es una persona o un negocio."
+        "kind": "Elija si es una persona o un negocio.",
+        "directTo": "Ese aliado ya no está disponible en el directorio."
       },
       "needs": "Necesita: {service}",
       "toAnotherAlly": "Para otro aliado de la red: {service}",
@@ -4954,7 +4959,9 @@
       "network": "Mandar este referido a otro aliado de la red de Anthony Multiservice",
       "networkHint": "Anthony Multiservice elige al aliado y se lo pasa. Usted verá el estado del referido.",
       "requestedService": "¿Qué servicio necesita la persona?",
-      "requestedServicePlaceholder": "Por ejemplo: instalar losas en la cocina"
+      "requestedServicePlaceholder": "Por ejemplo: instalar losas en la cocina",
+      "directTo": "Directo a {name}: {service}",
+      "permissionDirect": "Confirmo que tengo permiso de esta persona para compartir sus datos con Anthony Multiservice y con {name}."
     },
     "services": {
       "title": "Mis servicios",
@@ -5015,6 +5022,25 @@
       "errors": {
         "businessName": "Escriba el nombre del negocio."
       }
+    },
+    "directory": {
+      "title": "Directorio de la Red",
+      "intro": "Aliados de la red de Anthony Multiservice a los que usted puede mandar un referido directo. Anthony Multiservice recibe una copia.",
+      "notAvailable": "El directorio de la red no está disponible para su cuenta. Puede seguir mandando referidos a otros aliados desde Referidos: Anthony Multiservice elige al aliado.",
+      "search": "Buscar por nombre, servicio, tipo o ciudad",
+      "empty": "Todavía no hay aliados en el directorio.",
+      "refer": "Mandar referido directo",
+      "referTitle": "Referido directo para {name}",
+      "back": "Volver al directorio"
+    },
+    "directoryOptIn": {
+      "title": "Directorio de la Red",
+      "text": "Acepto que mi negocio aparezca en el Directorio de la Red de Anthony Multiservice (solo nombre, tipo, servicios, ciudad y logo) y que otros aliados autorizados me manden referidos directos.",
+      "hint": "Nunca se muestran su teléfono, su correo, sus clientes ni su red. Puede quitarlo cuando quiera.",
+      "on": "Su negocio aparece en el directorio.",
+      "off": "Su negocio no aparece en el directorio.",
+      "saved": "Guardado.",
+      "error": "No se pudo guardar. Inténtelo de nuevo."
     }
   },
   "PartnerAccess": {
@@ -5117,5 +5143,16 @@
       "addedBy": "Agregado por",
       "date": "Fecha"
     }
+  },
+  "PartnerDirectoryFlags": {
+    "title": "Directorio de la red y referidos directos",
+    "hint": "Apagados por defecto. Los aliados sin permiso siguen mandando referidos a otros aliados pasando por usted.",
+    "access": "Puede ver el directorio de la red y referir directo",
+    "accessHint": "Ve el Directorio de la Red en su portal (solo nombre, tipo, servicios, ciudad y logo) y puede mandar referidos directos. Usted recibe una copia.",
+    "listed": "Aparecer en el directorio de la red",
+    "listedHint": "Solo aparece si además el aliado lo acepta en su portal (Mi perfil).",
+    "optedIn": "El aliado aceptó aparecer en el directorio.",
+    "notOptedIn": "El aliado todavía no aceptó aparecer en el directorio: no se muestra.",
+    "saved": "Guardado."
   }
 }

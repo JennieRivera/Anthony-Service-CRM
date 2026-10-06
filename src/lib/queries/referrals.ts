@@ -43,6 +43,7 @@ export async function listReferralsWithClient() {
       clientId: clients.id,
       clientName: clients.fullName,
       networkRouting: referrals.networkRouting,
+      directReferral: referrals.directReferral,
       senderName: sender.organizationName,
       assigneeName: assignee.organizationName,
     })

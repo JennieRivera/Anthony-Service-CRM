@@ -15,16 +15,29 @@ const MAIN_NAV = [
   { href: "/partners/documents", key: "documents", icon: FileText },
   { href: "/partners/marketing", key: "marketing", icon: Megaphone },
 ] as const;
-const MORE_NAV = [
+const BASE_MORE_NAV = [
   { href: "/partners/network", key: "network", icon: Users },
   { href: "/partners/profile", key: "profile", icon: UserRound },
 ] as const;
-const NAV = [...MAIN_NAV, ...MORE_NAV];
+// Only for allies AMS authorized to see the network directory.
+const DIRECTORY_NAV = { href: "/partners/directory", key: "directory", icon: Network } as const;
 
 const isActive = (pathname: string, href: string) =>
   href === "/partners" ? pathname === "/partners" : pathname.startsWith(href);
 
-export function PartnerHeader({ signedIn, businessName, hasLogo = false }: { signedIn: boolean; businessName?: string; hasLogo?: boolean }) {
+export function PartnerHeader({
+  signedIn,
+  businessName,
+  hasLogo = false,
+  showDirectory = false,
+}: {
+  signedIn: boolean;
+  businessName?: string;
+  hasLogo?: boolean;
+  showDirectory?: boolean;
+}) {
+  const MORE_NAV = showDirectory ? [DIRECTORY_NAV, ...BASE_MORE_NAV] : [...BASE_MORE_NAV];
+  const NAV = [...MAIN_NAV, ...MORE_NAV];
   const t = useTranslations("Partners");
   const locale = useLocale();
   const pathname = usePathname();

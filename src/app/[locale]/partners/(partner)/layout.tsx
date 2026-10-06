@@ -5,6 +5,7 @@ import { getLegalTexts, pickLocale } from "@/lib/legal/texts";
 import { getPartnerAlliance, getPartnerLogoUrl } from "@/lib/partners/queries";
 import { hasPartnerAccepted } from "@/lib/partners/page";
 import { getPartnerSession, partnerDb } from "@/lib/partners/session";
+import { getDirectoryStatus } from "@/lib/partners/directory";
 import { PartnerHeader } from "@/components/partners/PartnerHeader";
 import { PartnerTermsGate } from "@/components/partners/PartnerTermsGate";
 import { LegalFooter } from "@/components/portal/LegalFooter";
@@ -27,18 +28,19 @@ export default async function PartnerLayout({
   const { allianceId } = session!;
 
   const db = partnerDb();
-  const [alliance, logo, texts, accepted] = await Promise.all([
+  const [alliance, logo, texts, accepted, directory] = await Promise.all([
     getPartnerAlliance(db, allianceId),
     getPartnerLogoUrl(db, allianceId),
     getLegalTexts(db),
     hasPartnerAccepted(db, allianceId),
+    getDirectoryStatus(db, allianceId),
   ]);
   if (!alliance) redirect({ href: "/partners/access", locale });
 
   const t = await getTranslations("Partners");
   return (
     <>
-      <PartnerHeader signedIn businessName={alliance!.organizationName} hasLogo={Boolean(logo)} />
+      <PartnerHeader signedIn businessName={alliance!.organizationName} hasLogo={Boolean(logo)} showDirectory={directory.access} />
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-6">
         {accepted ? (
           children

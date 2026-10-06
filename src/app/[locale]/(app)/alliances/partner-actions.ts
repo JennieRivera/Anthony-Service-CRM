@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
-import { allianceDocuments } from "@/lib/db/schema";
+import { allianceDocuments, strategicAlliances } from "@/lib/db/schema";
 import { logAuditEvent } from "@/lib/audit";
 import { requireAccessArea } from "@/lib/permissions";
 import { PartnerAccessError, createPartnerAccessLink, revokePartnerAccess } from "@/lib/partners/access";
@@ -133,5 +133,27 @@ export async function convertAllianceToActiveAction(allianceId: string): Promise
   revalidatePath(`/alliances/${allianceId}`);
   revalidatePath("/alliance-directory");
   revalidatePath("/community");
+  return { ok: true };
+}
+
+// Option B switches on the alliance record (both off by default): may this
+// ally see the network directory and refer directly, and may it appear in
+// that directory (it also has to accept that in its own portal).
+export async function setAllianceDirectoryFlagsAction(
+  allianceId: string,
+  flags: { directoryAccess: boolean; directoryListed: boolean },
+): Promise<{ ok: true }> {
+  await requireAccessArea("alliances");
+  await getDb()
+    .update(strategicAlliances)
+    .set({ directoryAccess: flags.directoryAccess === true, directoryListed: flags.directoryListed === true, updatedAt: new Date() })
+    .where(eq(strategicAlliances.id, allianceId));
+  await logAuditEvent({
+    action: "alliance.directory_flags_changed",
+    entityType: "alliance",
+    entityId: allianceId,
+    summary: `Network directory: access ${flags.directoryAccess ? "on" : "off"}, listed ${flags.directoryListed ? "on" : "off"}`,
+  });
+  revalidatePath(`/alliances/${allianceId}`);
   return { ok: true };
 }

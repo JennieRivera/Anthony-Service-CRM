@@ -2136,7 +2136,10 @@
         "invalid": "Please check the details.",
         "not_network": "This is not an ally-to-ally referral.",
         "same_ally": "It can’t be assigned to the same ally who sent it."
-      }
+      },
+      "directTitle": "Direct referral between allies",
+      "directHint": "An authorized ally sent this referral directly to another ally from the Network Directory. This is your copy.",
+      "direct": "direct"
     }
   },
   "PaymentStatus": {
@@ -4788,7 +4791,8 @@
       "marketing": "Marketing",
       "referrals": "Referrals",
       "more": "More",
-      "network": "My network"
+      "network": "My network",
+      "directory": "Directory"
     },
     "access": {
       "title": "Your partner portal",
@@ -4946,7 +4950,8 @@
         "limit_reached": "You reached today's referral limit.",
         "generic": "Couldn't send. Please try again.",
         "requestedService": "Write what service the person needs.",
-        "kind": "Choose whether it's a person or a business."
+        "kind": "Choose whether it's a person or a business.",
+        "directTo": "That ally is no longer available in the directory."
       },
       "needs": "Needs: {service}",
       "toAnotherAlly": "For another ally in the network: {service}",
@@ -4954,7 +4959,9 @@
       "network": "Send this referral to another ally in the Anthony Multiservice network",
       "networkHint": "Anthony Multiservice chooses the ally and passes it on. You'll see the referral's status.",
       "requestedService": "What service does the person need?",
-      "requestedServicePlaceholder": "For example: install kitchen tile"
+      "requestedServicePlaceholder": "For example: install kitchen tile",
+      "directTo": "Direct to {name}: {service}",
+      "permissionDirect": "I confirm that I have this person's permission to share their details with Anthony Multiservice and with {name}."
     },
     "services": {
       "title": "My services",
@@ -5015,6 +5022,25 @@
       "errors": {
         "businessName": "Enter the business name."
       }
+    },
+    "directory": {
+      "title": "Network Directory",
+      "intro": "Allies in the Anthony Multiservice network you can send a direct referral to. Anthony Multiservice gets a copy.",
+      "notAvailable": "The network directory isn't available for your account. You can still send referrals to other allies from Referrals: Anthony Multiservice chooses the ally.",
+      "search": "Search by name, service, type or city",
+      "empty": "There are no allies in the directory yet.",
+      "refer": "Send a direct referral",
+      "referTitle": "Direct referral for {name}",
+      "back": "Back to the directory"
+    },
+    "directoryOptIn": {
+      "title": "Network Directory",
+      "text": "I agree that my business appears in the Anthony Multiservice Network Directory (only name, type, services, city and logo) and that other authorized allies may send me direct referrals.",
+      "hint": "Your phone, email, clients and network are never shown. You can remove it at any time.",
+      "on": "Your business appears in the directory.",
+      "off": "Your business does not appear in the directory.",
+      "saved": "Saved.",
+      "error": "Couldn't save. Please try again."
     }
   },
   "PartnerAccess": {
@@ -5117,5 +5143,16 @@
       "addedBy": "Added by",
       "date": "Date"
     }
+  },
+  "PartnerDirectoryFlags": {
+    "title": "Network directory and direct referrals",
+    "hint": "Off by default. Allies without permission keep sending referrals to other allies through you.",
+    "access": "Can see the network directory and refer directly",
+    "accessHint": "Sees the Network Directory in its portal (only name, type, services, city and logo) and can send direct referrals. You get a copy.",
+    "listed": "Appear in the network directory",
+    "listedHint": "It only appears if the ally also accepts it in its portal (My profile).",
+    "optedIn": "The ally accepted appearing in the directory.",
+    "notOptedIn": "The ally hasn't accepted appearing in the directory yet: it isn't shown.",
+    "saved": "Saved."
   }
 }

@@ -25,6 +25,7 @@ import { ACTIVE_ALLY_STATUSES, getAllianceNetworkForStaff } from "@/lib/partners
 import { strategicAlliances as allianceTable } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { AllianceConvertButton } from "@/components/alliances/AllianceConvertButton";
+import { AllianceDirectorySwitches } from "@/components/alliances/AllianceDirectorySwitches";
 import { getDb } from "@/lib/db";
 import type { PortalDb } from "@/lib/portal/db";
 import AccessDenied from "@/components/AccessDenied";
@@ -263,6 +264,14 @@ export default async function AllianceDetailPage({
           lastLoginAt: partner.access.lastLoginAt ? new Date(partner.access.lastLoginAt).toISOString() : null,
           termsAcceptedAt: partner.termsAcceptedAt ? partner.termsAcceptedAt.toISOString() : null,
         }}
+      />
+
+      <AllianceDirectorySwitches
+        allianceId={id}
+        directoryAccess={alliance.directoryAccess}
+        directoryListed={alliance.directoryListed}
+        directoryOptIn={alliance.directoryOptIn}
+        canEdit={canEditAlliance}
       />
 
       {(partner.profile || partner.photos.length > 0 || partner.services.length > 0 || partner.addedClients.length > 0) && (

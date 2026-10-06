@@ -3474,6 +3474,10 @@ export const referrals = pgTable("referrals", {
   assignedAt: timestamp("assigned_at", { withTimezone: true }),
   assigneeNote: text("assignee_note"),
   showAssigneeToSender: boolean("show_assignee_to_sender").notNull().default(false),
+  // Option B: an authorized ally referred this person DIRECTLY to another
+  // ally from the network directory (assignedAllianceId = that ally); AMS
+  // only gets a copy.
+  directReferral: boolean("direct_referral").notNull().default(false),
 });
 
 export const referralStatusHistory = pgTable("referral_status_history", {
@@ -3816,6 +3820,15 @@ export const strategicAlliances = pgTable("strategic_alliances", {
   addedByAllianceId: uuid("added_by_alliance_id").references((): AnyPgColumn => strategicAlliances.id, {
     onDelete: "set null",
   }),
+  // Partner portal (Phase B, option B — off by default). directoryAccess:
+  // staff lets this ally see the "Network directory" and refer directly to
+  // another ally. An ally appears in that directory only when staff set
+  // directoryListed AND the ally itself accepted it in its portal
+  // (directoryOptIn). The directory never shows phones, emails, clients or
+  // any ally's network.
+  directoryAccess: boolean("directory_access").notNull().default(false),
+  directoryListed: boolean("directory_listed").notNull().default(false),
+  directoryOptIn: boolean("directory_opt_in").notNull().default(false),
 });
 
 // Phase 1.5B — B2B Alliances enhancement. One alliance can have several
@@ -4811,7 +4824,7 @@ export const partnerConsentEvents = pgTable(
     allianceId: uuid("alliance_id").references(() => strategicAlliances.id, { onDelete: "set null" }),
     allianceNameSnapshot: text("alliance_name_snapshot").notNull(),
     consentType: text("consent_type", {
-      enum: ["partner_terms", "not_a_law_firm", "license_insurance", "contact_permission"],
+      enum: ["partner_terms", "not_a_law_firm", "license_insurance", "contact_permission", "directory_listing"],
     }).notNull(),
     granted: boolean("granted").notNull(),
     textShown: text("text_shown").notNull(),

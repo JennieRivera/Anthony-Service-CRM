@@ -334,6 +334,65 @@ async function main() {
     assert.ok(!(await net.listPartnerContacts(db, allyB.id)).some((x) => x.name === "Maria Net"));
   });
 
+  // ── Phase B, option B: network directory and direct referrals ────────
+  const dir = await import("./directory");
+  const [allyC] = await db
+    .insert(strategicAlliances)
+    .values({ organizationName: "Ally C (TEST)", phone: "(555) 555-0203", email: "c-secret@example.com", city: "Kissimmee", organizationType: "installer_remodeling" })
+    .returning();
+  await ok("directory: off by default — no access, nobody listed", async () => {
+    await assert.rejects(dir.listNetworkDirectory(db, allyA.id), q.PartnerNotFoundError);
+    assert.equal(await dir.isInViewersDirectory(db, allyA.id, allyC.id), false);
+    await assert.rejects(
+      q.createPartnerReferral(db, { allianceId: allyA.id, input: { name: "Direct One", phone: "(555) 555-0601", permission: true, directTo: allyC.id, requestedService: "Tile" }, ...evidence }),
+      q.PartnerValidationError,
+    );
+  });
+  await ok("directory: shows only allies AMS listed AND that opted in; never contact details", async () => {
+    await db.update(strategicAlliances).set({ directoryAccess: true }).where(eq(strategicAlliances.id, allyA.id));
+    await db.update(strategicAlliances).set({ directoryListed: true }).where(eq(strategicAlliances.id, allyC.id));
+    assert.deepEqual(await dir.listNetworkDirectory(db, allyA.id), []);
+    await dir.setDirectoryOptIn(db, { allianceId: allyC.id, optIn: true, textShown: "I agree", ipAddress: "203.0.113.5", userAgent: "test" });
+    const entries = await dir.listNetworkDirectory(db, allyA.id);
+    assert.deepEqual(entries.map((e) => e.id), [allyC.id]);
+    assert.deepEqual(Object.keys(entries[0]).sort(), ["city", "hasLogo", "id", "name", "services", "type"]);
+    assert.ok(!JSON.stringify(entries).includes("c-secret@example.com") && !JSON.stringify(entries).includes("555-0203"));
+    // B is not authorized: still no directory, even though C is listed.
+    await assert.rejects(dir.listNetworkDirectory(db, allyB.id), q.PartnerNotFoundError);
+    assert.equal(await dir.getDirectoryLogoUrl(db, allyB.id, allyC.id), null);
+    // An ally is never in its own directory.
+    await db.update(strategicAlliances).set({ directoryListed: true, directoryOptIn: true }).where(eq(strategicAlliances.id, allyA.id));
+    assert.ok(!(await dir.listNetworkDirectory(db, allyA.id)).some((e) => e.id === allyA.id));
+  });
+  await ok("direct referral: only authorized → listed ally; receiver sees it, AMS gets a copy", async () => {
+    // B (not authorized) can't refer directly, even to a listed ally.
+    await assert.rejects(
+      q.createPartnerReferral(db, { allianceId: allyB.id, input: { name: "Direct Two", phone: "(555) 555-0602", permission: true, directTo: allyC.id, requestedService: "Tile" }, ...evidence }),
+      q.PartnerValidationError,
+    );
+    const r = await q.createPartnerReferral(db, {
+      allianceId: allyA.id,
+      input: { name: "Direct One", phone: "(555) 555-0601", permission: true, directTo: allyC.id, requestedService: "Bathroom tile", note: "Prefers mornings" },
+      ...evidence,
+    });
+    const received = (await q.listPartnerReferrals(db, allyC.id)).toPartner.find((x) => x.id === r.id)!;
+    assert.equal(received.name, "Direct One");
+    assert.equal(received.requestedService, "Bathroom tile");
+    assert.equal(received.partnerNote, "Prefers mornings");
+    assert.ok(!(await q.listPartnerReferrals(db, allyB.id)).toPartner.some((x) => x.id === r.id));
+    const sent = (await q.listPartnerReferrals(db, allyA.id)).fromPartner.find((x) => x.id === r.id)!;
+    assert.equal(sent.stage, "assigned");
+    assert.equal(sent.assignedTo, allyC.organizationName);
+    const [copy] = await db.select().from(tasks).where(eq(tasks.referralId, r.id));
+    assert.ok(copy.title.startsWith("Direct referral (copy for AMS)"));
+    // C withdraws from the directory → no more direct referrals to it.
+    await dir.setDirectoryOptIn(db, { allianceId: allyC.id, optIn: false, textShown: "I agree", ipAddress: null, userAgent: null });
+    await assert.rejects(
+      q.createPartnerReferral(db, { allianceId: allyA.id, input: { name: "Direct Three", phone: "(555) 555-0603", permission: true, directTo: allyC.id, requestedService: "Tile" }, ...evidence }),
+      q.PartnerValidationError,
+    );
+  });
+
   // ── tasks invariant ──────────────────────────────────────────────────
   await ok("tasks: every task has a client or an alliance (database check)", async () => {
     await assert.rejects(db.insert(tasks).values({ type: "follow_up", title: "orphan" }));

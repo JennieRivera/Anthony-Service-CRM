@@ -113,6 +113,8 @@ export async function recordPartnerConsent(
     ipAddress: string | null;
     userAgent: string | null;
     referralId?: string | null;
+    // false = the ally withdrew it (e.g. unticked "show me in the directory").
+    granted?: boolean;
     now?: Date;
   },
 ) {
@@ -120,7 +122,7 @@ export async function recordPartnerConsent(
     allianceId: params.allianceId,
     allianceNameSnapshot: await allianceName(db, params.allianceId),
     consentType: params.type,
-    granted: true,
+    granted: params.granted ?? true,
     textShown: params.textShown,
     referralId: params.referralId ?? null,
     ipAddress: params.ipAddress?.slice(0, 64) ?? null,
@@ -496,6 +498,9 @@ export async function listPartnerReferrals(db: PortalDb, allianceId: string) {
       assignedAllianceId: referrals.assignedAllianceId,
       requestedService: referrals.requestedService,
       assigneeNote: referrals.assigneeNote,
+      directReferral: referrals.directReferral,
+      directName: referrals.partnerContactName,
+      directPhone: referrals.partnerContactPhone,
       consent: clientCommunicationPreferences.partnerReferralConsent,
       clientName: clients.fullName,
       clientPhone: clients.phone,
@@ -510,10 +515,19 @@ export async function listPartnerReferrals(db: PortalDb, allianceId: string) {
       ),
     )
     .orderBy(desc(referrals.referralDate));
-  const toPartner = toPartnerRows.map(({ assignedAllianceId, requestedService, assigneeNote, partnerNote, partnerService, ...r }) =>
-    assignedAllianceId === allianceId
-      ? { ...r, partnerNote: assigneeNote, partnerService: null, requestedService }
-      : { ...r, partnerNote, partnerService, requestedService: null },
+  const toPartner = toPartnerRows.map(
+    ({ assignedAllianceId, requestedService, assigneeNote, partnerNote, partnerService, directReferral, directName, directPhone, ...r }) =>
+      assignedAllianceId === allianceId
+        ? {
+            ...r,
+            partnerNote: assigneeNote,
+            partnerService: null,
+            requestedService,
+            // Option B: the sender confirmed the person's permission to share
+            // their details with THIS ally, so it sees what the sender typed.
+            ...(directReferral ? { consent: true, clientName: directName ?? "", clientPhone: directPhone } : {}),
+          }
+        : { ...r, partnerNote, partnerService, requestedService: null },
   );
 
   const assignee = aliasedTable(strategicAlliances, "assignee");
@@ -530,6 +544,7 @@ export async function listPartnerReferrals(db: PortalDb, allianceId: string) {
       service: referrals.partnerService,
       note: referrals.partnerNote,
       networkRouting: referrals.networkRouting,
+      directReferral: referrals.directReferral,
       requestedService: referrals.requestedService,
       assignedAllianceId: referrals.assignedAllianceId,
       showAssignee: referrals.showAssigneeToSender,
@@ -550,15 +565,20 @@ export async function listPartnerReferrals(db: PortalDb, allianceId: string) {
     })),
     fromPartner: fromPartner.map(({ pipelineStatus, assignedAllianceId, showAssignee, assigneeName, ...r }) => {
       const base = partnerReferralStage(pipelineStatus);
-      const stage: PartnerSentStage = !r.networkRouting
+      const stage: PartnerSentStage = !r.networkRouting && !r.directReferral
         ? base
         : !assignedAllianceId
           ? "sent"
           : base === "new"
             ? "assigned"
             : base;
-      // Who received it: only when staff ticked "show who it was assigned to".
-      return { ...r, stage, assignedTo: r.networkRouting && assignedAllianceId && showAssignee ? assigneeName : null };
+      // Who received it: the ally it chose (direct), or — option A — only
+      // when staff ticked "show who it was assigned to".
+      return {
+        ...r,
+        stage,
+        assignedTo: (r.networkRouting || r.directReferral) && assignedAllianceId && showAssignee ? assigneeName : null,
+      };
     }),
   };
 }
@@ -633,9 +653,30 @@ export async function createPartnerReferral(
       : null;
   const note = clean(input.note, 1000);
   // Option A: "send this referral to another ally of the AMS network".
-  const network = input.network === true;
+  // Option B: straight to an ally from the network directory (directTo) —
+  // only for an ally staff authorized, only to an ally in its directory.
+  const wantsDirect = input.directTo !== undefined && input.directTo !== null && input.directTo !== "";
+  if (wantsDirect && !isUuid(input.directTo)) throw new PartnerValidationError("directTo");
+  const directTo: string | null = wantsDirect ? (input.directTo as string) : null;
+  const network = input.network === true && !directTo;
   const requestedService = clean(input.requestedService, 200);
-  if (network && requestedService.length < 2) throw new PartnerValidationError("requestedService");
+  if ((network || directTo) && requestedService.length < 2) throw new PartnerValidationError("requestedService");
+  let directName = "";
+  if (directTo) {
+    if (directTo === params.allianceId) throw new PartnerValidationError("directTo");
+    const [sender] = await db
+      .select({ access: strategicAlliances.directoryAccess })
+      .from(strategicAlliances)
+      .where(eq(strategicAlliances.id, params.allianceId))
+      .limit(1);
+    const [target] = await db
+      .select({ name: strategicAlliances.organizationName })
+      .from(strategicAlliances)
+      .where(and(eq(strategicAlliances.id, directTo), eq(strategicAlliances.directoryListed, true), eq(strategicAlliances.directoryOptIn, true)))
+      .limit(1);
+    if (!sender?.access || !target) throw new PartnerValidationError("directTo");
+    directName = target.name;
+  }
 
   const [recent] = await db
     .select({ n: count() })
@@ -689,7 +730,21 @@ export async function createPartnerReferral(
       partnerService: service,
       partnerNote: note || null,
       networkRouting: network,
-      requestedService: network ? requestedService : null,
+      requestedService: network || directTo ? requestedService : null,
+      ...(directTo
+        ? {
+            // Option B: it goes straight to that ally; the sender's note is
+            // written for it. AMS gets a copy (task below).
+            directReferral: true,
+            assignedAllianceId: directTo,
+            assignedAt: now,
+            assigneeNote: note || null,
+            showAssigneeToSender: true,
+            receivingParty: directName,
+            pipelineStatus: "sent_to_partner" as const,
+            status: "in_progress" as const,
+          }
+        : {}),
       createdAt: now,
     })
     .returning({ id: referrals.id, referralSeq: referrals.referralSeq });
@@ -703,7 +758,7 @@ export async function createPartnerReferral(
       name,
       phone,
       email: email || null,
-      services: network ? requestedService : null,
+      services: network || directTo ? requestedService : null,
       note: note || null,
       clientId: lead.id,
       referralId: referral.id,
@@ -728,7 +783,9 @@ export async function createPartnerReferral(
     type: network ? "partner_referral_assign" : "partner_referral",
     title: network
       ? `Assign referral to an ally: ${name} needs "${requestedService}" (from ${ally})${dup ? ` — possible duplicate of ${dup.name}` : ""}`
-      : `New referral from ${ally}: ${name}${dup ? ` — possible duplicate of ${dup.name}` : ""}`,
+      : directTo
+        ? `Direct referral (copy for AMS) from ${ally} to ${directName}: ${name} needs "${requestedService}"${dup ? ` — possible duplicate of ${dup.name}` : ""}`
+        : `New referral from ${ally}: ${name}${dup ? ` — possible duplicate of ${dup.name}` : ""}`,
     createdAt: now,
   });
   return { ...referral, clientId: lead.id, contactId: contact.id };

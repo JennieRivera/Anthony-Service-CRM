@@ -533,6 +533,13 @@
       "when": 1791328322806,
       "tag": "0075_partner_network",
       "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1791330399062,
+      "tag": "0076_partner_directory",
+      "breakpoints": true
     }
   ]
 }

@@ -4,6 +4,8 @@ import { getPartnerProfile } from "@/lib/partners/queries";
 import { PARTNER_MAX_PHOTOS, PARTNER_MAX_SERVICES } from "@/lib/partners/config";
 import { listPartnerServices } from "@/lib/partners/services";
 import { licenseModeFor } from "@/lib/partners/license";
+import { getDirectoryStatus } from "@/lib/partners/directory";
+import { PartnerDirectoryOptIn } from "@/components/partners/PartnerDirectoryOptIn";
 import { PartnerProfileForm } from "@/components/partners/PartnerProfileForm";
 import { PartnerGallery } from "@/components/partners/PartnerGallery";
 import { PartnerUploadForm } from "@/components/partners/PartnerUploadForm";
@@ -15,7 +17,11 @@ export default async function PartnerProfilePage({ params }: { params: Promise<{
   const ctx = await requirePartnerPage(locale);
   if (!ctx) return null;
 
-  const [profile, services] = await Promise.all([getPartnerProfile(ctx.db, ctx.allianceId), listPartnerServices(ctx.db, ctx.allianceId)]);
+  const [profile, services, directory] = await Promise.all([
+    getPartnerProfile(ctx.db, ctx.allianceId),
+    listPartnerServices(ctx.db, ctx.allianceId),
+    getDirectoryStatus(ctx.db, ctx.allianceId),
+  ]);
   if (!profile) return null;
   const t = await getTranslations("Partners.profile");
   const a = profile.alliance;
@@ -58,6 +64,8 @@ export default async function PartnerProfilePage({ params }: { params: Promise<{
       />
 
       <PartnerServicesEditor services={services} max={PARTNER_MAX_SERVICES} />
+
+      {directory.listed && <PartnerDirectoryOptIn optIn={directory.optIn} />}
 
       <section className="flex flex-col gap-3">
         <h2 className="font-heading text-lg text-foreground">{t("galleryTitle", { max: PARTNER_MAX_PHOTOS })}</h2>

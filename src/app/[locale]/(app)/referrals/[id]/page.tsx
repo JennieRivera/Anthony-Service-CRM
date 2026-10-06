@@ -59,7 +59,7 @@ export default async function ReferralDetailPage({
   const referralNumber = `REF-${String(referral.referralSeq).padStart(5, "0")}`;
   // Ally-network referral (option A): who received it, and the allies staff
   // can pick from.
-  const [assignedAllianceName, allianceOptions] = referral.networkRouting
+  const [assignedAllianceName, allianceOptions] = referral.networkRouting || referral.directReferral
     ? await Promise.all([
         referral.assignedAllianceId
           ? getDb()
@@ -185,11 +185,11 @@ export default async function ReferralDetailPage({
         </div>
       </div>
 
-      {referral.networkRouting && (
+      {(referral.networkRouting || referral.directReferral) && (
         <div className="flex flex-col gap-4 rounded-lg border-2 border-primary/40 bg-card p-6">
           <div className="flex flex-col gap-1">
-            <h2 className="font-heading text-lg text-foreground">{t("network.title")}</h2>
-            <p className="text-sm text-muted-foreground">{t("network.hint")}</p>
+            <h2 className="font-heading text-lg text-foreground">{referral.directReferral ? t("network.directTitle") : t("network.title")}</h2>
+            <p className="text-sm text-muted-foreground">{referral.directReferral ? t("network.directHint") : t("network.hint")}</p>
           </div>
           <p className="text-sm text-foreground">
             {t("network.from")}{" "}
@@ -217,7 +217,7 @@ export default async function ReferralDetailPage({
               <span className="text-muted-foreground">{t("network.senderNote")}:</span> {referral.partnerNote}
             </p>
           )}
-          {canEditReferral && (
+          {canEditReferral && referral.networkRouting && (
             <NetworkReferralAssign
               referralId={id}
               alliances={allianceOptions.filter((a) => a.id !== referral.allianceId)}
