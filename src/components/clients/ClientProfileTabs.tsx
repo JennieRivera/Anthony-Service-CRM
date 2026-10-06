@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { CaseStatusBadge } from "./StatusBadge";
 import { DocumentList } from "@/components/documents/DocumentList";
 import { DocumentUploader } from "@/components/documents/DocumentUploader";
+import { defaultClientUploadFolder } from "@/lib/validation/documentDrawer";
 import { ConversationTimeline } from "./ConversationTimeline";
 import { LogConversationDialog } from "./LogConversationDialog";
 import { CommunicationPreferencesPanel } from "./CommunicationPreferencesPanel";
@@ -82,8 +83,11 @@ export function ClientProfileTabs({
   communicationPreferences,
   highlevelSync,
   highlevelPreview,
+  interestedServices = null,
 }: {
   clientId: string;
+  // For the default "Service / folder" when uploading a document.
+  interestedServices?: readonly string[] | null;
   cases: Case[];
   invoices: Invoice[];
   appointments: Appointment[];
@@ -438,13 +442,23 @@ export function ClientProfileTabs({
 
       <TabsContent value="documents" className="flex flex-col gap-4 pt-4">
         {blobConfigured ? (
-          <DocumentUploader clientId={clientId} />
+          <DocumentUploader
+            clientId={clientId}
+            chooseServiceFolder
+            defaultServiceFolder={defaultClientUploadFolder(
+              cases.filter((c) => c.status !== "completed" && c.status !== "cancelled").map((c) => c.serviceType),
+              interestedServices,
+            )}
+          />
         ) : (
           <p className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
             {tDocuments("notConfigured")}
           </p>
         )}
-        <DocumentList documents={documents} />
+        <DocumentList
+          documents={documents}
+          caseServiceById={Object.fromEntries(cases.map((c) => [c.id, c.serviceType]))}
+        />
       </TabsContent>
 
       <TabsContent value="preferences" className="flex flex-col gap-4 pt-4">

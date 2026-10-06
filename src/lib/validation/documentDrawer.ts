@@ -1,94 +1,70 @@
-import type { serviceTypeValues } from "./client";
+import { activeServiceTypeValues, type ServiceTypeValue } from "./client";
 
-type ServiceType = (typeof serviceTypeValues)[number];
+// The Documents archive. Folders = the single services list
+// (src/lib/validation/client.ts — same names and order as the Services
+// menu) plus four general folders. Service folders are keyed by the
+// service type itself, so they can never drift from the list again.
+export type ServiceFolder = Exclude<ServiceTypeValue, "online_notary">;
+export const SERVICE_FOLDERS = activeServiceTypeValues as readonly ServiceFolder[];
 
-// The 12 top-level "drawers" of the Documents cabinet (Phase 1 of the
-// document-reorganization plan). Nine map to one or more case service
-// types; "clientes", "referidos", and "otros" are cross-cutting and don't
-// come from a case at all.
-export const drawerValues = [
-  "notaria",
-  "impuestos",
-  "bookkeeping",
-  "inmigracion",
-  "credito",
-  "consultoria",
-  "formacion",
-  "academia",
-  "marketing",
-  "seguros",
-  "tecnologia",
-  "eventos",
-  "remodelacion",
-  "clientes",
-  "referidos",
-  "otros",
-] as const;
+export const GENERAL_FOLDERS = ["clientes", "alianzas", "referidos", "otros"] as const;
+export type GeneralFolder = (typeof GENERAL_FOLDERS)[number];
 
-export type Drawer = (typeof drawerValues)[number];
+export type Drawer = ServiceFolder | GeneralFolder;
+export const drawerValues: readonly Drawer[] = [...SERVICE_FOLDERS, ...GENERAL_FOLDERS];
 
-// Drawers backed by one or more case service types — a client shows up as
-// a sub-folder here whenever they have a case of one of these types.
-export const SERVICE_DRAWERS = [
-  "notaria",
-  "impuestos",
-  "bookkeeping",
-  "inmigracion",
-  "credito",
-  "consultoria",
-  "formacion",
-  "academia",
-  "marketing",
-  "seguros",
-  "tecnologia",
-  "eventos",
-  "remodelacion",
-] as const satisfies readonly Drawer[];
+export const isServiceFolder = (d: string): d is ServiceFolder => (SERVICE_FOLDERS as readonly string[]).includes(d);
 
-export type ServiceDrawer = (typeof SERVICE_DRAWERS)[number];
-
-// Several real service types collapse into one drawer (Apostille/Doc Prep
-// into Notaría; Sales Tax and IRS Administrative into Impuestos) per the
-// user's explicit decision — see the folder-cabinet proposal.
-export const SERVICE_TYPE_TO_DRAWER: Record<ServiceType, ServiceDrawer> = {
-  notary: "notaria",
-  online_notary: "notaria",
-  document_prep: "notaria",
-  tax_prep: "impuestos",
-  sales_tax: "impuestos",
-  irs_administrative: "impuestos",
-  bookkeeping: "bookkeeping",
-  immigration: "inmigracion",
-  credit_financing: "credito",
-  leadership: "consultoria",
-  company_registration: "formacion",
-  academy: "academia",
-  marketing: "marketing",
-  insurance_compliance: "seguros",
-  crm_technology: "tecnologia",
-  corporate_events: "eventos",
-  remodeling: "remodelacion",
-};
-
-export function drawerColor(drawer: Drawer): string {
-  return DRAWER_COLORS[drawer];
+// The legacy "Online Notary" type files under Notary Public.
+export function serviceFolderFor(service: ServiceTypeValue): ServiceFolder {
+  return service === "online_notary" ? "notary" : service;
 }
 
-const DRAWER_COLORS: Record<Drawer, string> = {
-  notaria: "#2c5f8a",
-  impuestos: "#2f6b4f",
-  bookkeeping: "#b9861f",
-  inmigracion: "#c1571f",
-  credito: "#6b4e9e",
-  consultoria: "#a65a42",
-  formacion: "#55606e",
-  academia: "#9c3f6b",
-  marketing: "#3c6e8a",
-  seguros: "#2e7d6b",
-  tecnologia: "#3f5aa8",
-  eventos: "#a8325e",
-  remodelacion: "#8a5a2b",
+// Where a document lives — exactly one folder, decided by where it was
+// uploaded (owner's rule, 2026-10-06):
+//   referral → Referrals; an explicit folder (chosen on the client record,
+//   set from the case, or "Move to…") → that service; an Immigration
+//   sub-folder → Immigration; a case (older rows) → the case's service;
+//   tagged "Other" → Other; anything else → Clients.
+// Alliance documents are a separate table and always live in Alliances.
+export function documentFolder(doc: {
+  referralId: string | null;
+  serviceType: ServiceTypeValue | null;
+  caseServiceType: ServiceTypeValue | null;
+  folder: string | null;
+  category: string | null;
+}): Drawer {
+  if (doc.referralId) return "referidos";
+  if (doc.serviceType) return serviceFolderFor(doc.serviceType);
+  if (doc.folder) return "immigration";
+  if (doc.caseServiceType) return serviceFolderFor(doc.caseServiceType);
+  if (doc.category === "other") return "otros";
+  return "clientes";
+}
+
+// Default "Service / folder" when uploading on a client record: the
+// service of their only open case; otherwise their first service of
+// interest; otherwise the general Clients folder (null).
+export function defaultClientUploadFolder(
+  openCaseServices: ServiceTypeValue[],
+  interestedServices: readonly string[] | null | undefined,
+): ServiceFolder | null {
+  const open = [...new Set(openCaseServices.map(serviceFolderFor))];
+  if (open.length === 1) return open[0];
+  const interested = (interestedServices ?? []).find((s) => (activeServiceTypeValues as readonly string[]).includes(s));
+  return interested ? (interested as ServiceFolder) : null;
+}
+
+const GENERAL_COLORS: Record<GeneralFolder, string> = {
   clientes: "#4a7c59",
+  alianzas: "#3f5aa8",
   referidos: "#96751a",
   otros: "#7a7266",
 };
+
+// Service folders use the service's own color (Settings → Service colors);
+// general folders have fixed colors.
+export function drawerColor(drawer: Drawer, serviceColors: Record<string, string> = {}): string {
+  if (isServiceFolder(drawer)) return serviceColors[drawer] ?? "#55606e";
+  return GENERAL_COLORS[drawer];
+}

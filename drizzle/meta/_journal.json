@@ -505,6 +505,13 @@
       "when": 1791313013907,
       "tag": "0071_partner_alliance_types",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1791317494227,
+      "tag": "0072_document_service_folder",
+      "breakpoints": true
     }
   ]
 }

@@ -6,17 +6,16 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Stamp,
-  Landmark,
   Calculator,
   Globe,
-  CreditCard,
-  Briefcase,
+  LineChart,
+  Target,
   Building2,
   GraduationCap,
   Megaphone,
   Users,
   Handshake,
-  Shield,
+  ShieldCheck,
   FolderOpen,
   FileText,
   ChevronRight,
@@ -25,18 +24,26 @@ import {
   Cpu,
   PartyPopper,
   Hammer,
+  BookMarked,
+  Receipt,
+  Network,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DocumentStatusPill } from "@/components/documents/StatusPill";
 import { viewHref, downloadHref } from "@/components/documents/downloadHref";
 import { MoveCategorySelect } from "@/components/documents/MoveCategorySelect";
+import { MoveServiceFolderSelect } from "@/components/documents/MoveServiceFolderSelect";
 import { DocumentUploader } from "@/components/documents/DocumentUploader";
 import {
-  drawerValues,
+  documentFolder,
   drawerColor,
-  SERVICE_TYPE_TO_DRAWER,
+  drawerValues,
+  isServiceFolder,
+  serviceFolderFor,
   type Drawer,
+  type ServiceFolder,
 } from "@/lib/validation/documentDrawer";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 import { AllianceDocumentUploader } from "@/components/alliances/AllianceDocumentUploader";
@@ -46,43 +53,40 @@ import type {
   listAcademyEnrollmentsForFolders,
 } from "@/lib/queries/documents";
 import type { listAlliances, listAllianceDocuments } from "@/lib/queries/alliances";
-import type { serviceTypeValues } from "@/lib/validation/client";
+import type { ServiceTypeValue } from "@/lib/validation/client";
 
-type ServiceType = (typeof serviceTypeValues)[number];
 type DocumentRow = Awaited<ReturnType<typeof listAllDocuments>>[number];
 type ReferralFolder = Awaited<ReturnType<typeof listReferralsForFolders>>[number];
 type AllianceRow = Awaited<ReturnType<typeof listAlliances>>[number];
 type AllianceDocRow = Awaited<ReturnType<typeof listAllianceDocuments>>[number];
 type AcademyEnrollmentRow = Awaited<ReturnType<typeof listAcademyEnrollmentsForFolders>>[number];
 type ClientOption = { id: string; fullName: string; folderNumber: string | null };
-type CaseOption = { id: string; title: string; clientId: string; serviceType: ServiceType };
+type CaseOption = { id: string; title: string; clientId: string; serviceType: ServiceTypeValue };
 
-const DRAWER_ICONS: Record<Drawer, typeof Stamp> = {
-  notaria: Stamp,
-  impuestos: Landmark,
-  bookkeeping: Calculator,
-  inmigracion: Globe,
-  credito: CreditCard,
-  consultoria: Briefcase,
-  formacion: Building2,
-  academia: GraduationCap,
+const DRAWER_ICONS: Record<Drawer, LucideIcon> = {
+  company_registration: Building2,
+  tax_prep: Calculator,
+  bookkeeping: BookMarked,
+  sales_tax: Receipt,
+  irs_administrative: FileText,
+  notary: Stamp,
+  document_prep: FileText,
+  immigration: Globe,
+  leadership: Target,
+  credit_financing: LineChart,
+  crm_technology: Cpu,
   marketing: Megaphone,
-  seguros: Shield,
-  tecnologia: Cpu,
-  eventos: PartyPopper,
-  remodelacion: Hammer,
+  insurance_compliance: ShieldCheck,
+  academy: GraduationCap,
+  corporate_events: PartyPopper,
+  remodeling: Hammer,
   clientes: Users,
+  alianzas: Network,
   referidos: Handshake,
   otros: FolderOpen,
 };
 
-function computeDrawer(doc: DocumentRow): Drawer | null {
-  if (doc.referralId) return "referidos";
-  if (doc.folder) return "inmigracion";
-  if (doc.serviceType) return SERVICE_TYPE_TO_DRAWER[doc.serviceType];
-  if (doc.category === "other") return "otros";
-  return null;
-}
+const folderOf = (doc: DocumentRow): Drawer => documentFolder(doc);
 
 function folderLabel(number: string | null, name: string): string {
   return number ? `${number} — ${name}` : name;
@@ -90,14 +94,19 @@ function folderLabel(number: string | null, name: string): string {
 
 type View =
   | { level: "drawers" }
-  | { level: "clients"; drawer: Drawer }
-  | { level: "client-docs"; drawer: Drawer; clientId: string }
+  | { level: "clients"; drawer: ServiceFolder | "clientes" }
+  | { level: "client-docs"; drawer: ServiceFolder | "clientes"; clientId: string }
   | { level: "referrals" }
   | { level: "referral-docs"; referralId: string }
   | { level: "alliances" }
   | { level: "alliance-docs"; allianceId: string }
   | { level: "otros" };
 
+// The Documents archive: one folder per service (the single services list)
+// plus Clients, Alliances, Referrals and Other. Every document lives in
+// exactly ONE folder, decided by where it was uploaded — see
+// documentFolder() in src/lib/validation/documentDrawer.ts. Folder
+// counters count documents.
 export function DocumentsCabinet({
   documents,
   clients,
@@ -106,6 +115,7 @@ export function DocumentsCabinet({
   alliances,
   allianceDocuments,
   academyEnrollments,
+  serviceColors,
   blobConfigured,
 }: {
   documents: DocumentRow[];
@@ -115,20 +125,24 @@ export function DocumentsCabinet({
   alliances: AllianceRow[];
   allianceDocuments: AllianceDocRow[];
   academyEnrollments: AcademyEnrollmentRow[];
+  serviceColors: Record<string, string>;
   blobConfigured: boolean;
 }) {
   const t = useTranslations("Documents");
   const tDrawer = useTranslations("DocumentDrawer");
+  const tService = useTranslations("ServiceType");
   const [view, setView] = useState<View>({ level: "drawers" });
+
+  const drawerLabel = (d: Drawer) => (isServiceFolder(d) ? tService(d) : tDrawer(d));
+  const color = (d: Drawer) => drawerColor(d, serviceColors);
 
   const drawerCounts = useMemo(() => {
     const map = new Map<Drawer, number>();
     for (const doc of documents) {
-      const drawer = computeDrawer(doc);
-      if (drawer) map.set(drawer, (map.get(drawer) ?? 0) + 1);
+      const d = folderOf(doc);
+      map.set(d, (map.get(d) ?? 0) + 1);
     }
-    map.set("clientes", documents.length);
-    map.set("referidos", (map.get("referidos") ?? 0) + allianceDocuments.length);
+    map.set("alianzas", allianceDocuments.length);
     return map;
   }, [documents, allianceDocuments]);
 
@@ -137,6 +151,7 @@ export function DocumentsCabinet({
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {drawerValues.map((drawer) => {
           const Icon = DRAWER_ICONS[drawer];
+          const count = drawerCounts.get(drawer) ?? 0;
           return (
             <button
               key={drawer}
@@ -145,23 +160,29 @@ export function DocumentsCabinet({
                 setView(
                   drawer === "referidos"
                     ? { level: "referrals" }
-                    : drawer === "otros"
-                      ? { level: "otros" }
-                      : { level: "clients", drawer },
+                    : drawer === "alianzas"
+                      ? { level: "alliances" }
+                      : drawer === "otros"
+                        ? { level: "otros" }
+                        : { level: "clients", drawer },
                 )
               }
               className="flex flex-col gap-3 rounded-lg border border-border bg-card p-5 text-left transition-colors hover:border-foreground/30"
-              style={{ borderTopWidth: 4, borderTopColor: drawerColor(drawer) }}
+              style={{ borderTopWidth: 4, borderTopColor: color(drawer) }}
             >
               <div className="flex items-center justify-between">
-                <Icon className="h-5 w-5" style={{ color: drawerColor(drawer) }} />
-                <span className="text-xs text-muted-foreground">
-                  {drawerCounts.get(drawer) ?? 0}
+                <Icon className="h-5 w-5" style={{ color: color(drawer) }} />
+                <span
+                  className={
+                    count > 0
+                      ? "rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-foreground"
+                      : "text-xs text-muted-foreground"
+                  }
+                >
+                  {t("clientFolderCount", { count })}
                 </span>
               </div>
-              <span className="font-heading text-base text-foreground">
-                {tDrawer(drawer)}
-              </span>
+              <span className="font-heading text-base text-foreground">{drawerLabel(drawer)}</span>
             </button>
           );
         })}
@@ -171,57 +192,55 @@ export function DocumentsCabinet({
 
   if (view.level === "clients") {
     const { drawer } = view;
-    const clientIds =
-      drawer === "clientes"
-        ? clients.map((c) => c.id)
-        : Array.from(
-            new Set(
-              cases
-                .filter((c) => SERVICE_TYPE_TO_DRAWER[c.serviceType] === drawer)
-                .map((c) => c.clientId),
-            ),
-          );
-    const folderClients = clients.filter((c) => clientIds.includes(c.id));
+    const docsHere = documents.filter((d) => folderOf(d) === drawer);
+    // A client is in a service folder if they have a case of that service,
+    // a document filed there, or (Academy) an enrollment. Clients lists
+    // everyone, so staff can file general documents for any client.
+    const ids = new Set<string>(docsHere.map((d) => d.clientId));
+    if (drawer === "clientes") {
+      for (const c of clients) ids.add(c.id);
+    } else {
+      for (const c of cases) if (serviceFolderFor(c.serviceType) === drawer) ids.add(c.clientId);
+      if (drawer === "academy") for (const e of academyEnrollments) ids.add(e.clientId);
+    }
+    const countFor = (clientId: string) => docsHere.filter((d) => d.clientId === clientId).length;
+    const folderClients = clients
+      .filter((c) => ids.has(c.id))
+      .sort((a, b) => countFor(b.id) - countFor(a.id) || a.fullName.localeCompare(b.fullName));
 
     return (
       <div className="flex flex-col gap-4">
         <Breadcrumb
           items={[
             { label: t("backToDrawers"), onClick: () => setView({ level: "drawers" }) },
-            { label: tDrawer(drawer) },
+            { label: drawerLabel(drawer) },
           ]}
         />
+        {drawer === "clientes" && <p className="text-sm text-muted-foreground">{t("clientsDrawerHint")}</p>}
         {folderClients.length === 0 ? (
           <p className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
             {t("noClientsInDrawer")}
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {folderClients.map((client) => {
-              const count = documents.filter(
-                (d) =>
-                  d.clientId === client.id &&
-                  (drawer === "clientes" ? true : computeDrawer(d) === drawer),
-              ).length;
-              return (
-                <button
-                  key={client.id}
-                  type="button"
-                  onClick={() => setView({ level: "client-docs", drawer, clientId: client.id })}
-                  className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-4 text-left hover:border-foreground/30"
-                >
-                  <span className="flex items-center gap-2 min-w-0">
-                    <Folder className="h-4 w-4 shrink-0" style={{ color: drawerColor(drawer) }} />
-                    <span className="truncate text-sm font-medium text-foreground">
-                      {folderLabel(client.folderNumber, client.fullName)}
-                    </span>
+            {folderClients.map((client) => (
+              <button
+                key={client.id}
+                type="button"
+                onClick={() => setView({ level: "client-docs", drawer, clientId: client.id })}
+                className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-4 text-left hover:border-foreground/30"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <Folder className="h-4 w-4 shrink-0" style={{ color: color(drawer) }} />
+                  <span className="truncate text-sm font-medium text-foreground">
+                    {folderLabel(client.folderNumber, client.fullName)}
                   </span>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {t("clientFolderCount", { count })}
-                  </span>
-                </button>
-              );
-            })}
+                </span>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {t("clientFolderCount", { count: countFor(client.id) })}
+                </span>
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -231,41 +250,38 @@ export function DocumentsCabinet({
   if (view.level === "client-docs") {
     const { drawer, clientId } = view;
     const client = clients.find((c) => c.id === clientId);
-    const clientDocs = documents.filter(
-      (d) => d.clientId === clientId && (drawer === "clientes" ? true : computeDrawer(d) === drawer),
-    );
-    const matchingCases = cases.filter(
-      (c) => c.clientId === clientId && (drawer === "clientes" || SERVICE_TYPE_TO_DRAWER[c.serviceType] === drawer),
-    );
-    const isImmigration = drawer === "inmigracion";
-    const isAcademia = drawer === "academia";
-    const studentEnrollments = isAcademia
-      ? academyEnrollments.filter((e) => e.clientId === clientId)
-      : [];
+    const clientDocs = documents.filter((d) => d.clientId === clientId && folderOf(d) === drawer);
+    const matchingCases =
+      drawer === "clientes"
+        ? []
+        : cases.filter((c) => c.clientId === clientId && serviceFolderFor(c.serviceType) === drawer);
+    const studentEnrollments =
+      drawer === "academy" ? academyEnrollments.filter((e) => e.clientId === clientId) : [];
 
     return (
       <div className="flex flex-col gap-4">
         <Breadcrumb
           items={[
             { label: t("backToDrawers"), onClick: () => setView({ level: "drawers" }) },
-            { label: tDrawer(drawer), onClick: () => setView({ level: "clients", drawer }) },
+            { label: drawerLabel(drawer), onClick: () => setView({ level: "clients", drawer }) },
             { label: client ? folderLabel(client.folderNumber, client.fullName) : "" },
           ]}
         />
 
-        {isAcademia && <StudentEnrollments enrollments={studentEnrollments} />}
+        {drawer === "academy" && <StudentEnrollments enrollments={studentEnrollments} />}
 
         {blobConfigured && (
           <ClientDocUploader
             clientId={clientId}
+            drawer={drawer}
             matchingCases={matchingCases}
-            showFolderSelect={isImmigration}
+            showFolderSelect={drawer === "immigration"}
           />
         )}
 
         <CabinetDocumentList
           documents={clientDocs}
-          groupByImmigrationFolder={isImmigration}
+          groupByImmigrationFolder={drawer === "immigration"}
           emptyMessage={t("empty")}
         />
       </div>
@@ -281,14 +297,7 @@ export function DocumentsCabinet({
             { label: tDrawer("referidos") },
           ]}
         />
-        <div className="flex gap-2">
-          <Button variant="default" size="sm" disabled>
-            {t("byReferredClient")}
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setView({ level: "alliances" })}>
-            {t("byAlliance")}
-          </Button>
-        </div>
+        <p className="text-sm text-muted-foreground">{t("referralsDrawerHint")}</p>
         {referrals.length === 0 ? (
           <p className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
             {t("noReferrals")}
@@ -304,8 +313,8 @@ export function DocumentsCabinet({
                   onClick={() => setView({ level: "referral-docs", referralId: referral.id })}
                   className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-4 text-left hover:border-foreground/30"
                 >
-                  <span className="flex items-center gap-2 min-w-0">
-                    <Folder className="h-4 w-4 shrink-0" style={{ color: drawerColor("referidos") }} />
+                  <span className="flex min-w-0 items-center gap-2">
+                    <Folder className="h-4 w-4 shrink-0" style={{ color: color("referidos") }} />
                     <span className="truncate text-sm font-medium text-foreground">
                       R-{String(referral.referralSeq).padStart(3, "0")} — {referral.clientName}
                     </span>
@@ -323,51 +332,41 @@ export function DocumentsCabinet({
   }
 
   if (view.level === "alliances") {
+    const countFor = (allianceId: string) => allianceDocuments.filter((d) => d.allianceId === allianceId).length;
+    const sorted = [...alliances].sort(
+      (a, b) => countFor(b.id) - countFor(a.id) || a.organizationName.localeCompare(b.organizationName),
+    );
     return (
       <div className="flex flex-col gap-4">
         <Breadcrumb
           items={[
             { label: t("backToDrawers"), onClick: () => setView({ level: "drawers" }) },
-            { label: tDrawer("referidos"), onClick: () => setView({ level: "referrals" }) },
+            { label: tDrawer("alianzas") },
           ]}
         />
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setView({ level: "referrals" })}>
-            {t("byReferredClient")}
-          </Button>
-          <Button variant="default" size="sm" disabled>
-            {t("byAlliance")}
-          </Button>
-        </div>
+        <p className="text-sm text-muted-foreground">{t("alliancesDrawerHint")}</p>
         {alliances.length === 0 ? (
           <p className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
             {t("noAlliancesLinked")}
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {alliances.map((alliance) => {
-              const count =
-                referrals.filter((r) => r.allianceId === alliance.id).length +
-                allianceDocuments.filter((d) => d.allianceId === alliance.id).length;
-              return (
-                <button
-                  key={alliance.id}
-                  type="button"
-                  onClick={() => setView({ level: "alliance-docs", allianceId: alliance.id })}
-                  className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-4 text-left hover:border-foreground/30"
-                >
-                  <span className="flex items-center gap-2 min-w-0">
-                    <Folder className="h-4 w-4 shrink-0" style={{ color: drawerColor("referidos") }} />
-                    <span className="truncate text-sm font-medium text-foreground">
-                      {alliance.organizationName}
-                    </span>
-                  </span>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {t("clientFolderCount", { count })}
-                  </span>
-                </button>
-              );
-            })}
+            {sorted.map((alliance) => (
+              <button
+                key={alliance.id}
+                type="button"
+                onClick={() => setView({ level: "alliance-docs", allianceId: alliance.id })}
+                className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-4 text-left hover:border-foreground/30"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <Folder className="h-4 w-4 shrink-0" style={{ color: color("alianzas") }} />
+                  <span className="truncate text-sm font-medium text-foreground">{alliance.organizationName}</span>
+                </span>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {t("clientFolderCount", { count: countFor(alliance.id) })}
+                </span>
+              </button>
+            ))}
           </div>
         )}
       </div>
@@ -385,8 +384,7 @@ export function DocumentsCabinet({
         <Breadcrumb
           items={[
             { label: t("backToDrawers"), onClick: () => setView({ level: "drawers" }) },
-            { label: tDrawer("referidos"), onClick: () => setView({ level: "referrals" }) },
-            { label: t("byAlliance"), onClick: () => setView({ level: "alliances" }) },
+            { label: tDrawer("alianzas"), onClick: () => setView({ level: "alliances" }) },
             { label: alliance?.organizationName ?? "" },
           ]}
         />
@@ -421,12 +419,7 @@ export function DocumentsCabinet({
                 <Button
                   variant="ghost"
                   size="icon-xs"
-                  render={
-                    <a
-                      href={`/api/alliance-documents/${doc.id}/file?download=1`}
-                      title={t("download")}
-                    />
-                  }
+                  render={<a href={`/api/alliance-documents/${doc.id}/file?download=1`} title={t("download")} />}
                 >
                   <Download className="h-3.5 w-3.5" />
                 </Button>
@@ -470,32 +463,22 @@ export function DocumentsCabinet({
             { label: t("backToDrawers"), onClick: () => setView({ level: "drawers" }) },
             { label: tDrawer("referidos"), onClick: () => setView({ level: "referrals" }) },
             {
-              label: referral
-                ? `R-${String(referral.referralSeq).padStart(3, "0")} — ${referral.clientName}`
-                : "",
+              label: referral ? `R-${String(referral.referralSeq).padStart(3, "0")} — ${referral.clientName}` : "",
             },
           ]}
         />
 
         {blobConfigured && referral && (
-          <DocumentUploader
-            clientId={referral.clientId}
-            referralId={referral.id}
-            defaultCategory="contracts"
-          />
+          <DocumentUploader clientId={referral.clientId} referralId={referral.id} defaultCategory="contracts" />
         )}
 
-        <CabinetDocumentList
-          documents={referralDocs}
-          groupByImmigrationFolder={false}
-          emptyMessage={t("empty")}
-        />
+        <CabinetDocumentList documents={referralDocs} groupByImmigrationFolder={false} emptyMessage={t("empty")} />
       </div>
     );
   }
 
   // view.level === "otros"
-  const otrosDocs = documents.filter((d) => computeDrawer(d) === "otros");
+  const otrosDocs = documents.filter((d) => folderOf(d) === "otros");
   return (
     <div className="flex flex-col gap-4">
       <Breadcrumb
@@ -505,19 +488,14 @@ export function DocumentsCabinet({
         ]}
       />
       <p className="text-sm text-muted-foreground">{t("otrosDrawerHint")}</p>
-      <CabinetDocumentList
-        documents={otrosDocs}
-        groupByImmigrationFolder={false}
-        emptyMessage={t("empty")}
-        showClientName
-      />
+      <CabinetDocumentList documents={otrosDocs} groupByImmigrationFolder={false} emptyMessage={t("empty")} showClientName />
     </div>
   );
 }
 
 function Breadcrumb({ items }: { items: { label: string; onClick?: () => void }[] }) {
   return (
-    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+    <div className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
       {items.map((item, i) => (
         <span key={i} className="flex items-center gap-1.5">
           {i > 0 && <ChevronRight className="h-3.5 w-3.5" />}
@@ -552,8 +530,7 @@ function StudentEnrollments({ enrollments }: { enrollments: AcademyEnrollmentRow
             <span className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
               <Badge variant="outline">{tStatus(e.status)}</Badge>
               <span>
-                {t("startDate")}:{" "}
-                {e.enrollmentDate ? formatDate(e.enrollmentDate) : "—"}
+                {t("startDate")}: {e.enrollmentDate ? formatDate(e.enrollmentDate) : "—"}
               </span>
               <span>
                 {t("endDate")}:{" "}
@@ -571,22 +548,29 @@ function StudentEnrollments({ enrollments }: { enrollments: AcademyEnrollmentRow
   );
 }
 
+// Uploading inside a folder files the document there: a service folder
+// passes that service (and the case, when the client has one or more cases
+// of it); the Clients folder passes none.
 function ClientDocUploader({
   clientId,
+  drawer,
   matchingCases,
   showFolderSelect,
 }: {
   clientId: string;
+  drawer: ServiceFolder | "clientes";
   matchingCases: CaseOption[];
   showFolderSelect: boolean;
 }) {
   const [selectedCaseId, setSelectedCaseId] = useState(matchingCases[0]?.id);
+  const serviceFolder = drawer === "clientes" ? null : drawer;
 
   if (matchingCases.length <= 1) {
     return (
       <DocumentUploader
         clientId={clientId}
         caseId={matchingCases[0]?.id}
+        serviceFolder={serviceFolder}
         showFolderSelect={showFolderSelect}
       />
     );
@@ -608,6 +592,7 @@ function ClientDocUploader({
       <DocumentUploader
         clientId={clientId}
         caseId={selectedCaseId}
+        serviceFolder={serviceFolder}
         showFolderSelect={showFolderSelect}
       />
     </div>
@@ -654,11 +639,10 @@ function CabinetDocumentList({
           <DocumentStatusPill status={doc.status} />
           <span>{formatDate(doc.createdAt)}</span>
           {!doc.folder && <MoveCategorySelect documentId={doc.id} category={doc.category} />}
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            render={<a href={downloadHref(doc.id)} title={t("download")} />}
-          >
+          {!doc.referralId && (
+            <MoveServiceFolderSelect documentId={doc.id} current={folderOf(doc)} hasCase={Boolean(doc.caseId)} />
+          )}
+          <Button variant="ghost" size="icon-xs" render={<a href={downloadHref(doc.id)} title={t("download")} />}>
             <Download className="h-3.5 w-3.5" />
           </Button>
         </div>

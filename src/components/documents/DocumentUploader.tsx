@@ -18,6 +18,9 @@ import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDoc
 import { selectableDocumentCategoryValues } from "@/lib/validation/documentCategory";
 import { DOCUMENT_ACCEPT, uploadErrorKey } from "./documentUploadShared";
 import { FilePickerButton } from "./FilePickerButton";
+import { SERVICE_FOLDERS, type ServiceFolder } from "@/lib/validation/documentDrawer";
+
+const CLIENTS_FOLDER = "clientes";
 
 export function DocumentUploader({
   clientId,
@@ -25,6 +28,9 @@ export function DocumentUploader({
   referralId,
   showFolderSelect,
   defaultCategory,
+  serviceFolder,
+  chooseServiceFolder,
+  defaultServiceFolder,
 }: {
   clientId: string;
   caseId?: string;
@@ -35,10 +41,20 @@ export function DocumentUploader({
   // (spec section 6) — every other case type omits the folder picker.
   showFolderSelect?: boolean;
   defaultCategory?: string;
+  // Documents archive folder. Fixed when uploading from inside a service
+  // folder of the archive; chosen by staff ("Service / folder") on the
+  // client record, starting from defaultServiceFolder (null = Clients).
+  // Case and referral uploads need neither (the server decides).
+  serviceFolder?: ServiceFolder | null;
+  chooseServiceFolder?: boolean;
+  defaultServiceFolder?: ServiceFolder | null;
 }) {
   const t = useTranslations("Documents");
   const tFolder = useTranslations("ImmigrationDocumentFolder");
   const tCategory = useTranslations("DocumentCategory");
+  const tService = useTranslations("ServiceType");
+  const tDrawer = useTranslations("DocumentDrawer");
+  const [folderChoice, setFolderChoice] = useState<string>(defaultServiceFolder ?? CLIENTS_FOLDER);
   const router = useRouter();
   const [documentType, setDocumentType] = useState("");
   const [folder, setFolder] = useState("");
@@ -62,6 +78,8 @@ export function DocumentUploader({
     if (caseId) formData.append("caseId", caseId);
     if (referralId) formData.append("referralId", referralId);
     if (documentType) formData.append("documentType", documentType);
+    const archiveFolder = serviceFolder ?? (chooseServiceFolder && folderChoice !== CLIENTS_FOLDER ? folderChoice : null);
+    if (archiveFolder) formData.append("serviceType", archiveFolder);
     if (showFolderSelect && folder) {
       formData.append("folder", folder);
     } else {
@@ -110,6 +128,21 @@ export function DocumentUploader({
           placeholder={t("documentTypePlaceholder")}
           className="sm:max-w-xs"
         />
+        {chooseServiceFolder && (
+          <Select value={folderChoice} onValueChange={(v) => setFolderChoice(v ?? CLIENTS_FOLDER)}>
+            <SelectTrigger className="sm:max-w-xs" aria-label={t("serviceFolder")} title={t("serviceFolder")}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={CLIENTS_FOLDER}>{tDrawer("clientes")}</SelectItem>
+              {SERVICE_FOLDERS.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {tService(s)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         {showFolderSelect ? (
           <Select
             value={folder || "none"}

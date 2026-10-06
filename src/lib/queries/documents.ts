@@ -48,7 +48,10 @@ export async function listAllDocuments() {
       folderNumber: clients.folderNumber,
       caseId: cases.id,
       caseTitle: cases.title,
-      serviceType: cases.serviceType,
+      // Folder chosen at upload / "Move to…" (null on older rows), and the
+      // case's service as the fallback — see documentFolder().
+      serviceType: documents.serviceType,
+      caseServiceType: cases.serviceType,
       referralId: documents.referralId,
       uploadedByClient: documents.uploadedByClient,
       sensitiveDataReason: documents.sensitiveDataReason,

@@ -1,0 +1,1 @@
+ALTER TABLE "documents" ADD COLUMN "service_type" "service_type";

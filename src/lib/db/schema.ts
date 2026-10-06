@@ -1142,6 +1142,11 @@ export const documents = pgTable("documents", {
   visibleToClient: boolean("visible_to_client").notNull().default(false),
   uploadedByClient: boolean("uploaded_by_client").notNull().default(false),
   sensitiveDataReason: text("sensitive_data_reason"),
+  // Documents archive folder (one per service). Set from the case when
+  // uploaded on a case, chosen by staff when uploaded on a client record,
+  // changeable with "Move to…". Null = the general "Clients" folder (or
+  // the case's service, for older rows uploaded on a case).
+  serviceType: serviceTypeEnum("service_type"),
 });
 
 // Phase 1 follow-up — a content library for marketing/social assets, kept

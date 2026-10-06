@@ -9,13 +9,22 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { DocumentStatusPill } from "./StatusPill";
 import { viewHref, downloadHref } from "./downloadHref";
 import { MoveCategorySelect } from "./MoveCategorySelect";
+import { MoveServiceFolderSelect } from "./MoveServiceFolderSelect";
+import { documentFolder } from "@/lib/validation/documentDrawer";
+import type { ServiceTypeValue } from "@/lib/validation/client";
 import { ClientVisibilityToggle } from "./ClientVisibilityToggle";
 import { Badge } from "@/components/ui/badge";
 import { deleteDocumentAction } from "@/app/[locale]/(app)/documents/actions";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 import type { Document } from "@/lib/db/schema";
 
-function DocumentRow({ doc }: { doc: Document }) {
+function DocumentRow({
+  doc,
+  caseServiceById,
+}: {
+  doc: Document;
+  caseServiceById?: Record<string, ServiceTypeValue>;
+}) {
   const t = useTranslations("Documents");
 
   return (
@@ -45,6 +54,16 @@ function DocumentRow({ doc }: { doc: Document }) {
         {/* A document with a fine immigration sub-folder stays tied to it —
             moving it to a general folder here would desync the two. */}
         {!doc.folder && <MoveCategorySelect documentId={doc.id} category={doc.category} />}
+        {caseServiceById && !doc.referralId && (
+          <MoveServiceFolderSelect
+            documentId={doc.id}
+            current={documentFolder({
+              ...doc,
+              caseServiceType: doc.caseId ? (caseServiceById[doc.caseId] ?? null) : null,
+            })}
+            hasCase={Boolean(doc.caseId)}
+          />
+        )}
         <Button
           variant="outline"
           size="sm"
@@ -75,8 +94,12 @@ function DocumentRow({ doc }: { doc: Document }) {
 export function DocumentList({
   documents,
   groupByFolder,
+  caseServiceById,
 }: {
   documents: Document[];
+  // Shows "Move to…" (Documents archive folder) on each row; maps the
+  // client's case ids to their service.
+  caseServiceById?: Record<string, ServiceTypeValue>;
   // Only meaningful for an Immigration Administrative Services case
   // (spec section 6) — groups documents under their 10 fixed folders.
   groupByFolder?: boolean;
@@ -92,7 +115,7 @@ export function DocumentList({
     return (
       <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">
         {documents.map((doc) => (
-          <DocumentRow key={doc.id} doc={doc} />
+          <DocumentRow key={doc.id} doc={doc} caseServiceById={caseServiceById} />
         ))}
       </ul>
     );

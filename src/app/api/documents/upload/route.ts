@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
-import { documents } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { cases, documents } from "@/lib/db/schema";
+import { isServiceFolder, serviceFolderFor } from "@/lib/validation/documentDrawer";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { isDatabaseConfigured } from "@/lib/db/config";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
@@ -78,11 +80,32 @@ export async function POST(request: Request) {
     addRandomSuffix: true,
   });
 
+  // Archive folder: a case upload goes to the case's service; a client
+  // record upload to the "Service / folder" staff picked (none = Clients);
+  // a referral upload to Referrals (no service).
+  const validCaseId = typeof caseId === "string" && caseId ? caseId : null;
+  const isReferral = typeof referralId === "string" && Boolean(referralId);
+  const chosen = formData.get("serviceType");
+  let serviceType: ReturnType<typeof serviceFolderFor> | null = null;
+  if (!isReferral) {
+    if (validCaseId) {
+      const [c] = await getDb()
+        .select({ serviceType: cases.serviceType })
+        .from(cases)
+        .where(eq(cases.id, validCaseId))
+        .limit(1);
+      serviceType = c ? serviceFolderFor(c.serviceType) : null;
+    } else if (typeof chosen === "string" && isServiceFolder(chosen)) {
+      serviceType = chosen;
+    }
+  }
+
   const [document] = await getDb()
     .insert(documents)
     .values({
       clientId,
-      caseId: typeof caseId === "string" && caseId ? caseId : null,
+      caseId: validCaseId,
+      serviceType,
       referralId: typeof referralId === "string" && referralId ? referralId : null,
       fileName: file.name,
       blobUrl: blob.url,

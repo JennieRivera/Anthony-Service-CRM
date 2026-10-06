@@ -9,6 +9,7 @@ import {
 import { listCasesWithClient, listClientsForSelect } from "@/lib/queries/cases";
 import { listAlliances, listAllianceDocuments } from "@/lib/queries/alliances";
 import { DocumentsCabinet } from "@/components/documents/DocumentsCabinet";
+import { getServiceColorMap } from "@/lib/queries/serviceColors";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
 export default async function DocumentsPage() {
@@ -23,11 +24,12 @@ export default async function DocumentsPage() {
   let alliances: Awaited<ReturnType<typeof listAlliances>> = [];
   let allianceDocuments: Awaited<ReturnType<typeof listAllianceDocuments>> = [];
   let academyEnrollments: Awaited<ReturnType<typeof listAcademyEnrollmentsForFolders>> = [];
+  let serviceColors: Record<string, string> = {};
   let error: string | null = null;
 
   if (configured) {
     try {
-      [documents, clients, cases, referrals, alliances, allianceDocuments, academyEnrollments] =
+      [documents, clients, cases, referrals, alliances, allianceDocuments, academyEnrollments, serviceColors] =
         await Promise.all([
           listAllDocuments(),
           listClientsForSelect(),
@@ -36,6 +38,7 @@ export default async function DocumentsPage() {
           listAlliances(),
           listAllianceDocuments(),
           listAcademyEnrollmentsForFolders(),
+          getServiceColorMap(),
         ]);
     } catch (err) {
       error = err instanceof Error ? err.message : "Unknown error";
@@ -74,6 +77,7 @@ export default async function DocumentsPage() {
           alliances={alliances}
           allianceDocuments={allianceDocuments}
           academyEnrollments={academyEnrollments}
+          serviceColors={serviceColors}
           blobConfigured={blobConfigured}
         />
       )}

@@ -191,6 +191,7 @@ export default async function ClientProfilePage({
       <ClientProfileTabs
         clientId={client.id}
         cases={cases}
+        interestedServices={client.interestedServices}
         invoices={invoices}
         appointments={appointments}
         documents={documents}

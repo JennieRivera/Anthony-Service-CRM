@@ -29,6 +29,8 @@ import { StudentCommunicationsList } from "@/components/academy/StudentCommunica
 import { StudentAppointmentsList } from "@/components/academy/StudentAppointmentsList";
 import { StudentFinanceList } from "@/components/academy/StudentFinanceList";
 import { DocumentList } from "@/components/documents/DocumentList";
+import { DocumentUploader } from "@/components/documents/DocumentUploader";
+import { isBlobConfigured } from "@/lib/blob/config";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 import { formatDate } from "@/lib/dates";
 import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
@@ -326,6 +328,8 @@ export default async function AcademyStudent360Page({
         {canViewDocuments && (
           <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
             <h2 className="font-heading text-lg text-foreground">{t("documentsTitle")}</h2>
+            {/* A student's documents are filed in the archive's Academy folder. */}
+            {isBlobConfigured() && <DocumentUploader clientId={client.id} serviceFolder="academy" />}
             {documents.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t("noDocuments")}</p>
             ) : (

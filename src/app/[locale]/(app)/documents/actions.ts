@@ -8,6 +8,7 @@ import { getDb } from "@/lib/db";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { documents } from "@/lib/db/schema";
 import { selectableDocumentCategoryValues } from "@/lib/validation/documentCategory";
+import { isServiceFolder } from "@/lib/validation/documentDrawer";
 import { logAuditEvent } from "@/lib/audit";
 import { requireAuthenticatedUser } from "@/lib/permissions";
 
@@ -111,4 +112,41 @@ export async function setDocumentClientVisibilityAction(documentId: string, visi
 
   revalidatePath(`/clients/${doc.clientId}`);
   if (doc.caseId) revalidatePath(`/cases/${doc.caseId}`);
+}
+
+// "Move to…": changes which archive folder (service) a document lives in.
+// null = the general Clients folder (not for a document attached to a
+// case — it never loses its case). Referral documents always stay in
+// Referrals. Nothing about the file itself changes.
+export async function moveDocumentToServiceFolderAction(documentId: string, folder: string | null) {
+  await requireAuthenticatedUser();
+  if (folder !== null && !isServiceFolder(folder)) throw new Error("Invalid folder");
+
+  const [doc] = await getDb()
+    .select({
+      referralId: documents.referralId,
+      caseId: documents.caseId,
+      clientId: documents.clientId,
+      fileName: documents.fileName,
+    })
+    .from(documents)
+    .where(eq(documents.id, documentId))
+    .limit(1);
+  if (!doc) throw new Error("Not found");
+  if (doc.referralId) throw new Error("Referral documents stay in Referrals");
+  if (folder === null && doc.caseId) throw new Error("A case document stays in a service folder");
+
+  await getDb()
+    .update(documents)
+    .set({ serviceType: folder })
+    .where(eq(documents.id, documentId));
+
+  await logAuditEvent({
+    action: "document.service_folder_changed",
+    entityType: "document",
+    entityId: documentId,
+    summary: `Moved "${doc.fileName}" to archive folder: ${folder ?? "clients"}`,
+  });
+  revalidatePath("/documents");
+  revalidatePath(`/clients/${doc.clientId}`);
 }
