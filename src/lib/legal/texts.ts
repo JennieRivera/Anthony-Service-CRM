@@ -45,7 +45,7 @@ export async function recordConsentEvent(
     appointmentId?: string | null;
     consentType: ConsentType;
     granted: boolean;
-    source: "portal" | "online_booking" | "staff";
+    source: "portal" | "online_booking" | "staff" | "sms_reply";
     textShown: string;
     ipAddress: string | null;
     userAgent: string | null;
@@ -87,7 +87,7 @@ export async function hasGrantedConsent(db: PortalDb, clientId: string, consentT
 export type LatestConsent = {
   granted: boolean;
   createdAt: Date;
-  source: "portal" | "online_booking" | "staff";
+  source: "portal" | "online_booking" | "staff" | "sms_reply";
   signatureName: string | null;
 };
 

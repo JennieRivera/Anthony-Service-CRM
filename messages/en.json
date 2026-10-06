@@ -2046,7 +2046,8 @@
     "document_review": "Review Client Document",
     "appointment_change_request": "Appointment Change Request",
     "client_info_review": "Review Client Info Change",
-    "service_interest": "Client Asked About Services"
+    "service_interest": "Client Asked About Services",
+    "call_client": "Call Client"
   },
   "Tasks": {
     "title": "Tasks",
@@ -3640,7 +3641,9 @@
       "unavailable": "That service can't be booked online right now. Please call us.",
       "generic": "Something went wrong. Please try again or call us.",
       "legalAck": "Please confirm you understand we are not attorneys."
-    }
+    },
+    "privacyLink": "Privacy Notice",
+    "smsConsentOptional": "Optional — you can book without it."
   },
   "OnlineBooking": {
     "settingsCard": "Online Booking",
@@ -3922,7 +3925,8 @@
           "label": "I agree to receive WhatsApp messages."
         },
         "sms": {
-          "label": "I agree to receive text messages (SMS)."
+          "label": "I agree to receive text messages (SMS).",
+          "help": "Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help."
         },
         "email": {
           "label": "I agree to receive emails."
@@ -3974,7 +3978,25 @@
     "statusPending": "Link sent, not used yet (expires {date})",
     "statusNone": "No access",
     "lastLogin": "Last sign-in",
-    "lastSeen": "Last activity"
+    "lastSeen": "Last activity",
+    "sendTitle": "Send the link directly",
+    "sendSms": "Send by SMS",
+    "sendEmail": "Send by email",
+    "sendHelp": "Creates a NEW link (the previous unused one stops working) and sends it only through a channel the client authorized.",
+    "sendUnavailable": "Not available: the client hasn't authorized SMS or email (or that service isn't connected yet). If the client gave you permission, mark it in Communication Preferences.",
+    "sendTestModeNote": "Test mode is on: it will go to YOUR test phone/email.",
+    "sentSms": "Link sent by SMS.",
+    "sentEmail": "Link sent by email.",
+    "sentTestMode": "Test mode: the link was sent to your test phone/email.",
+    "sendErrors": {
+      "not_found": "Client not found.",
+      "no_phone": "The client needs a phone number for the portal.",
+      "not_authorized": "The client hasn't authorized that channel.",
+      "disabled": "Automatic notices (or the portal-link notice) are turned off in Settings.",
+      "outside_sms_hours": "SMS can only be sent between 8:00 AM and 8:00 PM (Florida time). Send it by email or try later.",
+      "send_failed": "The message couldn't be sent. See Settings → Automatic notices.",
+      "test_contact_missing": "Test mode is on but your test phone/email isn't set in Settings."
+    }
   },
   "LegalTexts": {
     "settingsCard": "Legal texts",
@@ -4011,6 +4033,10 @@
       "privacy_notice": {
         "title": "Privacy Notice",
         "help": "Public page /privacy (linked from the portal). The default is only a DRAFT: it must be reviewed by an attorney before use. Lines starting with \"## \" are headings, lines starting with \"- \" are lists, and a blank line starts a new paragraph."
+      },
+      "sms_consent": {
+        "title": "Text-message consent (/book)",
+        "help": "The optional \"I agree to receive text messages\" checkbox on /book. US carriers require this kind of wording (who sends, frequency, rates, STOP/HELP, privacy notice). Each acceptance is saved with date, time, IP and the exact text."
       }
     },
     "pendingAttorneyReview": "Translation — pending attorney review",
@@ -4036,7 +4062,16 @@
     "bestTime_midday": "Midday",
     "bestTime_afternoon": "Afternoon",
     "bestTime_evening": "Evening",
-    "seeComment": "(see comment)"
+    "seeComment": "(see comment)",
+    "callClientNotice": "Call client (no authorized channel for an automatic notice): ",
+    "notice_appointment_confirmed": "Appointment confirmed",
+    "notice_appointment_reminder_24h": "Appointment reminder",
+    "notice_appointment_reminder_2h": "2-hour reminder",
+    "notice_case_update": "Case update",
+    "notice_portal_link": "Portal link",
+    "notice_owner_new_booking": "Alert for me: new online booking",
+    "notice_owner_document_uploaded": "Alert for me: client uploaded a document",
+    "notice_owner_change_request": "Alert for me: appointment change request"
   },
   "Privacy": {
     "metaTitle": "Privacy Notice | Anthony Multiservice",
@@ -4066,6 +4101,112 @@
       "portal": "Client portal",
       "online_booking": "Online booking",
       "staff": "Staff (CRM)"
+    }
+  },
+  "Notices": {
+    "title": "Automatic notices",
+    "description": "Appointment confirmations and reminders, case updates and the portal link, by SMS or email — only through the channel each client authorized.",
+    "backToSettings": "Back to Settings",
+    "settingsCardDescription": "Turn automatic SMS and email notices on or off, test mode, wording, and alerts for you.",
+    "manage": "Manage automatic notices",
+    "providersTitle": "Connections",
+    "emailProvider": "Email (Resend)",
+    "smsProvider": "SMS (Twilio)",
+    "connected": "connected",
+    "notConnected": "not connected",
+    "webhookHelp": "In Twilio, set the \"A message comes in\" webhook of your number (or Messaging Service) to:",
+    "providersHelp": "Keys live only in Vercel's environment variables. A channel that isn't connected is simply skipped (the next authorized channel is used, or a \"Call the client\" task is created).",
+    "generalTitle": "General",
+    "enabled": "Automatic notices on",
+    "enabledHelp": "Master switch: off = nothing is sent to anyone.",
+    "testMode": "Test mode",
+    "testModeHelp": "Every client notice goes to YOUR test phone/email below instead of the client, marked [PRUEBA]. Turn it off when you're ready.",
+    "testPhone": "My test phone (SMS)",
+    "testEmail": "My test email",
+    "ownerAlertEmail": "Email for alerts to me",
+    "ownerAlertEmailPlaceholder": "Empty = the CRM owner's email",
+    "preciseReminders": "Precise reminders (24 h and 2 h before)",
+    "preciseRemindersHelp": "On: reminders 24 hours and 2 hours before (notices run every 15 minutes). Off: a single reminder the day before, from 9 AM.",
+    "invalidPhone": "Enter a 10-digit US phone number.",
+    "invalidEmail": "Enter a valid email.",
+    "typesTitle": "Which notices",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved.",
+    "error": "Something went wrong.",
+    "testTitle": "Send a test",
+    "testHelp": "Sends a sample message ONLY to your test phone or email (save them first).",
+    "testSms": "Test SMS",
+    "testEmailButton": "Test email",
+    "testSmsSent": "Test SMS sent to your phone.",
+    "testEmailSent": "Test email sent.",
+    "testFailed": "The test couldn't be sent: {error}",
+    "textsTitle": "Wording of each notice",
+    "textsHelp": "Placeholders: {name} first name, {date}, {time}, {link}, {phone} business phone; alerts for you also {client} and {kind}. Never add sensitive data (SSN, case numbers, amounts, details of the matter).",
+    "textsType": "Notice",
+    "textsLanguage": "Language",
+    "subject": "Subject",
+    "body": "Message",
+    "smsAutoParts": "\"Anthony Multiservice:\" and \"Reply STOP to opt out.\" are always added automatically.",
+    "saveText": "Save text",
+    "restoreDefault": "Restore the original text",
+    "restored": "Original text restored.",
+    "textError": "The text couldn't be saved. Check the placeholders.",
+    "logTitle": "Latest notices",
+    "logEmpty": "No notices yet.",
+    "testModeTag": "test mode",
+    "channels": {
+      "sms": "SMS",
+      "email": "Email",
+      "none": "No channel"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "scheduled": "Waiting for 8 AM",
+      "sending": "Sending",
+      "sent": "Sent",
+      "failed": "Failed",
+      "skipped": "Not sent"
+    },
+    "types": {
+      "appointment_confirmed": {
+        "title": "Appointment confirmed",
+        "help": "When you change an appointment from Requested to Scheduled or Confirmed."
+      },
+      "appointment_reminder_24h": {
+        "title": "Appointment reminder",
+        "help": "24 hours before (or the day before, if precise reminders are off). Skipped if the client was told \"confirmed\" in the last 4 hours."
+      },
+      "appointment_reminder_2h": {
+        "title": "2-hour reminder",
+        "help": "2 hours before. Only with precise reminders."
+      },
+      "case_update": {
+        "title": "Case update",
+        "help": "When a case's status changes (except Cancelled) or the requested documents change. Says only \"you have an update in your portal\"."
+      },
+      "portal_link": {
+        "title": "Portal link",
+        "help": "The \"Send by SMS / email\" buttons on the client record."
+      },
+      "owner_new_booking": {
+        "title": "Alert for me: new online booking",
+        "help": "Email to you when someone books on /book."
+      },
+      "owner_document_uploaded": {
+        "title": "Alert for me: client uploaded a document",
+        "help": "Email to you when a client uploads a document in the portal."
+      },
+      "owner_change_request": {
+        "title": "Alert for me: appointment change request",
+        "help": "Email to you when a client asks to change or cancel an appointment."
+      }
+    },
+    "smsStatus": {
+      "ready": "ready",
+      "missing_credentials": "TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN missing in Vercel.",
+      "missing_sender": "Add TWILIO_MESSAGING_SERVICE_SID (or TWILIO_FROM_NUMBER) in Vercel.",
+      "not_enabled": "Ready to turn on: once Toll-Free Verification is approved, add TWILIO_SMS_ENABLED=true in Vercel and redeploy."
     }
   }
 }

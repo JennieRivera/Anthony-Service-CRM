@@ -2,6 +2,8 @@ import { logAuditEvent } from "@/lib/audit";
 import { PortalNotFoundError, requestAppointmentChange } from "@/lib/portal/queries";
 import { portalDb, requirePortalSessionForApi } from "@/lib/portal/session";
 import { badRequest, forbiddenOrigin, isSameOrigin, json, notFound, readSmallJson } from "@/lib/portal/http";
+import { notifyOwnerChangeRequest } from "@/lib/notifications/engine";
+import { sendNoticeAfter } from "@/lib/notifications/server";
 
 // "Ask to cancel / reschedule": never changes the appointment, only
 // creates a task for staff to confirm with the client.
@@ -34,6 +36,10 @@ export async function POST(
         summary: `Client asked to ${body.kind} an appointment through the portal`,
         actor: `client-portal:${session.clientId}`,
       });
+      const kind = body.kind;
+      sendNoticeAfter("owner_change_request", (db, deps) =>
+        notifyOwnerChangeRequest(db, { appointmentId: id, clientId: session.clientId, kind }, deps),
+      );
     }
     return json({ ok: true, result });
   } catch (err) {

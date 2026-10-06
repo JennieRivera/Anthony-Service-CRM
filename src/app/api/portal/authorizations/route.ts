@@ -35,7 +35,12 @@ export async function POST(request: Request) {
   const texts = Object.fromEntries(
     PORTAL_AUTHORIZATIONS.map((a) => [
       a,
-      a === "document_processing" ? pickLocale(legal.document_processing_authorization, locale) : t(`${a}.label`),
+      a === "document_processing"
+        ? pickLocale(legal.document_processing_authorization, locale)
+        : // SMS: the evidence includes the disclosure shown under the box.
+          a === "sms"
+          ? `${t("sms.label")} ${t("sms.help")}`
+          : t(`${a}.label`),
     ]),
   ) as AuthorizationTexts;
 

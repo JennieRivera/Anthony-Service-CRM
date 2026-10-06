@@ -127,4 +127,10 @@ assert.equal(
   `${es.SystemTitles.portalServiceInterest}(ver comentario) — "Hola"`,
 );
 
+// Step 3B: "Call the client" tasks from automatic notices.
+assert.equal(
+  localizeBookingTitle("Call client (no authorized channel for an automatic notice): Appointment confirmed", translators(es)),
+  `${es.SystemTitles.callClientNotice}${es.SystemTitles.notice_appointment_confirmed}`,
+);
+
 console.log("titles.test.ts: all title assertions passed.");

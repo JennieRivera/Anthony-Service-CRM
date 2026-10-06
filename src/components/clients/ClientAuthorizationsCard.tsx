@@ -19,7 +19,7 @@ type HistoryRow = {
   createdAt: Date;
   consentType: string;
   granted: boolean;
-  source: "portal" | "online_booking" | "staff";
+  source: "portal" | "online_booking" | "staff" | "sms_reply";
   ipAddress: string | null;
   signatureName: string | null;
 };

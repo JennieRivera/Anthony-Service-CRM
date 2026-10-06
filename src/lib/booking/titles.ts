@@ -1,4 +1,5 @@
 import type { ServiceType } from "./config";
+import { NOTICE_LABELS_EN } from "@/lib/notifications/config";
 
 // Online-booking appointment and task titles are STORED in English (one
 // stable format staff, exports and search all see the same way), e.g.
@@ -95,6 +96,8 @@ const PORTAL_PREFIXES = {
   "Review client info change (phone changed — verify before a new portal link): ": "portalInfoChangePhone",
   "Review client info change: ": "portalInfoChange",
   "Client requested information about: ": "portalServiceInterest",
+  // Step 3B
+  "Call client (no authorized channel for an automatic notice): ": "callClientNotice",
 } as const;
 
 export function buildPortalUploadTitle(fileName: string, mayBeSensitive: boolean): string {
@@ -239,6 +242,10 @@ export function localizeBookingTitle(title: string, t: BookingTitleTranslators):
     const body = title.slice(prefix.length);
     if (key === "portalInfoChange" || key === "portalInfoChangePhone") {
       return `${t.system(key)}${localizeProfileChangeBody(body, t)}`;
+    }
+    if (key === "callClientNotice") {
+      const notice = (Object.entries(NOTICE_LABELS_EN) as [string, string][]).find(([, label]) => label === body)?.[0];
+      return `${t.system(key)}${notice ? t.system(`notice_${notice}`) : body}`;
     }
     if (key === "portalServiceInterest") return `${t.system(key)}${localizeServiceInterestBody(body, t)}`;
     return `${t.system(key)}${body}`;

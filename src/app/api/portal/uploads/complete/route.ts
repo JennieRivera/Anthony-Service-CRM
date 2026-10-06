@@ -15,6 +15,8 @@ import {
 } from "@/lib/portal/queries";
 import { portalDb, requirePortalSessionForApi } from "@/lib/portal/session";
 import { badRequest, forbiddenOrigin, isSameOrigin, json, notFound, readSmallJson } from "@/lib/portal/http";
+import { notifyOwnerDocumentUploaded } from "@/lib/notifications/engine";
+import { sendNoticeAfter } from "@/lib/notifications/server";
 
 // Step 3 of a portal upload. Nothing the browser sends is trusted: the
 // blob must sit under a pathname signed for this session's client, its
@@ -118,6 +120,10 @@ export async function POST(request: Request) {
       summary: `Client uploaded "${fileName}" through the portal${sensitiveDataReason ? ` (may contain sensitive data: ${sensitiveDataReason})` : ""}`,
       actor: `client-portal:${session.clientId}`,
     });
+    const clientId = session.clientId;
+    sendNoticeAfter("owner_document_uploaded", (db, deps) =>
+      notifyOwnerDocumentUploaded(db, { documentId, clientId }, deps),
+    );
   } catch (err) {
     if (err instanceof PortalNotFoundError) return reject("not_found", 404);
     throw err;

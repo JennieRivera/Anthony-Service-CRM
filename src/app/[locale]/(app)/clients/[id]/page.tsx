@@ -12,6 +12,8 @@ import { ClientDeleteButton } from "@/components/clients/ClientDeleteButton";
 import { PortalAccessCard } from "@/components/clients/PortalAccessCard";
 import { ClientAuthorizationsCard } from "@/components/clients/ClientAuthorizationsCard";
 import { getLatestConsents, listConsentEvents } from "@/lib/legal/texts";
+import { availableChannelsForClient, getNotificationSettings } from "@/lib/notifications/engine";
+import { noticeDeps } from "@/lib/notifications/server";
 import { getDb } from "@/lib/db";
 import { getPortalAccessSummary } from "@/lib/portal/access";
 import type { PortalDb } from "@/lib/portal/db";
@@ -29,13 +31,16 @@ export default async function ClientProfilePage({
   if (!result) notFound();
 
   const portalDb = getDb() as unknown as PortalDb;
-  const [highlevelSync, highlevelPreview, portalAccess, latestConsents, consentHistory] = await Promise.all([
-    getClientHighlevelSync(id),
-    getHighLevelSyncPreview(id),
-    getPortalAccessSummary(portalDb, id),
-    getLatestConsents(portalDb, id),
-    listConsentEvents(portalDb, id),
-  ]);
+  const [highlevelSync, highlevelPreview, portalAccess, latestConsents, consentHistory, sendChannels, noticeSettings] =
+    await Promise.all([
+      getClientHighlevelSync(id),
+      getHighLevelSyncPreview(id),
+      getPortalAccessSummary(portalDb, id),
+      getLatestConsents(portalDb, id),
+      listConsentEvents(portalDb, id),
+      availableChannelsForClient(portalDb, id, noticeDeps()),
+      getNotificationSettings(portalDb),
+    ]);
 
   const {
     client,
@@ -149,6 +154,8 @@ export default async function ClientProfilePage({
 
       <PortalAccessCard
         clientId={client.id}
+        sendChannels={noticeSettings.enabled && noticeSettings.types.portal_link ? sendChannels : []}
+        noticesTestMode={noticeSettings.testMode}
         hasPhone={(client.phone ?? "").replace(/\D/g, "").length >= 4}
         summary={{
           pendingLink: portalAccess.pendingLink

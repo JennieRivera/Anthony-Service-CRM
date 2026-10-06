@@ -110,6 +110,7 @@ export function PortalAuthorizationsForm({
                     {label(a)}
                   </Label>
                   {a === "marketing" && <span className="text-sm text-muted-foreground">{t("items.marketing.help")}</span>}
+                  {a === "sms" && <span className="text-sm text-muted-foreground">{t("items.sms.help")}</span>}
                   {a === "document_processing" && initial.document_processing.granted && initial.document_processing.signatureName && (
                     <span className="text-sm text-muted-foreground">
                       {t("signedAs", { name: initial.document_processing.signatureName })}

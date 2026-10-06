@@ -51,6 +51,9 @@ export const publicBookingSchema = z.object({
   consent: z.literal(true, { message: "consent" }),
   // "I understand Anthony Multiservice is not a law firm…" — mandatory.
   legalAck: z.literal(true, { message: "legalAck" }),
+  // Optional (Step 3B): "I agree to receive text messages…" — the
+  // carrier-required opt-in wording (Settings → Legal texts → sms_consent).
+  smsConsent: z.boolean().optional(),
   // The page language, so the stored evidence records the exact text shown.
   locale: z.enum(["en", "es"]).optional(),
   // Honeypot: visually hidden, never filled in by a real person.

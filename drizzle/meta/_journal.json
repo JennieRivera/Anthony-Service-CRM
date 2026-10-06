@@ -463,6 +463,13 @@
       "when": 1791216038743,
       "tag": "0065_client_portal_2b",
       "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1791221662847,
+      "tag": "0066_automatic_notices",
+      "breakpoints": true
     }
   ]
 }

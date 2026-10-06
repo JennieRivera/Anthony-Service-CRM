@@ -9,6 +9,7 @@ export const LEGAL_TEXT_KEYS = [
   "florida_notary_disclosure",
   "document_processing_authorization",
   "privacy_notice",
+  "sms_consent",
 ] as const;
 export type LegalTextKey = (typeof LEGAL_TEXT_KEYS)[number];
 
@@ -44,6 +45,13 @@ export const DEFAULT_LEGAL_TEXTS: Record<LegalTextKey, LegalText> = {
     en: "I authorize Anthony Multiservice to review and process the documents I provide, only for the services I request.",
     es: "Autorizo a Anthony Multiservice a revisar y procesar los documentos que yo entregue, solo para los servicios que yo solicite.",
   },
+  // The optional SMS opt-in checkbox on /book (Step 3B), in the form US
+  // carriers expect (Twilio Toll-Free Verification): who sends, what kind
+  // of messages, frequency, "msg & data rates", STOP/HELP, privacy notice.
+  sms_consent: {
+    en: "I agree to receive text messages from Anthony Multiservice about my appointments and my case at the phone number I provided. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of any purchase. See our Privacy Notice.",
+    es: "Acepto recibir mensajes de texto de Anthony Multiservice sobre mis citas y mi caso al número que indiqué. La frecuencia de los mensajes varía. Pueden aplicarse tarifas de mensajes y datos. Responda STOP para cancelar o HELP para recibir ayuda. Aceptar no es una condición para ninguna compra. Consulte nuestro Aviso de Privacidad.",
+  },
   // DRAFT ONLY (Step 2B, 2026-10-05) — a starting point written in plain
   // language, NOT reviewed by an attorney. Shown at /privacy. Lines
   // starting with "## " render as headings; blank lines split paragraphs.
@@ -67,6 +75,9 @@ Your documents are stored in private storage and are only available to our staff
 
 ## Sharing
 We share information only when it is needed to provide the service you requested (for example, submitting a form to a government agency at your direction), when you authorize it, or when the law requires it.
+
+## Text messages (SMS)
+If you agree to receive text messages, we send only notices about your appointments and your case (for example, an appointment confirmation or reminder). Message frequency varies. Message and data rates may apply. Reply STOP to stop receiving them, or HELP for help. We do not share your mobile number or your text-message consent with third parties or affiliates for their marketing purposes.
 
 ## Your choices
 In the client portal ("My authorizations") you can accept or withdraw your contact and marketing preferences at any time, and update your contact details ("My profile"). You can also call us to ask about the information we keep about you.
@@ -95,6 +106,9 @@ Sus documentos se guardan en un almacenamiento privado y solo los pueden ver nue
 
 ## Con quién la compartimos
 Compartimos información solo cuando es necesario para prestar el servicio que usted pidió (por ejemplo, presentar un formulario ante una agencia del gobierno según sus instrucciones), cuando usted lo autoriza o cuando la ley lo exige.
+
+## Mensajes de texto (SMS)
+Si usted acepta recibir mensajes de texto, solo le enviamos avisos sobre sus citas y su caso (por ejemplo, la confirmación o el recordatorio de una cita). La frecuencia de los mensajes varía. Pueden aplicarse tarifas de mensajes y datos. Responda STOP para dejar de recibirlos o HELP para recibir ayuda. No compartimos su número de celular ni su consentimiento para recibir mensajes de texto con terceros ni con empresas afiliadas para sus fines de marketing.
 
 ## Sus opciones
 En el portal del cliente ("Mis autorizaciones") puede aceptar o quitar en cualquier momento sus preferencias de contacto y de marketing, y actualizar sus datos de contacto ("Mi perfil"). También puede llamarnos para preguntar qué información guardamos sobre usted.

@@ -51,6 +51,8 @@ import { authorizeAndLogAgentAction } from "@/lib/ai/auditLog";
 import { businessDateString } from "@/lib/dates";
 import { logAuditEvent } from "@/lib/audit";
 import { requireAccessArea, requireAuthenticatedUser } from "@/lib/permissions";
+import { notifyCaseUpdate } from "@/lib/notifications/engine";
+import { sendNoticeAfter } from "@/lib/notifications/server";
 import { z } from "zod";
 import { upsertModuleProgress } from "@/lib/queries/academyProgress";
 import {
@@ -900,12 +902,17 @@ export async function updateCaseAction(id: string, rawValues: CaseFormValues) {
   const fee = computeCaseFee(values);
 
   const [existing] = await db
-    .select({ status: cases.status })
+    .select({ status: cases.status, documentsRequested: cases.documentsRequested })
     .from(cases)
     .where(eq(cases.id, id))
     .limit(1);
 
   const statusChanged = Boolean(existing) && existing.status !== effectiveStatus;
+  const newDocumentsRequested = values.documentsRequested?.trim() || null;
+  const documentsRequestedChanged =
+    Boolean(existing) &&
+    newDocumentsRequested !== null &&
+    (existing.documentsRequested?.trim() || null) !== newDocumentsRequested;
   const justCompleted = statusChanged && effectiveStatus === "completed";
 
   await db
@@ -934,6 +941,17 @@ export async function updateCaseAction(id: string, rawValues: CaseFormValues) {
 
   if (existing && statusChanged) {
     await recordStatusChange(id, existing.status, effectiveStatus);
+  }
+
+  // Step 3B: "You have an update in your portal" (never what changed).
+  if (statusChanged || documentsRequestedChanged) {
+    sendNoticeAfter("case_update", (noticeDb, deps) =>
+      notifyCaseUpdate(
+        noticeDb,
+        { caseId: id, clientId: values.clientId, status: effectiveStatus, documentsRequested: newDocumentsRequested },
+        deps,
+      ),
+    );
   }
 
   await runAutomaticTasks({
@@ -969,6 +987,7 @@ export async function updateCaseStatusAction(
       status: cases.status,
       clientId: cases.clientId,
       title: cases.title,
+      documentsRequested: cases.documentsRequested,
     })
     .from(cases)
     .where(eq(cases.id, id))
@@ -981,6 +1000,13 @@ export async function updateCaseStatusAction(
 
   if (existing && existing.status !== status) {
     await recordStatusChange(id, existing.status, status);
+    sendNoticeAfter("case_update", (noticeDb, deps) =>
+      notifyCaseUpdate(
+        noticeDb,
+        { caseId: id, clientId: existing.clientId, status, documentsRequested: existing.documentsRequested },
+        deps,
+      ),
+    );
 
     if (status === "completed") {
       await db.insert(tasks).values({

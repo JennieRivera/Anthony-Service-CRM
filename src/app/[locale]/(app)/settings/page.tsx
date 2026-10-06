@@ -2,10 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Plug, ShieldCheck, LayoutGrid, Globe, Palette, Stamp, DollarSign, SunMoon, Users, CalendarClock, Scale } from "lucide-react";
+import { Plug, ShieldCheck, LayoutGrid, Globe, Palette, Stamp, DollarSign, SunMoon, Users, CalendarClock, Scale, BellRing } from "lucide-react";
 import AccessDenied from "@/components/AccessDenied";
 import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
 
@@ -13,6 +11,7 @@ export default async function SettingsPage() {
   const t = await getTranslations("Settings");
   const tBooking = await getTranslations("OnlineBooking");
   const tLegal = await getTranslations("LegalTexts");
+  const tNotices = await getTranslations("Notices");
   const session = await auth();
 
   // Phase 2H — section 4: Administration (Settings/Integrations/Security/
@@ -77,24 +76,12 @@ export default async function SettingsPage() {
           <CardTitle>{t("notifications")}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <p className="text-sm text-muted-foreground">
-            {t("notificationsComingSoon")}
-          </p>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="notify-appointment">
-              {t("notifyNewAppointment")}
-            </Label>
-            <Switch id="notify-appointment" disabled />
-          </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="notify-paid">{t("notifyInvoicePaid")}</Label>
-            <Switch id="notify-paid" disabled />
-          </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="notify-overdue">
-              {t("notifyOverdueInvoice")}
-            </Label>
-            <Switch id="notify-overdue" disabled />
+          <p className="text-sm text-muted-foreground">{tNotices("settingsCardDescription")}</p>
+          <div>
+            <Button variant="outline" render={<Link href="/settings/notifications" />}>
+              <BellRing className="h-4 w-4" />
+              {tNotices("manage")}
+            </Button>
           </div>
         </CardContent>
       </Card>

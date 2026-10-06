@@ -12,6 +12,7 @@ import {
   jsonb,
   pgEnum,
   uniqueIndex,
+  primaryKey,
   index,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
@@ -1001,6 +1002,9 @@ export const taskTypeEnum = pgEnum("task_type", [
   // (the title carries before → after), and the client asked about services.
   "client_info_review",
   "service_interest",
+  // Automatic notices (Step 3B) — a notice couldn't go out because the
+  // client authorized no channel (or has no phone/email for it).
+  "call_client",
 ]);
 
 export const taskStatusEnum = pgEnum("task_status", [
@@ -1544,7 +1548,8 @@ export const clientConsentEvents = pgTable(
     consentType: text("consent_type").notNull(),
     granted: boolean("granted").notNull(),
     // "staff": changed by staff in the CRM (Communication Preferences).
-    source: text("source", { enum: ["portal", "online_booking", "staff"] }).notNull(),
+    // "sms_reply": the client texted STOP / BAJA / ALTO (Step 3B).
+    source: text("source", { enum: ["portal", "online_booking", "staff", "sms_reply"] }).notNull(),
     textShown: text("text_shown").notNull(),
     // The client's typed name as a simple signature (document-processing
     // authorization only).
@@ -1577,6 +1582,87 @@ export const portalRateLimitEvents = pgTable(
       table.keyHash,
       table.occurredAt,
     ),
+  ],
+);
+
+// ── Automatic notices (Step 3B) ──────────────────────────────────────
+// Settings → Automatic notices. One row ("default"); a missing row falls
+// back to src/lib/notifications/config.ts. testMode sends EVERY client
+// notice to the owner's own test phone/email instead of the client.
+export const notificationSettings = pgTable("notification_settings", {
+  id: text("id").primaryKey().default("default"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedByEmail: text("updated_by_email"),
+  enabled: boolean("enabled").notNull().default(true),
+  testMode: boolean("test_mode").notNull().default(true),
+  testEmail: text("test_email"),
+  testPhone: text("test_phone"),
+  // Owner alerts (new online booking, client upload, change request).
+  ownerAlertEmail: text("owner_alert_email"),
+  // Per notice type: { appointment_confirmed: true, … }.
+  types: jsonb("types").$type<Record<string, boolean>>().notNull().default({}),
+  // true (default; Vercel Pro, notices run every 15 min): 24 h and 2 h
+  // reminders. false = one daily run: a day-before reminder only.
+  preciseReminders: boolean("precise_reminders").notNull().default(true),
+});
+
+// Editable wording per notice / channel / language. A missing row falls
+// back to the default text in src/lib/notifications/texts.ts.
+export const notificationTexts = pgTable(
+  "notification_texts",
+  {
+    type: text("type").notNull(),
+    channel: text("channel", { enum: ["email", "sms"] }).notNull(),
+    language: text("language", { enum: ["en", "es"] }).notNull(),
+    subject: text("subject"),
+    body: text("body").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedByEmail: text("updated_by_email"),
+  },
+  (table) => [primaryKey({ columns: [table.type, table.channel, table.language] })],
+);
+
+// Every automatic notice, one row each. dedupeKey is UNIQUE, so the same
+// notice can never be queued (or sent) twice even if the triggering code
+// runs again. body never contains a portal token (replaced by "[link]").
+export const notificationOutbox = pgTable(
+  "notification_outbox",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    dedupeKey: text("dedupe_key").notNull(),
+    type: text("type").notNull(),
+    audience: text("audience", { enum: ["client", "owner"] }).notNull(),
+    clientId: uuid("client_id").references(() => clients.id, { onDelete: "set null" }),
+    appointmentId: uuid("appointment_id").references(() => appointments.id, { onDelete: "set null" }),
+    caseId: uuid("case_id").references(() => cases.id, { onDelete: "set null" }),
+    // "none" = no authorized channel (a "Call the client" task was created).
+    channel: text("channel", { enum: ["email", "sms", "none"] }).notNull(),
+    recipient: text("recipient"),
+    language: text("language", { enum: ["en", "es"] }).notNull().default("en"),
+    subject: text("subject"),
+    body: text("body"),
+    status: text("status", {
+      enum: ["pending", "scheduled", "sending", "sent", "failed", "skipped"],
+    }).notNull(),
+    // SMS outside 8 AM–8 PM Florida time waits until this instant.
+    sendAfter: timestamp("send_after", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    providerMessageId: text("provider_message_id"),
+    error: text("error"),
+    testMode: boolean("test_mode").notNull().default(false),
+  },
+  (table) => [
+    uniqueIndex("notification_outbox_dedupe_key_idx").on(table.dedupeKey),
+    index("notification_outbox_status_send_after_idx").on(table.status, table.sendAfter),
+    index("notification_outbox_client_idx").on(table.clientId),
   ],
 );
 

@@ -27,6 +27,7 @@ const detailsSchema = publicBookingSchema.pick({
   preferredLanguage: true,
   consent: true,
   legalAck: true,
+  smsConsent: true,
   website: true,
 });
 
@@ -38,6 +39,7 @@ type DetailsValues = {
   preferredLanguage: "en" | "es";
   consent: boolean;
   legalAck: boolean;
+  smsConsent?: boolean;
   website: string;
 };
 
@@ -97,6 +99,8 @@ const LEGAL_NOTICE_SERVICES = new Set(["immigration", "notary", "online_notary"]
 export type BookingLegalTexts = {
   notALawFirm: string;
   acknowledgment: string;
+  // Optional SMS opt-in (Step 3B), carrier-required wording.
+  smsConsent: string;
 };
 
 export function BookingFlow({
@@ -137,6 +141,7 @@ export function BookingFlow({
       preferredLanguage: locale,
       consent: false,
       legalAck: false,
+      smsConsent: false,
       website: "",
     },
   });
@@ -531,6 +536,31 @@ export function BookingFlow({
                 )}
               />
               {fieldError("legalAck")}
+            </div>
+
+            {/* Optional: never required to book. */}
+            <div className="flex flex-col gap-1.5">
+              <Controller
+                control={control}
+                name="smsConsent"
+                render={({ field }) => (
+                  <label htmlFor="smsConsent" className="flex cursor-pointer items-start gap-3 text-sm text-foreground">
+                    <Checkbox
+                      id="smsConsent"
+                      checked={field.value === true}
+                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                      className="mt-0.5 size-5"
+                    />
+                    <span>
+                      {legal.smsConsent}{" "}
+                      <a href={`/${locale}/privacy`} target="_blank" rel="noopener" className="text-primary underline">
+                        {t("privacyLink")}
+                      </a>
+                    </span>
+                  </label>
+                )}
+              />
+              <p className="pl-8 text-xs text-muted-foreground">{t("smsConsentOptional")}</p>
             </div>
 
             {submitError && (

@@ -2046,7 +2046,8 @@
     "document_review": "Revisar Documento del Cliente",
     "appointment_change_request": "Solicitud de Cambio de Cita",
     "client_info_review": "Revisar Cambio de Datos del Cliente",
-    "service_interest": "El Cliente Pidió Información"
+    "service_interest": "El Cliente Pidió Información",
+    "call_client": "Llamar al Cliente"
   },
   "Tasks": {
     "title": "Tareas",
@@ -3640,7 +3641,9 @@
       "unavailable": "Ese servicio no se puede reservar en línea ahora. Por favor, llámenos.",
       "generic": "Algo salió mal. Por favor, intente de nuevo o llámenos.",
       "legalAck": "Confirme que entiende que no somos abogados."
-    }
+    },
+    "privacyLink": "Aviso de Privacidad",
+    "smsConsentOptional": "Opcional: puede reservar sin marcarla."
   },
   "OnlineBooking": {
     "settingsCard": "Reservas en Línea",
@@ -3922,7 +3925,8 @@
           "label": "Acepto recibir mensajes por WhatsApp."
         },
         "sms": {
-          "label": "Acepto recibir mensajes de texto (SMS)."
+          "label": "Acepto recibir mensajes de texto (SMS).",
+          "help": "La frecuencia de los mensajes varía. Pueden aplicarse tarifas de mensajes y datos. Responda STOP para cancelar o HELP para recibir ayuda."
         },
         "email": {
           "label": "Acepto recibir correos (email)."
@@ -3974,7 +3978,25 @@
     "statusPending": "Link enviado, todavía sin usar (vence {date})",
     "statusNone": "Sin acceso",
     "lastLogin": "Último ingreso",
-    "lastSeen": "Última actividad"
+    "lastSeen": "Última actividad",
+    "sendTitle": "Enviar el link directamente",
+    "sendSms": "Enviar por SMS",
+    "sendEmail": "Enviar por correo",
+    "sendHelp": "Crea un link NUEVO (el anterior sin usar deja de funcionar) y lo envía solo por un canal que el cliente autorizó.",
+    "sendUnavailable": "No disponible: el cliente no ha autorizado SMS ni correo (o ese servicio todavía no está conectado). Si el cliente le dio permiso, márquelo en Preferencias de comunicación.",
+    "sendTestModeNote": "El modo prueba está encendido: llegará a SU teléfono/correo de prueba.",
+    "sentSms": "Link enviado por SMS.",
+    "sentEmail": "Link enviado por correo.",
+    "sentTestMode": "Modo prueba: el link se envió a su teléfono/correo de prueba.",
+    "sendErrors": {
+      "not_found": "No se encontró el cliente.",
+      "no_phone": "El cliente necesita un teléfono para el portal.",
+      "not_authorized": "El cliente no ha autorizado ese canal.",
+      "disabled": "Los avisos automáticos (o el aviso del link del portal) están apagados en Configuración.",
+      "outside_sms_hours": "Los SMS solo se envían entre 8:00 AM y 8:00 PM (hora de Florida). Envíelo por correo o intente más tarde.",
+      "send_failed": "No se pudo enviar el mensaje. Revise Configuración → Avisos automáticos.",
+      "test_contact_missing": "El modo prueba está encendido pero falta su teléfono/correo de prueba en Configuración."
+    }
   },
   "LegalTexts": {
     "settingsCard": "Textos legales",
@@ -4011,6 +4033,10 @@
       "privacy_notice": {
         "title": "Aviso de Privacidad",
         "help": "Página pública /privacy (con link desde el portal). El texto original es solo un BORRADOR: un abogado debe revisarlo antes de usarlo. Las líneas que empiezan con \"## \" son títulos, las que empiezan con \"- \" son listas, y una línea en blanco empieza un párrafo nuevo."
+      },
+      "sms_consent": {
+        "title": "Consentimiento para mensajes de texto (/book)",
+        "help": "La casilla opcional \"Acepto recibir mensajes de texto\" de /book. Los operadores de EE. UU. exigen este tipo de texto (quién envía, frecuencia, tarifas, STOP/HELP, aviso de privacidad). Cada aceptación se guarda con fecha, hora, IP y el texto exacto."
       }
     },
     "pendingAttorneyReview": "Traducción — pendiente de revisión de un abogado",
@@ -4036,7 +4062,16 @@
     "bestTime_midday": "Mediodía",
     "bestTime_afternoon": "Tarde",
     "bestTime_evening": "Noche",
-    "seeComment": "(ver comentario)"
+    "seeComment": "(ver comentario)",
+    "callClientNotice": "Llamar al cliente (no autorizó ningún canal para un aviso automático): ",
+    "notice_appointment_confirmed": "Cita confirmada",
+    "notice_appointment_reminder_24h": "Recordatorio de cita",
+    "notice_appointment_reminder_2h": "Recordatorio 2 horas antes",
+    "notice_case_update": "Actualización del caso",
+    "notice_portal_link": "Link del portal",
+    "notice_owner_new_booking": "Aviso para mí: nueva reserva en línea",
+    "notice_owner_document_uploaded": "Aviso para mí: el cliente subió un documento",
+    "notice_owner_change_request": "Aviso para mí: pedido de cambio de cita"
   },
   "Privacy": {
     "metaTitle": "Aviso de Privacidad | Anthony Multiservice",
@@ -4066,6 +4101,112 @@
       "portal": "Portal del cliente",
       "online_booking": "Reserva en línea",
       "staff": "Equipo (CRM)"
+    }
+  },
+  "Notices": {
+    "title": "Avisos automáticos",
+    "description": "Confirmaciones y recordatorios de citas, actualizaciones del caso y el link del portal, por SMS o correo — solo por el canal que cada cliente autorizó.",
+    "backToSettings": "Volver a Configuración",
+    "settingsCardDescription": "Encender o apagar los avisos automáticos por SMS y correo, modo prueba, textos y avisos para usted.",
+    "manage": "Administrar avisos automáticos",
+    "providersTitle": "Conexiones",
+    "emailProvider": "Correo (Resend)",
+    "smsProvider": "SMS (Twilio)",
+    "connected": "conectado",
+    "notConnected": "sin conectar",
+    "webhookHelp": "En Twilio, ponga este link en \"A message comes in\" de su número (o Messaging Service):",
+    "providersHelp": "Las claves están solo en las variables de entorno de Vercel. Si un canal no está conectado, simplemente se salta (se usa el siguiente canal autorizado, o se crea la tarea \"Llamar al cliente\").",
+    "generalTitle": "General",
+    "enabled": "Avisos automáticos encendidos",
+    "enabledHelp": "Interruptor general: apagado = no se envía nada a nadie.",
+    "testMode": "Modo prueba",
+    "testModeHelp": "Todos los avisos para clientes llegan a SU teléfono/correo de prueba (abajo) en vez de al cliente, marcados [PRUEBA]. Apáguelo cuando esté listo.",
+    "testPhone": "Mi teléfono de prueba (SMS)",
+    "testEmail": "Mi correo de prueba",
+    "ownerAlertEmail": "Correo para los avisos para mí",
+    "ownerAlertEmailPlaceholder": "Vacío = el correo del dueño del CRM",
+    "preciseReminders": "Recordatorios exactos (24 h y 2 h antes)",
+    "preciseRemindersHelp": "Encendido: recordatorios 24 horas y 2 horas antes (los avisos corren cada 15 minutos). Apagado: un solo recordatorio el día anterior, desde las 9 AM.",
+    "invalidPhone": "Escriba un teléfono de EE. UU. de 10 dígitos.",
+    "invalidEmail": "Escriba un correo válido.",
+    "typesTitle": "Qué avisos",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "saved": "Guardado.",
+    "error": "Algo salió mal.",
+    "testTitle": "Enviar una prueba",
+    "testHelp": "Envía un mensaje de ejemplo SOLO a su teléfono o correo de prueba (guárdelos primero).",
+    "testSms": "SMS de prueba",
+    "testEmailButton": "Correo de prueba",
+    "testSmsSent": "SMS de prueba enviado a su teléfono.",
+    "testEmailSent": "Correo de prueba enviado.",
+    "testFailed": "No se pudo enviar la prueba: {error}",
+    "textsTitle": "Texto de cada aviso",
+    "textsHelp": "Campos: {name} nombre, {date}, {time}, {link}, {phone} teléfono del negocio; en los avisos para usted también {client} y {kind}. Nunca agregue datos sensibles (SSN, números de caso, montos, detalles del trámite).",
+    "textsType": "Aviso",
+    "textsLanguage": "Idioma",
+    "subject": "Asunto",
+    "body": "Mensaje",
+    "smsAutoParts": "\"Anthony Multiservice:\" y \"Responda STOP para no recibir más mensajes.\" se agregan siempre de forma automática.",
+    "saveText": "Guardar texto",
+    "restoreDefault": "Restaurar el texto original",
+    "restored": "Se restauró el texto original.",
+    "textError": "No se pudo guardar el texto. Revise los campos entre llaves.",
+    "logTitle": "Últimos avisos",
+    "logEmpty": "Todavía no hay avisos.",
+    "testModeTag": "modo prueba",
+    "channels": {
+      "sms": "SMS",
+      "email": "Correo",
+      "none": "Sin canal"
+    },
+    "statuses": {
+      "pending": "Pendiente",
+      "scheduled": "Esperando a las 8 AM",
+      "sending": "Enviando",
+      "sent": "Enviado",
+      "failed": "Falló",
+      "skipped": "No enviado"
+    },
+    "types": {
+      "appointment_confirmed": {
+        "title": "Cita confirmada",
+        "help": "Cuando cambia una cita de Solicitada a Programada o Confirmada."
+      },
+      "appointment_reminder_24h": {
+        "title": "Recordatorio de cita",
+        "help": "24 horas antes (o el día anterior, si los recordatorios exactos están apagados). No se envía si el cliente recibió \"cita confirmada\" en las últimas 4 horas."
+      },
+      "appointment_reminder_2h": {
+        "title": "Recordatorio 2 horas antes",
+        "help": "2 horas antes. Solo con recordatorios exactos."
+      },
+      "case_update": {
+        "title": "Actualización del caso",
+        "help": "Cuando cambia el estado de un caso (menos Cancelado) o los documentos pedidos. Solo dice \"tiene una actualización en su portal\"."
+      },
+      "portal_link": {
+        "title": "Link del portal",
+        "help": "Los botones \"Enviar por SMS / correo\" de la ficha del cliente."
+      },
+      "owner_new_booking": {
+        "title": "Aviso para mí: nueva reserva en línea",
+        "help": "Correo para usted cuando alguien reserva en /book."
+      },
+      "owner_document_uploaded": {
+        "title": "Aviso para mí: el cliente subió un documento",
+        "help": "Correo para usted cuando un cliente sube un documento en el portal."
+      },
+      "owner_change_request": {
+        "title": "Aviso para mí: pedido de cambio de cita",
+        "help": "Correo para usted cuando un cliente pide cambiar o cancelar una cita."
+      }
+    },
+    "smsStatus": {
+      "ready": "listo",
+      "missing_credentials": "Faltan TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN en Vercel.",
+      "missing_sender": "Agregue TWILIO_MESSAGING_SERVICE_SID (o TWILIO_FROM_NUMBER) en Vercel.",
+      "not_enabled": "Listo para encender: cuando aprueben la Toll-Free Verification, agregue TWILIO_SMS_ENABLED=true en Vercel y vuelva a publicar."
     }
   }
 }

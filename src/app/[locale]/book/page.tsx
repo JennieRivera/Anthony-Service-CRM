@@ -53,6 +53,7 @@ export default async function BookPage({
   const legal = {
     notALawFirm: pickLocale(legalTexts.not_a_law_firm, locale),
     acknowledgment: pickLocale(legalTexts.not_a_law_firm_ack, locale),
+    smsConsent: pickLocale(legalTexts.sms_consent, locale),
   };
   // A signed-in client-portal visitor gets their own name/phone/email
   // prefilled — read from their portal session here, never from the URL.

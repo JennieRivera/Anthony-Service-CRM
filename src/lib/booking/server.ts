@@ -7,6 +7,10 @@ import { BOOKING_RATE_LIMITS, type ServiceType } from "./config";
 import { bookingLanguageNote, buildBookingTitle } from "./titles";
 import { getLegalTexts, pickLocale, recordConsentEvent } from "@/lib/legal/texts";
 import type { PortalDb } from "@/lib/portal/db";
+import { clientCommunicationPreferences } from "@/lib/db/schema";
+import { businessDateString } from "@/lib/dates";
+import { notifyOwnerNewBooking } from "@/lib/notifications/engine";
+import { sendNoticeAfter } from "@/lib/notifications/server";
 import {
   bookingWindowDates,
   computeAvailability,
@@ -195,6 +199,41 @@ export async function submitPublicBooking(
         ipAddress: context.ip,
         userAgent: context.userAgent ?? null,
       });
+
+      // Optional SMS opt-in (Step 3B): same evidence, and the same switch
+      // staff see in Communication Preferences.
+      if (values.smsConsent === true) {
+        await recordConsentEvent(db, {
+          clientId: row.client_id,
+          appointmentId: row.appointment_id ?? null,
+          consentType: "sms",
+          granted: true,
+          source: "online_booking",
+          textShown: pickLocale(texts.sms_consent, values.locale ?? values.preferredLanguage),
+          ipAddress: context.ip,
+          userAgent: context.userAgent ?? null,
+        });
+        const now = new Date(nowMs);
+        const patch = {
+          smsConsent: true,
+          smsStatus: "active" as const,
+          consentDate: businessDateString(now),
+          consentSource: "Online booking",
+          updatedAt: now,
+        };
+        await db
+          .insert(clientCommunicationPreferences)
+          .values({ clientId: row.client_id, ...patch })
+          .onConflictDoUpdate({ target: clientCommunicationPreferences.clientId, set: patch });
+      }
+
+      if (row.appointment_id) {
+        const appointmentId = row.appointment_id;
+        const clientId = row.client_id;
+        sendNoticeAfter("owner_new_booking", (noticeDb, deps) =>
+          notifyOwnerNewBooking(noticeDb, { appointmentId, clientId, startAt: new Date(startMs) }, deps),
+        );
+      }
     }
     return { status: "ok", summary };
   }

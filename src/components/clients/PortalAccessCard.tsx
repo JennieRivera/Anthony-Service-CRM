@@ -2,13 +2,14 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Copy, KeyRound, ShieldOff } from "lucide-react";
+import { Copy, KeyRound, Mail, MessageSquare, ShieldOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { formatDateTime } from "@/lib/dates";
 import {
   createPortalLinkAction,
   revokePortalAccessAction,
+  sendPortalLinkAction,
 } from "@/app/[locale]/(app)/clients/portal-actions";
 
 export type PortalAccessSummaryView = {
@@ -25,16 +26,37 @@ export function PortalAccessCard({
   clientId,
   hasPhone,
   summary,
+  sendChannels = [],
+  noticesTestMode = false,
 }: {
   clientId: string;
   hasPhone: boolean;
   summary: PortalAccessSummaryView;
+  // Step 3B: channels the link can be sent through right now (authorized
+  // by the client, contact data present, provider connected).
+  sendChannels?: ("sms" | "email")[];
+  noticesTestMode?: boolean;
 }) {
   const t = useTranslations("PortalAccess");
   const [isPending, startTransition] = useTransition();
   const [link, setLink] = useState<{ url: string; expiresAt: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sent, setSent] = useState<string | null>(null);
+
+  function send(channel: "sms" | "email") {
+    setError(null);
+    setSent(null);
+    setLink(null);
+    startTransition(async () => {
+      const result = await sendPortalLinkAction(clientId, channel);
+      if (result.ok) {
+        setSent(result.testMode ? t("sentTestMode") : t(channel === "sms" ? "sentSms" : "sentEmail"));
+      } else {
+        setError(t(`sendErrors.${result.error}`));
+      }
+    });
+  }
 
   function generate() {
     setError(null);
@@ -94,8 +116,29 @@ export function PortalAccessCard({
         </div>
       </div>
 
+      {hasPhone && (
+        <div className="flex flex-col gap-2 rounded-md border border-border p-3">
+          <p className="text-sm font-medium text-foreground">{t("sendTitle")}</p>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" size="sm" variant="outline" disabled={isPending || !sendChannels.includes("sms")} onClick={() => send("sms")}>
+              <MessageSquare className="h-4 w-4" />
+              {t("sendSms")}
+            </Button>
+            <Button type="button" size="sm" variant="outline" disabled={isPending || !sendChannels.includes("email")} onClick={() => send("email")}>
+              <Mail className="h-4 w-4" />
+              {t("sendEmail")}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {sendChannels.length === 0 ? t("sendUnavailable") : t("sendHelp")}
+            {noticesTestMode && ` ${t("sendTestModeNote")}`}
+          </p>
+        </div>
+      )}
+
       {!hasPhone && <p className="text-sm text-destructive">{t("needsPhone")}</p>}
       {error && <p className="text-sm text-destructive">{error}</p>}
+      {sent && <p className="text-sm text-foreground" role="status">{sent}</p>}
 
       {link && (
         <div className="flex flex-col gap-2 rounded-md border border-primary/40 bg-secondary/40 p-3">

@@ -16,6 +16,8 @@ import { auth } from "@/auth";
 import { businessDateString, businessLocalToUtc, formatDateTime } from "@/lib/dates";
 import { logAuditEvent } from "@/lib/audit";
 import { requireAuthenticatedUser } from "@/lib/permissions";
+import { notifyAppointmentConfirmed } from "@/lib/notifications/engine";
+import { sendNoticeAfter } from "@/lib/notifications/server";
 
 export async function searchClientMatchesAction(query: {
   phone?: string;
@@ -162,6 +164,14 @@ async function runAppointmentStatusWorkflow(
   newStatus: Appointment["status"],
 ) {
   if (previousStatus === newStatus) return;
+
+  // Step 3B: "Requested" → "Scheduled"/"Confirmed" tells the client (by
+  // the channel they authorized) that the appointment is confirmed.
+  if (previousStatus === "requested" && (newStatus === "scheduled" || newStatus === "confirmed")) {
+    sendNoticeAfter("appointment_confirmed", (db, deps) => notifyAppointmentConfirmed(db, appointmentId, deps));
+    return;
+  }
+
   if (newStatus !== "completed" && newStatus !== "no_show") return;
 
   const db = getDb();
