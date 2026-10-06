@@ -20,6 +20,7 @@ import {
   salesTaxCaseDetails,
   irsCaseDetails,
   insuranceComplianceDetails,
+  remodelingDetails,
   caseStatusEnum,
   caseStatusHistory,
   tasks,
@@ -41,6 +42,7 @@ import {
   salesTaxServiceTypes,
   irsServiceTypes,
   insuranceComplianceServiceTypes,
+  remodelingServiceTypes,
   type CaseFormValues,
 } from "@/lib/validation/case";
 import { redirect } from "@/i18n/navigation";
@@ -840,6 +842,15 @@ async function upsertServiceDetails(
         target: insuranceComplianceDetails.caseId,
         set: detail,
       });
+    return;
+  }
+
+  if (remodelingServiceTypes.includes(values.serviceType)) {
+    const detail = { allianceId: values.remodelingAllianceId || null, updatedAt: new Date() };
+    await db
+      .insert(remodelingDetails)
+      .values({ caseId, ...detail })
+      .onConflictDoUpdate({ target: remodelingDetails.caseId, set: detail });
     return;
   }
 }

@@ -1,21 +1,48 @@
 import { z } from "zod";
 
+// THE list of services — one source for the Services menu, a case's
+// "Service type", /book, the portal, filters and reports, in the order the
+// owner approved on 2026-10-06. Names live in messages → ServiceType (CRM)
+// and PublicServiceType (/book, portal). The menu is built from this list
+// in src/components/shell/nav-drawers.ts.
 export const serviceTypeValues = [
-  "online_notary",
-  "document_prep",
-  "tax_prep",
   "company_registration",
-  "credit_financing",
-  "leadership",
-  "notary",
+  "tax_prep",
   "bookkeeping",
-  "immigration",
-  "academy",
-  "marketing",
   "sales_tax",
   "irs_administrative",
+  "notary",
+  "document_prep",
+  "immigration",
+  "leadership",
+  "credit_financing",
+  "crm_technology",
+  "marketing",
   "insurance_compliance",
+  "academy",
+  "corporate_events",
+  "remodeling",
+  // Legacy — folded into "notary". Kept for existing cases; never offered
+  // for a new one (see LEGACY_SERVICE_TYPES).
+  "online_notary",
 ] as const;
+
+export type ServiceTypeValue = (typeof serviceTypeValues)[number];
+
+export const LEGACY_SERVICE_TYPES: readonly ServiceTypeValue[] = ["online_notary"];
+
+// What a NEW case, appointment, catalog item… can be: every service except
+// the legacy ones.
+export const activeServiceTypeValues = serviceTypeValues.filter(
+  (s) => !LEGACY_SERVICE_TYPES.includes(s),
+);
+
+// Options for a service picker: the current services, plus the record's
+// own value when it is a legacy one (so editing an old record still shows
+// what it has).
+export function serviceTypeOptions(current?: string | null): ServiceTypeValue[] {
+  return serviceTypeValues.filter((s) => !LEGACY_SERVICE_TYPES.includes(s) || s === current);
+}
 
 export const clientStatusValues = [
   "lead",

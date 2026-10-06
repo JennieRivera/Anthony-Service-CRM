@@ -554,6 +554,8 @@ export const caseFormSchema = z.object({
     .or(z.literal("")),
   insuranceLastRenewedDate: optionalString,
   insuranceComplianceNotes: optionalString,
+  // Remodeling: the allied contractor (a strategic alliance).
+  remodelingAllianceId: optionalString,
 });
 
 export type CaseFormValues = z.infer<typeof caseFormSchema>;
@@ -571,3 +573,4 @@ export const salesTaxServiceTypes = ["sales_tax"];
 export const irsServiceTypes = ["irs_administrative"];
 export const insuranceComplianceServiceTypes = ["insurance_compliance"];
 export const documentPrepServiceTypes = ["document_prep"];
+export const remodelingServiceTypes = ["remodeling"];

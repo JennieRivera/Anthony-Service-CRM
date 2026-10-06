@@ -11,7 +11,7 @@ import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
 export default async function NewReferralPage({
   searchParams,
 }: {
-  searchParams: Promise<{ clientId?: string }>;
+  searchParams: Promise<{ clientId?: string; caseId?: string; allianceId?: string; category?: string }>;
 }) {
   const t = await getTranslations("Referrals");
 
@@ -25,7 +25,7 @@ export default async function NewReferralPage({
     );
   }
 
-  const { clientId } = await searchParams;
+  const { clientId, caseId, allianceId, category } = await searchParams;
   const [clients, cases, alliances] = await Promise.all([
     listClientsForSelect(),
     listCasesForSelect(),
@@ -51,6 +51,9 @@ export default async function NewReferralPage({
         cases={cases}
         alliances={alliances}
         defaultClientId={clientId}
+        defaultCaseId={cases.some((c) => c.id === caseId) ? caseId : undefined}
+        defaultAllianceId={alliances.some((a) => a.id === allianceId) ? allianceId : undefined}
+        defaultCategory={category === "commercial_finance" ? "commercial_finance" : undefined}
         onSubmit={createReferralAction}
       />
     </div>

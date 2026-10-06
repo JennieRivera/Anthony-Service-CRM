@@ -23,7 +23,7 @@ import {
   appointmentTypeValues,
   type AppointmentFormValues,
 } from "@/lib/validation/appointment";
-import { serviceTypeValues } from "@/lib/validation/client";
+import { serviceTypeOptions } from "@/lib/validation/client";
 import { paymentStatusValues } from "@/lib/validation/payment";
 import { ClientMatchPicker } from "./ClientMatchPicker";
 import type { Appointment } from "@/lib/db/schema";
@@ -56,6 +56,7 @@ export function AppointmentForm({
   const t = useTranslations("Appointments.form");
   const tStatus = useTranslations("AppointmentStatus");
   const tService = useTranslations("ServiceType");
+  const tCases = useTranslations("Cases");
   const tType = useTranslations("AppointmentType");
   const tPaymentStatus = useTranslations("PaymentStatus");
   const router = useRouter();
@@ -88,7 +89,8 @@ export function AppointmentForm({
       caseId: appointment?.caseId ?? "",
       allianceId: appointment?.allianceId ?? "",
       title: appointment?.title ?? "",
-      serviceType: appointment?.serviceType ?? "online_notary",
+      // No default service: staff must pick one.
+      serviceType: appointment?.serviceType ?? ("" as AppointmentFormValues["serviceType"]),
       appointmentType: appointment?.appointmentType ?? "in_person",
       startAt: defaultStartValue,
       endAt: defaultEndValue,
@@ -202,12 +204,12 @@ export function AppointmentForm({
             control={control}
             name="serviceType"
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue />
+              <Select value={field.value || null} onValueChange={(v) => field.onChange(v ?? "")}>
+                <SelectTrigger aria-invalid={!!errors.serviceType}>
+                  <SelectValue placeholder={tCases("form.chooseService")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {serviceTypeValues.map((service) => (
+                  {serviceTypeOptions(appointment?.serviceType).map((service) => (
                     <SelectItem key={service} value={service}>
                       {tService(service)}
                     </SelectItem>
@@ -216,6 +218,9 @@ export function AppointmentForm({
               </Select>
             )}
           />
+          {errors.serviceType && (
+            <p className="text-sm text-destructive">{tCases("form.chooseServiceError")}</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">

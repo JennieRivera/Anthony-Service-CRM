@@ -37,7 +37,12 @@ import {
   AlertTriangle,
   Wrench,
   Globe2,
+  BookMarked,
+  Receipt,
+  ShieldCheck,
+  Hammer,
 } from "lucide-react";
+import { activeServiceTypeValues, type ServiceTypeValue } from "@/lib/validation/client";
 
 export type DrawerLink = {
   href: string;
@@ -45,8 +50,11 @@ export type DrawerLink = {
   // drawer link's text always matches that module's main sidebar label.
   navLabelKey?: string;
   // Used only for links that have no existing sidebar entry to borrow a
-  // label from (the 10 service categories, and section headings).
+  // label from (section headings, grouped entries).
   labelKey?: string;
+  // A service: its label is that service's own name (messages →
+  // ServiceType), so the menu and a case's "Service type" never drift.
+  serviceType?: ServiceTypeValue;
   icon: LucideIcon;
 };
 
@@ -68,20 +76,51 @@ export type DrawerSection = {
 // themselves from the form's own list. "Commercial Finance Referrals" is a
 // referrals category (referralCategoryValues), not a case, so it opens
 // /referrals/new instead.
+const SERVICE_ICONS: Record<ServiceTypeValue, LucideIcon> = {
+  company_registration: Building2,
+  tax_prep: Calculator,
+  bookkeeping: BookMarked,
+  sales_tax: Receipt,
+  irs_administrative: FileText,
+  notary: Stamp,
+  document_prep: FileText,
+  immigration: Globe,
+  leadership: Target,
+  credit_financing: LineChart,
+  crm_technology: Cpu,
+  marketing: Megaphone,
+  insurance_compliance: ShieldCheck,
+  academy: GraduationCap,
+  corporate_events: PartyPopper,
+  remodeling: Hammer,
+  online_notary: Stamp,
+};
+
+// The Services menu IS the service list (src/lib/validation/client.ts →
+// serviceTypeValues, without the legacy ones), each opening a new case of
+// that type — with two exceptions approved by the owner: Notary Public and
+// Document Preparation share one entry that opens a two-button chooser,
+// and Commercial Finance Referrals (a referral category, not a case type)
+// sits right after Credit and opens /referrals/new.
+function serviceMenuLinks(): DrawerLink[] {
+  const links: DrawerLink[] = [];
+  for (const service of activeServiceTypeValues) {
+    if (service === "document_prep") continue;
+    if (service === "notary") {
+      links.push({ href: "/cases/new?choose=notary_documents", labelKey: "servicesNotaryDocuments", icon: Stamp });
+      continue;
+    }
+    links.push({ href: `/cases/new?serviceType=${service}`, serviceType: service, icon: SERVICE_ICONS[service] });
+    if (service === "credit_financing") {
+      links.push({ href: "/referrals/new?category=commercial_finance", labelKey: "servicesCommercialFinance", icon: Landmark });
+    }
+  }
+  return links;
+}
+
 export const SERVICES_DRAWER_SECTIONS: DrawerSection[] = [
   {
-    links: [
-      { href: "/cases/new?serviceType=company_registration", labelKey: "servicesBusinessFormation", icon: Building2 },
-      { href: "/cases/new", labelKey: "servicesTaxesBookkeeping", icon: Calculator },
-      { href: "/cases/new", labelKey: "servicesNotaryDocuments", icon: Stamp },
-      { href: "/cases/new?serviceType=immigration", labelKey: "servicesImmigration", icon: Globe },
-      { href: "/cases/new?serviceType=leadership", labelKey: "servicesConsulting", icon: Target },
-      { href: "/cases/new?serviceType=credit_financing", labelKey: "servicesCreditFinancial", icon: LineChart },
-      { href: "/referrals/new", labelKey: "servicesCommercialFinance", icon: Landmark },
-      { href: "/cases/new?serviceType=marketing", labelKey: "servicesCrmTech", icon: Cpu },
-      { href: "/cases/new?serviceType=marketing", labelKey: "servicesMarketingBranding", icon: Megaphone },
-      { href: "/cases/new", labelKey: "servicesCorporateEvents", icon: PartyPopper },
-    ],
+    links: serviceMenuLinks(),
   },
   {
     headingKey: "resourceLinksHeading",

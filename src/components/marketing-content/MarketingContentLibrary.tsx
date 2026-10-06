@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { serviceTypeValues } from "@/lib/validation/client";
+import { serviceTypeOptions, serviceTypeValues } from "@/lib/validation/client";
 import {
   marketingChannelValues,
   MARKETING_CONTENT_ACCEPT,
@@ -251,7 +251,7 @@ function UploadDialog() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="general">{t("generalService")}</SelectItem>
-                {serviceTypeValues.map((s) => (
+                {serviceTypeOptions().map((s) => (
                   <SelectItem key={s} value={s}>
                     {tService(s)}
                   </SelectItem>

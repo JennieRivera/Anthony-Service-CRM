@@ -61,7 +61,7 @@ async function main() {
     const bad = validateImportRow({ fullName: "", phone: "123", email: "no-at-sign" }, 0);
     assert.deepEqual(bad.errors.sort(), ["email_invalid", "name_missing", "phone_invalid"]);
     const good = validateImportRow(
-      { fullName: "Test Uno", phone: "407 555 0101", email: "UNO@Example.com", language: "English", services: "Taxes / Contabilidad; notary; Unknown" },
+      { fullName: "Test Uno", phone: "407 555 0101", email: "UNO@Example.com", language: "English", services: "Impuestos (Taxes); notary; Unknown" },
       1,
     );
     assert.deepEqual(good.errors, []);

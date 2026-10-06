@@ -40,6 +40,10 @@ const COLORS: {
   { key: "commercial_finance_referral", colorName: "Red", colorHex: "#C62828", sortOrder: 15 },
   { key: "community_strategic_alliances", colorName: "Lavender", colorHex: "#9575CD", sortOrder: 16 },
   { key: "other", colorName: "Gray", colorHex: "#78909C", sortOrder: 17 },
+  // Services approved 2026-10-06 (src/lib/validation/client.ts).
+  { key: "crm_technology", colorName: "Indigo", colorHex: "#3F51B5", sortOrder: 18 },
+  { key: "corporate_events", colorName: "Raspberry", colorHex: "#AD1457", sortOrder: 19 },
+  { key: "remodeling", colorName: "Brown", colorHex: "#8D6E63", sortOrder: 20 },
 ];
 
 async function main() {

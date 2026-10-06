@@ -151,4 +151,19 @@ for (const [stored, expected] of [
   assert.equal(localizeBookingTitle(stored, translators(en)), stored);
 }
 
+// Titles stored before the 2026-10-06 service rename (old English names)
+// still read as the service, in the new Spanish name.
+for (const [old, key] of [
+  ["Tax & Accounting", "tax_prep"],
+  ["Company Registration", "company_registration"],
+  ["Notary / RON / IPEN / Loan Signing", "notary"],
+  ["IRS / EIN / ITIN Administrative", "irs_administrative"],
+] as const) {
+  assert.equal(parseBookingTitle(`Online booking — ${old}: Ana Pérez`)?.serviceType, key);
+  assert.equal(
+    localizeBookingTitle(`Confirm: Online booking — ${old}: Ana Pérez`, translators(es)),
+    `${es.AppointmentSource.confirmPrefix}${es.AppointmentSource.online_booking} — ${es.ServiceType[key]}: Ana Pérez`,
+  );
+}
+
 console.log("titles.test.ts: all title assertions passed.");

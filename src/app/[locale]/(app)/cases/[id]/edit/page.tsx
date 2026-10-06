@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { getCaseById, listClientsForSelect } from "@/lib/queries/cases";
+import { getCaseById, getRemodelingDetails, listClientsForSelect } from "@/lib/queries/cases";
+import { listAlliancesForSelect } from "@/lib/queries/alliances";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { listActiveServiceCatalogItems } from "@/lib/queries/serviceCatalog";
 import { listSelectableAcademyPrograms } from "@/lib/queries/academyPrograms";
@@ -19,7 +20,7 @@ export default async function EditCasePage({
   const { id } = await params;
   const t = await getTranslations("Cases");
 
-  const [result, clients, companies, serviceCatalogItems, academyPrograms, academyCourses] =
+  const [result, clients, companies, serviceCatalogItems, academyPrograms, academyCourses, alliances, remodeling] =
     await Promise.all([
       getCaseById(id),
       listClientsForSelect(),
@@ -27,6 +28,8 @@ export default async function EditCasePage({
       listActiveServiceCatalogItems(),
       listSelectableAcademyPrograms(),
       listSelectableAcademyCourses(),
+      listAlliancesForSelect(),
+      getRemodelingDetails(id),
     ]);
 
   if (!result) notFound();
@@ -65,6 +68,8 @@ export default async function EditCasePage({
         salesTaxDetails={result.salesTaxDetails}
         irsDetails={result.irsDetails}
         insuranceDetails={result.insuranceDetails}
+        remodelingDetails={remodeling}
+        alliances={alliances}
         apostille={result.apostille}
         clients={clients}
         companies={companies}

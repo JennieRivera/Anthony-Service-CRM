@@ -4,7 +4,7 @@ import { dataAccess } from "@/lib/export/access";
 import { notFound } from "next/navigation";
 import { Pencil, FileText, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { getCaseById } from "@/lib/queries/cases";
+import { getCaseById, getRemodelingDetails } from "@/lib/queries/cases";
 import { findActiveTemplate } from "@/lib/queries/messageTemplates";
 import { listCompaniesForSelect } from "@/lib/queries/companies";
 import { getAcademyCourseById } from "@/lib/queries/academyCourses";
@@ -85,6 +85,7 @@ export default async function CaseDetailPage({
   const result = await getCaseById(id);
   if (!result) notFound();
   const companiesForSelect = await listCompaniesForSelect();
+  const remodeling = result.case.serviceType === "remodeling" ? await getRemodelingDetails(id) : null;
 
   const {
     case: c,
@@ -1487,6 +1488,35 @@ export default async function CaseDetailPage({
           <p className="text-xs text-muted-foreground">
             {t("form.irsDisclaimer")}
           </p>
+        </div>
+      )}
+
+      {c.serviceType === "remodeling" && (
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+          <h2 className="font-heading text-lg text-foreground">{t("remodelingDetails")}</h2>
+          <p className="text-sm text-muted-foreground">{t("remodelingHint")}</p>
+          <div className="text-sm">
+            <p className="text-muted-foreground">{t("form.remodelingAlliance")}</p>
+            {remodeling?.allianceId ? (
+              <Link href={`/alliances/${remodeling.allianceId}`} className="text-primary underline">
+                {remodeling.allianceName}
+              </Link>
+            ) : (
+              <p className="text-foreground">{t("remodelingNoAlliance")}</p>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              render={
+                <Link
+                  href={`/referrals/new?clientId=${c.clientId}&caseId=${c.id}${remodeling?.allianceId ? `&allianceId=${remodeling.allianceId}` : ""}`}
+                />
+              }
+            >
+              {t("createReferralToAlliance")}
+            </Button>
+          </div>
         </div>
       )}
 

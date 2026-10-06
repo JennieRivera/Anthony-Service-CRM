@@ -51,6 +51,11 @@ export const serviceTypeEnum = pgEnum("service_type", [
   // with a subType (see insuranceComplianceTypeEnum below), same pattern
   // as irs_administrative's own caseType.
   "insurance_compliance",
+  // Services list approved 2026-10-06: CRM/technology split out of
+  // marketing, and two partnership-based services (not bookable online).
+  "crm_technology",
+  "corporate_events",
+  "remodeling",
 ]);
 
 export const clientStatusEnum = pgEnum("client_status", [
@@ -2949,6 +2954,21 @@ export const insuranceComplianceStatusEnum = pgEnum("insurance_compliance_status
   "renewed",
   "cancelled",
 ]);
+
+// Remodeling & Remodeling Partnerships — we connect the client with an
+// allied contractor (a strategic alliance); we don't do the work. Same
+// extension-table pattern as the other service details.
+export const remodelingDetails = pgTable("remodeling_details", {
+  caseId: uuid("case_id")
+    .primaryKey()
+    .references(() => cases.id, { onDelete: "cascade" }),
+  allianceId: uuid("alliance_id").references(() => strategicAlliances.id, {
+    onDelete: "set null",
+  }),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
 
 export const insuranceComplianceDetails = pgTable("insurance_compliance_details", {
   caseId: uuid("case_id")

@@ -34,6 +34,9 @@ export function ReferralForm({
   cases,
   alliances,
   defaultClientId,
+  defaultCaseId,
+  defaultAllianceId,
+  defaultCategory,
   onSubmit,
 }: {
   referral?: Referral;
@@ -42,6 +45,11 @@ export function ReferralForm({
   cases: { id: string; title: string }[];
   alliances: { id: string; organizationName: string }[];
   defaultClientId?: string;
+  // Prefilled from a case ("Create referral to the ally" on a Remodeling
+  // case) or from the Services menu (Commercial Finance Referrals).
+  defaultCaseId?: string;
+  defaultAllianceId?: string;
+  defaultCategory?: ReferralFormValues["category"];
   onSubmit: (values: ReferralFormValues) => Promise<void>;
 }) {
   const t = useTranslations("Referrals.form");
@@ -63,13 +71,13 @@ export function ReferralForm({
     resolver: zodResolver(referralFormSchema),
     defaultValues: {
       clientId: referral?.clientId ?? defaultClientId ?? "",
-      caseId: referral?.caseId ?? "",
+      caseId: referral?.caseId ?? defaultCaseId ?? "",
       referralDate:
         referral?.referralDate ?? businessDateString(),
-      category: referral?.category ?? "general",
-      allianceId: referral?.allianceId ?? "",
+      category: referral?.category ?? defaultCategory ?? "general",
+      allianceId: referral?.allianceId ?? defaultAllianceId ?? "",
       referrerClientId: referral?.referrerClientId ?? "",
-      direction: referral?.direction ?? "",
+      direction: referral?.direction ?? (defaultAllianceId ? "ams_to_other_partner" : ""),
       originatingBusiness: referral?.originatingBusiness ?? "",
       referredBy: referral?.referredBy ?? "",
       receivingParty: referral?.receivingParty ?? "",

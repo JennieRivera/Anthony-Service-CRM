@@ -477,6 +477,76 @@ const templates: Record<
     ],
     includeNotaryBlock: false,
   },
+  crm_technology: {
+    documentTitle: {
+      en: "CRM, Technology & AI Project Intake",
+      es: "Admisión de Proyecto — CRM, Tecnología e IA",
+    },
+    intro: {
+      en: "This intake sheet organizes the information needed to scope your CRM, technology, automation, or AI project.",
+      es: "Esta hoja de admisión organiza la información necesaria para definir el alcance de su proyecto de CRM, tecnología, automatización o IA.",
+    },
+    sections: [
+      {
+        heading: { en: "Project Information", es: "Información del Proyecto" },
+        fields: [
+          { en: "Project Type (CRM / Website / Automation / AI)", es: "Tipo de Proyecto (CRM / Sitio Web / Automatización / IA)" },
+          { en: "Business Goal", es: "Meta del Negocio" },
+          { en: "Current Systems", es: "Sistemas Actuales" },
+          { en: "Deliverables", es: "Entregables" },
+          { en: "Deadline", es: "Fecha Límite" },
+        ],
+      },
+    ],
+    includeNotaryBlock: false,
+  },
+  corporate_events: {
+    documentTitle: {
+      en: "Corporate Events & Culinary Partnerships Intake",
+      es: "Admisión — Eventos Corporativos y Alianzas Culinarias",
+    },
+    intro: {
+      en: "This sheet organizes the information needed to plan your corporate event with our culinary and event partners.",
+      es: "Esta hoja organiza la información necesaria para planear su evento corporativo con nuestros aliados culinarios y de eventos.",
+    },
+    sections: [
+      {
+        heading: { en: "Event Information", es: "Información del Evento" },
+        fields: [
+          { en: "Type of Event", es: "Tipo de Evento" },
+          { en: "Date and Time", es: "Fecha y Hora" },
+          { en: "Location", es: "Lugar" },
+          { en: "Number of Guests", es: "Número de Invitados" },
+          { en: "Budget", es: "Presupuesto" },
+          { en: "Partner / Caterer", es: "Aliado / Servicio de Comida" },
+        ],
+      },
+    ],
+    includeNotaryBlock: false,
+  },
+  remodeling: {
+    documentTitle: {
+      en: "Remodeling Referral Intake",
+      es: "Admisión — Referido de Remodelación",
+    },
+    intro: {
+      en: "This sheet organizes the information needed to connect you with an allied remodeling contractor. Anthony Multiservice does not perform construction or remodeling work; the contractor contracts with you directly.",
+      es: "Esta hoja organiza la información necesaria para conectarle con un contratista aliado de remodelación. Anthony Multiservice no realiza trabajos de construcción ni de remodelación; el contratista contrata directamente con usted.",
+    },
+    sections: [
+      {
+        heading: { en: "Project Information", es: "Información del Proyecto" },
+        fields: [
+          { en: "Property Address", es: "Dirección de la Propiedad" },
+          { en: "Type of Work (Kitchen / Bathroom / Roof / Other)", es: "Tipo de Trabajo (Cocina / Baño / Techo / Otro)" },
+          { en: "Desired Start Date", es: "Fecha Deseada de Inicio" },
+          { en: "Estimated Budget", es: "Presupuesto Estimado" },
+          { en: "Allied Contractor", es: "Contratista Aliado" },
+        ],
+      },
+    ],
+    includeNotaryBlock: false,
+  },
   insurance_compliance: {
     documentTitle: {
       en: "Insurance & Compliance Intake",

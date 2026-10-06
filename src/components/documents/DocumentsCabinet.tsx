@@ -22,6 +22,9 @@ import {
   ChevronRight,
   Folder,
   Download,
+  Cpu,
+  PartyPopper,
+  Hammer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -65,6 +68,9 @@ const DRAWER_ICONS: Record<Drawer, typeof Stamp> = {
   academia: GraduationCap,
   marketing: Megaphone,
   seguros: Shield,
+  tecnologia: Cpu,
+  eventos: PartyPopper,
+  remodelacion: Hammer,
   clientes: Users,
   referidos: Handshake,
   otros: FolderOpen,

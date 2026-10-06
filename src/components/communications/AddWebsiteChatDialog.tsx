@@ -30,7 +30,7 @@ import {
   type WebsiteChatSessionFormValues,
 } from "@/lib/validation/socialChannels";
 import { createWebsiteChatSessionAction } from "@/app/[locale]/(app)/communications/social-actions";
-import { serviceTypeValues } from "@/lib/validation/client";
+import { serviceTypeOptions } from "@/lib/validation/client";
 
 export function AddWebsiteChatDialog({
   clients,
@@ -177,7 +177,7 @@ export function AddWebsiteChatDialog({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">{t("noServiceInterest")}</SelectItem>
-                      {serviceTypeValues.map((s) => (
+                      {serviceTypeOptions(field.value).map((s) => (
                         <SelectItem key={s} value={s}>
                           {tService(s)}
                         </SelectItem>

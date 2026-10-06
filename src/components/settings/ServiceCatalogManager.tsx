@@ -18,7 +18,7 @@ import {
   updateServiceCatalogItemAction,
   toggleServiceCatalogItemActiveAction,
 } from "@/app/[locale]/(app)/settings/service-catalog/actions";
-import { serviceTypeValues } from "@/lib/validation/client";
+import { serviceTypeOptions, serviceTypeValues } from "@/lib/validation/client";
 import type { ServiceCatalogItemFormValues } from "@/lib/validation/serviceCatalog";
 import type { ServiceCatalogItem } from "@/lib/db/schema";
 
@@ -230,7 +230,7 @@ function ServiceCatalogFields({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {serviceTypeValues.map((type) => (
+            {serviceTypeOptions(draft.serviceType).map((type) => (
               <SelectItem key={type} value={type}>
                 {tService(type)}
               </SelectItem>

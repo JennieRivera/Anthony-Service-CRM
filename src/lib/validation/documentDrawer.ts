@@ -17,6 +17,9 @@ export const drawerValues = [
   "academia",
   "marketing",
   "seguros",
+  "tecnologia",
+  "eventos",
+  "remodelacion",
   "clientes",
   "referidos",
   "otros",
@@ -37,6 +40,9 @@ export const SERVICE_DRAWERS = [
   "academia",
   "marketing",
   "seguros",
+  "tecnologia",
+  "eventos",
+  "remodelacion",
 ] as const satisfies readonly Drawer[];
 
 export type ServiceDrawer = (typeof SERVICE_DRAWERS)[number];
@@ -59,6 +65,9 @@ export const SERVICE_TYPE_TO_DRAWER: Record<ServiceType, ServiceDrawer> = {
   academy: "academia",
   marketing: "marketing",
   insurance_compliance: "seguros",
+  crm_technology: "tecnologia",
+  corporate_events: "eventos",
+  remodeling: "remodelacion",
 };
 
 export function drawerColor(drawer: Drawer): string {
@@ -76,6 +85,9 @@ const DRAWER_COLORS: Record<Drawer, string> = {
   academia: "#9c3f6b",
   marketing: "#3c6e8a",
   seguros: "#2e7d6b",
+  tecnologia: "#3f5aa8",
+  eventos: "#a8325e",
+  remodelacion: "#8a5a2b",
   clientes: "#4a7c59",
   referidos: "#96751a",
   otros: "#7a7266",

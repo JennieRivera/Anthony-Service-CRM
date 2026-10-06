@@ -27,7 +27,7 @@ import {
   socialContentLanguageValues,
   type SocialMediaContentFormValues,
 } from "@/lib/validation/socialMedia";
-import { serviceTypeValues } from "@/lib/validation/client";
+import { serviceTypeOptions } from "@/lib/validation/client";
 import type { SocialMediaContent } from "@/lib/db/schema";
 
 export function SocialMediaContentForm({
@@ -194,7 +194,7 @@ export function SocialMediaContentForm({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">{t("generalService")}</SelectItem>
-                  {serviceTypeValues.map((value) => (
+                  {serviceTypeOptions(field.value).map((value) => (
                     <SelectItem key={value} value={value}>
                       {tService(value)}
                     </SelectItem>

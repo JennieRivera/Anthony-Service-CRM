@@ -3,7 +3,7 @@ import { clientCommunicationPreferences, clientConsentEvents, clients, tasks } f
 import { businessDateString } from "@/lib/dates";
 import { formatUsPhone, usPhoneDigits } from "@/lib/validation/onlineBooking";
 import { portalProfileSchema, type BestTimeToCall } from "@/lib/validation/portalProfile";
-import { serviceTypeValues } from "@/lib/validation/client";
+import { activeServiceTypeValues } from "@/lib/validation/client";
 import {
   PROFILE_BEST_TIME_LABELS_EN,
   PROFILE_FIELD_LABELS_EN,
@@ -193,11 +193,9 @@ export async function setPortalPhoto(db: PortalDb, clientId: string, blobUrl: st
 
 // ── Services that interest me ─────────────────────────────────────────
 
-// Every CRM service type except the legacy "online_notary" (folded into
-// "notary"), in the CRM's own order.
-export const PORTAL_SERVICE_TYPES: readonly ServiceType[] = serviceTypeValues.filter(
-  (s) => s !== "online_notary",
-);
+// Every current CRM service (the legacy "online_notary" is folded into
+// "notary"), in the CRM's own order — the same single list as everywhere.
+export const PORTAL_SERVICE_TYPES: readonly ServiceType[] = activeServiceTypeValues;
 
 export async function getPortalInterestedServices(db: PortalDb, clientId: string): Promise<ServiceType[]> {
   const [row] = await db

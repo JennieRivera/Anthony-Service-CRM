@@ -1,6 +1,8 @@
 import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
+  remodelingDetails,
+  strategicAlliances,
   cases,
   clients,
   notaryLogEntries,
@@ -243,4 +245,18 @@ export async function getCaseById(id: string) {
     documents: caseDocuments,
     statusHistory,
   };
+}
+
+// Remodeling cases: the allied contractor picked on the case (if any).
+export async function getRemodelingDetails(caseId: string) {
+  const [row] = await getDb()
+    .select({
+      allianceId: remodelingDetails.allianceId,
+      allianceName: strategicAlliances.organizationName,
+    })
+    .from(remodelingDetails)
+    .leftJoin(strategicAlliances, eq(remodelingDetails.allianceId, strategicAlliances.id))
+    .where(eq(remodelingDetails.caseId, caseId))
+    .limit(1);
+  return row ?? null;
 }

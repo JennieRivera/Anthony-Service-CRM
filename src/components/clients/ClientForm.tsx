@@ -27,7 +27,7 @@ import {
 import {
   clientFormSchema,
   clientStatusValues,
-  serviceTypeValues,
+  serviceTypeOptions,
   type ClientFormValues,
 } from "@/lib/validation/client";
 import { selectableDocumentCategoryValues } from "@/lib/validation/documentCategory";
@@ -346,7 +346,7 @@ export function ClientForm({
           name="interestedServices"
           render={({ field }) => (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {serviceTypeValues.map((service) => {
+              {serviceTypeOptions().map((service) => {
                 const checked = field.value.includes(service);
                 return (
                   <label

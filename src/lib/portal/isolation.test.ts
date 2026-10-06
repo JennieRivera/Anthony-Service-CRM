@@ -18,6 +18,7 @@ import { drizzle } from "drizzle-orm/pglite";
 import { eq } from "drizzle-orm";
 import * as schema from "../db/schema";
 import type { PortalDb } from "./db";
+import { SERVICE_LABELS_EN } from "@/lib/booking/titles";
 
 process.env.AUTH_SECRET ??= "isolation-test-secret";
 
@@ -331,7 +332,7 @@ async function main() {
     const [task] = await tasksOf("service_interest");
     assert.equal(task.clientId, a.id);
     assert.equal(task.caseId, null);
-    assert.ok(task.title.includes("Company Registration") && task.title.includes("Necesito abrir una LLC"));
+    assert.ok(task.title.includes(SERVICE_LABELS_EN.company_registration) && task.title.includes("Necesito abrir una LLC"));
   });
   await ok("services: unknown, legacy or empty requests are rejected", async () => {
     for (const services of [["not_a_service"], ["online_notary"], "tax_prep", [{ x: 1 }]]) {

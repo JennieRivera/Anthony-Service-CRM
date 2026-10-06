@@ -14,20 +14,37 @@ import { NOTICE_LABELS_EN } from "@/lib/notifications/config";
 // messages/en.json → ServiceType (enforced by titles.test.ts), so the
 // title reads exactly like the rest of the English UI.
 export const SERVICE_LABELS_EN: Record<ServiceType, string> = {
-  online_notary: "Online Notary",
+  company_registration: "Business Formation & Corporate Services",
+  tax_prep: "Tax Preparation",
+  bookkeeping: "Bookkeeping",
+  sales_tax: "Sales Tax Registration",
+  irs_administrative: "IRS / EIN / ITIN",
+  notary: "Notary Public (Signatures, RON, IPEN, Loan Signing)",
   document_prep: "Document Preparation",
+  immigration: "Immigration Administrative Services",
+  leadership: "Business Consulting",
+  credit_financing: "Credit & Financial Readiness",
+  crm_technology: "CRM, Technology & AI",
+  marketing: "Marketing & Branding",
+  insurance_compliance: "Insurance & Compliance",
+  academy: "Academy / Training",
+  corporate_events: "Corporate Events & Culinary Partnerships",
+  remodeling: "Remodeling & Remodeling Partnerships",
+  online_notary: "Online Notary (legacy)",
+};
+
+// English names used in titles stored BEFORE the 2026-10-06 rename. Still
+// recognized when reading a title, so existing appointments and tasks keep
+// showing in Spanish; new titles use SERVICE_LABELS_EN above.
+const LEGACY_SERVICE_LABELS_EN: Partial<Record<ServiceType, string>> = {
+  online_notary: "Online Notary",
   tax_prep: "Tax & Accounting",
   company_registration: "Company Registration",
   credit_financing: "Credit & Financing",
-  leadership: "Business Consulting",
   notary: "Notary / RON / IPEN / Loan Signing",
   bookkeeping: "Bookkeeping / Accounting Support",
-  immigration: "Immigration Administrative Services",
-  academy: "Academy / Training",
   marketing: "Marketing / Branding / AI / Automation",
-  sales_tax: "Sales Tax Registration",
   irs_administrative: "IRS / EIN / ITIN Administrative",
-  insurance_compliance: "Insurance & Compliance",
 };
 
 const PREFIX = "Online booking — ";
@@ -43,7 +60,9 @@ export function bookingLanguageNote(language: "en" | "es"): string {
 }
 
 const LABEL_TO_SERVICE = new Map(
-  Object.entries(SERVICE_LABELS_EN).map(([key, label]) => [label, key as ServiceType]),
+  [...Object.entries(LEGACY_SERVICE_LABELS_EN), ...Object.entries(SERVICE_LABELS_EN)].map(
+    ([key, label]) => [label as string, key as ServiceType],
+  ),
 );
 
 const LANGUAGE_NOTE = / — Client requested (English|Spanish) for this booking\.$/;

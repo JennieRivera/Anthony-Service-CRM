@@ -62,12 +62,13 @@ import {
   irsItinStatusValues,
   irsApplicationStatusValues,
   insuranceComplianceServiceTypes,
+  remodelingServiceTypes,
   insuranceComplianceTypeValues,
   insuranceComplianceStatusValues,
   documentPrepCaseStatusValues,
   type CaseFormValues,
 } from "@/lib/validation/case";
-import { serviceTypeValues } from "@/lib/validation/client";
+import { LEGACY_SERVICE_TYPES, serviceTypeValues } from "@/lib/validation/client";
 import { paymentStatusValues } from "@/lib/validation/payment";
 import type {
   Case,
@@ -101,8 +102,10 @@ export function CaseForm({
   salesTaxDetails,
   irsDetails,
   insuranceDetails,
+  remodelingDetails,
   apostille,
   clients,
+  alliances = [],
   companies,
   serviceCatalogItems = [],
   academyPrograms = [],
@@ -124,7 +127,10 @@ export function CaseForm({
   salesTaxDetails?: SalesTaxCaseDetails | null;
   irsDetails?: IrsCaseDetails | null;
   insuranceDetails?: InsuranceComplianceDetails | null;
+  remodelingDetails?: { allianceId: string | null } | null;
   apostille?: ApostilleDetails | null;
+  // Remodeling: allied contractors to pick from (Alliances).
+  alliances?: { id: string; organizationName: string }[];
   clients: { id: string; fullName: string }[];
   companies: { id: string; legalBusinessName: string }[];
   serviceCatalogItems?: ServiceCatalogItem[];
@@ -188,7 +194,8 @@ export function CaseForm({
     resolver: zodResolver(caseFormSchema),
     defaultValues: {
       clientId: caseRecord?.clientId ?? defaultClientId ?? "",
-      serviceType: caseRecord?.serviceType ?? defaultServiceType ?? "online_notary",
+      // No default service: staff must pick one ("Choose a service").
+      serviceType: caseRecord?.serviceType ?? defaultServiceType ?? ("" as CaseFormValues["serviceType"]),
       status: caseRecord?.status ?? "new",
       title: caseRecord?.title ?? "",
       dueDate: caseRecord?.dueDate ?? "",
@@ -382,6 +389,7 @@ export function CaseForm({
       insuranceStatus: insuranceDetails?.status ?? "not_started",
       insuranceLastRenewedDate: insuranceDetails?.lastRenewedDate ?? "",
       insuranceComplianceNotes: insuranceDetails?.complianceNotes ?? "",
+      remodelingAllianceId: remodelingDetails?.allianceId ?? "",
     },
   });
 
@@ -402,6 +410,12 @@ export function CaseForm({
   const isIrs = irsServiceTypes.includes(serviceType);
   const irsCaseType = watch("irsCaseType");
   const isInsurance = insuranceComplianceServiceTypes.includes(serviceType);
+  const isRemodeling = remodelingServiceTypes.includes(serviceType);
+  // New cases only offer current services; an existing case on a legacy
+  // type (e.g. Online Notary) keeps showing it, marked "(legacy)".
+  const serviceOptions = (serviceTypeValues as readonly string[]).filter(
+    (s) => !LEGACY_SERVICE_TYPES.includes(s as (typeof serviceTypeValues)[number]) || s === caseRecord?.serviceType,
+  ) as (typeof serviceTypeValues)[number][];
   // Apostille / authentication fields are an optional add-on for Document Prep cases.
   const isApostille = serviceType === "document_prep";
 
@@ -461,12 +475,12 @@ export function CaseForm({
             control={control}
             name="serviceType"
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue />
+              <Select value={field.value || null} onValueChange={(v) => field.onChange(v ?? "")}>
+                <SelectTrigger aria-invalid={!!errors.serviceType}>
+                  <SelectValue placeholder={t("chooseService")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {serviceTypeValues.map((service) => (
+                  {serviceOptions.map((service) => (
                     <SelectItem key={service} value={service}>
                       {tService(service)}
                     </SelectItem>
@@ -475,6 +489,9 @@ export function CaseForm({
               </Select>
             )}
           />
+          {errors.serviceType && (
+            <p className="text-sm text-destructive">{t("chooseServiceError")}</p>
+          )}
         </div>
 
         {!isNotary &&
@@ -2955,6 +2972,38 @@ export function CaseForm({
               id="insuranceComplianceNotes"
               rows={3}
               {...register("insuranceComplianceNotes")}
+            />
+          </div>
+        </div>
+      )}
+
+      {isRemodeling && (
+        <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">
+          <h3 className="font-heading text-base text-foreground">{tCases("remodelingDetails")}</h3>
+          <p className="text-sm text-muted-foreground">{tCases("remodelingHint")}</p>
+          <div className="flex flex-col gap-1.5 sm:max-w-md">
+            <Label>{t("remodelingAlliance")}</Label>
+            <Controller
+              control={control}
+              name="remodelingAllianceId"
+              render={({ field }) => (
+                <Select
+                  value={field.value || "none"}
+                  onValueChange={(v) => field.onChange(!v || v === "none" ? "" : v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t("remodelingAllianceNone")}</SelectItem>
+                    {alliances.map((a) => (
+                      <SelectItem key={a.id} value={a.id}>
+                        {a.organizationName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             />
           </div>
         </div>

@@ -31,6 +31,7 @@ export function NavDrawer({
   collapsedTrigger?: boolean;
 }) {
   const t = useTranslations("Nav");
+  const tService = useTranslations("ServiceType");
   const [open, setOpen] = useState(false);
 
   return (
@@ -85,7 +86,7 @@ export function NavDrawer({
                 const LinkIcon = link.icon;
                 return (
                   <Link
-                    key={`${link.href}-${link.navLabelKey ?? link.labelKey}`}
+                    key={`${link.href}-${link.serviceType ?? link.navLabelKey ?? link.labelKey}`}
                     href={link.href}
                     // Deferred: closing the Sheet synchronously in the same
                     // click that triggers the Link's navigation unmounts the
@@ -98,7 +99,9 @@ export function NavDrawer({
                     className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-[var(--drawer-foreground)] transition-colors hover:bg-[var(--drawer-accent)] hover:text-[var(--drawer-accent-foreground)]"
                   >
                     <LinkIcon className="h-4 w-4 shrink-0 text-[var(--drawer-primary)]" />
-                    <span>{t(link.navLabelKey ?? link.labelKey ?? "")}</span>
+                    <span>
+                      {link.serviceType ? tService(link.serviceType) : t(link.navLabelKey ?? link.labelKey ?? "")}
+                    </span>
                   </Link>
                 );
               })}
