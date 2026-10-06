@@ -25,6 +25,8 @@ import { FacebookThreadsSection } from "@/components/communications/FacebookThre
 import { InstagramThreadsSection } from "@/components/communications/InstagramThreadsSection";
 import { WebsiteChatSection } from "@/components/communications/WebsiteChatSection";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
+import { ExportMenu } from "@/components/export/ExportMenu";
+import { dataAccess } from "@/lib/export/access";
 
 // Channel tabs, in display order. "manual" = a social network with no API
 // connection yet (logged by hand); "automatic" = also receives the
@@ -50,6 +52,7 @@ export default async function CommunicationsPage({
   const tSocial = await getTranslations("SocialChannels");
   const tChannel = await getTranslations("ConversationChannel");
   const configured = isDatabaseConfigured();
+  const { canExport } = await dataAccess();
   const { tab, channel: _channel, ...filters } = await searchParams;
   void _channel;
 
@@ -88,11 +91,15 @@ export default async function CommunicationsPage({
       <CommunicationTable communications={rows} />
     );
 
-  const registerButton = (channel?: Channel) => (
-    <Button render={<Link href={channel ? `/communications/new?channel=${channel}` : "/communications/new"} />}>
-      <Plus className="h-4 w-4" />
-      {channel ? t("register") : t("newCommunication")}
-    </Button>
+  // Export = the rows of the open tab, with the filters above applied.
+  const registerButton = (channel?: Channel, rows: typeof communications = communications) => (
+    <div className="flex flex-wrap gap-2">
+      {canExport && <ExportMenu target={{ kind: "list", list: "communications", ids: rows.map((r) => r.id) }} />}
+      <Button render={<Link href={channel ? `/communications/new?channel=${channel}` : "/communications/new"} />}>
+        <Plus className="h-4 w-4" />
+        {channel ? t("register") : t("newCommunication")}
+      </Button>
+    </div>
   );
 
   const tabs: CommunicationsTab[] = [
@@ -121,7 +128,7 @@ export default async function CommunicationsPage({
               <p className="text-sm text-muted-foreground">
                 {note === "manual" ? t("manualForNow") : note === "automatic" ? t("automaticHere") : ""}
               </p>
-              {registerButton(channel)}
+              {registerButton(channel, rows)}
             </div>
             {list(rows)}
           </>

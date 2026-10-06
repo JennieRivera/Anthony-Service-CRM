@@ -1,4 +1,6 @@
 import { formatDate, formatDateTime } from "@/lib/dates";
+import { ExportMenu } from "@/components/export/ExportMenu";
+import { dataAccess } from "@/lib/export/access";
 import { notFound } from "next/navigation";
 import { Pencil, FileText, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -40,6 +42,7 @@ export default async function CaseDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const { canExport } = await dataAccess();
   const t = await getTranslations("Cases");
   const tService = await getTranslations("ServiceType");
   const tActType = await getTranslations("NotarialActType");
@@ -198,7 +201,8 @@ export default async function CaseDetailPage({
         >
           &larr; {c.serviceType === "academy" ? tAcademy("backToAcademy") : t("backToCases")}
         </Link>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {canExport && <ExportMenu target={{ kind: "record", type: "case", id }} />}
           <Button
             variant="outline"
             render={<a href={`/api/cases/${id}/template/pdf`} />}

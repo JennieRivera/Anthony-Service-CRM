@@ -7,10 +7,13 @@ import { Button } from "@/components/ui/button";
 import { ClientTable } from "@/components/clients/ClientTable";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 import type { Client } from "@/lib/db/schema";
+import { ImportClientsMenu } from "@/components/clients/ImportClientsMenu";
+import { dataAccess } from "@/lib/export/access";
 
 export default async function ClientsPage() {
   const t = await getTranslations("Clients");
   const configured = isDatabaseConfigured();
+  const { canExport, canImport } = await dataAccess();
 
   let clients: Client[] = [];
   let error: string | null = null;
@@ -29,10 +32,13 @@ export default async function ClientsPage() {
         <h1 className="font-heading text-2xl text-foreground">
           {t("title")}
         </h1>
-        <Button render={<Link href="/clients/new" />}>
-          <Plus className="h-4 w-4" />
-          {t("newClient")}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {configured && canImport && <ImportClientsMenu />}
+          <Button render={<Link href="/clients/new" />}>
+            <Plus className="h-4 w-4" />
+            {t("newClient")}
+          </Button>
+        </div>
       </div>
 
       {!configured && <DatabaseNotConfigured />}
@@ -43,7 +49,7 @@ export default async function ClientsPage() {
         </p>
       )}
 
-      {configured && !error && <ClientTable clients={clients} />}
+      {configured && !error && <ClientTable clients={clients} canExport={canExport} />}
     </div>
   );
 }

@@ -6,10 +6,13 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { PaymentTable } from "@/components/payments/PaymentTable";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
+import { ExportMenu } from "@/components/export/ExportMenu";
+import { dataAccess } from "@/lib/export/access";
 
 export default async function PaymentsPage() {
   const t = await getTranslations("Payments");
   const configured = isDatabaseConfigured();
+  const { canExport } = await dataAccess();
 
   let payments: Awaited<ReturnType<typeof listPaymentsWithInvoice>> = [];
   let error: string | null = null;
@@ -28,10 +31,15 @@ export default async function PaymentsPage() {
         <h1 className="font-heading text-2xl text-foreground">
           {t("title")}
         </h1>
-        <Button render={<Link href="/payments/new" />}>
-          <Plus className="h-4 w-4" />
-          {t("newPayment")}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {configured && canExport && (
+            <ExportMenu target={{ kind: "list", list: "payments", ids: payments.map((row) => row.id) }} />
+          )}
+          <Button render={<Link href="/payments/new" />}>
+            <Plus className="h-4 w-4" />
+            {t("newPayment")}
+          </Button>
+        </div>
       </div>
 
       {!configured && <DatabaseNotConfigured />}

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CompanyTable } from "@/components/companies/CompanyTable";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
+import { ExportMenu } from "@/components/export/ExportMenu";
+import { dataAccess } from "@/lib/export/access";
 
 export default async function CompaniesPage({
   searchParams,
@@ -15,6 +17,7 @@ export default async function CompaniesPage({
 }) {
   const t = await getTranslations("Companies");
   const configured = isDatabaseConfigured();
+  const { canExport } = await dataAccess();
   const { state } = await searchParams;
 
   let companies: Awaited<ReturnType<typeof listCompanies>> = [];
@@ -32,10 +35,15 @@ export default async function CompaniesPage({
     <div className="flex w-full flex-col gap-6 px-8 py-10">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl text-foreground">{t("title")}</h1>
-        <Button render={<Link href="/companies/new" />}>
-          <Plus className="h-4 w-4" />
-          {t("newCompany")}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {configured && canExport && (
+            <ExportMenu target={{ kind: "list", list: "companies", ids: companies.map((row) => row.id) }} />
+          )}
+          <Button render={<Link href="/companies/new" />}>
+            <Plus className="h-4 w-4" />
+            {t("newCompany")}
+          </Button>
+        </div>
       </div>
 
       {state && (

@@ -4,10 +4,12 @@ import { listTaskBoard } from "@/lib/queries/taskBoard";
 import { businessDateString } from "@/lib/dates";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 import { TaskBoard } from "@/components/tasks/TaskBoard";
+import { dataAccess } from "@/lib/export/access";
 
 export default async function TasksPage() {
   const t = await getTranslations("Tasks");
   const configured = isDatabaseConfigured();
+  const { canExport } = await dataAccess();
 
   let openTasks: Awaited<ReturnType<typeof listTaskBoard>> = [];
   let error: string | null = null;
@@ -43,7 +45,7 @@ export default async function TasksPage() {
               {t("empty")}
             </p>
           ) : (
-            <TaskBoard tasks={openTasks} today={businessDateString()} />
+            <TaskBoard tasks={openTasks} today={businessDateString()} canExport={canExport} />
           )}
         </>
       )}

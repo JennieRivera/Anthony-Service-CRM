@@ -1,4 +1,6 @@
 import { formatDate, formatTime } from "@/lib/dates";
+import { ExportMenu } from "@/components/export/ExportMenu";
+import { dataAccess } from "@/lib/export/access";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -24,6 +26,7 @@ export default async function AppointmentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const { canExport } = await dataAccess();
   const t = await getTranslations("Appointments");
   const td = await getTranslations("Appointments.detail");
   const tService = await getTranslations("ServiceType");
@@ -45,10 +48,13 @@ export default async function AppointmentDetailPage({
         <Link href="/appointments" className="text-sm text-muted-foreground underline">
           &larr; {t("backToAppointments")}
         </Link>
-        <Button variant="outline" render={<Link href={`/appointments/${id}/edit`} />}>
-          <Pencil className="h-4 w-4" />
-          {t("editAppointment")}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {canExport && <ExportMenu target={{ kind: "record", type: "appointment", id }} />}
+          <Button variant="outline" render={<Link href={`/appointments/${id}/edit`} />}>
+            <Pencil className="h-4 w-4" />
+            {t("editAppointment")}
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">

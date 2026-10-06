@@ -9,6 +9,8 @@ import { listServiceColorSettings, getServiceColorMap } from "@/lib/queries/serv
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
+import { ExportMenu } from "@/components/export/ExportMenu";
+import { dataAccess } from "@/lib/export/access";
 import { AppointmentCalendar } from "@/components/appointments/AppointmentCalendar";
 import { ServiceColorLegend } from "@/components/appointments/ServiceColorLegend";
 import { AppointmentFilters } from "@/components/appointments/AppointmentFilters";
@@ -20,6 +22,7 @@ export default async function AppointmentsPage({
 }) {
   const t = await getTranslations("Appointments");
   const configured = isDatabaseConfigured();
+  const { canExport } = await dataAccess();
   const filters = await searchParams;
 
   let appointments: Awaited<ReturnType<typeof listAppointmentsWithClient>> = [];
@@ -45,10 +48,15 @@ export default async function AppointmentsPage({
         <h1 className="font-heading text-2xl text-foreground">
           {t("title")}
         </h1>
-        <Button render={<Link href="/appointments/new" />}>
-          <Plus className="h-4 w-4" />
-          {t("newAppointment")}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {configured && canExport && (
+            <ExportMenu target={{ kind: "list", list: "appointments", ids: appointments.map((row) => row.id) }} />
+          )}
+          <Button render={<Link href="/appointments/new" />}>
+            <Plus className="h-4 w-4" />
+            {t("newAppointment")}
+          </Button>
+        </div>
       </div>
 
       {!configured && <DatabaseNotConfigured />}

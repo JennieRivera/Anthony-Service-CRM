@@ -167,7 +167,11 @@ export type AccessArea =
   //     nothing about editing plans, benefits, or an alliance's
   //     membership status/terms.
   | "b2b_membership"
-  | "b2b_membership_billing";
+  | "b2b_membership_billing"
+  // Export (CSV/PDF/Word) and import (clients CSV). Bulk data leaving or
+  // entering the CRM: owner-only by default — see EXPLICIT_ONLY_AREAS.
+  | "data_export"
+  | "data_import";
 
 // "*" = every area, used only by the two roles with no narrower business
 // meaning. Every other role is an explicit array — "default deny when a
@@ -253,11 +257,19 @@ export const ROLE_PERMISSIONS: Record<Role, AccessArea[] | "*"> = {
 // exactly super_admin and admin, explicitly, regardless of what any other
 // role's wildcard would otherwise imply. manager keeps every other "*"
 // permission unchanged — this is the one named exception, not a redesign.
+// Export/import are never implied by manager's "*" wildcard: only
+// super_admin/admin have them, plus any role the owner deliberately lists
+// them for in ROLE_PERMISSIONS above.
+const EXPLICIT_ONLY_AREAS: AccessArea[] = ["data_export", "data_import"];
+
 export function canAccessArea(role: Role, area: AccessArea): boolean {
   if (area === "user_role_administration") {
     return role === "super_admin" || role === "admin";
   }
   const allowed = ROLE_PERMISSIONS[role];
+  if (EXPLICIT_ONLY_AREAS.includes(area)) {
+    return role === "super_admin" || role === "admin" || (allowed !== "*" && allowed.includes(area));
+  }
   return allowed === "*" || allowed.includes(area);
 }
 

@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { ExportMenu } from "@/components/export/ExportMenu";
+import { dataAccess } from "@/lib/export/access";
 import { Pencil, ShieldAlert } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getClientById } from "@/lib/queries/clients";
@@ -24,6 +26,7 @@ export default async function ClientProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const { canExport } = await dataAccess();
   const t = await getTranslations("Clients");
   const tAiEscalations = await getTranslations("AiEscalations");
 
@@ -70,6 +73,7 @@ export default async function ClientProfilePage({
           &larr; {t("backToClients")}
         </Link>
         <div className="flex flex-wrap gap-2">
+          {canExport && <ExportMenu target={{ kind: "record", type: "client", id }} />}
           <Button
             variant="outline"
             render={<Link href={`/ai-escalations/new?clientId=${id}`} />}

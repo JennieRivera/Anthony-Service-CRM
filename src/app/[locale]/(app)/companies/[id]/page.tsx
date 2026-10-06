@@ -1,4 +1,6 @@
 import { formatDate } from "@/lib/dates";
+import { ExportMenu } from "@/components/export/ExportMenu";
+import { dataAccess } from "@/lib/export/access";
 import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -28,6 +30,7 @@ export default async function CompanyDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const { canExport } = await dataAccess();
   const t = await getTranslations("Companies");
   const tEntityType = await getTranslations("CompanyEntityType");
   const tEinStatus = await getTranslations("CompanyEinStatus");
@@ -198,10 +201,13 @@ export default async function CompanyDetailPage({
         <Link href="/companies" className="text-sm text-muted-foreground underline">
           &larr; {t("backToCompanies")}
         </Link>
-        <Button render={<Link href={`/companies/${id}/edit`} />}>
-          <Pencil className="h-4 w-4" />
-          {t("editCompany")}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {canExport && <ExportMenu target={{ kind: "record", type: "company", id }} />}
+          <Button render={<Link href={`/companies/${id}/edit`} />}>
+            <Pencil className="h-4 w-4" />
+            {t("editCompany")}
+          </Button>
+        </div>
       </div>
 
       <CompanyProfileTabs

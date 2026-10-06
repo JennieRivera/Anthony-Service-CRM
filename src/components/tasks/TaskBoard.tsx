@@ -43,6 +43,7 @@ import { formatDate, formatDateTime } from "@/lib/dates";
 import { useBookingTitle } from "@/components/booking/useBookingTitle";
 import { viewHref } from "@/components/documents/downloadHref";
 import type { TaskBoardRow } from "@/lib/queries/taskBoard";
+import { ExportMenu } from "@/components/export/ExportMenu";
 import {
   addTaskNoteAction,
   markTaskDoneAction,
@@ -120,7 +121,15 @@ function DirectButton({ action, size = "sm" }: { action: DirectAction; size?: "s
   );
 }
 
-export function TaskBoard({ tasks, today }: { tasks: TaskBoardRow[]; today: string }) {
+export function TaskBoard({
+  tasks,
+  today,
+  canExport = false,
+}: {
+  tasks: TaskBoardRow[];
+  today: string;
+  canExport?: boolean;
+}) {
   const t = useTranslations("Tasks");
   const tType = useTranslations("TaskType");
   const title = useBookingTitle();
@@ -212,6 +221,11 @@ export function TaskBoard({ tasks, today }: { tasks: TaskBoardRow[]; today: stri
           </Select>
         </div>
         <p className="pb-2 text-sm text-muted-foreground">{t("showing", { shown: visible.length, total: tasks.length })}</p>
+        {canExport && (
+          <div className="ml-auto">
+            <ExportMenu target={{ kind: "list", list: "tasks", ids: visible.map((task) => task.id) }} />
+          </div>
+        )}
       </div>
 
       {visible.length === 0 ? (

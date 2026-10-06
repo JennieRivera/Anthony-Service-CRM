@@ -26,10 +26,11 @@ import { Badge } from "@/components/ui/badge";
 import { ClientStatusBadge } from "./StatusBadge";
 import type { Client } from "@/lib/db/schema";
 import { clientStatusValues } from "@/lib/validation/client";
+import { ExportMenu } from "@/components/export/ExportMenu";
 
 type SortKey = "name" | "added";
 
-export function ClientTable({ clients }: { clients: Client[] }) {
+export function ClientTable({ clients, canExport = false }: { clients: Client[]; canExport?: boolean }) {
   const t = useTranslations("Clients");
   const tStatus = useTranslations("ClientStatus");
   const tService = useTranslations("ServiceType");
@@ -110,6 +111,11 @@ export function ClientTable({ clients }: { clients: Client[] }) {
             ))}
           </SelectContent>
         </Select>
+        {canExport && (
+          <div className="sm:ml-auto">
+            <ExportMenu target={{ kind: "list", list: "clients", ids: filtered.map((c) => c.id) }} />
+          </div>
+        )}
       </div>
 
       {filtered.length === 0 ? (

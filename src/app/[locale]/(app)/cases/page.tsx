@@ -5,12 +5,15 @@ import { listCasesWithClient } from "@/lib/queries/cases";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
+import { ExportMenu } from "@/components/export/ExportMenu";
+import { dataAccess } from "@/lib/export/access";
 import { CasesView } from "@/components/cases/CasesView";
 import type { CaseCardData } from "@/components/cases/CaseKanbanBoard";
 
 export default async function CasesPage() {
   const t = await getTranslations("Cases");
   const configured = isDatabaseConfigured();
+  const { canExport } = await dataAccess();
 
   let cases: CaseCardData[] = [];
   let error: string | null = null;
@@ -39,10 +42,15 @@ export default async function CasesPage() {
         <h1 className="font-heading text-2xl text-foreground">
           {t("title")}
         </h1>
-        <Button render={<Link href="/cases/new" />}>
-          <Plus className="h-4 w-4" />
-          {t("newCase")}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {configured && canExport && (
+            <ExportMenu target={{ kind: "list", list: "cases", ids: cases.map((row) => row.id) }} />
+          )}
+          <Button render={<Link href="/cases/new" />}>
+            <Plus className="h-4 w-4" />
+            {t("newCase")}
+          </Button>
+        </div>
       </div>
 
       {!configured && <DatabaseNotConfigured />}
