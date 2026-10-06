@@ -435,7 +435,7 @@
     "deleteConfirmTitle": "Delete this client?",
     "deleteConfirmDescription": "This permanently removes the client along with their cases, appointments, and documents. This can't be undone.",
     "deleteConfirmDismiss": "Never mind",
-    "deleteBlockedByBilling": "Can't delete this client — they still have invoices or payments on file. Remove those first.",
+    "deleteBlockedByBilling": "This client can't be deleted: they have invoices or payments on record. That financial history is kept.",
     "tabOverview": "Overview",
     "tabTimeline": "Timeline",
     "tabConversations": "Conversations",
@@ -495,7 +495,19 @@
       "evening": "Evening"
     },
     "profilePhoto": "Profile photo",
-    "addedByAlliance": "Added by {name}"
+    "addedByAlliance": "Added by {name}",
+    "deleteBlockedByCompensation": "This client can't be deleted: one of their referrals already has a compensation record. That financial history is kept.",
+    "deleteBlockedLinked": "This client can't be deleted: they still have linked records. Try again or let the administrator know.",
+    "deleteImpact": {
+      "intro": "This permanently deletes the client.",
+      "alsoDeleted": "Also deleted: {items}.",
+      "cases": "{count, plural, one {1 case} other {# cases}}",
+      "appointments": "{count, plural, one {1 appointment} other {# appointments}}",
+      "documents": "{count, plural, one {1 document} other {# documents}}",
+      "referrals": "{count, plural, one {1 referral} other {# referrals}}",
+      "tasks": "{count, plural, one {1 open task} other {# open tasks}}",
+      "noUndo": "This can't be undone."
+    }
   },
   "Cases": {
     "title": "Cases",
@@ -3094,6 +3106,21 @@
       "save": "Save Contact",
       "saving": "Saving...",
       "empty": "No contacts yet. Add the first person at this alliance."
+    },
+    "delete": {
+      "button": "Delete",
+      "deleting": "Deleting...",
+      "cancel": "No, thanks",
+      "title": "Delete this alliance?",
+      "deleted": "This deletes the alliance with its portal access and sessions, its partner profile ({photos, plural, =0 {no photos} one {1 photo} other {# photos}}), {documents, plural, =0 {no documents} one {1 alliance document} other {# alliance documents}}, contacts, network, memberships and tasks.",
+      "keptClients": "{count, plural, one {1 client \"Added by\" this alliance} other {# clients \"Added by\" this alliance}}",
+      "keptReferrals": "{count, plural, one {1 referral} other {# referrals}} (as history, without the alliance)",
+      "kept": "Kept: {items}.",
+      "archiveHint": "If this is a real ally, archive it instead: set the status to Inactive and revoke portal access.",
+      "noUndo": "This can't be undone.",
+      "blockedBilling": "This alliance can't be deleted: it has memberships linked to invoices. That financial history is kept; archive it instead.",
+      "blockedLinked": "This alliance can't be deleted: it still has linked records. Archive it instead.",
+      "keptConsents": "the record of terms acceptance (legal history)"
     }
   },
   "AllianceDocumentType": {
@@ -4725,7 +4752,8 @@
       "profile": "My profile",
       "documents": "Documents",
       "marketing": "Marketing",
-      "referrals": "Referrals"
+      "referrals": "Referrals",
+      "more": "More"
     },
     "access": {
       "title": "Your partner portal",

@@ -55,6 +55,9 @@ export default async function PartnerLayout({
         floridaNotaryDisclosure={texts.florida_notary_disclosure}
         questionsLabel={t("questions", { phone: businessInfo.phone })}
       />
+      {/* Room for the phone bottom navigation (PartnerHeader), so it never
+          covers the end of the footer. */}
+      <div className="h-[calc(3.5rem+env(safe-area-inset-bottom))] sm:hidden" aria-hidden />
     </>
   );
 }

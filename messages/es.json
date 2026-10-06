@@ -435,7 +435,7 @@
     "deleteConfirmTitle": "¿Eliminar este cliente?",
     "deleteConfirmDescription": "Esto elimina permanentemente al cliente junto con sus casos, citas y documentos. No se puede deshacer.",
     "deleteConfirmDismiss": "No, gracias",
-    "deleteBlockedByBilling": "No se puede eliminar este cliente — todavía tiene facturas o pagos registrados. Elimínalos primero.",
+    "deleteBlockedByBilling": "No se puede eliminar este cliente: tiene facturas o pagos registrados. Ese historial financiero se conserva.",
     "tabOverview": "Resumen",
     "tabTimeline": "Cronología",
     "tabConversations": "Conversaciones",
@@ -495,7 +495,19 @@
       "evening": "Noche"
     },
     "profilePhoto": "Foto de perfil",
-    "addedByAlliance": "Agregado por {name}"
+    "addedByAlliance": "Agregado por {name}",
+    "deleteBlockedByCompensation": "No se puede eliminar este cliente: uno de sus referidos ya tiene una comisión registrada. Ese historial financiero se conserva.",
+    "deleteBlockedLinked": "No se puede eliminar este cliente: todavía tiene registros vinculados. Inténtalo de nuevo o avísale al administrador.",
+    "deleteImpact": {
+      "intro": "Esto elimina permanentemente al cliente.",
+      "alsoDeleted": "También se eliminan: {items}.",
+      "cases": "{count, plural, one {1 caso} other {# casos}}",
+      "appointments": "{count, plural, one {1 cita} other {# citas}}",
+      "documents": "{count, plural, one {1 documento} other {# documentos}}",
+      "referrals": "{count, plural, one {1 referido} other {# referidos}}",
+      "tasks": "{count, plural, one {1 tarea abierta} other {# tareas abiertas}}",
+      "noUndo": "No se puede deshacer."
+    }
   },
   "Cases": {
     "title": "Casos",
@@ -3094,6 +3106,21 @@
       "save": "Guardar Contacto",
       "saving": "Guardando...",
       "empty": "Aún no hay contactos. Agrega la primera persona de esta alianza."
+    },
+    "delete": {
+      "button": "Eliminar",
+      "deleting": "Eliminando...",
+      "cancel": "No, gracias",
+      "title": "¿Eliminar esta alianza?",
+      "deleted": "Se elimina la alianza con su acceso al portal y sesiones, su perfil de aliado ({photos, plural, =0 {sin fotos} one {1 foto} other {# fotos}}), {documents, plural, =0 {sin documentos} one {1 documento de la alianza} other {# documentos de la alianza}}, contactos, red, membresías y tareas.",
+      "keptClients": "{count, plural, one {1 cliente \"Agregado por\" esta alianza} other {# clientes \"Agregados por\" esta alianza}}",
+      "keptReferrals": "{count, plural, one {1 referido} other {# referidos}} (como historial, sin alianza)",
+      "kept": "Se conservan: {items}.",
+      "archiveHint": "Si es un aliado real, mejor archívalo: cambia el estado a Inactiva y revoca el acceso al portal.",
+      "noUndo": "No se puede deshacer.",
+      "blockedBilling": "No se puede eliminar esta alianza: tiene membresías vinculadas a facturas. Ese historial financiero se conserva; archívala en su lugar.",
+      "blockedLinked": "No se puede eliminar esta alianza: todavía tiene registros vinculados. Archívala en su lugar.",
+      "keptConsents": "el registro de aceptación de los términos (historial legal)"
     }
   },
   "AllianceDocumentType": {
@@ -4725,7 +4752,8 @@
       "profile": "Mi perfil",
       "documents": "Documentos",
       "marketing": "Marketing",
-      "referrals": "Referidos"
+      "referrals": "Referidos",
+      "more": "Más"
     },
     "access": {
       "title": "Su portal de aliado",

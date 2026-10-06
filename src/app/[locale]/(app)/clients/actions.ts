@@ -10,6 +10,9 @@ import { getLocale } from "next-intl/server";
 import { logAuditEvent } from "@/lib/audit";
 import { findPossibleDuplicateClients } from "@/lib/queries/clients";
 import { requireAuthenticatedUser } from "@/lib/permissions";
+import { del } from "@vercel/blob";
+import { isBlobConfigured } from "@/lib/blob/config";
+import { deleteClientRecord } from "@/lib/deletion";
 
 function normalize(values: ClientFormValues) {
   const interestedServices = Array.from(new Set(values.interestedServices));
@@ -103,42 +106,43 @@ export async function updateClientAction(
 }
 
 // Admin-only hard delete, added on explicit request. Cascades the client's
-// own cases, appointments, and documents (schema.ts onDelete rules) — that
-// blast radius is spelled out in the UI's confirmation dialog, not just
-// assumed. Invoices/payments use onDelete "restrict" on purpose (financial
-// correctness), so a client with billing history can't be deleted until
-// those are removed first; we surface that instead of letting the DB error
-// bubble up raw. A notary journal entry is never touched beyond having its
-// clientId set null — its frozen clientNameSnapshot keeps it intact.
+// own cases, appointments, documents and tasks (schema.ts onDelete rules);
+// the client's referrals are deleted first, since a referral can't exist
+// without its client (that RESTRICT is what used to crash this). The blast
+// radius is spelled out in the confirmation dialog (getClientDeletionImpact).
+// Financial history blocks it with a reason instead: invoices/payments, or a
+// referral that has a compensation record. A notary journal entry is never
+// touched beyond having its clientId set null — its frozen
+// clientNameSnapshot keeps it intact.
 export async function deleteClientAction(
   id: string,
-): Promise<{ ok: true } | { ok: false; reason: "has_billing_history" }> {
+): Promise<{ ok: true } | { ok: false; reason: "billing" | "compensation" | "linked_records" }> {
   await requireAuthenticatedUser();
-  const db = getDb();
-  const [existing] = await db
-    .select({ fullName: clients.fullName })
-    .from(clients)
-    .where(eq(clients.id, id))
-    .limit(1);
-  if (!existing) return { ok: true };
+  const result = await deleteClientRecord(getDb(), id);
+  if (!result.ok) {
+    if (result.reason === "not_found") return { ok: true };
+    return { ok: false, reason: result.reason };
+  }
 
-  try {
-    await db.delete(clients).where(eq(clients.id, id));
-  } catch (error) {
-    if (error && typeof error === "object" && "code" in error && error.code === "23503") {
-      return { ok: false, reason: "has_billing_history" };
-    }
-    throw error;
+  // The files of the deleted documents (best effort, like a single
+  // document delete).
+  if (isBlobConfigured()) {
+    await Promise.all(result.documentUrls.map((url) => del(url).catch(() => undefined)));
   }
 
   await logAuditEvent({
     action: "client.deleted",
     entityType: "client",
     entityId: id,
-    summary: `Deleted client: ${existing.fullName}`,
+    summary:
+      result.referrals > 0
+        ? `Deleted client: ${result.fullName} (and ${result.referrals} referral(s))`
+        : `Deleted client: ${result.fullName}`,
   });
 
   revalidatePath("/clients");
+  revalidatePath("/tasks");
+  revalidatePath("/referrals");
   const locale = await getLocale();
   redirect({ href: "/clients", locale });
   return { ok: true };

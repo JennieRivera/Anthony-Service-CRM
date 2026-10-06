@@ -18,6 +18,10 @@ import { AllianceMembershipSection } from "@/components/alliances/AllianceMember
 import { PartnerAccessCard } from "@/components/alliances/PartnerAccessCard";
 import { PartnerDocumentVisibility } from "@/components/alliances/PartnerDocumentVisibility";
 import { getPartnerStaffView } from "@/lib/partners/staff";
+import { AllianceDeleteButton } from "@/components/alliances/AllianceDeleteButton";
+import { getAllianceDeletionImpact } from "@/lib/deletion";
+import { getDb } from "@/lib/db";
+import type { PortalDb } from "@/lib/portal/db";
 import AccessDenied from "@/components/AccessDenied";
 import { getCurrentRole, hasAccessArea, hasAllianceViewAccess } from "@/lib/permissions";
 import { listActiveMembershipPlansForSelect, listActiveMembershipBenefitsForSelect } from "@/lib/queries/memberships";
@@ -57,6 +61,9 @@ export default async function AllianceDetailPage({
     );
   }
   const canEditAlliance = hasAccessArea(role, "alliances");
+  // Deleting an alliance is for super_admin/admin only.
+  const deletionImpact =
+    role === "super_admin" || role === "admin" ? await getAllianceDeletionImpact(getDb() as unknown as PortalDb, id) : null;
   const canManageMembership = hasAccessArea(role, "b2b_membership");
   const canLinkInvoice = hasAccessArea(role, "b2b_membership_billing");
 
@@ -100,12 +107,15 @@ export default async function AllianceDetailPage({
         >
           &larr; {t("backToAlliances")}
         </Link>
-        {canEditAlliance && (
-          <Button render={<Link href={`/alliances/${id}/edit`} />}>
-            <Pencil className="h-4 w-4" />
-            {t("editAlliance")}
-          </Button>
-        )}
+        <div className="flex flex-wrap gap-2">
+          {canEditAlliance && (
+            <Button render={<Link href={`/alliances/${id}/edit`} />}>
+              <Pencil className="h-4 w-4" />
+              {t("editAlliance")}
+            </Button>
+          )}
+          {deletionImpact && <AllianceDeleteButton allianceId={id} impact={deletionImpact} />}
+        </div>
       </div>
 
       {/* Alliance information */}

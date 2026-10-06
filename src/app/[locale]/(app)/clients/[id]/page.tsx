@@ -21,6 +21,7 @@ import { eq } from "drizzle-orm";
 import { strategicAlliances } from "@/lib/db/schema";
 import { getPortalAccessSummary } from "@/lib/portal/access";
 import type { PortalDb } from "@/lib/portal/db";
+import { getClientDeletionImpact } from "@/lib/deletion";
 
 export default async function ClientProfilePage({
   params,
@@ -44,7 +45,7 @@ export default async function ClientProfilePage({
     : [];
 
   const portalDb = getDb() as unknown as PortalDb;
-  const [highlevelSync, highlevelPreview, portalAccess, latestConsents, consentHistory, sendBlocks, noticeSettings] =
+  const [highlevelSync, highlevelPreview, portalAccess, latestConsents, consentHistory, sendBlocks, noticeSettings, deletionImpact] =
     await Promise.all([
       getClientHighlevelSync(id),
       getHighLevelSyncPreview(id),
@@ -53,6 +54,7 @@ export default async function ClientProfilePage({
       listConsentEvents(portalDb, id),
       portalLinkSendBlocks(portalDb, id, noticeDeps()),
       getNotificationSettings(portalDb),
+      getClientDeletionImpact(portalDb, id),
     ]);
 
   const {
@@ -95,7 +97,7 @@ export default async function ClientProfilePage({
             <Pencil className="h-4 w-4" />
             {t("editClient")}
           </Button>
-          <ClientDeleteButton clientId={id} />
+          <ClientDeleteButton clientId={id} impact={deletionImpact} />
         </div>
       </div>
 

@@ -10,6 +10,11 @@ import { logAuditEvent } from "@/lib/audit";
 import { requireAccessArea } from "@/lib/permissions";
 import { PartnerAccessError, createPartnerAccessLink, revokePartnerAccess } from "@/lib/partners/access";
 import type { PortalDb } from "@/lib/portal/db";
+import { del } from "@vercel/blob";
+import { getLocale } from "next-intl/server";
+import { redirect } from "@/i18n/navigation";
+import { isBlobConfigured } from "@/lib/blob/config";
+import { deleteAllianceRecord } from "@/lib/deletion";
 
 // Staff controls for an alliance's partner portal (CRM side). The raw link
 // token is returned exactly once, to be copied and sent by WhatsApp.
@@ -72,4 +77,38 @@ export async function setAllianceDocumentPartnerVisibilityAction(documentId: str
     summary: `"${doc.fileName}" ${visible ? "shared with" : "hidden from"} the partner`,
   });
   revalidatePath(`/alliances/${doc.allianceId}`);
+}
+
+// Admin-only (super_admin/admin) hard delete of an alliance — meant for
+// test or mistaken records. For a real ally, archiving (status "inactive"
+// + revoking portal access) keeps the history. What goes and what stays is
+// in deleteAllianceRecord and spelled out in the confirmation dialog.
+export async function deleteAllianceAction(
+  allianceId: string,
+): Promise<{ ok: true } | { ok: false; reason: "membership_billing" | "linked_records" }> {
+  const role = await requireAccessArea("alliances");
+  if (role !== "super_admin" && role !== "admin") throw new Error("Forbidden: admin only");
+
+  const result = await deleteAllianceRecord(db(), allianceId);
+  if (!result.ok) {
+    if (result.reason === "not_found") return { ok: true };
+    return { ok: false, reason: result.reason };
+  }
+  // Documents, photos and logo files (best effort).
+  if (isBlobConfigured()) {
+    await Promise.all(result.blobUrls.map((url) => del(url).catch(() => undefined)));
+  }
+  await logAuditEvent({
+    action: "alliance.deleted",
+    entityType: "alliance",
+    entityId: allianceId,
+    summary: `Deleted alliance: ${result.name}`,
+  });
+  revalidatePath("/community");
+  revalidatePath("/clients");
+  revalidatePath("/referrals");
+  revalidatePath("/tasks");
+  const locale = await getLocale();
+  redirect({ href: "/community", locale });
+  return { ok: true };
 }

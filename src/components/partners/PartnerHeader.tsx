@@ -1,29 +1,37 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { FileText, Handshake, House, LogOut, Megaphone, Network, UserRound } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { Ellipsis, FileText, Handshake, House, LogOut, Megaphone, Network, UserRound } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
-const NAV = [
+// Same pattern as the client portal: on a computer every section is a tab
+// under the header; on a phone the first four go in a bottom bar and the
+// rest open from its "More" button.
+const MAIN_NAV = [
   { href: "/partners", key: "home", icon: House },
-  { href: "/partners/profile", key: "profile", icon: UserRound },
+  { href: "/partners/referrals", key: "referrals", icon: Handshake },
   { href: "/partners/documents", key: "documents", icon: FileText },
   { href: "/partners/marketing", key: "marketing", icon: Megaphone },
-  { href: "/partners/referrals", key: "referrals", icon: Handshake },
 ] as const;
+const MORE_NAV = [{ href: "/partners/profile", key: "profile", icon: UserRound }] as const;
+const NAV = [...MAIN_NAV, ...MORE_NAV];
 
 const isActive = (pathname: string, href: string) =>
   href === "/partners" ? pathname === "/partners" : pathname.startsWith(href);
 
-// Partner portal header: business name, sign out, and the five sections as
-// tabs (they scroll sideways on a narrow phone instead of wrapping).
 export function PartnerHeader({ signedIn, businessName, hasLogo = false }: { signedIn: boolean; businessName?: string; hasLogo?: boolean }) {
   const t = useTranslations("Partners");
+  const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
+  // The "More" panel is open only on the page where it was opened, so it
+  // closes by itself after navigating.
+  const [moreOpenOn, setMoreOpenOn] = useState<string | null>(null);
+  const moreOpen = moreOpenOn === pathname;
+  const moreActive = MORE_NAV.some((item) => isActive(pathname, item.href));
 
   async function signOut() {
     setSigningOut(true);
@@ -50,37 +58,115 @@ export function PartnerHeader({ signedIn, businessName, hasLogo = false }: { sig
             {businessName && <span className="truncate text-xs text-muted-foreground">{businessName}</span>}
           </div>
         </div>
-        {signedIn && (
-          <button
-            type="button"
-            onClick={signOut}
-            disabled={signingOut}
-            className="flex min-h-10 shrink-0 items-center gap-1.5 rounded-md px-2 text-sm text-muted-foreground hover:text-foreground"
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href={pathname}
+            locale={locale === "es" ? "en" : "es"}
+            className="rounded-full border border-border px-3 py-1.5 text-sm text-foreground hover:bg-secondary"
           >
-            <LogOut className="size-4" aria-hidden />
-            {t("signOut")}
-          </button>
-        )}
+            {locale === "es" ? "English" : "Español"}
+          </Link>
+          {signedIn && (
+            <button
+              type="button"
+              onClick={signOut}
+              disabled={signingOut}
+              className="flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-sm text-foreground hover:bg-secondary"
+            >
+              <LogOut className="size-4" aria-hidden />
+              <span className="sr-only sm:not-sr-only">{t("signOut")}</span>
+            </button>
+          )}
+        </div>
       </div>
+
       {signedIn && (
-        <nav className="mx-auto w-full max-w-4xl overflow-x-auto px-2" aria-label={t("title")}>
-          <ul className="flex min-w-max gap-1">
-            {NAV.map(({ href, key, icon: Icon }) => (
-              <li key={href}>
-                <Link
-                  href={href}
-                  className={cn(
-                    "flex min-h-11 items-center gap-1.5 border-b-2 px-3 text-sm",
-                    isActive(pathname, href)
-                      ? "border-primary font-medium text-foreground"
-                      : "border-transparent text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  <Icon className="size-4" aria-hidden />
-                  {t(`nav.${key}`)}
-                </Link>
-              </li>
-            ))}
+        <nav className="mx-auto hidden w-full max-w-4xl overflow-x-auto px-2 sm:block" aria-label={t("title")}>
+          <ul className="flex gap-1">
+            {NAV.map((item) => {
+              const active = isActive(pathname, item.href);
+              const Icon = item.icon;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm whitespace-nowrap",
+                      active ? "border-primary font-medium text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <Icon className="size-4" aria-hidden />
+                    {t(`nav.${item.key}`)}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      )}
+
+      {signedIn && (
+        <nav
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] sm:hidden"
+          aria-label={t("title")}
+        >
+          {moreOpen && (
+            <ul id="partner-more-menu" className="flex flex-col border-b border-border py-1">
+              {MORE_NAV.map((item) => {
+                const active = isActive(pathname, item.href);
+                const Icon = item.icon;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => setMoreOpenOn(null)}
+                      className={cn("flex min-h-12 items-center gap-3 px-5 text-base", active ? "font-medium text-primary" : "text-foreground")}
+                    >
+                      <Icon className="size-5" aria-hidden />
+                      {t(`nav.${item.key}`)}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <ul className="grid grid-cols-5">
+            {MAIN_NAV.map((item) => {
+              const active = isActive(pathname, item.href);
+              const Icon = item.icon;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-14 flex-col items-center justify-center gap-0.5 px-1 text-xs",
+                      active ? "font-medium text-primary" : "text-muted-foreground",
+                    )}
+                  >
+                    <Icon className="size-5" aria-hidden />
+                    <span className="max-w-full truncate">{t(`nav.${item.key}`)}</span>
+                  </Link>
+                </li>
+              );
+            })}
+            <li>
+              <button
+                type="button"
+                aria-expanded={moreOpen}
+                aria-controls="partner-more-menu"
+                onClick={() => setMoreOpenOn(moreOpen ? null : pathname)}
+                className={cn(
+                  "flex min-h-14 w-full flex-col items-center justify-center gap-0.5 px-1 text-xs",
+                  moreOpen || moreActive ? "font-medium text-primary" : "text-muted-foreground",
+                )}
+              >
+                <Ellipsis className="size-5" aria-hidden />
+                <span>{t("nav.more")}</span>
+              </button>
+            </li>
           </ul>
         </nav>
       )}
