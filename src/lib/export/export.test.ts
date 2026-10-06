@@ -72,6 +72,15 @@ async function main() {
     assert.deepEqual(good.warnings, [{ kind: "unknown_service", value: "Unknown" }]);
   });
 
+  await ok("import: old service names (before the rename) still map to the service", () => {
+    const row = validateImportRow(
+      { fullName: "Test Dos", services: "Taxes / Contabilidad; Contabilidad; Registro de Compañía; Tax & Accounting; Crédito y Financiamiento" },
+      0,
+    );
+    assert.deepEqual(row.data.services, ["tax_prep", "bookkeeping", "company_registration", "credit_financing"]);
+    assert.deepEqual(row.warnings, []);
+  });
+
   await ok("import: duplicates by phone digits / email, against clients and inside the file", () => {
     const rows = [
       validateImportRow({ fullName: "A", phone: "407-555-0101" }, 0),

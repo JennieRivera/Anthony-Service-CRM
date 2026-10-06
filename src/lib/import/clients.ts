@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { formatUsPhone, usPhoneDigits } from "@/lib/validation/onlineBooking";
 import { serviceTypeValues } from "@/lib/validation/client";
+import { LEGACY_SERVICE_LABELS_EN } from "@/lib/booking/titles";
 import en from "../../../messages/en.json";
 import { plain, type ImportField } from "./clientsShared";
 export { MAX_IMPORT_ROWS, mapHeader, type ImportField } from "./clientsShared";
@@ -14,6 +15,25 @@ import es from "../../../messages/es.json";
 
 // Service names accepted in the CSV: the key, or its English/Spanish label.
 const SERVICE_LOOKUP = new Map<string, (typeof serviceTypeValues)[number]>();
+// Spanish names used before the 2026-10-06 rename — older spreadsheets
+// still say e.g. "Taxes / Contabilidad". (The old English names come from
+// LEGACY_SERVICE_LABELS_EN, shared with the stored-title parser.)
+const LEGACY_SERVICE_LABELS_ES: Partial<Record<(typeof serviceTypeValues)[number], string>> = {
+  online_notary: "Notary Public en Línea (RON)",
+  tax_prep: "Taxes / Contabilidad",
+  company_registration: "Registro de Compañía",
+  credit_financing: "Crédito y Financiamiento",
+  notary: "Notary Public / RON / IPEN / Firma de Préstamos",
+  bookkeeping: "Contabilidad",
+  marketing: "Marketing / Marca / IA / Automatización",
+  irs_administrative: "Administrativo IRS / EIN / ITIN",
+};
+for (const legacy of [LEGACY_SERVICE_LABELS_EN, LEGACY_SERVICE_LABELS_ES]) {
+  for (const [key, name] of Object.entries(legacy)) {
+    SERVICE_LOOKUP.set(plain(name), key as (typeof serviceTypeValues)[number]);
+  }
+}
+// Current names last, so they always win.
 for (const key of serviceTypeValues) {
   SERVICE_LOOKUP.set(plain(key), key);
   SERVICE_LOOKUP.set(plain((en.ServiceType as Record<string, string>)[key] ?? key), key);

@@ -36,7 +36,7 @@ export const SERVICE_LABELS_EN: Record<ServiceType, string> = {
 // English names used in titles stored BEFORE the 2026-10-06 rename. Still
 // recognized when reading a title, so existing appointments and tasks keep
 // showing in Spanish; new titles use SERVICE_LABELS_EN above.
-const LEGACY_SERVICE_LABELS_EN: Partial<Record<ServiceType, string>> = {
+export const LEGACY_SERVICE_LABELS_EN: Partial<Record<ServiceType, string>> = {
   online_notary: "Online Notary",
   tax_prep: "Tax & Accounting",
   company_registration: "Company Registration",
