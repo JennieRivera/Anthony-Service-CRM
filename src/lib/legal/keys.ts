@@ -26,13 +26,15 @@ export const legalTextMaxLength = (key: LegalTextKey) =>
 export type LegalText = { en: string; es: string };
 
 export const DEFAULT_LEGAL_TEXTS: Record<LegalTextKey, LegalText> = {
+  // NMLS sentences added 2026-10-06 at the owner's request — pending
+  // review by a licensed attorney (Settings → Legal texts says so).
   not_a_law_firm: {
-    en: "Anthony Multiservice is not a law firm. We are not attorneys and do not provide legal or immigration advice. We provide administrative and document-preparation services at the client's direction. If you need legal advice, please consult a licensed attorney or an accredited representative.",
-    es: "Anthony Multiservice no es una firma de abogados. No somos abogados y no damos asesoría legal ni de inmigración. Ofrecemos servicios administrativos y de preparación de documentos según las instrucciones del cliente. Si necesita asesoría legal, consulte a un abogado licenciado o a un representante acreditado.",
+    en: "Anthony Multiservice is not a law firm and does not provide legal advice. It is not an NMLS-licensed lender or loan originator: it does not offer, negotiate or approve loans or mortgages. Credit services and financing referrals are administrative and referral-only. We do not provide immigration advice; we provide administrative and document-preparation services at the client's direction. If you need legal advice, please consult a licensed attorney or an accredited representative.",
+    es: "Anthony Multiservice no es una firma de abogados y no ofrece asesoría legal. Tampoco es un prestamista ni originador de préstamos con licencia NMLS: no ofrece, negocia ni aprueba préstamos ni hipotecas. Los servicios de crédito y referidos de financiamiento son administrativos y de referencia a terceros. No damos asesoría de inmigración; ofrecemos servicios administrativos y de preparación de documentos según las instrucciones del cliente. Si necesita asesoría legal, consulte a un abogado licenciado o a un representante acreditado.",
   },
   not_a_law_firm_email: {
-    en: "Anthony Multiservice is not a law firm and does not provide legal advice.",
-    es: "Anthony Multiservice no es una firma de abogados y no ofrece asesoría legal.",
+    en: "Anthony Multiservice is not a law firm or an NMLS-licensed lender, and does not provide legal advice or loans.",
+    es: "Anthony Multiservice no es una firma de abogados ni un prestamista con licencia NMLS, y no ofrece asesoría legal ni préstamos.",
   },
   // DRAFT written 2026-10-06 at the owner's request — pending review by a
   // licensed attorney before relying on it (Settings → Legal texts says so).
@@ -41,8 +43,8 @@ export const DEFAULT_LEGAL_TEXTS: Record<LegalTextKey, LegalText> = {
     es: "Términos de la alianza\n1. Anthony Multiservice (AMS) y su negocio son independientes. Ninguno es empleado, agente ni representante legal del otro.\n2. Solo comparta datos de personas que le dieron permiso. Usted es responsable de ese permiso.\n3. La información de clientes que AMS le refiera es confidencial: úsela solo para atender ese referido y no la comparta.\n4. Usted es responsable de sus propias licencias, seguros, impuestos y del trabajo que realiza. AMS no realiza ni garantiza ese trabajo.\n5. Los materiales de marketing compartidos en el portal solo se pueden usar para promocionar la alianza, según lo acordado.\n6. Las comisiones o pagos por referidos, si los hay, se rigen por su acuerdo de alianza firmado.\n7. AMS puede suspender el acceso al portal en cualquier momento.",
   },
   not_a_law_firm_ack: {
-    en: "I understand that Anthony Multiservice is not a law firm and does not give me legal advice.",
-    es: "Entiendo que Anthony Multiservice no es una firma de abogados y no me da asesoría legal.",
+    en: "I understand that Anthony Multiservice is not a law firm or an NMLS-licensed lender, and does not give me legal advice or loans.",
+    es: "Entiendo que Anthony Multiservice no es una firma de abogados ni un prestamista con licencia NMLS, y no me da asesoría legal ni préstamos.",
   },
   // Florida Statutes §117.05(10): a non-attorney notary public who
   // advertises notary services in a language other than English must post
@@ -97,8 +99,8 @@ If you agree to receive text messages, we send only notices about your appointme
 ## Your choices
 In the client portal ("My authorizations") you can accept or withdraw your contact and marketing preferences at any time, and update your contact details ("My profile"). You can also call us to ask about the information we keep about you.
 
-## Not a law firm
-Anthony Multiservice is not a law firm and does not provide legal advice.
+## Not a law firm or a lender
+Anthony Multiservice is not a law firm and does not provide legal advice. It is not an NMLS-licensed lender or loan originator: it does not offer, negotiate or approve loans or mortgages. Credit services and financing referrals are administrative and referral-only.
 
 ## Contact
 Questions about this notice: call us at (689) 342-6309.`,
@@ -128,8 +130,8 @@ Si usted acepta recibir mensajes de texto, solo le enviamos avisos sobre sus cit
 ## Sus opciones
 En el portal del cliente ("Mis autorizaciones") puede aceptar o quitar en cualquier momento sus preferencias de contacto y de marketing, y actualizar sus datos de contacto ("Mi perfil"). También puede llamarnos para preguntar qué información guardamos sobre usted.
 
-## No somos una firma de abogados
-Anthony Multiservice no es una firma de abogados y no da asesoría legal.
+## No somos una firma de abogados ni prestamistas
+Anthony Multiservice no es una firma de abogados y no da asesoría legal. Tampoco es un prestamista ni originador de préstamos con licencia NMLS: no ofrece, negocia ni aprueba préstamos ni hipotecas. Los servicios de crédito y referidos de financiamiento son administrativos y de referencia a terceros.
 
 ## Contacto
 Preguntas sobre este aviso: llámenos al (689) 342-6309.`,

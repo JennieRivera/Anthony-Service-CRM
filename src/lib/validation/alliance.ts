@@ -21,6 +21,7 @@ export const organizationTypeValues = [
   "business_organization",
   "contractor_remodeling",
   "chef_culinary",
+  "installer_remodeling",
 ] as const;
 
 export const allianceStatusValues = [

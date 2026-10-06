@@ -6,6 +6,9 @@ import { EXPORT_FORMATS } from "@/lib/export/document";
 import { EXPORT_LISTS, MAX_EXPORT_ROWS, buildListTable, listIsLandscape } from "@/lib/export/lists";
 import { exportGuard, exportResponse, exportedLabel } from "@/lib/export/respond";
 import { exportTranslator } from "@/lib/export/translator";
+import { getDb } from "@/lib/db";
+import { getLegalTexts, pickLocale } from "@/lib/legal/texts";
+import type { PortalDb } from "@/lib/portal/db";
 
 // POST { list, format, ids, locale } — the ids are the rows the person is
 // looking at, in display order. See src/lib/export/lists.ts.
@@ -28,6 +31,7 @@ export async function POST(request: Request) {
   const tr = exportTranslator(locale);
   const table = await buildListTable(list, ids, tr);
   const title = tr.t(`Export.lists.${list}`);
+  const legal = await getLegalTexts(getDb() as unknown as PortalDb);
 
   await logAuditEvent({
     action: "data.exported",
@@ -42,6 +46,7 @@ export async function POST(request: Request) {
       subtitle: tr.t("Export.recordCount", { count: table.rows.length }),
       exportedLabel: exportedLabel(tr),
       sections: [{ heading: title, table, empty: tr.t("Export.none") }],
+      footerNote: pickLocale(legal.not_a_law_firm, locale),
       landscape: listIsLandscape(table),
       fileBase: tr.t(`Export.files.${list}`),
     },

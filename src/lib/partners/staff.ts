@@ -5,12 +5,13 @@ import { addDays, businessDateString } from "@/lib/dates";
 import type { PortalDb } from "@/lib/portal/db";
 import { PARTNER_EXPIRY_ALERT_DAYS } from "./config";
 import { getPartnerAccessSummary } from "./access";
+import { listPartnerServices } from "./services";
 
 // Staff (CRM) view of what an alliance did in its partner portal. Read by
 // the alliance record page — never by the partner portal itself.
 export async function getPartnerStaffView(allianceId: string) {
   const db = getDb();
-  const [[profile], photos, added, terms, summary] = await Promise.all([
+  const [[profile], photos, added, terms, summary, services] = await Promise.all([
     db.select().from(partnerProfiles).where(eq(partnerProfiles.allianceId, allianceId)).limit(1),
     db
       .select({ id: partnerPhotos.id, fileName: partnerPhotos.fileName })
@@ -29,6 +30,7 @@ export async function getPartnerStaffView(allianceId: string) {
       .orderBy(desc(partnerConsentEvents.createdAt))
       .limit(1),
     getPartnerAccessSummary(db as unknown as PortalDb, allianceId),
+    listPartnerServices(db as unknown as PortalDb, allianceId),
   ]);
 
   const today = businessDateString();
@@ -39,6 +41,7 @@ export async function getPartnerStaffView(allianceId: string) {
   return {
     profile: profile ?? null,
     photos,
+    services,
     addedClients: added,
     termsAcceptedAt: terms[0]?.createdAt ?? null,
     termsIp: terms[0]?.ipAddress ?? null,

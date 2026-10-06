@@ -36,6 +36,7 @@ import { DocumentUploader } from "@/components/documents/DocumentUploader";
 import { CaseDeleteButton } from "@/components/cases/CaseDeleteButton";
 import { BusinessFormationCompanyLink } from "@/components/cases/BusinessFormationCompanyLink";
 import { Badge } from "@/components/ui/badge";
+import { FinanceLegalNotice } from "@/components/legal/FinanceLegalNotice";
 
 export default async function CaseDetailPage({
   params,
@@ -235,6 +236,8 @@ export default async function CaseDetailPage({
           )}
         </div>
       </div>
+
+      {c.serviceType === "credit_financing" && <FinanceLegalNotice />}
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
         <div className="flex items-center gap-3">

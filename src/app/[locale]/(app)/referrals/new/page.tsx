@@ -7,6 +7,7 @@ import { listAlliancesForSelect } from "@/lib/queries/alliances";
 import { createReferralAction } from "../actions";
 import AccessDenied from "@/components/AccessDenied";
 import { getCurrentRole, hasAccessArea } from "@/lib/permissions";
+import { FinanceLegalNotice } from "@/components/legal/FinanceLegalNotice";
 
 export default async function NewReferralPage({
   searchParams,
@@ -45,6 +46,8 @@ export default async function NewReferralPage({
           &larr; {t("backToReferrals")}
         </Link>
       </div>
+
+      {category === "commercial_finance" && <FinanceLegalNotice />}
 
       <ReferralForm
         clients={clients}

@@ -121,7 +121,7 @@ function SmsConsentText({ text, linkLabel, href }: { text: string; linkLabel: st
   );
 }
 
-const LEGAL_NOTICE_SERVICES =new Set(["immigration", "notary", "online_notary"]);
+const LEGAL_NOTICE_SERVICES = new Set(["immigration", "notary", "online_notary", "credit_financing"]);
 
 export type BookingLegalTexts = {
   notALawFirm: string;

@@ -11,6 +11,7 @@ import { ReferralPipelineStatusBadge } from "@/components/referrals/ReferralPipe
 import { ReferralCompensationSection } from "@/components/referrals/ReferralCompensationSection";
 import AccessDenied from "@/components/AccessDenied";
 import { getCurrentRole, hasAccessArea, hasReferralViewAccess } from "@/lib/permissions";
+import { FinanceLegalNotice } from "@/components/legal/FinanceLegalNotice";
 import {
   setCompensationTermsAction,
   markCompensationEarnedAction,
@@ -68,6 +69,8 @@ export default async function ReferralDetailPage({
           </Button>
         )}
       </div>
+
+      {referral.category === "commercial_finance" && <FinanceLegalNotice />}
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
         <div className="flex items-center justify-between">

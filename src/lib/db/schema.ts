@@ -3705,6 +3705,10 @@ export const organizationTypeEnum = pgEnum("organization_type", [
   "contractor_remodeling",
   // Chefs / caterers for Corporate Events & Culinary Partnerships cases.
   "chef_culinary",
+  // Installers (floors, tile and other installations) — also offered on
+  // Remodeling cases next to general contractors. A Florida license is
+  // optional for them.
+  "installer_remodeling",
 ]);
 
 export const allianceStatusEnum = pgEnum("alliance_status", [
@@ -4805,6 +4809,26 @@ export const partnerProfiles = pgTable("partner_profiles", {
   insuranceProvider: text("insurance_provider"),
   insuranceExpiration: date("insurance_expiration"),
 });
+
+// The services an alliance offers, managed by the alliance in its portal
+// ("My services") and shown on its Alliance record in the CRM.
+export const partnerServices = pgTable(
+  "partner_services",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    allianceId: uuid("alliance_id")
+      .notNull()
+      .references(() => strategicAlliances.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    serviceArea: text("service_area"),
+    // Optional "from" price, in dollars.
+    priceFrom: numeric("price_from", { precision: 12, scale: 2 }),
+  },
+  (table) => [index("partner_services_alliance_idx").on(table.allianceId)],
+);
 
 // The alliance's business photo gallery (private Blob, max 12).
 export const partnerPhotos = pgTable(

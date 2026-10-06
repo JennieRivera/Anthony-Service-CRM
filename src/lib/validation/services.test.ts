@@ -64,12 +64,15 @@ for (const s of ["crm_technology", "corporate_events", "remodeling"] as const) {
   assert.equal(DEFAULT_BOOKABLE_SERVICE_DURATIONS[s], undefined);
 }
 
-// Partner-based services pick their ally from the matching alliance type.
-assert.deepEqual(PARTNER_SERVICES.remodeling.allianceType, "contractor_remodeling");
-assert.deepEqual(PARTNER_SERVICES.corporate_events.allianceType, "chef_culinary");
-for (const { allianceType } of Object.values(PARTNER_SERVICES)) {
-  assert.ok((organizationTypeValues as readonly string[]).includes(allianceType));
-  for (const locale of ["en", "es"]) assert.ok(messages(locale).OrganizationType[allianceType]);
+// Partner-based services pick their ally from the matching alliance types
+// (Remodeling: general contractors and installers together).
+assert.deepEqual([...PARTNER_SERVICES.remodeling.allianceTypes], ["contractor_remodeling", "installer_remodeling"]);
+assert.deepEqual([...PARTNER_SERVICES.corporate_events.allianceTypes], ["chef_culinary"]);
+for (const { allianceTypes } of Object.values(PARTNER_SERVICES)) {
+  for (const allianceType of allianceTypes) {
+    assert.ok((organizationTypeValues as readonly string[]).includes(allianceType));
+    for (const locale of ["en", "es"]) assert.ok(messages(locale).OrganizationType[allianceType]);
+  }
 }
 for (const locale of ["en", "es"]) {
   for (const service of Object.keys(PARTNER_SERVICES)) {

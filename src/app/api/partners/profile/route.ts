@@ -9,6 +9,7 @@ import {
 import { partnerDb, requirePartnerSessionForApi } from "@/lib/partners/session";
 import { badRequest, forbiddenOrigin, isSameOrigin, json, readSmallJson } from "@/lib/portal/http";
 import { requestIp, requestUserAgent } from "@/lib/request-info";
+import { licenseModeFor } from "@/lib/partners/license";
 
 // "My profile": changes apply right away and create a task for staff.
 // A contractor (Remodeling) must confirm its Florida license and insurance
@@ -32,7 +33,8 @@ export async function PUT(request: Request) {
   const touchesLicense = ["licenseNumber", "licenseExpiration", "insuranceProvider", "insuranceExpiration"].some(
     (f) => typeof values[f] === "string" && (values[f] as string).trim() !== "",
   );
-  const isContractor = alliance.organizationType === "contractor_remodeling";
+  // Contractors and installers confirm their license / insurance details.
+  const isContractor = licenseModeFor(alliance.organizationType) !== "other";
   if (isContractor && touchesLicense && body.licenseConfirmed !== true) return json({ error: "license_confirmation" }, 400);
 
   try {

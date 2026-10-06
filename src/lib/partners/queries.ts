@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gt, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, gt, inArray, or, sql } from "drizzle-orm";
 import {
   allianceDocuments,
   clientCommunicationPreferences,
@@ -678,7 +678,7 @@ export async function createPartnerExpiryTasks(db: PortalDb, days: number, now =
     })
     .from(partnerProfiles)
     .innerJoin(strategicAlliances, eq(strategicAlliances.id, partnerProfiles.allianceId))
-    .where(eq(strategicAlliances.organizationType, "contractor_remodeling"));
+    .where(inArray(strategicAlliances.organizationType, ["contractor_remodeling", "installer_remodeling"]));
   let created = 0;
   for (const r of rows) {
     const expiring = [

@@ -2,7 +2,7 @@
 
 import { FieldErrorText } from "@/components/ui/field-error-text";
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
@@ -40,6 +40,8 @@ export function AllianceForm({
   const t = useTranslations("Alliances.form");
   const tStatus = useTranslations("AllianceStatus");
   const tOrgType = useTranslations("OrganizationType");
+  // A short description for the types that have one (e.g. Installer).
+  const tOrgTypeHint = useTranslations("OrganizationTypeHint");
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -79,6 +81,7 @@ export function AllianceForm({
       partnerResponsibilities: alliance?.partnerResponsibilities ?? "",
     },
   });
+  const organizationType = useWatch({ control, name: "organizationType" });
 
   async function submit(values: AllianceFormValues) {
     setSubmitting(true);
@@ -131,6 +134,9 @@ export function AllianceForm({
               </Select>
             )}
           />
+          {organizationType && tOrgTypeHint.has(organizationType) && (
+            <p className="text-xs text-muted-foreground">{tOrgTypeHint(organizationType)}</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">

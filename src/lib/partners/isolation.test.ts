@@ -227,6 +227,22 @@ async function main() {
     assert.ok(await q.getPartnerPhotoUrl(db, allyB.id, id));
   });
 
+  await ok("services: A only lists, edits and removes its own services", async () => {
+    const svc = await import("./services");
+    const bService = await svc.savePartnerService(db, { allianceId: allyB.id, values: { name: "Tile install", priceFrom: "$1,200" } });
+    assert.equal(bService.priceFrom, "1200.00");
+    const aService = await svc.savePartnerService(db, { allianceId: allyA.id, values: { name: "Kitchen remodel" } });
+    assert.deepEqual((await svc.listPartnerServices(db, allyA.id)).map((s) => s.id), [aService.id]);
+    await assert.rejects(svc.savePartnerService(db, { allianceId: allyA.id, id: bService.id, values: { name: "Hijacked" } }), q.PartnerValidationError);
+    assert.equal(await svc.removePartnerService(db, { allianceId: allyA.id, id: bService.id }), false);
+    assert.equal((await svc.listPartnerServices(db, allyB.id))[0]?.name, "Tile install");
+    await assert.rejects(svc.savePartnerService(db, { allianceId: allyA.id, values: { name: "" } }), q.PartnerValidationError);
+    await assert.rejects(svc.savePartnerService(db, { allianceId: allyA.id, values: { name: "X", priceFrom: "abc" } }), q.PartnerValidationError);
+    assert.equal(await svc.removePartnerService(db, { allianceId: allyA.id, id: aService.id }), true);
+    const reviewTasks = await db.select().from(tasks).where(and(eq(tasks.allianceId, allyA.id), eq(tasks.type, "partner_profile_review")));
+    assert.ok(reviewTasks.some((t) => t.title.includes("added Kitchen remodel")) && reviewTasks.some((t) => t.title.includes("removed Kitchen remodel")));
+  });
+
   // ── tasks invariant ──────────────────────────────────────────────────
   await ok("tasks: every task has a client or an alliance (database check)", async () => {
     await assert.rejects(db.insert(tasks).values({ type: "follow_up", title: "orphan" }));

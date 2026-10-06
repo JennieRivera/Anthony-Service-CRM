@@ -1,10 +1,13 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requirePartnerPage } from "@/lib/partners/page";
 import { getPartnerProfile } from "@/lib/partners/queries";
-import { PARTNER_MAX_PHOTOS } from "@/lib/partners/config";
+import { PARTNER_MAX_PHOTOS, PARTNER_MAX_SERVICES } from "@/lib/partners/config";
+import { listPartnerServices } from "@/lib/partners/services";
+import { licenseModeFor } from "@/lib/partners/license";
 import { PartnerProfileForm } from "@/components/partners/PartnerProfileForm";
 import { PartnerGallery } from "@/components/partners/PartnerGallery";
 import { PartnerUploadForm } from "@/components/partners/PartnerUploadForm";
+import { PartnerServicesEditor } from "@/components/partners/PartnerServicesEditor";
 
 export default async function PartnerProfilePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -12,7 +15,7 @@ export default async function PartnerProfilePage({ params }: { params: Promise<{
   const ctx = await requirePartnerPage(locale);
   if (!ctx) return null;
 
-  const profile = await getPartnerProfile(ctx.db, ctx.allianceId);
+  const [profile, services] = await Promise.all([getPartnerProfile(ctx.db, ctx.allianceId), listPartnerServices(ctx.db, ctx.allianceId)]);
   if (!profile) return null;
   const t = await getTranslations("Partners.profile");
   const a = profile.alliance;
@@ -35,7 +38,7 @@ export default async function PartnerProfilePage({ params }: { params: Promise<{
       </section>
 
       <PartnerProfileForm
-        isContractor={a.organizationType === "contractor_remodeling"}
+        licenseMode={licenseModeFor(a.organizationType)}
         initial={{
           contactPerson: a.contactPerson ?? "",
           phone: a.phone ?? "",
@@ -53,6 +56,8 @@ export default async function PartnerProfilePage({ params }: { params: Promise<{
           insuranceExpiration: profile.insuranceExpiration,
         }}
       />
+
+      <PartnerServicesEditor services={services} max={PARTNER_MAX_SERVICES} />
 
       <section className="flex flex-col gap-3">
         <h2 className="font-heading text-lg text-foreground">{t("galleryTitle", { max: PARTNER_MAX_PHOTOS })}</h2>

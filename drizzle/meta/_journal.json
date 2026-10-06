@@ -519,6 +519,13 @@
       "when": 1791318395448,
       "tag": "0073_partner_portal_phase_a",
       "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1791324226471,
+      "tag": "0074_partner_services_installer",
+      "breakpoints": true
     }
   ]
 }

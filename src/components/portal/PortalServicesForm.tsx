@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { CalendarPlus, CheckCircle2 } from "lucide-react";
+import { CalendarPlus, CheckCircle2, Landmark } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -18,10 +18,13 @@ export function PortalServicesForm({
   services,
   interested,
   bookable,
+  financeNotice,
 }: {
   services: ServiceType[];
   interested: ServiceType[];
   bookable: ServiceType[];
+  // "Not a law firm / not an NMLS-licensed lender", highlighted on Credit.
+  financeNotice?: string;
 }) {
   const t = useTranslations("Portal.services");
   const tService = useTranslations("PublicServiceType");
@@ -83,6 +86,12 @@ export function PortalServicesForm({
                 <span className="flex min-w-0 flex-col gap-1">
                   <span className="font-medium text-foreground">{tService(service)}</span>
                   <span className="text-sm text-muted-foreground">{t(`descriptions.${service}`)}</span>
+                  {service === "credit_financing" && financeNotice && (
+                    <span className="flex items-start gap-2 rounded-lg border-2 border-primary/50 p-3 text-sm text-foreground" role="note">
+                      <Landmark className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                      <span>{financeNotice}</span>
+                    </span>
+                  )}
                   {already && (
                     <span className="self-start rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
                       {t("onYourList")}

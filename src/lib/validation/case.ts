@@ -577,10 +577,10 @@ export const documentPrepServiceTypes = ["document_prep"];
 export const remodelingServiceTypes = ["remodeling"];
 
 // Services worked through an allied partner from Alliances: which form
-// field holds the ally, and which alliance type is offered first.
+// field holds the ally, and which alliance types are offered first.
 export const PARTNER_SERVICES = {
-  remodeling: { field: "remodelingAllianceId", allianceType: "contractor_remodeling" },
-  corporate_events: { field: "corporateEventsAllianceId", allianceType: "chef_culinary" },
+  remodeling: { field: "remodelingAllianceId", allianceTypes: ["contractor_remodeling", "installer_remodeling"] },
+  corporate_events: { field: "corporateEventsAllianceId", allianceTypes: ["chef_culinary"] },
 } as const;
 export type PartnerService = keyof typeof PARTNER_SERVICES;
 export const isPartnerService = (s: string): s is PartnerService => s in PARTNER_SERVICES;

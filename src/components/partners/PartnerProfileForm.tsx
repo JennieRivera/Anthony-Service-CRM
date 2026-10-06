@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import type { LicenseMode } from "@/lib/partners/license";
 
 type Values = Record<
   | "contactPerson"
@@ -30,8 +31,9 @@ type Values = Record<
 
 // "My profile". Saving applies the changes and sends AMS a review task.
 // A contractor confirms its Florida license and insurance when it saves
-// them (stored with date and IP).
-export function PartnerProfileForm({ initial, isContractor }: { initial: Values; isContractor: boolean }) {
+// them (stored with date and IP); for an installer the license is
+// optional, so it only confirms that what it typed is correct.
+export function PartnerProfileForm({ initial, licenseMode }: { initial: Values; licenseMode: LicenseMode }) {
   const t = useTranslations("Partners.profile");
   const router = useRouter();
   const [values, setValues] = useState<Values>(initial);
@@ -41,11 +43,13 @@ export function PartnerProfileForm({ initial, isContractor }: { initial: Values;
 
   const set = (k: keyof Values) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setValues((v) => ({ ...v, [k]: e.target.value }));
+  const needsConfirm = licenseMode !== "other";
+  const confirmText = licenseMode === "installer" ? t("licenseConfirmInstaller") : t("licenseConfirm");
   const hasLicense = [values.licenseNumber, values.licenseExpiration, values.insuranceProvider, values.insuranceExpiration].some((x) => x.trim());
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    if (isContractor && hasLicense && !licenseConfirmed) {
+    if (needsConfirm && hasLicense && !licenseConfirmed) {
       setMessage({ kind: "error", text: t("errors.license_confirmation") });
       return;
     }
@@ -55,7 +59,7 @@ export function PartnerProfileForm({ initial, isContractor }: { initial: Values;
       const res = await fetch("/api/partners/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ values, licenseConfirmed, licenseConfirmText: t("licenseConfirm") }),
+        body: JSON.stringify({ values, licenseConfirmed, licenseConfirmText: confirmText }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string; changed?: string[] };
       if (!res.ok) {
@@ -101,17 +105,17 @@ export function PartnerProfileForm({ initial, isContractor }: { initial: Values;
 
       <fieldset className="flex flex-col gap-4 rounded-lg border border-border p-4">
         <legend className="px-1 text-sm font-medium text-foreground">{t("licenseTitle")}</legend>
-        <p className="text-sm text-muted-foreground">{isContractor ? t("licenseHintContractor") : t("licenseHint")}</p>
+        <p className="text-sm text-muted-foreground">{licenseMode === "contractor" ? t("licenseHintContractor") : licenseMode === "installer" ? t("licenseHintInstaller") : t("licenseHint")}</p>
         <div className="grid gap-4 sm:grid-cols-2">
           {field("licenseNumber")}
           {field("licenseExpiration", "date")}
           {field("insuranceProvider")}
           {field("insuranceExpiration", "date")}
         </div>
-        {isContractor && hasLicense && (
+        {needsConfirm && hasLicense && (
           <label htmlFor="license-confirm" className="flex cursor-pointer items-start gap-3 text-sm text-foreground">
             <Checkbox id="license-confirm" checked={licenseConfirmed} onCheckedChange={(v) => setLicenseConfirmed(v === true)} className="mt-0.5 size-5" />
-            <span>{t("licenseConfirm")}</span>
+            <span>{confirmText}</span>
           </label>
         )}
       </fieldset>

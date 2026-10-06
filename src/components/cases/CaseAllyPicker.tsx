@@ -14,7 +14,7 @@ import {
 import { PARTNER_SERVICES, type PartnerService, type CaseFormValues } from "@/lib/validation/case";
 
 // Partner-based services (Remodeling, Corporate Events): pick the allied
-// contractor / chef from Alliances. Lists only alliances of the matching
+// contractor or installer / chef from Alliances. Lists only alliances of the matching
 // type, unless staff asks to see every alliance; the one already chosen
 // always stays listed.
 export function CaseAllyPicker({
@@ -29,10 +29,11 @@ export function CaseAllyPicker({
   alliances: { id: string; organizationName: string; organizationType?: string | null }[];
 }) {
   const t = useTranslations(`Cases.partners.${service}`);
-  const { field: fieldName, allianceType } = PARTNER_SERVICES[service];
+  const { field: fieldName, allianceTypes } = PARTNER_SERVICES[service];
   const [showAll, setShowAll] = useState(false);
-  const ofType = alliances.filter((a) => a.organizationType === allianceType);
-  const options = showAll ? alliances : alliances.filter((a) => a.organizationType === allianceType || a.id === value);
+  const isOfType = (type?: string | null) => (allianceTypes as readonly string[]).includes(type ?? "");
+  const ofType = alliances.filter((a) => isOfType(a.organizationType));
+  const options = showAll ? alliances : alliances.filter((a) => isOfType(a.organizationType) || a.id === value);
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border border-dashed border-border p-4">

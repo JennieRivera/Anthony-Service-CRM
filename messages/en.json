@@ -774,13 +774,13 @@
     "partners": {
       "remodeling": {
         "title": "Remodeling & Remodeling Partnerships",
-        "hint": "We connect the client with an allied contractor; the contractor does the work and contracts with the client directly.",
-        "field": "Allied contractor",
+        "hint": "We connect the client with an allied contractor or installer; the ally does the work and contracts directly with the client.",
+        "field": "Allied contractor or installer",
         "none": "Not chosen yet",
-        "noAlly": "No allied contractor chosen yet.",
-        "noneOfType": "No “Contractor / Remodeling” alliances yet. Set that type on the alliance (Alliances → Edit), or see all alliances.",
+        "noAlly": "No allied contractor or installer chosen yet.",
+        "noneOfType": "There are no «Contractor / Remodeling» or «Installer / Remodeling» alliances yet. You can set the type on the alliance (Alliances → Edit) or see all alliances.",
         "showAll": "See all alliances",
-        "onlyType": "Contractors only",
+        "onlyType": "Show only contractors and installers",
         "createReferral": "Create referral to the ally"
       },
       "corporate_events": {
@@ -2883,7 +2883,8 @@
     "university": "University",
     "business_organization": "Business Organization",
     "contractor_remodeling": "Contractor / Remodeling",
-    "chef_culinary": "Chef / Culinary"
+    "chef_culinary": "Chef / Culinary",
+    "installer_remodeling": "Installer / Remodeling"
   },
   "AllianceStatus": {
     "prospect": "Prospect",
@@ -4226,16 +4227,16 @@
     "error": "Something went wrong",
     "keys": {
       "not_a_law_firm": {
-        "title": "Notice: \"We are not attorneys\"",
-        "help": "Footer of /book, of the client portal and of the Privacy Notice, and highlighted on /book for Immigration and Notary Public services."
+        "title": "Notice: \"Not a law firm or an NMLS lender\"",
+        "help": "Footer of /book, the client portal, the partner portal, the Privacy Notice and PDF/Word exports; highlighted on /book for Immigration, Notary Public and Credit, and on Credit & Financial Readiness and Commercial Financing Referrals. The NMLS part (\"not a lender\") is new: pending review by an attorney."
       },
       "not_a_law_firm_email": {
         "title": "Short notice for emails",
-        "help": "One line at the bottom of automatic emails, in small gray type under the signature. The full notice above still shows on /book, the portal and the Privacy Notice."
+        "help": "One line at the end of automatic emails, in small gray type below the signature. Includes NMLS (pending review by an attorney)."
       },
       "not_a_law_firm_ack": {
         "title": "Mandatory acknowledgment",
-        "help": "The checkbox clients must tick on /book and the first time they open the portal. Each acceptance is saved with date, time, IP and the exact text."
+        "help": "The checkbox the client ticks on /book and the first time they open the portal, and that an ally accepts the first time it opens its portal. Includes NMLS (pending review by an attorney). Each acceptance is saved with date, time, IP and the exact text."
       },
       "partner_terms": {
         "title": "Alliance terms (partner portal)",
@@ -4846,7 +4847,7 @@
         "city": "City",
         "state": "State (e.g. FL)",
         "description": "Business description",
-        "servicesOffered": "Services you offer",
+        "servicesOffered": "Notes about your services (optional)",
         "serviceArea": "Service area",
         "socialLinks": "Social media (one link per line)",
         "licenseNumber": "License number",
@@ -4870,7 +4871,9 @@
         "limit_reached": "You made many changes today. Try again tomorrow.",
         "invalid": "Check the information.",
         "generic": "Couldn't save. Please try again."
-      }
+      },
+      "licenseHintInstaller": "As an installer, a Florida license is optional (some jobs don't require one). If you have a license or insurance, enter them and we'll remind you before they expire.",
+      "licenseConfirmInstaller": "I confirm that the license and insurance details I entered are correct."
     },
     "referrals": {
       "title": "Referrals",
@@ -4906,6 +4909,35 @@
         "contact": "Enter a phone or an email.",
         "limit_reached": "You reached today's referral limit.",
         "generic": "Couldn't send. Please try again."
+      }
+    },
+    "services": {
+      "title": "My services",
+      "intro": "The services your business offers. Anthony Multiservice sees them and reviews every change.",
+      "empty": "You haven't added any services yet.",
+      "add": "Add service",
+      "fields": {
+        "name": "Service name",
+        "description": "Short description (optional)",
+        "serviceArea": "Service area (optional)",
+        "priceFrom": "Price \"from\" (optional)"
+      },
+      "from": "from {price}",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "edit": "Edit {name}",
+      "remove": "Remove {name}",
+      "removeConfirm": "Remove \"{name}\"?",
+      "removeHint": "The service will no longer show on your profile.",
+      "removeButton": "Remove",
+      "errors": {
+        "name": "Enter the service name.",
+        "price": "Enter the price using numbers only (for example 150 or 150.50).",
+        "too_many": "You've reached the maximum number of services.",
+        "limit_reached": "You made many changes today. Please try again tomorrow.",
+        "invalid": "Please check the details.",
+        "generic": "Couldn't save. Please try again."
       }
     }
   },
@@ -4946,8 +4978,15 @@
       "serviceArea": "Service area",
       "socialLinks": "Social media",
       "license": "License (number · expires)",
-      "insurance": "Insurance (company · expires)"
+      "insurance": "Insurance (company · expires)",
+      "servicesNotes": "Notes about services"
     },
-    "addedClients": "{count, plural, one {1 person added by this partner} other {# people added by this partner}}"
+    "addedClients": "{count, plural, one {1 person added by this partner} other {# people added by this partner}}",
+    "servicesTitle": "Services ({count})",
+    "noServices": "No services added in the portal yet.",
+    "priceFrom": "from {price}"
+  },
+  "OrganizationTypeHint": {
+    "installer_remodeling": "Floors, tile and other installations"
   }
 }

@@ -1,7 +1,7 @@
 import { formatDate, formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Pencil, Download, Calendar } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getAllianceById, listAlliancesForSelect } from "@/lib/queries/alliances";
 import { listClientsForSelect } from "@/lib/queries/clients";
 import { isBlobConfigured } from "@/lib/blob/config";
@@ -20,6 +20,7 @@ import { PartnerDocumentVisibility } from "@/components/alliances/PartnerDocumen
 import { getPartnerStaffView } from "@/lib/partners/staff";
 import { AllianceDeleteButton } from "@/components/alliances/AllianceDeleteButton";
 import { getAllianceDeletionImpact } from "@/lib/deletion";
+import { formatPriceFrom } from "@/lib/partners/format";
 import { getDb } from "@/lib/db";
 import type { PortalDb } from "@/lib/portal/db";
 import AccessDenied from "@/components/AccessDenied";
@@ -79,6 +80,7 @@ export default async function AllianceDetailPage({
   ]);
   if (!result) notFound();
   const tPartner = await getTranslations("PartnerAccess");
+  const locale = await getLocale();
 
   const {
     alliance,
@@ -229,7 +231,7 @@ export default async function AllianceDetailPage({
         }}
       />
 
-      {(partner.profile || partner.photos.length > 0 || partner.addedClients.length > 0) && (
+      {(partner.profile || partner.photos.length > 0 || partner.services.length > 0 || partner.addedClients.length > 0) && (
         <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6">
           <h2 className="font-heading text-lg text-foreground">{tPartner("profileTitle")}</h2>
           <p className="text-sm text-muted-foreground">{tPartner("profileHint")}</p>
@@ -251,7 +253,7 @@ export default async function AllianceDetailPage({
               {(
                 [
                   ["description", partner.profile?.description],
-                  ["servicesOffered", partner.profile?.servicesOffered],
+                  ["servicesNotes", partner.profile?.servicesOffered],
                   ["serviceArea", partner.profile?.serviceArea],
                   ["socialLinks", partner.profile?.socialLinks],
                   ["license", partner.profile?.licenseNumber ? `${partner.profile.licenseNumber}${partner.profile.licenseExpiration ? ` · ${formatDate(partner.profile.licenseExpiration)}` : ""}` : null],
@@ -264,6 +266,28 @@ export default async function AllianceDetailPage({
                 </div>
               ))}
             </dl>
+          </div>
+          <div className="flex flex-col gap-2">
+            <h3 className="text-sm font-medium text-foreground">{tPartner("servicesTitle", { count: partner.services.length })}</h3>
+            {partner.services.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{tPartner("noServices")}</p>
+            ) : (
+              <ul className="grid gap-2 sm:grid-cols-2">
+                {partner.services.map((s) => (
+                  <li key={s.id} className="flex flex-col gap-0.5 rounded-md border border-border p-3 text-sm">
+                    <span className="font-medium text-foreground">{s.name}</span>
+                    {s.description && <span className="text-muted-foreground">{s.description}</span>}
+                    {(s.serviceArea || s.priceFrom) && (
+                      <span className="text-xs text-muted-foreground">
+                        {[s.serviceArea, s.priceFrom ? tPartner("priceFrom", { price: formatPriceFrom(s.priceFrom, locale) ?? "" }) : null]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           {partner.photos.length > 0 && (
             <ul className="grid grid-cols-3 gap-2 sm:grid-cols-6">

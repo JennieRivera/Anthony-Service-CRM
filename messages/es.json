@@ -774,13 +774,13 @@
     "partners": {
       "remodeling": {
         "title": "Remodelación y Alianzas de Remodelación",
-        "hint": "Conectamos al cliente con un contratista aliado; el contratista hace la obra y contrata directamente con el cliente.",
-        "field": "Contratista aliado",
+        "hint": "Conectamos al cliente con un contratista o instalador aliado; el aliado hace el trabajo y contrata directamente con el cliente.",
+        "field": "Contratista o instalador aliado",
         "none": "Sin elegir todavía",
-        "noAlly": "Todavía no se eligió un contratista aliado.",
-        "noneOfType": "Todavía no hay alianzas de tipo «Contratista / Remodelación». Puede marcar ese tipo en la alianza (Alianzas → Editar) o ver todas las alianzas.",
+        "noAlly": "Todavía no se eligió un contratista o instalador aliado.",
+        "noneOfType": "Todavía no hay alianzas de tipo «Contratista / Remodelación» ni «Instalador / Remodelación». Puede marcar el tipo en la alianza (Alianzas → Editar) o ver todas las alianzas.",
         "showAll": "Ver todas las alianzas",
-        "onlyType": "Ver solo contratistas",
+        "onlyType": "Ver solo contratistas e instaladores",
         "createReferral": "Crear referido al aliado"
       },
       "corporate_events": {
@@ -2883,7 +2883,8 @@
     "university": "Universidad",
     "business_organization": "Organización Empresarial",
     "contractor_remodeling": "Contratista / Remodelación",
-    "chef_culinary": "Chef / Culinaria"
+    "chef_culinary": "Chef / Culinaria",
+    "installer_remodeling": "Instalador / Remodelación"
   },
   "AllianceStatus": {
     "prospect": "Prospecto",
@@ -4226,16 +4227,16 @@
     "error": "Algo salió mal",
     "keys": {
       "not_a_law_firm": {
-        "title": "Aviso: \"No somos abogados\"",
-        "help": "Pie de página de /book, del portal y del Aviso de Privacidad, y destacado en /book para Inmigración y Notary Public."
+        "title": "Aviso: \"No somos abogados ni prestamistas (NMLS)\"",
+        "help": "Pie de página de /book, del portal del cliente, del portal de aliados, del Aviso de Privacidad y de las exportaciones PDF/Word; destacado en /book para Inmigración, Notary Public y Crédito, y en Crédito y Preparación Financiera y Referidos de Financiamiento Comercial. La parte de NMLS (\"no somos prestamistas\") es nueva: pendiente de revisión de un abogado."
       },
       "not_a_law_firm_email": {
         "title": "Aviso corto para correos",
-        "help": "Una línea al final de los correos automáticos, en letra pequeña gris debajo de la firma. El aviso completo de arriba se sigue mostrando en /book, el portal y el Aviso de Privacidad."
+        "help": "Una línea al final de los correos automáticos, en letra pequeña gris debajo de la firma. Incluye NMLS (pendiente de revisión de un abogado)."
       },
       "not_a_law_firm_ack": {
         "title": "Casilla obligatoria",
-        "help": "La casilla que el cliente debe marcar en /book y la primera vez que entra al portal. Cada aceptación se guarda con fecha, hora, IP y el texto exacto."
+        "help": "La casilla que el cliente marca en /book y la primera vez que entra al portal, y que el aliado acepta la primera vez que entra a su portal. Incluye NMLS (pendiente de revisión de un abogado). Cada aceptación se guarda con fecha, hora, IP y el texto exacto."
       },
       "partner_terms": {
         "title": "Términos de la alianza (portal de aliados)",
@@ -4846,7 +4847,7 @@
         "city": "Ciudad",
         "state": "Estado (ej. FL)",
         "description": "Descripción del negocio",
-        "servicesOffered": "Servicios que ofrece",
+        "servicesOffered": "Notas sobre sus servicios (opcional)",
         "serviceArea": "Área de servicio",
         "socialLinks": "Redes sociales (un enlace por línea)",
         "licenseNumber": "Número de licencia",
@@ -4870,7 +4871,9 @@
         "limit_reached": "Hizo muchos cambios hoy. Inténtelo mañana.",
         "invalid": "Revise los datos.",
         "generic": "No se pudo guardar. Inténtelo de nuevo."
-      }
+      },
+      "licenseHintInstaller": "Como instalador, la licencia de Florida es opcional (algunos trabajos no la requieren). Si tiene licencia o seguro, escríbalos y le avisaremos antes de que venzan.",
+      "licenseConfirmInstaller": "Confirmo que los datos de licencia y seguro que escribí son correctos."
     },
     "referrals": {
       "title": "Referidos",
@@ -4906,6 +4909,35 @@
         "contact": "Escriba un teléfono o un correo.",
         "limit_reached": "Llegó al límite de referidos por hoy.",
         "generic": "No se pudo enviar. Inténtelo de nuevo."
+      }
+    },
+    "services": {
+      "title": "Mis servicios",
+      "intro": "Los servicios que ofrece su negocio. Anthony Multiservice los ve y revisa cada cambio.",
+      "empty": "Todavía no ha agregado servicios.",
+      "add": "Agregar servicio",
+      "fields": {
+        "name": "Nombre del servicio",
+        "description": "Descripción corta (opcional)",
+        "serviceArea": "Área de servicio (opcional)",
+        "priceFrom": "Precio «desde» (opcional)"
+      },
+      "from": "desde {price}",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "cancel": "Cancelar",
+      "edit": "Editar {name}",
+      "remove": "Quitar {name}",
+      "removeConfirm": "¿Quitar «{name}»?",
+      "removeHint": "El servicio deja de aparecer en su perfil.",
+      "removeButton": "Quitar",
+      "errors": {
+        "name": "Escriba el nombre del servicio.",
+        "price": "Escriba el precio solo con números (por ejemplo 150 o 150.50).",
+        "too_many": "Llegó al máximo de servicios.",
+        "limit_reached": "Hizo muchos cambios hoy. Inténtelo mañana.",
+        "invalid": "Revise los datos.",
+        "generic": "No se pudo guardar. Inténtelo de nuevo."
       }
     }
   },
@@ -4946,8 +4978,15 @@
       "serviceArea": "Área de servicio",
       "socialLinks": "Redes sociales",
       "license": "Licencia (número · vence)",
-      "insurance": "Seguro (compañía · vence)"
+      "insurance": "Seguro (compañía · vence)",
+      "servicesNotes": "Notas sobre sus servicios"
     },
-    "addedClients": "{count, plural, one {1 persona agregada por este aliado} other {# personas agregadas por este aliado}}"
+    "addedClients": "{count, plural, one {1 persona agregada por este aliado} other {# personas agregadas por este aliado}}",
+    "servicesTitle": "Servicios ({count})",
+    "noServices": "Todavía no agregó servicios en su portal.",
+    "priceFrom": "desde {price}"
+  },
+  "OrganizationTypeHint": {
+    "installer_remodeling": "Pisos, losas y otras instalaciones"
   }
 }
