@@ -4262,7 +4262,7 @@
     "keys": {
       "not_a_law_firm": {
         "title": "Aviso: \"No somos abogados ni prestamistas (NMLS)\"",
-        "help": "Pie de página de /book, del portal del cliente, del portal de aliados, del Aviso de Privacidad y de las exportaciones PDF/Word; destacado en /book para Inmigración, Notary Public y Crédito, y en Crédito y Preparación Financiera y Referidos de Financiamiento Comercial. La parte de NMLS (\"no somos prestamistas\") es nueva: pendiente de revisión de un abogado."
+        "help": "Pie de página de /book, del portal del cliente, de Diamante Conecta 360, del Aviso de Privacidad y de las exportaciones PDF/Word; destacado en /book para Inmigración, Notary Public y Crédito, y en Crédito y Preparación Financiera y Referidos de Financiamiento Comercial. La parte de NMLS (\"no somos prestamistas\") es nueva: pendiente de revisión de un abogado."
       },
       "not_a_law_firm_email": {
         "title": "Aviso corto para correos",
@@ -4270,11 +4270,11 @@
       },
       "not_a_law_firm_ack": {
         "title": "Casilla obligatoria",
-        "help": "La casilla que el cliente marca en /book y la primera vez que entra al portal, y que el aliado acepta la primera vez que entra a su portal. Incluye NMLS (pendiente de revisión de un abogado). Cada aceptación se guarda con fecha, hora, IP y el texto exacto."
+        "help": "La casilla que el cliente marca en /book y la primera vez que entra al portal, y que el aliado acepta la primera vez que entra a Diamante Conecta 360. Incluye NMLS (pendiente de revisión de un abogado). Cada aceptación se guarda con fecha, hora, IP y el texto exacto."
       },
       "partner_terms": {
-        "title": "Términos de la alianza (portal de aliados)",
-        "help": "BORRADOR — pendiente de revisión de un abogado. Lo acepta cada aliado la primera vez que entra a su portal."
+        "title": "Términos de la alianza (Diamante Conecta 360)",
+        "help": "BORRADOR — pendiente de revisión de un abogado. Lo acepta cada aliado la primera vez que entra a Diamante Conecta 360."
       },
       "florida_notary_disclosure": {
         "title": "Aviso de Notary Public de Florida (sección 117.05(10))",
@@ -4784,7 +4784,7 @@
     "check_this_field": "Revise este campo."
   },
   "Partners": {
-    "title": "Portal de Aliados",
+    "title": "Diamante Conecta 360",
     "signOut": "Salir",
     "questions": "¿Preguntas? Llámenos al {phone}",
     "nav": {
@@ -4799,12 +4799,12 @@
       "calendar": "Calendario"
     },
     "access": {
-      "title": "Su portal de aliado",
+      "title": "Su acceso a Diamante Conecta 360",
       "intro": "Para proteger su información, escriba los últimos 4 dígitos del teléfono de su negocio que tenemos registrado.",
       "lastFourLabel": "Últimos 4 dígitos del teléfono",
       "continue": "Continuar",
       "checking": "Verificando…",
-      "noLink": "Para abrir su portal necesita el link personal que le enviamos. Si venció o no funciona, pídanos uno nuevo.",
+      "noLink": "Para entrar a Diamante Conecta 360 necesita el link personal que le enviamos. Si venció o no funciona, pídanos uno nuevo.",
       "callUs": "Llámenos al {phone}",
       "errors": {
         "format": "Escriba 4 dígitos.",
@@ -4815,7 +4815,7 @@
       }
     },
     "gate": {
-      "title": "Bienvenido al Portal de Aliados",
+      "title": "Bienvenido a Diamante Conecta 360",
       "acceptTerms": "He leído y acepto los Términos de la alianza.",
       "continue": "Aceptar y continuar",
       "error": "No se pudo guardar. Inténtelo de nuevo."
@@ -5078,16 +5078,17 @@
         "limit_reached": "Ya pidió varias reuniones hoy. Inténtelo mañana.",
         "generic": "No se pudo enviar. Inténtelo de nuevo."
       }
-    }
+    },
+    "subtitle": "La red de aliados de Anthony Multiservice"
   },
   "PartnerAccess": {
-    "title": "Acceso al portal del aliado",
+    "title": "Acceso a Diamante Conecta 360",
     "description": "Genere un link personal y envíelo al aliado por WhatsApp. El aliado lo confirma con los últimos 4 dígitos del teléfono de la alianza. El link vence en 7 días y funciona una sola vez; la sesión dura 30 días.",
     "generate": "Generar link",
     "generateNew": "Generar link nuevo",
     "revoke": "Revocar acceso",
     "revoking": "Revocando…",
-    "revokeConfirmTitle": "¿Revocar el acceso al portal del aliado?",
+    "revokeConfirmTitle": "¿Revocar el acceso a Diamante Conecta 360?",
     "revokeConfirmDescription": "Cualquier link sin usar deja de funcionar y se cierra la sesión del aliado en todos sus dispositivos.",
     "cancel": "Cancelar",
     "needsPhone": "Primero agregue un teléfono a la alianza: el link se confirma con sus últimos 4 dígitos.",
@@ -5108,8 +5109,8 @@
     "uploadedByPartner": "Subido por el aliado",
     "visibleToPartner": "Visible para el aliado",
     "mayContainSensitiveData": "Puede contener datos sensibles",
-    "profileTitle": "Perfil del aliado (portal)",
-    "profileHint": "Lo que el aliado escribió en su portal. Cada cambio le crea una tarea para revisarlo.",
+    "profileTitle": "Perfil del aliado (Diamante Conecta 360)",
+    "profileHint": "Lo que el aliado escribió en Diamante Conecta 360. Cada cambio le crea una tarea para revisarlo.",
     "expiryAlert": "La licencia o el seguro de este contratista vence pronto o ya venció. Revise su perfil.",
     "fields": {
       "description": "Descripción",

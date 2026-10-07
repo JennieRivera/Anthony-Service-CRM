@@ -113,7 +113,7 @@ export async function createPartnerContact(
       status: "prospect",
       servicesConnected: services || null,
       dateIntroduced: businessDateString(now),
-      notes: `Agregado por ${owner} (portal de aliados).${note ? ` Nota del aliado: ${note}` : ""}`,
+      notes: `Agregado por ${owner} (Diamante Conecta 360).${note ? ` Nota del aliado: ${note}` : ""}`,
       addedByAllianceId: params.allianceId,
       createdAt: now,
       updatedAt: now,

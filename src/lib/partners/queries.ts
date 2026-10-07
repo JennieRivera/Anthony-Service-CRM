@@ -706,7 +706,7 @@ export async function createPartnerReferral(
       preferredLanguage: "es",
       referralSource: `Aliado: ${ally}`.slice(0, 200),
       interestedServices: service ? [service] : null,
-      notes: `Agregado por ${ally} (portal de aliados).${note ? ` Nota del aliado: ${note}` : ""}`,
+      notes: `Agregado por ${ally} (Diamante Conecta 360).${note ? ` Nota del aliado: ${note}` : ""}`,
       addedByAllianceId: params.allianceId,
     })
     .returning({ id: clients.id });

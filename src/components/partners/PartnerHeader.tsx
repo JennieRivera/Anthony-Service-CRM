@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { CalendarDays, Ellipsis, FileText, Handshake, House, LogOut, Megaphone, Network, UserRound, Users } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { ConectaDiamond } from "./ConectaDiamond";
 
 // Same pattern as the client portal: on a computer every section is a tab
 // under the header; on a phone the first four go in a bottom bar and the
@@ -66,13 +67,11 @@ export function PartnerHeader({
             // eslint-disable-next-line @next/next/no-img-element
             <img src="/api/partners/logo" alt="" className="size-9 shrink-0 rounded-md border border-border object-cover" />
           ) : (
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <Network className="size-5" aria-hidden />
-            </span>
+            <ConectaDiamond className="size-9" />
           )}
           <div className="flex min-w-0 flex-col leading-tight">
             <span className="font-heading text-base text-foreground">{t("title")}</span>
-            {businessName && <span className="truncate text-xs text-muted-foreground">{businessName}</span>}
+            <span className="truncate text-xs text-muted-foreground">{businessName ?? t("subtitle")}</span>
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">

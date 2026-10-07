@@ -4262,7 +4262,7 @@
     "keys": {
       "not_a_law_firm": {
         "title": "Notice: \"Not a law firm or an NMLS lender\"",
-        "help": "Footer of /book, the client portal, the partner portal, the Privacy Notice and PDF/Word exports; highlighted on /book for Immigration, Notary Public and Credit, and on Credit & Financial Readiness and Commercial Financing Referrals. The NMLS part (\"not a lender\") is new: pending review by an attorney."
+        "help": "Footer of /book, the client portal, Diamante Conecta 360, the Privacy Notice and PDF/Word exports; highlighted on /book for Immigration, Notary Public and Credit, and on Credit & Financial Readiness and Commercial Financing Referrals. The NMLS part (\"not a lender\") is new: pending review by an attorney."
       },
       "not_a_law_firm_email": {
         "title": "Short notice for emails",
@@ -4270,11 +4270,11 @@
       },
       "not_a_law_firm_ack": {
         "title": "Mandatory acknowledgment",
-        "help": "The checkbox the client ticks on /book and the first time they open the portal, and that an ally accepts the first time it opens its portal. Includes NMLS (pending review by an attorney). Each acceptance is saved with date, time, IP and the exact text."
+        "help": "The checkbox the client ticks on /book and the first time they open the portal, and that an ally accepts the first time it opens Diamante Conecta 360. Includes NMLS (pending review by an attorney). Each acceptance is saved with date, time, IP and the exact text."
       },
       "partner_terms": {
-        "title": "Alliance terms (partner portal)",
-        "help": "DRAFT — pending attorney review. Each alliance accepts it the first time it signs in to its portal."
+        "title": "Alliance terms (Diamante Conecta 360)",
+        "help": "DRAFT — pending review by an attorney. Each ally accepts it the first time it opens Diamante Conecta 360."
       },
       "florida_notary_disclosure": {
         "title": "Florida Notary Public disclosure (section 117.05(10))",
@@ -4784,7 +4784,7 @@
     "check_this_field": "Please check this field."
   },
   "Partners": {
-    "title": "Partner Portal",
+    "title": "Diamante Conecta 360",
     "signOut": "Sign out",
     "questions": "Questions? Call us at {phone}",
     "nav": {
@@ -4799,12 +4799,12 @@
       "calendar": "Calendar"
     },
     "access": {
-      "title": "Your partner portal",
+      "title": "Your Diamante Conecta 360 access",
       "intro": "To protect your information, enter the last 4 digits of your business phone number we have on file.",
       "lastFourLabel": "Last 4 digits of the phone",
       "continue": "Continue",
       "checking": "Checking…",
-      "noLink": "To open your portal you need the personal link we sent you. If it expired or doesn't work, ask us for a new one.",
+      "noLink": "To open Diamante Conecta 360 you need the personal link we sent you. If it expired or doesn't work, ask us for a new one.",
       "callUs": "Call us at {phone}",
       "errors": {
         "format": "Enter 4 digits.",
@@ -4815,7 +4815,7 @@
       }
     },
     "gate": {
-      "title": "Welcome to the Partner Portal",
+      "title": "Welcome to Diamante Conecta 360",
       "acceptTerms": "I have read and accept the Alliance terms.",
       "continue": "Accept and continue",
       "error": "Couldn't save. Please try again."
@@ -5078,16 +5078,17 @@
         "limit_reached": "You already requested several meetings today. Please try again tomorrow.",
         "generic": "Couldn't send. Please try again."
       }
-    }
+    },
+    "subtitle": "Anthony Multiservice partner network"
   },
   "PartnerAccess": {
-    "title": "Partner portal access",
-    "description": "Generate a personal link and send it to the partner by WhatsApp. The partner confirms it with the last 4 digits of the alliance's phone. The link expires in 7 days and works once; the session lasts 30 days.",
+    "title": "Diamante Conecta 360 access",
+    "description": "Generate a personal link and send it to the ally by WhatsApp. The ally confirms it with the last 4 digits of the alliance's phone. The link expires in 7 days and works only once; the session lasts 30 days.",
     "generate": "Generate link",
     "generateNew": "Generate new link",
     "revoke": "Revoke access",
     "revoking": "Revoking…",
-    "revokeConfirmTitle": "Revoke partner portal access?",
+    "revokeConfirmTitle": "Revoke Diamante Conecta 360 access?",
     "revokeConfirmDescription": "Any unused link stops working and the partner is signed out on every device.",
     "cancel": "Cancel",
     "needsPhone": "First add a phone to the alliance: the link is confirmed with its last 4 digits.",
@@ -5108,8 +5109,8 @@
     "uploadedByPartner": "Uploaded by the partner",
     "visibleToPartner": "Visible to the partner",
     "mayContainSensitiveData": "May contain sensitive data",
-    "profileTitle": "Partner profile (portal)",
-    "profileHint": "What the partner wrote in its portal. Every change creates a task for you to review.",
+    "profileTitle": "Ally profile (Diamante Conecta 360)",
+    "profileHint": "What the ally wrote in Diamante Conecta 360. Each change creates a task for you to review.",
     "expiryAlert": "This contractor's license or insurance expires soon or has expired. Check its profile.",
     "fields": {
       "description": "Description",
