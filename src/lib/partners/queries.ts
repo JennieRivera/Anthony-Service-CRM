@@ -369,13 +369,15 @@ export async function recordPartnerDocumentUpload(
     folder?: "documents" | "photos";
   },
 ) {
+  // A file in "Photos & images" is never a contract, W-9…: always "other".
+  const documentType = params.folder === "photos" ? "other" : params.documentType;
   const [doc] = await db
     .insert(allianceDocuments)
     .values({
       allianceId: params.allianceId,
       fileName: params.fileName,
       blobUrl: params.blobUrl,
-      documentType: params.documentType,
+      documentType,
       folder: params.folder ?? "documents",
       uploadedByPartner: true,
       visibleToPartner: true,
@@ -385,7 +387,7 @@ export async function recordPartnerDocumentUpload(
   await db.insert(tasks).values({
     allianceId: params.allianceId,
     type: "partner_document_review",
-    title: `Review partner document (${params.documentType}): ${params.fileName}`,
+    title: `Review partner document (${documentType}): ${params.fileName}`,
   });
   return doc.id;
 }

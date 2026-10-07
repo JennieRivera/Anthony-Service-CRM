@@ -439,7 +439,8 @@ async function main() {
       allianceId: allyA.id,
       fileName: "kitchen.jpg",
       blobUrl: "https://blob.example/kitchen.jpg",
-      documentType: "other",
+      // Even if the form still had "contract" chosen, a photo is "other".
+      documentType: "contract",
       sensitiveDataReason: null,
       folder: "photos",
     });
@@ -448,6 +449,7 @@ async function main() {
     assert.ok(ids.includes(own) && ids.includes(ownPhoto) && ids.includes(docAShared.id));
     assert.ok(!ids.includes(docAInternal.id) && !ids.includes(docBShared.id));
     assert.equal(items.find((i) => i.id === ownPhoto)?.folder, "photos");
+    assert.equal(items.find((i) => i.id === ownPhoto)?.documentType, "other");
     assert.equal(items.find((i) => i.id === own)?.folder, "documents");
     assert.ok(items.filter((i) => i.folder === "marketing").every((i) => i.id !== assetOnlyB.id && i.id !== assetNone.id));
     assert.ok(items.every((i) => i.viewUrl.startsWith("/api/partners/")));

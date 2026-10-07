@@ -118,6 +118,9 @@ export function AllianceArchive({
 
       {mode === "partner" && folder !== "marketing" && (
         <PartnerUploadForm
+          // One form per folder, so a photo never keeps the document type
+          // chosen in Documents.
+          key={folder}
           kind="document"
           folder={folder}
           documentTypes={folder === "documents" ? documentTypes : undefined}
