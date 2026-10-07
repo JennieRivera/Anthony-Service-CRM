@@ -29,6 +29,17 @@ export function partnerLast4Hash(allianceId: string, lastFour: string): string {
   return hmac(`partner-last4:${allianceId}:${lastFour}`);
 }
 
+// Diamante Conecta 360 email codes: only this HMAC is stored, bound to the
+// purpose and the email, so a "join" code can't be used to sign in.
+export function partnerEmailCodeHash(purpose: "signup" | "login", email: string, code: string): string {
+  return hmac(`partner-email-code:${purpose}:${email}:${code}`);
+}
+
+// Rate-limit keys for the email-code endpoints (per email, per IP).
+export function partnerEmailKey(email: string): string {
+  return hmac(`partner-email:${email}`);
+}
+
 // Upload pathnames: partner-uploads/<kind>/<nonce>.<mac>/<file>, the MAC
 // bound to the alliance AND the kind, so /complete can trust neither the
 // browser's alliance nor its claimed purpose.

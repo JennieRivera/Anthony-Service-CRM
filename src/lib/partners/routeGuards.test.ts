@@ -32,7 +32,13 @@ for (const page of pages) {
   assert.ok(/if \(!ctx\) return null;/.test(src), `${rel(page)} must stop when requirePartnerPage() returns null`);
 }
 
-const SESSION_LIFECYCLE = new Set(["src/app/api/partners/login/route.ts", "src/app/api/partners/logout/route.ts"]);
+const SESSION_LIFECYCLE = new Set([
+  "src/app/api/partners/login/route.ts",
+  "src/app/api/partners/logout/route.ts",
+  // Diamante Conecta 360 "Sign in with my email" (no session yet).
+  "src/app/api/partners/email-login/start/route.ts",
+  "src/app/api/partners/email-login/verify/route.ts",
+]);
 const routes = walk(path.join(root, "src/app/api/partners")).filter((f) => f.endsWith("route.ts"));
 assert.ok(routes.length >= 11, `expected the partner API routes, found ${routes.length}`);
 for (const route of routes) {

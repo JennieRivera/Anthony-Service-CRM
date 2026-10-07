@@ -26,6 +26,7 @@ import { strategicAlliances as allianceTable } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { AllianceConvertButton } from "@/components/alliances/AllianceConvertButton";
 import { AllianceDirectorySwitches } from "@/components/alliances/AllianceDirectorySwitches";
+import { AllianceApproveButton } from "@/components/alliances/AllianceApproveButton";
 import { getDb } from "@/lib/db";
 import type { PortalDb } from "@/lib/portal/db";
 import AccessDenied from "@/components/AccessDenied";
@@ -87,6 +88,7 @@ export default async function AllianceDetailPage({
   const tPartner = await getTranslations("PartnerAccess");
   const tNetwork = await getTranslations("AllyNetwork");
   const tStatus = await getTranslations("AllianceStatus");
+  const tConecta = await getTranslations("Conecta.staff");
   const locale = await getLocale();
   // Partner portal (Phase B): who added this alliance, and what this
   // alliance added to ITS network.
@@ -141,6 +143,22 @@ export default async function AllianceDetailPage({
           {deletionImpact && <AllianceDeleteButton allianceId={id} impact={deletionImpact} />}
         </div>
       </div>
+
+      {alliance.appliedViaConecta && (
+        <div className="flex flex-col gap-3 rounded-lg border-2 border-primary/40 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-0.5 text-sm">
+            <p className="font-medium text-foreground">{tConecta("appliedVia")}</p>
+            <p className="text-muted-foreground">
+              {alliance.emailLoginEnabled && (ACTIVE_ALLY_STATUSES as readonly string[]).includes(alliance.status)
+                ? tConecta("approved")
+                : tConecta("pending")}
+            </p>
+          </div>
+          {canEditAlliance && !(alliance.emailLoginEnabled && (ACTIVE_ALLY_STATUSES as readonly string[]).includes(alliance.status)) && (
+            <AllianceApproveButton allianceId={id} hasEmail={Boolean(alliance.email)} />
+          )}
+        </div>
+      )}
 
       {addedBy && (
         <div className="flex flex-col gap-3 rounded-lg border-2 border-primary/40 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">

@@ -28,6 +28,8 @@ const isPublicPath = (pathname: string) =>
   /^(\/(en|es))?\/book\/?$/.test(pathname) ||
   // The public Privacy Notice — exact match, no sub-paths (Step 2B).
   /^(\/(en|es))?\/privacy\/?$/.test(pathname) ||
+  // "Join Diamante Conecta 360" — exact match, no sub-paths.
+  /^(\/(en|es))?\/conecta\/unirse\/?$/.test(pathname) ||
   isPortalPath(pathname) ||
   isPartnerPath(pathname);
 

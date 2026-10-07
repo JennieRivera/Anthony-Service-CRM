@@ -37,6 +37,15 @@ const nextConfig: NextConfig = {
         source: "/api/partners/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
+      // "Join Diamante Conecta 360": not indexed for now (owner's choice).
+      {
+        source: "/:locale(en|es)/conecta/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      {
+        source: "/api/conecta/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
     ];
   },
 };

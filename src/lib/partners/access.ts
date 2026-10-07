@@ -52,6 +52,9 @@ export async function createPartnerAccessLink(
   }
   const lastFour = lastFourDigits(alliance.phone);
   if (!lastFour) throw new PartnerAccessError("Alliance has no phone number");
+  // Giving access approves it: "Sign in with my email" works too (when the
+  // alliance has an email).
+  await db.update(strategicAlliances).set({ emailLoginEnabled: true }).where(eq(strategicAlliances.id, params.allianceId));
 
   await db
     .update(partnerAccessLinks)
@@ -78,6 +81,8 @@ export async function createPartnerAccessLink(
 }
 
 export async function revokePartnerAccess(db: PortalDb, allianceId: string, now = new Date()) {
+  // Also turns off "Sign in with my email".
+  await db.update(strategicAlliances).set({ emailLoginEnabled: false }).where(eq(strategicAlliances.id, allianceId));
   await db
     .update(partnerAccessLinks)
     .set({ revokedAt: now })
@@ -162,17 +167,24 @@ export async function redeemPartnerAccessLink(
     .returning({ id: partnerAccessLinks.id });
   if (!claimed) return fail();
 
+  const { sessionToken, sessionExpiresAt } = await createPartnerSession(db, link.allianceId, link.id, now);
+  return { ok: true, allianceId: link.allianceId, sessionToken, sessionExpiresAt };
+}
+
+// A new partner session (personal link, or Diamante Conecta 360's
+// "Sign in with my email"). Only the token's hash is stored.
+export async function createPartnerSession(db: PortalDb, allianceId: string, linkId: string | null, now = new Date()) {
   const sessionToken = generatePartnerToken();
   const sessionExpiresAt = new Date(now.getTime() + PARTNER_SESSION_TTL_DAYS * DAY_MS);
   await db.insert(partnerSessions).values({
-    allianceId: link.allianceId,
-    linkId: link.id,
+    allianceId,
+    linkId,
     tokenHash: hashPartnerToken(sessionToken),
     expiresAt: sessionExpiresAt,
     createdAt: now,
     lastSeenAt: now,
   });
-  return { ok: true, allianceId: link.allianceId, sessionToken, sessionExpiresAt };
+  return { sessionToken, sessionExpiresAt };
 }
 
 export type ResolvedPartnerSession = { sessionId: string; allianceId: string; expiresAt: Date };

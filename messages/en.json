@@ -2210,7 +2210,8 @@
     "partner_license_expiring": "Partner License/Insurance Expiring",
     "partner_referral_assign": "Assign Referral to an Ally",
     "partner_network_review": "Review Ally Network",
-    "partner_meeting_request": "Ally Meeting Request"
+    "partner_meeting_request": "Ally Meeting Request",
+    "partner_application_review": "Review Ally Application"
   },
   "Tasks": {
     "title": "Tasks",
@@ -4804,7 +4805,7 @@
       "lastFourLabel": "Last 4 digits of the phone",
       "continue": "Continue",
       "checking": "Checking…",
-      "noLink": "To open Diamante Conecta 360 you need the personal link we sent you. If it expired or doesn't work, ask us for a new one.",
+      "noLink": "To sign in you need the personal link we sent you by WhatsApp, or sign in with your email if your access is approved.",
       "callUs": "Call us at {phone}",
       "errors": {
         "format": "Enter 4 digits.",
@@ -4812,7 +4813,9 @@
         "locked": "This link was locked after too many attempts. Call us at {phone} for a new one.",
         "rateLimited": "Too many attempts. Wait a few minutes and try again.",
         "generic": "Something went wrong. Please try again."
-      }
+      },
+      "wantToJoin": "Not an ally yet?",
+      "join": "Join Diamante Conecta 360"
     },
     "gate": {
       "title": "Welcome to Diamante Conecta 360",
@@ -5079,7 +5082,27 @@
         "generic": "Couldn't send. Please try again."
       }
     },
-    "subtitle": "Anthony Multiservice partner network"
+    "subtitle": "Anthony Multiservice partner network",
+    "emailLogin": {
+      "open": "Sign in with my email",
+      "title": "Sign in with my email",
+      "intro": "Enter your business email registered in Diamante Conecta 360. If your access is approved, we'll send you a 6-digit code.",
+      "email": "Email",
+      "sendCode": "Send me the code",
+      "sending": "Sending…",
+      "codeSent": "If {email} has approved access, a 6-digit code will arrive in a few minutes. It expires in 10 minutes.",
+      "code": "6-digit code",
+      "signIn": "Sign in",
+      "checking": "Checking…",
+      "changeEmail": "Use another email",
+      "errors": {
+        "email": "Enter a valid email.",
+        "invalid": "The code is wrong or expired.",
+        "rate_limited": "Too many attempts. Wait a few minutes and try again.",
+        "unavailable": "This option isn't available right now. Use your personal link or call us.",
+        "generic": "Something went wrong. Please try again."
+      }
+    }
   },
   "PartnerAccess": {
     "title": "Diamante Conecta 360 access",
@@ -5192,5 +5215,64 @@
     "optedIn": "The ally accepted appearing in the directory.",
     "notOptedIn": "The ally hasn't accepted appearing in the directory yet: it isn't shown.",
     "saved": "Saved."
+  },
+  "Conecta": {
+    "join": {
+      "title": "Join Diamante Conecta 360",
+      "intro": "Diamante Conecta 360 is the Anthony Multiservice partner network. Tell us about your business: we'll email you a code to confirm it and review your application.",
+      "fields": {
+        "businessName": "Business name",
+        "contactPerson": "Contact person",
+        "allyType": "Type of ally",
+        "city": "City",
+        "phone": "Phone",
+        "email": "Email",
+        "services": "Services you offer",
+        "website": "Website or social media (optional)"
+      },
+      "chooseType": "Choose one",
+      "termsTitle": "Alliance terms",
+      "acceptTerms": "I have read and accept the Alliance terms.",
+      "acceptContact": "I agree that Anthony Multiservice may contact me by phone, WhatsApp or email about this application and the alliance.",
+      "submit": "Send application",
+      "sending": "Sending…",
+      "codeTitle": "Confirm your email",
+      "codeSent": "We sent a 6-digit code to {email}. It expires in 10 minutes.",
+      "code": "6-digit code",
+      "confirm": "Confirm",
+      "checking": "Checking…",
+      "back": "Go back and fix my details",
+      "doneTitle": "Thank you! We received your application.",
+      "doneText": "Anthony Multiservice will review it and email you when your Diamante Conecta 360 access is approved.",
+      "errors": {
+        "businessName": "Enter the business name.",
+        "contactPerson": "Enter the contact person's name.",
+        "allyType": "Choose the type of ally.",
+        "services": "Write which services you offer.",
+        "city": "Enter the city.",
+        "phone": "Enter a valid US phone number.",
+        "email": "Enter a valid email.",
+        "consents": "Tick the three boxes to continue.",
+        "invalid": "The code is wrong or expired. Check it or send the application again.",
+        "rate_limited": "Too many attempts. Wait a few minutes and try again.",
+        "unavailable": "This form isn't available right now. Call us at (689) 342-6309.",
+        "send_failed": "We couldn't send the code to that email. Check it and try again.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "staff": {
+      "appliedVia": "Application from Diamante Conecta 360",
+      "pending": "Waiting for your approval: no access yet.",
+      "approved": "Approved: it can sign in with its email.",
+      "approve": "Approve and give access",
+      "approving": "Approving…",
+      "approveTitle": "Approve and give access to Diamante Conecta 360?",
+      "approveDescription": "The alliance becomes Active, \"Sign in with my email\" is turned on and it gets a welcome email with how to sign in. You can also generate its WhatsApp link.",
+      "approveDescriptionNoEmail": "The alliance becomes Active. It has no email: generate its WhatsApp link so it can sign in.",
+      "approvedEmailed": "Approved. The welcome email was sent.",
+      "approvedNoEmail": "Approved. No email was sent: generate its WhatsApp link.",
+      "cancel": "Cancel",
+      "error": "Something went wrong"
+    }
   }
 }

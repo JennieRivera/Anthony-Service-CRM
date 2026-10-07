@@ -547,6 +547,13 @@
       "when": 1791331220913,
       "tag": "0077_partner_calendar",
       "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1791332559435,
+      "tag": "0078_diamante_conecta",
+      "breakpoints": true
     }
   ]
 }

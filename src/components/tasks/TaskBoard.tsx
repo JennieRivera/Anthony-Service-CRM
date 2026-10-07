@@ -89,6 +89,7 @@ const PARTNER_TYPES = new Set([
   "partner_license_expiring",
   "partner_network_review",
   "partner_meeting_request",
+  "partner_application_review",
 ]);
 
 function directAction(task: TaskBoardRow): DirectAction {

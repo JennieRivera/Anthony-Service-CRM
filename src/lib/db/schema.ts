@@ -1034,6 +1034,9 @@ export const taskTypeEnum = pgEnum("task_type", [
   // Partner portal (Phase B4) — an ally asked for a meeting ("Request a
   // meeting"); staff confirms it and creates the appointment.
   "partner_meeting_request",
+  // Diamante Conecta 360 — a business applied on the public "Join" page
+  // and confirmed its email; staff reviews and approves it.
+  "partner_application_review",
 ]);
 
 export const taskStatusEnum = pgEnum("task_status", [
@@ -3837,6 +3840,12 @@ export const strategicAlliances = pgTable("strategic_alliances", {
   directoryAccess: boolean("directory_access").notNull().default(false),
   directoryListed: boolean("directory_listed").notNull().default(false),
   directoryOptIn: boolean("directory_opt_in").notNull().default(false),
+  // Diamante Conecta 360: "Sign in with my email" (6-digit code) works only
+  // while this is on AND the alliance is active. Turned on when staff
+  // approves access, off when access is revoked.
+  emailLoginEnabled: boolean("email_login_enabled").notNull().default(false),
+  // Applied through the public "Join Diamante Conecta 360" page.
+  appliedViaConecta: boolean("applied_via_conecta").notNull().default(false),
 });
 
 // Phase 1.5B — B2B Alliances enhancement. One alliance can have several
@@ -4926,6 +4935,27 @@ export const partnerContactDocuments = pgTable(
     sensitiveDataReason: text("sensitive_data_reason"),
   },
   (table) => [index("partner_contact_documents_contact_idx").on(table.contactId)],
+);
+
+// Diamante Conecta 360: 6-digit email codes — "Join" (confirm the email
+// before the application reaches the CRM; the form waits in payload) and
+// "Sign in with my email". Only an HMAC of the code is stored; a code
+// expires in 10 minutes and allows 5 tries.
+export const partnerEmailCodes = pgTable(
+  "partner_email_codes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    purpose: text("purpose", { enum: ["signup", "login"] }).notNull(),
+    email: text("email").notNull(),
+    codeHash: text("code_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    attempts: integer("attempts").notNull().default(0),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    allianceId: uuid("alliance_id").references(() => strategicAlliances.id, { onDelete: "cascade" }),
+    payload: jsonb("payload"),
+  },
+  (table) => [index("partner_email_codes_email_idx").on(table.email, table.purpose, table.createdAt)],
 );
 
 // The alliance's business photo gallery (private Blob, max 12).

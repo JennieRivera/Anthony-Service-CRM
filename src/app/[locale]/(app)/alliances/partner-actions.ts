@@ -16,6 +16,10 @@ import { redirect } from "@/i18n/navigation";
 import { isBlobConfigured } from "@/lib/blob/config";
 import { deleteAllianceRecord } from "@/lib/deletion";
 import { convertAllianceToActive } from "@/lib/partners/network";
+import { approveConectaAlliance } from "@/lib/partners/conecta";
+import { approvedEmail } from "@/lib/partners/conectaEmails";
+import { isEmailConfigured, realSenders } from "@/lib/notifications/providers";
+import { getLegalTexts, pickLocale } from "@/lib/legal/texts";
 
 // Staff controls for an alliance's partner portal (CRM side). The raw link
 // token is returned exactly once, to be copied and sent by WhatsApp.
@@ -156,4 +160,42 @@ export async function setAllianceDirectoryFlagsAction(
   });
   revalidatePath(`/alliances/${allianceId}`);
   return { ok: true };
+}
+
+// Diamante Conecta 360: "Approve and give access" — the alliance becomes an
+// active ally, "Sign in with my email" is turned on, and it gets an email
+// with how to sign in.
+export async function approveConectaAllianceAction(allianceId: string): Promise<{ ok: true; emailed: boolean } | { ok: false }> {
+  await requireAccessArea("alliances");
+  const staffEmail = (await auth())?.user?.email ?? null;
+  const approved = await approveConectaAlliance(db(), { allianceId, staffEmail });
+  if (!approved) return { ok: false };
+  let emailed = false;
+  if (approved.email && isEmailConfigured()) {
+    const h = await headers();
+    const host = h.get("x-forwarded-host") ?? h.get("host");
+    const proto = h.get("x-forwarded-proto") ?? (host?.startsWith("localhost") ? "http" : "https");
+    const locale = approved.locale;
+    const legal = await getLegalTexts(db());
+    const sent = await realSenders.email({
+      to: approved.email,
+      ...approvedEmail({
+        name: approved.name,
+        accessUrl: `${proto}://${host}/${locale}/partners/access`,
+        locale,
+        legalLine: pickLocale(legal.not_a_law_firm_email, locale),
+      }),
+    });
+    emailed = sent.ok;
+  }
+  await logAuditEvent({
+    action: "conecta.application_approved",
+    entityType: "alliance",
+    entityId: allianceId,
+    summary: `Diamante Conecta 360: application approved, email sign-in on${emailed ? ", welcome email sent" : ""}`,
+  });
+  revalidatePath(`/alliances/${allianceId}`);
+  revalidatePath("/alliance-directory");
+  revalidatePath("/tasks");
+  return { ok: true, emailed };
 }

@@ -2210,7 +2210,8 @@
     "partner_license_expiring": "Licencia/Seguro del Aliado por Vencer",
     "partner_referral_assign": "Asignar Referido a un Aliado",
     "partner_network_review": "Revisar Red del Aliado",
-    "partner_meeting_request": "Solicitud de Reunión del Aliado"
+    "partner_meeting_request": "Solicitud de Reunión del Aliado",
+    "partner_application_review": "Revisar Solicitud de Aliado"
   },
   "Tasks": {
     "title": "Tareas",
@@ -4804,7 +4805,7 @@
       "lastFourLabel": "Últimos 4 dígitos del teléfono",
       "continue": "Continuar",
       "checking": "Verificando…",
-      "noLink": "Para entrar a Diamante Conecta 360 necesita el link personal que le enviamos. Si venció o no funciona, pídanos uno nuevo.",
+      "noLink": "Para entrar necesita el link personal que le enviamos por WhatsApp, o entre con su correo si su acceso está aprobado.",
       "callUs": "Llámenos al {phone}",
       "errors": {
         "format": "Escriba 4 dígitos.",
@@ -4812,7 +4813,9 @@
         "locked": "Este link se bloqueó por demasiados intentos. Llámenos al {phone} para recibir uno nuevo.",
         "rateLimited": "Demasiados intentos. Espere unos minutos e inténtelo de nuevo.",
         "generic": "Algo salió mal. Inténtelo de nuevo."
-      }
+      },
+      "wantToJoin": "¿Todavía no es aliado?",
+      "join": "Únase a Diamante Conecta 360"
     },
     "gate": {
       "title": "Bienvenido a Diamante Conecta 360",
@@ -5079,7 +5082,27 @@
         "generic": "No se pudo enviar. Inténtelo de nuevo."
       }
     },
-    "subtitle": "La red de aliados de Anthony Multiservice"
+    "subtitle": "La red de aliados de Anthony Multiservice",
+    "emailLogin": {
+      "open": "Entrar con mi correo",
+      "title": "Entrar con mi correo",
+      "intro": "Escriba el correo de su negocio registrado en Diamante Conecta 360. Si su acceso está aprobado, le enviaremos un código de 6 dígitos.",
+      "email": "Correo",
+      "sendCode": "Enviarme el código",
+      "sending": "Enviando…",
+      "codeSent": "Si {email} tiene acceso aprobado, le llegará un código de 6 dígitos en unos minutos. Vence en 10 minutos.",
+      "code": "Código de 6 dígitos",
+      "signIn": "Entrar",
+      "checking": "Verificando…",
+      "changeEmail": "Usar otro correo",
+      "errors": {
+        "email": "Escriba un correo válido.",
+        "invalid": "El código no es correcto o ya venció.",
+        "rate_limited": "Demasiados intentos. Espere unos minutos e inténtelo de nuevo.",
+        "unavailable": "Esta opción no está disponible en este momento. Use su link personal o llámenos.",
+        "generic": "Algo salió mal. Inténtelo de nuevo."
+      }
+    }
   },
   "PartnerAccess": {
     "title": "Acceso a Diamante Conecta 360",
@@ -5192,5 +5215,64 @@
     "optedIn": "El aliado aceptó aparecer en el directorio.",
     "notOptedIn": "El aliado todavía no aceptó aparecer en el directorio: no se muestra.",
     "saved": "Guardado."
+  },
+  "Conecta": {
+    "join": {
+      "title": "Únase a Diamante Conecta 360",
+      "intro": "Diamante Conecta 360 es la red de aliados de Anthony Multiservice. Cuéntenos de su negocio: le enviaremos un código a su correo para confirmarlo y revisaremos su solicitud.",
+      "fields": {
+        "businessName": "Nombre del negocio",
+        "contactPerson": "Persona de contacto",
+        "allyType": "Tipo de aliado",
+        "city": "Ciudad",
+        "phone": "Teléfono",
+        "email": "Correo",
+        "services": "Servicios que ofrece",
+        "website": "Sitio web o redes sociales (opcional)"
+      },
+      "chooseType": "Elija uno",
+      "termsTitle": "Términos de la alianza",
+      "acceptTerms": "He leído y acepto los Términos de la alianza.",
+      "acceptContact": "Acepto que Anthony Multiservice me contacte por teléfono, WhatsApp o correo sobre esta solicitud y la alianza.",
+      "submit": "Enviar solicitud",
+      "sending": "Enviando…",
+      "codeTitle": "Confirme su correo",
+      "codeSent": "Le enviamos un código de 6 dígitos a {email}. Vence en 10 minutos.",
+      "code": "Código de 6 dígitos",
+      "confirm": "Confirmar",
+      "checking": "Verificando…",
+      "back": "Volver y corregir mis datos",
+      "doneTitle": "¡Gracias! Recibimos su solicitud.",
+      "doneText": "Anthony Multiservice la revisará y le avisará por correo cuando su acceso a Diamante Conecta 360 esté aprobado.",
+      "errors": {
+        "businessName": "Escriba el nombre del negocio.",
+        "contactPerson": "Escriba el nombre de la persona de contacto.",
+        "allyType": "Elija el tipo de aliado.",
+        "services": "Escriba qué servicios ofrece.",
+        "city": "Escriba la ciudad.",
+        "phone": "Escriba un teléfono válido de EE. UU.",
+        "email": "Escriba un correo válido.",
+        "consents": "Marque las tres casillas para continuar.",
+        "invalid": "El código no es correcto o ya venció. Revíselo o vuelva a enviar la solicitud.",
+        "rate_limited": "Demasiados intentos. Espere unos minutos e inténtelo de nuevo.",
+        "unavailable": "Este formulario no está disponible en este momento. Llámenos al (689) 342-6309.",
+        "send_failed": "No pudimos enviar el código a ese correo. Revíselo e inténtelo de nuevo.",
+        "generic": "Algo salió mal. Inténtelo de nuevo."
+      }
+    },
+    "staff": {
+      "appliedVia": "Solicitud desde Diamante Conecta 360",
+      "pending": "Pendiente de su aprobación: todavía no tiene acceso.",
+      "approved": "Aprobada: puede entrar con su correo.",
+      "approve": "Aprobar y dar acceso",
+      "approving": "Aprobando…",
+      "approveTitle": "¿Aprobar y dar acceso a Diamante Conecta 360?",
+      "approveDescription": "La alianza pasa a Activa, se activa \"Entrar con mi correo\" y le llega un correo de bienvenida con cómo entrar. También puede generarle el link por WhatsApp.",
+      "approveDescriptionNoEmail": "La alianza pasa a Activa. No tiene correo: genérele el link por WhatsApp para que entre.",
+      "approvedEmailed": "Aprobada. Le enviamos el correo de bienvenida.",
+      "approvedNoEmail": "Aprobada. No se envió correo: genérele el link por WhatsApp.",
+      "cancel": "Cancelar",
+      "error": "Algo salió mal"
+    }
   }
 }
