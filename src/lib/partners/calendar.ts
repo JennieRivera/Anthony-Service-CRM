@@ -105,6 +105,7 @@ export async function requestPartnerMeeting(db: PortalDb, params: { allianceId: 
     .from(strategicAlliances)
     .where(eq(strategicAlliances.id, params.allianceId))
     .limit(1);
+  // English mode labels, translated on display (titles.ts).
   const modeLabel = { in_person: "in person", phone: "phone", video: "video call" }[mode];
   await db.insert(tasks).values({
     allianceId: params.allianceId,

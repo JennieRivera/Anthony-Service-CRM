@@ -4292,6 +4292,14 @@
       "sms_consent": {
         "title": "Consentimiento para mensajes de texto (/book)",
         "help": "La casilla opcional \"Acepto recibir mensajes de texto\" de /book. Los operadores de EE. UU. exigen este tipo de texto (quién envía, frecuencia, tarifas, STOP/HELP, aviso de privacidad). Cada aceptación se guarda con fecha, hora, IP y el texto exacto."
+      },
+      "conecta_not_a_law_firm": {
+        "title": "Aviso de Diamante Conecta 360: \"No somos abogados ni prestamistas (NMLS)\"",
+        "help": "Solo en el portal de aliados (pie y bienvenida) y en la página \"Únase a Diamante Conecta 360\". BORRADOR — pendiente de revisión de un abogado."
+      },
+      "conecta_not_a_law_firm_email": {
+        "title": "Aviso corto para correos de Diamante Conecta 360",
+        "help": "Una línea al final de los correos de Diamante Conecta 360 (códigos y bienvenida). BORRADOR — pendiente de revisión de un abogado."
       }
     },
     "pendingAttorneyReview": "Traducción — pendiente de revisión de un abogado",
@@ -4342,7 +4350,50 @@
     "taskPartnerDocument": "Revisar documento del aliado ",
     "taskPartnerMarketing": "Aprobar material de marketing del aliado: ",
     "taskPartnerExpiring": "Licencia/seguro del contratista por vencer: ",
-    "taskPartnerReferral": "Referido nuevo de "
+    "taskPartnerReferral": "Referido nuevo de ",
+    "taskConectaApplication": "Revisar solicitud de aliado (Diamante Conecta 360): ",
+    "taskPartnerServices": "Revisar servicios del aliado: ",
+    "taskNetworkDocument": "Revisar documento de la red del aliado: ",
+    "taskAssignReferral": "Asignar referido a un aliado: ",
+    "taskDirectReferral": "Referido directo (copia para AMS): ",
+    "taskNewAlly": "Aliado nuevo agregado por ",
+    "taskMeetingRequest": "Solicitud de reunión de ",
+    "fragDuplicate": " — posible duplicado de ",
+    "fragSensitive": " — puede contener datos sensibles",
+    "fragPreferred": " — prefiere: ",
+    "fragNote": " — nota: ",
+    "fragModeInPerson": " (en persona)",
+    "fragModeVideo": " (videollamada)",
+    "fragModePhone": " (por teléfono)",
+    "fragNeeds": " necesita ",
+    "fragFromPrice": " (desde $",
+    "fragFrom": " (de ",
+    "fragLicense": " — licencia ",
+    "fragInsuranceAnd": ", seguro ",
+    "fragInsurance": " — seguro ",
+    "fragDocContract": "(contrato)",
+    "fragDocW9": "(W-9)",
+    "fragDocLicense": "(licencia)",
+    "fragDocInsurance": "(seguro)",
+    "fragDocAgreement": "(acuerdo de alianza)",
+    "fragDocOther": "(otro)",
+    "fragAdded": "agregó ",
+    "fragEdited": "editó ",
+    "fragRemoved": "quitó ",
+    "partnerField_contactPerson": "Persona de contacto",
+    "partnerField_phone": "Teléfono",
+    "partnerField_email": "Correo",
+    "partnerField_website": "Sitio web",
+    "partnerField_city": "Ciudad",
+    "partnerField_state": "Estado",
+    "partnerField_description": "Descripción",
+    "partnerField_servicesOffered": "Notas sobre servicios",
+    "partnerField_serviceArea": "Área de servicio",
+    "partnerField_socialLinks": "Redes sociales",
+    "partnerField_licenseNumber": "Número de licencia",
+    "partnerField_licenseExpiration": "Vencimiento de la licencia",
+    "partnerField_insuranceProvider": "Compañía de seguro",
+    "partnerField_insuranceExpiration": "Vencimiento del seguro"
   },
   "Privacy": {
     "metaTitle": "Aviso de Privacidad | Anthony Multiservice",
@@ -4811,7 +4862,7 @@
         "format": "Escriba 4 dígitos.",
         "invalid": "Los dígitos no coinciden o este link ya no es válido.",
         "locked": "Este link se bloqueó por demasiados intentos. Llámenos al {phone} para recibir uno nuevo.",
-        "rateLimited": "Demasiados intentos. Espere unos minutos e inténtelo de nuevo.",
+        "rateLimited": "Demasiados intentos. Espere unos minutos e intente otra vez.",
         "generic": "Algo salió mal. Inténtelo de nuevo."
       },
       "wantToJoin": "¿Todavía no es aliado?",
@@ -4825,7 +4876,7 @@
     },
     "home": {
       "welcome": "Hola, {name}",
-      "intro": "Aquí comparte con Anthony Multiservice su perfil, documentos, materiales y referidos.",
+      "intro": "Aquí comparte con Diamante Conecta 360 su perfil, documentos, materiales y referidos.",
       "referrals": "Referidos",
       "referralsText": "{count, plural, =0 {No hay referidos nuevos} one {1 referido nuevo} other {# referidos nuevos}}",
       "documents": "Documentos",
@@ -4852,16 +4903,16 @@
     },
     "documents": {
       "title": "Documentos",
-      "intro": "Suba sus contratos firmados y documentos (W-9, licencia, seguro, acuerdo de alianza). Abajo también están los documentos que Anthony Multiservice compartió con usted.",
+      "intro": "Suba sus contratos firmados y documentos (W-9, licencia, seguro, acuerdo de alianza). Abajo también están los documentos que Diamante Conecta 360 compartió con usted.",
       "upload": "Subir un documento",
       "empty": "Todavía no hay documentos.",
       "fromYou": "Subido por usted",
-      "fromAms": "De Anthony Multiservice",
+      "fromAms": "De Diamante Conecta 360",
       "download": "Descargar"
     },
     "marketing": {
       "title": "Marketing y publicidad",
-      "intro": "Descargue los materiales que Anthony Multiservice comparte con usted, y envíe los suyos para que los promocionemos.",
+      "intro": "Descargue los materiales que Diamante Conecta 360 comparte con usted, y envíe los suyos para que los promocionemos.",
       "sharedTitle": "Materiales para usted",
       "sharedEmpty": "Todavía no hay materiales compartidos.",
       "download": "Descargar",
@@ -4876,7 +4927,7 @@
     },
     "profile": {
       "title": "Mi perfil",
-      "intro": "Así conocemos a {name}. Los cambios se guardan al momento y Anthony Multiservice los revisa.",
+      "intro": "Así conocemos a {name}. Los cambios se guardan al momento y Diamante Conecta 360 los revisa.",
       "logoTitle": "Logo",
       "changeLogo": "Cambiar logo",
       "addLogo": "Subir logo",
@@ -4906,7 +4957,7 @@
       "licenseConfirm": "Confirmo que tengo licencia vigente del estado de Florida y seguro, y que los datos que escribí son correctos.",
       "save": "Guardar",
       "saving": "Guardando…",
-      "saved": "Guardado. Anthony Multiservice revisará los cambios.",
+      "saved": "Guardado. Diamante Conecta 360 revisará los cambios.",
       "noChanges": "No había cambios.",
       "errors": {
         "license_confirmation": "Marque la confirmación de licencia y seguro.",
@@ -4922,7 +4973,7 @@
     },
     "referrals": {
       "title": "Referidos",
-      "intro": "Los referidos que Anthony Multiservice le envía y los que usted nos envía.",
+      "intro": "Los referidos que Diamante Conecta 360 le envía y los que usted nos envía.",
       "toYouTitle": "Referidos para usted",
       "toYouEmpty": "Todavía no hay referidos para usted.",
       "hidden": "Datos de contacto ocultos hasta que el cliente dé permiso.",
@@ -4963,8 +5014,8 @@
       "needs": "Necesita: {service}",
       "toAnotherAlly": "Para otro aliado de la red: {service}",
       "assignedTo": "Asignado a {name}",
-      "network": "Mandar este referido a otro aliado de la red de Anthony Multiservice",
-      "networkHint": "Anthony Multiservice elige al aliado y se lo pasa. Usted verá el estado del referido.",
+      "network": "Mandar este referido a otro aliado de la red de Diamante Conecta 360",
+      "networkHint": "Diamante Conecta 360 elige al aliado y se lo pasa. Usted verá el estado del referido.",
       "requestedService": "¿Qué servicio necesita la persona?",
       "requestedServicePlaceholder": "Por ejemplo: instalar losas en la cocina",
       "directTo": "Directo a {name}: {service}",
@@ -4972,7 +5023,7 @@
     },
     "services": {
       "title": "Mis servicios",
-      "intro": "Los servicios que ofrece su negocio. Anthony Multiservice los ve y revisa cada cambio.",
+      "intro": "Los servicios que ofrece su negocio. Diamante Conecta 360 los ve y revisa cada cambio.",
       "empty": "Todavía no ha agregado servicios.",
       "add": "Agregar servicio",
       "fields": {
@@ -5001,7 +5052,7 @@
     },
     "network": {
       "title": "Mis aliados y contactos",
-      "intro": "Su propia red: las personas que necesitan un servicio y los negocios que usted conoce. Solo usted y Anthony Multiservice ven esta lista.",
+      "intro": "Su propia red: las personas que necesitan un servicio y los negocios que usted conoce. Solo usted y Diamante Conecta 360 ven esta lista.",
       "addTitle": "Agregar a mi red",
       "kindQuestion": "¿Qué quiere agregar?",
       "kind": {
@@ -5032,8 +5083,8 @@
     },
     "directory": {
       "title": "Directorio de la Red",
-      "intro": "Aliados de la red de Anthony Multiservice a los que usted puede mandar un referido directo. Anthony Multiservice recibe una copia.",
-      "notAvailable": "El directorio de la red no está disponible para su cuenta. Puede seguir mandando referidos a otros aliados desde Referidos: Anthony Multiservice elige al aliado.",
+      "intro": "Aliados de la red de Diamante Conecta 360 a los que usted puede mandar un referido directo. Diamante Conecta 360 recibe una copia.",
+      "notAvailable": "El directorio de la red no está disponible para su cuenta. Puede seguir mandando referidos a otros aliados desde Referidos: Diamante Conecta 360 elige al aliado.",
       "search": "Buscar por nombre, servicio, tipo o ciudad",
       "empty": "Todavía no hay aliados en el directorio.",
       "refer": "Mandar referido directo",
@@ -5051,8 +5102,8 @@
     },
     "calendar": {
       "title": "Calendario",
-      "intro": "Sus reuniones con Anthony Multiservice y las citas de sus referidos.",
-      "meetingsTitle": "Próximas reuniones con Anthony Multiservice",
+      "intro": "Sus reuniones con Diamante Conecta 360 y las citas de sus referidos.",
+      "meetingsTitle": "Próximas reuniones con Diamante Conecta 360",
       "noMeetings": "No tiene reuniones programadas.",
       "pastTitle": "Reuniones anteriores",
       "referralsTitle": "Citas de sus referidos",
@@ -5074,7 +5125,7 @@
       "send": "Enviar solicitud",
       "sending": "Enviando…",
       "cancel": "Cancelar",
-      "requested": "¡Gracias! Anthony Multiservice le confirmará la reunión.",
+      "requested": "¡Gracias! Diamante Conecta 360 le confirmará la reunión.",
       "errors": {
         "topic": "Escriba de qué quiere hablar.",
         "preferred": "Escriba qué días y horas le convienen.",
@@ -5098,7 +5149,7 @@
       "errors": {
         "email": "Escriba un correo válido.",
         "invalid": "El código no es correcto o ya venció.",
-        "rate_limited": "Demasiados intentos. Espere unos minutos e inténtelo de nuevo.",
+        "rate_limited": "Demasiados intentos. Espere unos minutos e intente otra vez.",
         "unavailable": "Esta opción no está disponible en este momento. Use su link personal o llámenos.",
         "generic": "Algo salió mal. Inténtelo de nuevo."
       }
@@ -5254,7 +5305,7 @@
         "email": "Escriba un correo válido.",
         "consents": "Marque las tres casillas para continuar.",
         "invalid": "El código no es correcto o ya venció. Revíselo o vuelva a enviar la solicitud.",
-        "rate_limited": "Demasiados intentos. Espere unos minutos e inténtelo de nuevo.",
+        "rate_limited": "Demasiados intentos. Espere unos minutos e intente otra vez.",
         "unavailable": "Este formulario no está disponible en este momento. Llámenos al (689) 342-6309.",
         "send_failed": "No pudimos enviar el código a ese correo. Revíselo e inténtelo de nuevo.",
         "generic": "Algo salió mal. Inténtelo de nuevo."

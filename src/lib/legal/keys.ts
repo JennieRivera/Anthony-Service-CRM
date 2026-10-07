@@ -11,6 +11,10 @@ export const LEGAL_TEXT_KEYS = [
   "not_a_law_firm_ack",
   // Partner portal: what an alliance accepts the first time it signs in.
   "partner_terms",
+  // Diamante Conecta 360's own version of the notice: only in the partner
+  // portal, on /conecta/unirse and in Diamante Conecta 360 emails.
+  "conecta_not_a_law_firm",
+  "conecta_not_a_law_firm_email",
   "florida_notary_disclosure",
   "document_processing_authorization",
   "privacy_notice",
@@ -41,6 +45,16 @@ export const DEFAULT_LEGAL_TEXTS: Record<LegalTextKey, LegalText> = {
   partner_terms: {
     en: "Diamante Conecta 360 — Alliance terms\n1. Anthony Multiservice (AMS) and your business are independent. Neither is the other's employee, agent, or legal representative.\n2. Only share information about people who gave you permission. You are responsible for that permission.\n3. Client information AMS refers to you is confidential: use it only to serve that referral, and do not share it.\n4. You are responsible for your own licenses, insurance, taxes, and the work you perform. AMS does not perform or guarantee that work.\n5. Marketing materials shared through the portal may only be used to promote the alliance, as agreed.\n6. Referral fees or commissions, if any, are governed by your signed alliance agreement.\n7. AMS may suspend portal access at any time.",
     es: "Diamante Conecta 360 — Términos de la alianza\n1. Anthony Multiservice (AMS) y su negocio son independientes. Ninguno es empleado, agente ni representante legal del otro.\n2. Solo comparta datos de personas que le dieron permiso. Usted es responsable de ese permiso.\n3. La información de clientes que AMS le refiera es confidencial: úsela solo para atender ese referido y no la comparta.\n4. Usted es responsable de sus propias licencias, seguros, impuestos y del trabajo que realiza. AMS no realiza ni garantiza ese trabajo.\n5. Los materiales de marketing compartidos en el portal solo se pueden usar para promocionar la alianza, según lo acordado.\n6. Las comisiones o pagos por referidos, si los hay, se rigen por su acuerdo de alianza firmado.\n7. AMS puede suspender el acceso al portal en cualquier momento.",
+  },
+  // Written 2026-10-06 at the owner's request — pending review by a
+  // licensed attorney (Settings → Legal texts says so).
+  conecta_not_a_law_firm: {
+    en: "Anthony Multiservice (Diamante Conecta 360) is not a law firm and does not provide legal advice. It is not an NMLS-licensed lender or loan originator: it does not offer, negotiate or approve loans or mortgages. Credit services and financing referrals are administrative and referral-only. We do not provide immigration advice; we provide administrative and document-preparation services at the client's direction. If you need legal advice, please consult a licensed attorney or an accredited representative.",
+    es: "Anthony Multiservice (Diamante Conecta 360) no es una firma de abogados y no ofrece asesoría legal. Tampoco es un prestamista ni originador de préstamos con licencia NMLS: no ofrece, negocia ni aprueba préstamos ni hipotecas. Los servicios de crédito y referidos de financiamiento son administrativos y de referencia a terceros. No ofrecemos asesoría de inmigración; ofrecemos servicios administrativos y de preparación de documentos bajo la dirección del cliente. Si necesita asesoría legal, consulte a un abogado con licencia o a un representante acreditado.",
+  },
+  conecta_not_a_law_firm_email: {
+    en: "Anthony Multiservice (Diamante Conecta 360) is not a law firm or an NMLS-licensed lender, and does not provide legal advice or loans.",
+    es: "Anthony Multiservice (Diamante Conecta 360) no es una firma de abogados ni un prestamista con licencia NMLS, y no ofrece asesoría legal ni préstamos.",
   },
   not_a_law_firm_ack: {
     en: "I understand that Anthony Multiservice is not a law firm or an NMLS-licensed lender, and does not give me legal advice or loans.",

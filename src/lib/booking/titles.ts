@@ -210,13 +210,87 @@ const TASK_PREFIXES = {
   "Documents pending: ": "taskDocumentsPending",
   "Close out: ": "taskCloseOut",
   "Confirm: ": "taskConfirm",
-  // Partner portal (Phase A).
+} as const;
+
+// ── Partner portal / Diamante Conecta 360 task titles ─────────────────
+// A fixed English prefix + a body of names and what the ally typed, with a
+// few fixed English fragments (below) that are translated too. Longest
+// prefix first where one starts like another.
+const PARTNER_TASK_PREFIXES = {
+  "Review ally application (Diamante Conecta 360): ": "taskConectaApplication",
   "Review partner profile change: ": "taskPartnerProfile",
+  "Review partner services: ": "taskPartnerServices",
   "Review partner document ": "taskPartnerDocument",
+  "Review ally-network document: ": "taskNetworkDocument",
   "Approve partner marketing material: ": "taskPartnerMarketing",
   "Contractor license/insurance expiring: ": "taskPartnerExpiring",
   "New referral from ": "taskPartnerReferral",
+  "Assign referral to an ally: ": "taskAssignReferral",
+  "Direct referral (copy for AMS): ": "taskDirectReferral",
+  "New ally added by ": "taskNewAlly",
+  "Meeting request from ": "taskMeetingRequest",
 } as const;
+
+// Fixed English pieces inside those bodies → SystemTitles keys.
+const PARTNER_FRAGMENTS: [string, string][] = [
+  [" — possible duplicate of ", "fragDuplicate"],
+  [" — may contain sensitive data", "fragSensitive"],
+  [" — preferred: ", "fragPreferred"],
+  [" — note: ", "fragNote"],
+  [" (in person)", "fragModeInPerson"],
+  [" (video call)", "fragModeVideo"],
+  [" (phone)", "fragModePhone"],
+  [" needs ", "fragNeeds"],
+  [" (from $", "fragFromPrice"],
+  [" (from ", "fragFrom"],
+  [" — license ", "fragLicense"],
+  [", insurance ", "fragInsuranceAnd"],
+  [" — insurance ", "fragInsurance"],
+  ["(contract)", "fragDocContract"],
+  ["(w9)", "fragDocW9"],
+  ["(license)", "fragDocLicense"],
+  ["(insurance)", "fragDocInsurance"],
+  ["(alliance_agreement)", "fragDocAgreement"],
+  ["(other)", "fragDocOther"],
+];
+// What the ally changed in "My services" (start of the body).
+const SERVICE_ACTIONS: [string, string][] = [
+  ["added ", "fragAdded"],
+  ["edited ", "fragEdited"],
+  ["removed ", "fragRemoved"],
+];
+// Profile field names in "Review partner profile change: field: a → b; …".
+const PARTNER_PROFILE_FIELDS = [
+  "contactPerson",
+  "phone",
+  "email",
+  "website",
+  "city",
+  "state",
+  "description",
+  "servicesOffered",
+  "serviceArea",
+  "socialLinks",
+  "licenseNumber",
+  "licenseExpiration",
+  "insuranceProvider",
+  "insuranceExpiration",
+];
+const PARTNER_FIELD_RE = new RegExp(`(^|; )(${PARTNER_PROFILE_FIELDS.join("|")}): `, "g");
+
+function localizePartnerBody(key: string, body: string, t: BookingTitleTranslators): string {
+  let out = body;
+  if (key === "taskPartnerServices") {
+    const action = SERVICE_ACTIONS.find(([en]) => out.startsWith(en));
+    if (action) out = `${t.system(action[1])}${out.slice(action[0].length)}`;
+  }
+  if (key === "taskPartnerProfile") {
+    out = out.replace(PARTNER_FIELD_RE, (_m, sep: string, field: string) => `${sep}${t.system(`partnerField_${field}`)}: `);
+    out = out.split("(empty)").join(t.system("valueEmpty"));
+  }
+  for (const [en, k] of PARTNER_FRAGMENTS) out = out.split(en).join(t.system(k));
+  return out;
+}
 const TASK_EXACT = {
   "No communication logged recently": "taskNoCommunication",
 } as const;
@@ -282,6 +356,9 @@ function localizeServiceInterestBody(body: string, t: BookingTitleTranslators): 
 }
 
 export function localizeBookingTitle(title: string, t: BookingTitleTranslators): string {
+  for (const [prefix, key] of Object.entries(PARTNER_TASK_PREFIXES)) {
+    if (title.startsWith(prefix)) return `${t.system(key)}${localizePartnerBody(key, title.slice(prefix.length), t)}`;
+  }
   for (const [prefix, key] of Object.entries(PORTAL_PREFIXES)) {
     if (!title.startsWith(prefix)) continue;
     const body = title.slice(prefix.length);

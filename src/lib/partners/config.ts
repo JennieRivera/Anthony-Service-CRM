@@ -19,11 +19,11 @@ export const PARTNER_MAX_SERVICES = 30;
 export const PARTNER_MAX_MEETING_REQUESTS_PER_DAY = 5;
 
 // Diamante Conecta 360 — 6-digit email codes ("Join" and "Sign in with my
-// email"): 10 minutes, 5 tries; at most 3 codes per email every 15 minutes
-// and 10 per IP per hour.
+// email"): 10 minutes, 5 tries; at most 5 codes per email every 15 minutes
+// (approving an application starts that count over) and 10 per IP per hour.
 export const PARTNER_EMAIL_CODE_TTL_MINUTES = 10;
 export const PARTNER_EMAIL_CODE_MAX_ATTEMPTS = 5;
-export const PARTNER_EMAIL_CODES_PER_EMAIL = 3;
+export const PARTNER_EMAIL_CODES_PER_EMAIL = 5;
 export const PARTNER_EMAIL_CODES_EMAIL_WINDOW_MINUTES = 15;
 export const PARTNER_EMAIL_CODES_PER_IP_HOUR = 10;
 

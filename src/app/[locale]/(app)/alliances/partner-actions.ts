@@ -183,7 +183,7 @@ export async function approveConectaAllianceAction(allianceId: string): Promise<
         name: approved.name,
         accessUrl: `${proto}://${host}/${locale}/partners/access`,
         locale,
-        legalLine: pickLocale(legal.not_a_law_firm_email, locale),
+        legalLine: pickLocale(legal.conecta_not_a_law_firm_email, locale),
       }),
     });
     emailed = sent.ok;

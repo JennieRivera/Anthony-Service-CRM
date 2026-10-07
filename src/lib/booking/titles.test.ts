@@ -166,4 +166,46 @@ for (const [old, key] of [
   );
 }
 
+// Partner portal / Diamante Conecta 360 tasks: stored in English, shown in
+// Spanish on /es (and unchanged on /en).
+// [stored, Spanish, English when it differs from what is stored]
+const partnerCases: [string, string, string?][] = [
+  [
+    "Review ally application (Diamante Conecta 360): PRUEBA CONECTA UNO — possible duplicate of Tile Pros",
+    "Revisar solicitud de aliado (Diamante Conecta 360): PRUEBA CONECTA UNO — posible duplicado de Tile Pros",
+  ],
+  [
+    "Assign referral to an ally: Maria needs \"Kitchen tile\" (from Chef Angel)",
+    "Asignar referido a un aliado: Maria necesita \"Kitchen tile\" (de Chef Angel)",
+  ],
+  [
+    "Direct referral (copy for AMS): Ally A → Ally C: Ana needs \"Tile\"",
+    "Referido directo (copia para AMS): Ally A → Ally C: Ana necesita \"Tile\"",
+  ],
+  [
+    "Meeting request from J & J: New services — preferred: Tuesday (video call) — note: after 3",
+    "Solicitud de reunión de J & J: New services — prefiere: Tuesday (videollamada) — nota: after 3",
+  ],
+  ["Review partner services: added Tile install (from $1200.00)", "Revisar servicios del aliado: agregó Tile install (desde $1200.00)"],
+  [
+    "Review partner profile change: description: (empty) → Pisos; city: Orlando → Kissimmee",
+    "Revisar cambio de perfil del aliado: Descripción: (vacío) → Pisos; Ciudad: Orlando → Kissimmee",
+    "Review partner profile change: Description: (empty) → Pisos; City: Orlando → Kissimmee",
+  ],
+  ["Review partner document (w9): w9.pdf", "Revisar documento del aliado (W-9): w9.pdf", "Review partner document (W-9): w9.pdf"],
+  [
+    "Review ally-network document: \"contract.pdf\" — J Tile LLC — may contain sensitive data",
+    "Revisar documento de la red del aliado: \"contract.pdf\" — J Tile LLC — puede contener datos sensibles",
+  ],
+  ["New ally added by Chef Angel: J Tile LLC", "Aliado nuevo agregado por Chef Angel: J Tile LLC"],
+  [
+    "Contractor license/insurance expiring: J & J — license 2026-10-20, insurance 2026-10-25",
+    "Licencia/seguro del contratista por vencer: J & J — licencia 2026-10-20, seguro 2026-10-25",
+  ],
+];
+for (const [stored, spanish, english] of partnerCases) {
+  assert.equal(localizeBookingTitle(stored, translators(es)), spanish);
+  assert.equal(localizeBookingTitle(stored, translators(en)), english ?? stored);
+}
+
 console.log("titles.test.ts: all title assertions passed.");

@@ -47,13 +47,13 @@ export default async function PartnerLayout({
         ) : (
           <PartnerTermsGate
             terms={pickLocale(texts.partner_terms, locale)}
-            notice={pickLocale(texts.not_a_law_firm, locale)}
+            notice={pickLocale(texts.conecta_not_a_law_firm, locale)}
             noticeLabel={pickLocale(texts.not_a_law_firm_ack, locale)}
           />
         )}
       </main>
       <LegalFooter
-        notALawFirm={pickLocale(texts.not_a_law_firm, locale)}
+        notALawFirm={pickLocale(texts.conecta_not_a_law_firm, locale)}
         floridaNotaryDisclosure={texts.florida_notary_disclosure}
         questionsLabel={t("questions", { phone: businessInfo.phone })}
       />

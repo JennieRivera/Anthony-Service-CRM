@@ -121,8 +121,8 @@ async function main() {
     assert.equal((await c.verifyConectaApplication(db, { email: "new@example.com", code: fresh.ok ? fresh.code : "", ipKey: null, ipAddress: null, userAgent: null })).ok, true);
   });
 
-  await ok("limits: 3 codes per email per 15 minutes; IP blocked after many wrong codes", async () => {
-    for (let i = 0; i < 3; i++) assert.ok((await c.startConectaApplication(db, { input: application("busy@example.com"), ipKey: null })).ok);
+  await ok("limits: 5 codes per email per 15 minutes; IP blocked after many wrong codes", async () => {
+    for (let i = 0; i < 5; i++) assert.ok((await c.startConectaApplication(db, { input: application("busy@example.com"), ipKey: null })).ok);
     assert.deepEqual(await c.startConectaApplication(db, { input: application("busy@example.com"), ipKey: null }), { ok: false, reason: "rate_limited" });
     for (let i = 0; i < 10; i++) await c.verifyConectaApplication(db, { email: "nobody@example.com", code: "000000", ipKey: "ip-bad", ipAddress: null, userAgent: null });
     assert.deepEqual(await c.verifyConectaApplication(db, { email: "nobody@example.com", code: "000000", ipKey: "ip-bad", ipAddress: null, userAgent: null }), {
@@ -134,6 +134,9 @@ async function main() {
   await ok("email sign-in: an unapproved Prospect never gets a code; after approval it does and signs in", async () => {
     const before = await c.startEmailLogin(db, { email: "jose@example.com", ipKey: null });
     assert.equal(before.send, null);
+    // Use up the email's limit before approval: approving starts it over.
+    for (let i = 0; i < 4; i++) await c.startEmailLogin(db, { email: "jose@example.com", ipKey: null });
+    assert.equal((await c.startEmailLogin(db, { email: "jose@example.com", ipKey: null })).rateLimited, true);
     const approved = await c.approveConectaAlliance(db, { allianceId: applicantId, staffEmail: "owner@example.com" });
     assert.equal(approved?.locale, "es");
     const [task] = await db.select().from(tasks).where(and(eq(tasks.allianceId, applicantId), eq(tasks.type, "partner_application_review")));

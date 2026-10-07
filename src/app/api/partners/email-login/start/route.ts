@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   if (send) {
     const locale = body.locale === "en" ? "en" : "es";
     const legal = await getLegalTexts(db);
-    const mail = codeEmail({ code: send.code, purpose: "login", locale, legalLine: pickLocale(legal.not_a_law_firm_email, locale) });
+    const mail = codeEmail({ code: send.code, purpose: "login", locale, legalLine: pickLocale(legal.conecta_not_a_law_firm_email, locale) });
     const sent = await realSenders.email({ to: send.email, ...mail });
     await logAuditEvent({
       action: "partner.email_code_sent",

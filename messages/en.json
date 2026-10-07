@@ -4292,6 +4292,14 @@
       "sms_consent": {
         "title": "Text-message consent (/book)",
         "help": "The optional \"I agree to receive text messages\" checkbox on /book. US carriers require this kind of wording (who sends, frequency, rates, STOP/HELP, privacy notice). Each acceptance is saved with date, time, IP and the exact text."
+      },
+      "conecta_not_a_law_firm": {
+        "title": "Diamante Conecta 360 notice: \"Not a law firm or an NMLS lender\"",
+        "help": "Only in the partner portal (footer and welcome) and on the \"Join Diamante Conecta 360\" page. DRAFT — pending review by an attorney."
+      },
+      "conecta_not_a_law_firm_email": {
+        "title": "Short notice for Diamante Conecta 360 emails",
+        "help": "One line at the end of Diamante Conecta 360 emails (codes and welcome). DRAFT — pending review by an attorney."
       }
     },
     "pendingAttorneyReview": "Translation — pending attorney review",
@@ -4342,7 +4350,50 @@
     "taskPartnerDocument": "Review partner document ",
     "taskPartnerMarketing": "Approve partner marketing material: ",
     "taskPartnerExpiring": "Contractor license/insurance expiring: ",
-    "taskPartnerReferral": "New referral from "
+    "taskPartnerReferral": "New referral from ",
+    "taskConectaApplication": "Review ally application (Diamante Conecta 360): ",
+    "taskPartnerServices": "Review partner services: ",
+    "taskNetworkDocument": "Review ally-network document: ",
+    "taskAssignReferral": "Assign referral to an ally: ",
+    "taskDirectReferral": "Direct referral (copy for AMS): ",
+    "taskNewAlly": "New ally added by ",
+    "taskMeetingRequest": "Meeting request from ",
+    "fragDuplicate": " — possible duplicate of ",
+    "fragSensitive": " — may contain sensitive data",
+    "fragPreferred": " — preferred: ",
+    "fragNote": " — note: ",
+    "fragModeInPerson": " (in person)",
+    "fragModeVideo": " (video call)",
+    "fragModePhone": " (phone)",
+    "fragNeeds": " needs ",
+    "fragFromPrice": " (from $",
+    "fragFrom": " (from ",
+    "fragLicense": " — license ",
+    "fragInsuranceAnd": ", insurance ",
+    "fragInsurance": " — insurance ",
+    "fragDocContract": "(contract)",
+    "fragDocW9": "(W-9)",
+    "fragDocLicense": "(license)",
+    "fragDocInsurance": "(insurance)",
+    "fragDocAgreement": "(alliance agreement)",
+    "fragDocOther": "(other)",
+    "fragAdded": "added ",
+    "fragEdited": "edited ",
+    "fragRemoved": "removed ",
+    "partnerField_contactPerson": "Contact person",
+    "partnerField_phone": "Phone",
+    "partnerField_email": "Email",
+    "partnerField_website": "Website",
+    "partnerField_city": "City",
+    "partnerField_state": "State",
+    "partnerField_description": "Description",
+    "partnerField_servicesOffered": "Notes about services",
+    "partnerField_serviceArea": "Service area",
+    "partnerField_socialLinks": "Social media",
+    "partnerField_licenseNumber": "License number",
+    "partnerField_licenseExpiration": "License expiration",
+    "partnerField_insuranceProvider": "Insurance company",
+    "partnerField_insuranceExpiration": "Insurance expiration"
   },
   "Privacy": {
     "metaTitle": "Privacy Notice | Anthony Multiservice",
@@ -4825,7 +4876,7 @@
     },
     "home": {
       "welcome": "Hello, {name}",
-      "intro": "Here you share your profile, documents, materials and referrals with Anthony Multiservice.",
+      "intro": "Here you share your profile, documents, materials and referrals with Diamante Conecta 360.",
       "referrals": "Referrals",
       "referralsText": "{count, plural, =0 {No new referrals} one {1 new referral} other {# new referrals}}",
       "documents": "Documents",
@@ -4852,16 +4903,16 @@
     },
     "documents": {
       "title": "Documents",
-      "intro": "Upload your signed contracts and documents (W-9, license, insurance, alliance agreement). Documents Anthony Multiservice shared with you are below too.",
+      "intro": "Upload your signed contracts and documents (W-9, license, insurance, alliance agreement). Documents Diamante Conecta 360 shared with you are below too.",
       "upload": "Upload a document",
       "empty": "No documents yet.",
       "fromYou": "Uploaded by you",
-      "fromAms": "From Anthony Multiservice",
+      "fromAms": "From Diamante Conecta 360",
       "download": "Download"
     },
     "marketing": {
       "title": "Marketing & advertising",
-      "intro": "Download materials Anthony Multiservice shares with you, and send yours for us to promote.",
+      "intro": "Download materials Diamante Conecta 360 shares with you, and send yours for us to promote.",
       "sharedTitle": "Materials for you",
       "sharedEmpty": "No shared materials yet.",
       "download": "Download",
@@ -4876,7 +4927,7 @@
     },
     "profile": {
       "title": "My profile",
-      "intro": "This is how we know {name}. Changes save right away and Anthony Multiservice reviews them.",
+      "intro": "This is how we know {name}. Changes save right away and Diamante Conecta 360 reviews them.",
       "logoTitle": "Logo",
       "changeLogo": "Change logo",
       "addLogo": "Upload logo",
@@ -4906,7 +4957,7 @@
       "licenseConfirm": "I confirm I hold a current State of Florida license and insurance, and that the information I entered is correct.",
       "save": "Save",
       "saving": "Saving…",
-      "saved": "Saved. Anthony Multiservice will review the changes.",
+      "saved": "Saved. Diamante Conecta 360 will review the changes.",
       "noChanges": "There were no changes.",
       "errors": {
         "license_confirmation": "Check the license and insurance confirmation.",
@@ -4922,7 +4973,7 @@
     },
     "referrals": {
       "title": "Referrals",
-      "intro": "Referrals Anthony Multiservice sends you and the ones you send us.",
+      "intro": "Referrals Diamante Conecta 360 sends you and the ones you send us.",
       "toYouTitle": "Referrals for you",
       "toYouEmpty": "No referrals for you yet.",
       "hidden": "Contact details hidden until the client gives permission.",
@@ -4963,8 +5014,8 @@
       "needs": "Needs: {service}",
       "toAnotherAlly": "For another ally in the network: {service}",
       "assignedTo": "Assigned to {name}",
-      "network": "Send this referral to another ally in the Anthony Multiservice network",
-      "networkHint": "Anthony Multiservice chooses the ally and passes it on. You'll see the referral's status.",
+      "network": "Send this referral to another ally in the Diamante Conecta 360 network",
+      "networkHint": "Diamante Conecta 360 chooses the ally and passes it on. You'll see the referral's status.",
       "requestedService": "What service does the person need?",
       "requestedServicePlaceholder": "For example: install kitchen tile",
       "directTo": "Direct to {name}: {service}",
@@ -4972,7 +5023,7 @@
     },
     "services": {
       "title": "My services",
-      "intro": "The services your business offers. Anthony Multiservice sees them and reviews every change.",
+      "intro": "The services your business offers. Diamante Conecta 360 sees them and reviews every change.",
       "empty": "You haven't added any services yet.",
       "add": "Add service",
       "fields": {
@@ -5001,7 +5052,7 @@
     },
     "network": {
       "title": "My allies and contacts",
-      "intro": "Your own network: people who need a service and businesses you know. Only you and Anthony Multiservice see this list.",
+      "intro": "Your own network: people who need a service and businesses you know. Only you and Diamante Conecta 360 see this list.",
       "addTitle": "Add to my network",
       "kindQuestion": "What do you want to add?",
       "kind": {
@@ -5032,8 +5083,8 @@
     },
     "directory": {
       "title": "Network Directory",
-      "intro": "Allies in the Anthony Multiservice network you can send a direct referral to. Anthony Multiservice gets a copy.",
-      "notAvailable": "The network directory isn't available for your account. You can still send referrals to other allies from Referrals: Anthony Multiservice chooses the ally.",
+      "intro": "Allies in the Diamante Conecta 360 network you can send a direct referral to. Diamante Conecta 360 gets a copy.",
+      "notAvailable": "The network directory isn't available for your account. You can still send referrals to other allies from Referrals: Diamante Conecta 360 chooses the ally.",
       "search": "Search by name, service, type or city",
       "empty": "There are no allies in the directory yet.",
       "refer": "Send a direct referral",
@@ -5051,8 +5102,8 @@
     },
     "calendar": {
       "title": "Calendar",
-      "intro": "Your meetings with Anthony Multiservice and your referrals' appointments.",
-      "meetingsTitle": "Upcoming meetings with Anthony Multiservice",
+      "intro": "Your meetings with Diamante Conecta 360 and your referrals' appointments.",
+      "meetingsTitle": "Upcoming meetings with Diamante Conecta 360",
       "noMeetings": "You have no meetings scheduled.",
       "pastTitle": "Past meetings",
       "referralsTitle": "Your referrals' appointments",
@@ -5074,7 +5125,7 @@
       "send": "Send request",
       "sending": "Sending…",
       "cancel": "Cancel",
-      "requested": "Thank you! Anthony Multiservice will confirm the meeting.",
+      "requested": "Thank you! Diamante Conecta 360 will confirm the meeting.",
       "errors": {
         "topic": "Write what you'd like to talk about.",
         "preferred": "Write which days and times work for you.",

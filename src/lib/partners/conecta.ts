@@ -65,8 +65,10 @@ async function recentEvents(db: PortalDb, keyHash: string, sinceMs: number, now:
 }
 
 // Counts a code request for the email and the IP; false = over the limit.
+const emailCodeKey = (email: string) => `code-email:${partnerEmailKey(email)}`;
+
 async function allowCodeRequest(db: PortalDb, email: string, ipKey: string | null, now: Date) {
-  const emailKey = `code-email:${partnerEmailKey(email)}`;
+  const emailKey = emailCodeKey(email);
   const ipCodeKey = ipKey ? `code-ip:${ipKey}` : null;
   if ((await recentEvents(db, emailKey, PARTNER_EMAIL_CODES_EMAIL_WINDOW_MINUTES * MINUTE_MS, now)) >= PARTNER_EMAIL_CODES_PER_EMAIL) return false;
   if (ipCodeKey && (await recentEvents(db, ipCodeKey, 60 * MINUTE_MS, now)) >= PARTNER_EMAIL_CODES_PER_IP_HOUR) return false;
@@ -267,6 +269,11 @@ export async function approveConectaAlliance(db: PortalDb, params: { allianceId:
     .update(tasks)
     .set({ status: "done", completedAt: now })
     .where(and(eq(tasks.allianceId, params.allianceId), eq(tasks.type, "partner_application_review"), eq(tasks.status, "open")));
+  // Requests made before the approval don't count against its first
+  // sign-in: that email's code count starts over.
+  if (a.email) {
+    await db.delete(portalRateLimitEvents).where(eq(portalRateLimitEvents.keyHash, emailCodeKey(normalizeEmail(a.email))));
+  }
   // The applicant's language is in the note written when it applied.
   const locale: "es" | "en" = a.notes?.includes("Diamante Conecta 360 (inglés)") ? "en" : "es";
   return { email: a.email, name: a.name, locale };

@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     code: started.code,
     purpose: "signup",
     locale: started.locale,
-    legalLine: pickLocale(legal.not_a_law_firm_email, started.locale),
+    legalLine: pickLocale(legal.conecta_not_a_law_firm_email, started.locale),
   });
   const sent = await realSenders.email({ to: started.email, ...mail });
   await logAuditEvent({

@@ -784,7 +784,7 @@ export async function createPartnerReferral(
     title: network
       ? `Assign referral to an ally: ${name} needs "${requestedService}" (from ${ally})${dup ? ` — possible duplicate of ${dup.name}` : ""}`
       : directTo
-        ? `Direct referral (copy for AMS) from ${ally} to ${directName}: ${name} needs "${requestedService}"${dup ? ` — possible duplicate of ${dup.name}` : ""}`
+        ? `Direct referral (copy for AMS): ${ally} → ${directName}: ${name} needs "${requestedService}"${dup ? ` — possible duplicate of ${dup.name}` : ""}`
         : `New referral from ${ally}: ${name}${dup ? ` — possible duplicate of ${dup.name}` : ""}`,
     createdAt: now,
   });

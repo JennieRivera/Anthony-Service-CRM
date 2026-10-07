@@ -236,7 +236,7 @@ export async function recordPartnerContactDocument(
   await db.insert(tasks).values({
     allianceId: params.allianceId,
     type: "partner_network_review",
-    title: `Review document "${params.fileName}" for ${contact?.businessName ?? contact?.name ?? "a contact"} (ally network)${params.sensitiveDataReason ? " — may contain sensitive data" : ""}`.slice(0, 2000),
+    title: `Review ally-network document: "${params.fileName}" — ${contact?.businessName ?? contact?.name ?? "—"}${params.sensitiveDataReason ? " — may contain sensitive data" : ""}`.slice(0, 2000),
     createdAt: now,
   });
   return doc.id;
