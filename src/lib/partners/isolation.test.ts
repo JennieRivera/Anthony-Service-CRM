@@ -431,6 +431,37 @@ async function main() {
     await assert.rejects(cal.requestPartnerMeeting(db, { allianceId: allyB.id, input: { topic: "One more", preferred: "Any" } }), q.PartnerLimitError);
   });
 
+  // ── "My files" (Diamante Conecta 360) ────────────────────────────────
+  const archive = await import("./archive");
+  await ok("my files: A sees its own uploads + what AMS shared, in folders; never B's or internal ones", async () => {
+    const own = await q.recordPartnerDocumentUpload(db, { allianceId: allyA.id, fileName: "w9.pdf", blobUrl: "https://blob.example/w9.pdf", documentType: "w9", sensitiveDataReason: null });
+    const ownPhoto = await q.recordPartnerDocumentUpload(db, {
+      allianceId: allyA.id,
+      fileName: "kitchen.jpg",
+      blobUrl: "https://blob.example/kitchen.jpg",
+      documentType: "other",
+      sensitiveDataReason: null,
+      folder: "photos",
+    });
+    const items = await archive.getAllianceArchive(db, allyA.id, "partner");
+    const ids = items.map((i) => i.id);
+    assert.ok(ids.includes(own) && ids.includes(ownPhoto) && ids.includes(docAShared.id));
+    assert.ok(!ids.includes(docAInternal.id) && !ids.includes(docBShared.id));
+    assert.equal(items.find((i) => i.id === ownPhoto)?.folder, "photos");
+    assert.equal(items.find((i) => i.id === own)?.folder, "documents");
+    assert.ok(items.filter((i) => i.folder === "marketing").every((i) => i.id !== assetOnlyB.id && i.id !== assetNone.id));
+    assert.ok(items.every((i) => i.viewUrl.startsWith("/api/partners/")));
+    // Staff sees the internal one too.
+    assert.ok((await archive.getAllianceArchive(db, allyA.id, "staff")).some((i) => i.id === docAInternal.id));
+
+    // Move rules: only its own uploads; only web images into Photos.
+    await assert.rejects(archive.moveAllianceDocument(db, { allianceId: allyA.id, documentId: own, folder: "photos", by: "partner" }), /not_image/);
+    await assert.rejects(archive.moveAllianceDocument(db, { allianceId: allyA.id, documentId: docAShared.id, folder: "photos", by: "partner" }), /not_found/);
+    await assert.rejects(archive.moveAllianceDocument(db, { allianceId: allyB.id, documentId: ownPhoto, folder: "documents", by: "partner" }), /not_found/);
+    await archive.moveAllianceDocument(db, { allianceId: allyA.id, documentId: ownPhoto, folder: "documents", by: "partner" });
+    assert.equal((await archive.getAllianceArchive(db, allyA.id, "partner")).find((i) => i.id === ownPhoto)?.folder, "documents");
+  });
+
   // ── tasks invariant ──────────────────────────────────────────────────
   await ok("tasks: every task has a client or an alliance (database check)", async () => {
     await assert.rejects(db.insert(tasks).values({ type: "follow_up", title: "orphan" }));

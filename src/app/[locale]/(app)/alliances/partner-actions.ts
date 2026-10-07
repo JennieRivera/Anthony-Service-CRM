@@ -17,6 +17,7 @@ import { isBlobConfigured } from "@/lib/blob/config";
 import { deleteAllianceRecord } from "@/lib/deletion";
 import { convertAllianceToActive } from "@/lib/partners/network";
 import { approveConectaAlliance } from "@/lib/partners/conecta";
+import { ArchiveMoveError, moveAllianceDocument } from "@/lib/partners/archive";
 import { approvedEmail } from "@/lib/partners/conectaEmails";
 import { isEmailConfigured, realSenders } from "@/lib/notifications/providers";
 import { getLegalTexts, pickLocale } from "@/lib/legal/texts";
@@ -198,4 +199,29 @@ export async function approveConectaAllianceAction(allianceId: string): Promise<
   revalidatePath("/alliance-directory");
   revalidatePath("/tasks");
   return { ok: true, emailed };
+}
+
+// "My files" — staff moves an alliance file between Documents and Photos &
+// images (only web images can go to Photos).
+export async function moveAllianceFileAction(
+  allianceId: string,
+  documentId: string,
+  folder: "documents" | "photos",
+): Promise<{ ok: true } | { ok: false; error: "invalid" | "not_found" | "not_image" }> {
+  await requireAccessArea("alliances");
+  try {
+    const moved = await moveAllianceDocument(db(), { allianceId, documentId, folder, by: "staff" });
+    await logAuditEvent({
+      action: "alliance.document_moved",
+      entityType: "alliance",
+      entityId: allianceId,
+      summary: `Moved "${moved.fileName}" to ${folder}`,
+    });
+  } catch (err) {
+    if (err instanceof ArchiveMoveError) return { ok: false, error: err.message as "invalid" | "not_found" | "not_image" };
+    throw err;
+  }
+  revalidatePath(`/alliances/${allianceId}`);
+  revalidatePath("/documents");
+  return { ok: true };
 }

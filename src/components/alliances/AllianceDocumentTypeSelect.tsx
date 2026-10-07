@@ -20,7 +20,7 @@ export function AllianceDocumentTypeSelect({
   document,
 }: {
   allianceId: string;
-  document: AllianceDocument;
+  document: Pick<AllianceDocument, "id" | "documentType">;
 }) {
   const t = useTranslations("Alliances.documents");
   const tDocType = useTranslations("AllianceDocumentType");

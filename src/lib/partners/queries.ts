@@ -366,6 +366,7 @@ export async function recordPartnerDocumentUpload(
     blobUrl: string;
     documentType: PartnerDocumentType;
     sensitiveDataReason: string | null;
+    folder?: "documents" | "photos";
   },
 ) {
   const [doc] = await db
@@ -375,6 +376,7 @@ export async function recordPartnerDocumentUpload(
       fileName: params.fileName,
       blobUrl: params.blobUrl,
       documentType: params.documentType,
+      folder: params.folder ?? "documents",
       uploadedByPartner: true,
       visibleToPartner: true,
       sensitiveDataReason: params.sensitiveDataReason,

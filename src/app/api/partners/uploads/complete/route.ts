@@ -69,6 +69,7 @@ export async function POST(request: Request) {
     documentType?: unknown;
     caption?: unknown;
     contactId?: unknown;
+    folder?: unknown;
   } | null;
   if (!body || typeof body.pathname !== "string" || typeof body.fileName !== "string") return badRequest();
   const kind = partnerUploadKindFor(body.pathname, session.allianceId);
@@ -78,6 +79,9 @@ export async function POST(request: Request) {
   const fileKind = portalKindForFileName(fileName);
   if (!fileName || !fileKind || portalKindForFileName(body.pathname) !== fileKind) return badRequest();
   if ((kind === "logo" || kind === "photo") && !["jpeg", "png", "webp"].includes(fileKind)) return badRequest();
+  // "My files": a document can go to "Photos & images" — web images only.
+  const folder = kind === "document" && body.folder === "photos" ? "photos" : "documents";
+  if (folder === "photos" && !["jpeg", "png", "webp"].includes(fileKind)) return badRequest();
 
   const db = partnerDb();
   let blob;
@@ -143,6 +147,7 @@ export async function POST(request: Request) {
         blobUrl: blob.url,
         documentType,
         sensitiveDataReason,
+        folder,
       });
       await logAuditEvent({ action: "partner.document_uploaded", entityType: "alliance_document", entityId: id, summary: `Alliance uploaded "${fileName}" (${documentType})`, actor });
     } else if (kind === "contact_document") {

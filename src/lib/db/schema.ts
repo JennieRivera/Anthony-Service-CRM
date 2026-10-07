@@ -3914,6 +3914,10 @@ export const allianceDocuments = pgTable("alliance_documents", {
   visibleToPartner: boolean("visible_to_partner").notNull().default(false),
   uploadedByPartner: boolean("uploaded_by_partner").notNull().default(false),
   sensitiveDataReason: text("sensitive_data_reason"),
+  // "My files" (Diamante Conecta 360): which folder the file is in —
+  // Documents (contracts, W-9, license, insurance, agreements) or Photos &
+  // images (only web images). Marketing is its own folder (shared assets).
+  folder: text("folder", { enum: ["documents", "photos"] }).notNull().default("documents"),
 });
 
 export const allianceStatusHistory = pgTable("alliance_status_history", {

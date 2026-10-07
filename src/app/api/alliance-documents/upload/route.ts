@@ -79,6 +79,8 @@ export async function POST(request: Request) {
       fileName: file.name,
       blobUrl: blob.url,
       documentType,
+      // "My files" folder: web images go to Photos & images (staff can move it).
+      folder: /\.(jpe?g|png|webp)$/i.test(file.name) ? "photos" : "documents",
     })
     .returning();
 

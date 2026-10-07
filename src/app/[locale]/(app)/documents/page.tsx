@@ -9,6 +9,9 @@ import {
 import { listCasesWithClient, listClientsForSelect } from "@/lib/queries/cases";
 import { listAlliances, listAllianceDocuments } from "@/lib/queries/alliances";
 import { DocumentsCabinet } from "@/components/documents/DocumentsCabinet";
+import { getAllianceArchives, type ArchiveItem } from "@/lib/partners/archive";
+import { getDb } from "@/lib/db";
+import type { PortalDb } from "@/lib/portal/db";
 import { getServiceColorMap } from "@/lib/queries/serviceColors";
 import DatabaseNotConfigured from "@/components/DatabaseNotConfigured";
 
@@ -25,6 +28,7 @@ export default async function DocumentsPage() {
   let allianceDocuments: Awaited<ReturnType<typeof listAllianceDocuments>> = [];
   let academyEnrollments: Awaited<ReturnType<typeof listAcademyEnrollmentsForFolders>> = [];
   let serviceColors: Record<string, string> = {};
+  let allianceArchives: Record<string, ArchiveItem[]> = {};
   let error: string | null = null;
 
   if (configured) {
@@ -40,6 +44,8 @@ export default async function DocumentsPage() {
           listAcademyEnrollmentsForFolders(),
           getServiceColorMap(),
         ]);
+      // "My files" folders for each alliance (Documents → Alliances).
+      allianceArchives = await getAllianceArchives(getDb() as unknown as PortalDb, alliances.map((a) => a.id));
     } catch (err) {
       error = err instanceof Error ? err.message : "Unknown error";
     }
@@ -76,6 +82,7 @@ export default async function DocumentsPage() {
           referrals={referrals}
           alliances={alliances}
           allianceDocuments={allianceDocuments}
+          allianceArchives={allianceArchives}
           academyEnrollments={academyEnrollments}
           serviceColors={serviceColors}
           blobConfigured={blobConfigured}

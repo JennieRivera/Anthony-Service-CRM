@@ -1,0 +1,1 @@
+ALTER TABLE "alliance_documents" ADD COLUMN "folder" text DEFAULT 'documents' NOT NULL;

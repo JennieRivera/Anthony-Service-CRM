@@ -1,6 +1,6 @@
 import { formatDate, formatDateTime } from "@/lib/dates";
 import { notFound } from "next/navigation";
-import { Pencil, Download, Calendar } from "lucide-react";
+import { Pencil, Calendar } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getAllianceById, listAlliancesForSelect } from "@/lib/queries/alliances";
 import { listClientsForSelect } from "@/lib/queries/clients";
@@ -10,13 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AllianceStatusBadge } from "@/components/alliances/AllianceStatusBadge";
 import { AllianceDocumentUploader } from "@/components/alliances/AllianceDocumentUploader";
-import { AllianceDocumentTypeSelect } from "@/components/alliances/AllianceDocumentTypeSelect";
 import { AllianceContactsSection } from "@/components/alliances/AllianceContactsSection";
 import { AllianceNetworkSection } from "@/components/alliances/AllianceNetworkSection";
 import { AllianceActivitySection } from "@/components/alliances/AllianceActivitySection";
 import { AllianceMembershipSection } from "@/components/alliances/AllianceMembershipSection";
 import { PartnerAccessCard } from "@/components/alliances/PartnerAccessCard";
-import { PartnerDocumentVisibility } from "@/components/alliances/PartnerDocumentVisibility";
 import { getPartnerStaffView } from "@/lib/partners/staff";
 import { AllianceDeleteButton } from "@/components/alliances/AllianceDeleteButton";
 import { getAllianceDeletionImpact } from "@/lib/deletion";
@@ -27,6 +25,8 @@ import { eq } from "drizzle-orm";
 import { AllianceConvertButton } from "@/components/alliances/AllianceConvertButton";
 import { AllianceDirectorySwitches } from "@/components/alliances/AllianceDirectorySwitches";
 import { AllianceApproveButton } from "@/components/alliances/AllianceApproveButton";
+import { AllianceArchive } from "@/components/partners/AllianceArchive";
+import { getAllianceArchive } from "@/lib/partners/archive";
 import { getDb } from "@/lib/db";
 import type { PortalDb } from "@/lib/portal/db";
 import AccessDenied from "@/components/AccessDenied";
@@ -103,6 +103,7 @@ export default async function AllianceDetailPage({
       : Promise.resolve(null),
     getAllianceNetworkForStaff(getDb() as unknown as PortalDb, id),
   ]);
+  const archive = await getAllianceArchive(getDb() as unknown as PortalDb, id, "staff");
   const needsConversion =
     Boolean(result.alliance.addedByAllianceId) && !(ACTIVE_ALLY_STATUSES as readonly string[]).includes(result.alliance.status);
 
@@ -110,7 +111,6 @@ export default async function AllianceDetailPage({
     alliance,
     statusHistory,
     linkedReferrals,
-    documents,
     linkedClient,
     linkedCompany,
     contacts,
@@ -673,30 +673,8 @@ export default async function AllianceDetailPage({
           {t("documentsTitle")}
         </h2>
         {blobConfigured && <AllianceDocumentUploader allianceId={id} />}
-        {documents.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t("documents.empty")}</p>
-        ) : (
-          <ul className="flex flex-col divide-y divide-border">
-            {documents.map((doc) => (
-              <li key={doc.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
-                <span className="truncate font-medium text-foreground">{doc.fileName}</span>
-                <div className="flex flex-wrap items-center gap-2">
-                  {doc.sensitiveDataReason && <Badge variant="destructive">{tPartner("mayContainSensitiveData")}</Badge>}
-                  <PartnerDocumentVisibility documentId={doc.id} visible={doc.visibleToPartner} uploadedByPartner={doc.uploadedByPartner} />
-                  <AllianceDocumentTypeSelect allianceId={id} document={doc} />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    render={<a href={`/api/alliance-documents/${doc.id}/file?download=1`} />}
-                  >
-                    <Download className="h-4 w-4" />
-                    {t("documents.download")}
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        {/* "My files": the same folders the ally sees in its portal. */}
+        <AllianceArchive items={archive} mode="staff" allianceId={id} />
       </div>
 
       {/* Relationship/status history */}

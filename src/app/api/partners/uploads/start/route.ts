@@ -19,14 +19,14 @@ export async function POST(request: Request) {
   if (response) return response;
   if (!isBlobConfigured()) return json({ error: "unavailable" }, 503);
 
-  const body = (await readSmallJson(request)) as { fileName?: unknown; kind?: unknown; contactId?: unknown } | null;
+  const body = (await readSmallJson(request)) as { fileName?: unknown; kind?: unknown; contactId?: unknown; folder?: unknown } | null;
   if (!body || typeof body.fileName !== "string" || body.fileName.length > 255) return badRequest();
   if (!(PARTNER_UPLOAD_KINDS as readonly unknown[]).includes(body.kind)) return badRequest();
   const kind = body.kind as PartnerUploadKind;
 
   const fileKind = portalKindForFileName(body.fileName);
   if (!fileKind) return json({ error: "unsupported_type" }, 400);
-  if (IMAGE_ONLY_KINDS.includes(kind) && !["jpeg", "png", "webp"].includes(fileKind)) {
+  if ((IMAGE_ONLY_KINDS.includes(kind) || (kind === "document" && body.folder === "photos")) && !["jpeg", "png", "webp"].includes(fileKind)) {
     return json({ error: "unsupported_type" }, 400);
   }
 

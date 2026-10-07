@@ -47,6 +47,8 @@ import {
 } from "@/lib/validation/documentDrawer";
 import { immigrationDocumentFolderValues } from "@/lib/validation/immigrationDocumentFolder";
 import { AllianceDocumentUploader } from "@/components/alliances/AllianceDocumentUploader";
+import { AllianceArchive } from "@/components/partners/AllianceArchive";
+import type { ArchiveItem } from "@/lib/partners/archive";
 import type {
   listAllDocuments,
   listReferralsForFolders,
@@ -114,6 +116,7 @@ export function DocumentsCabinet({
   referrals,
   alliances,
   allianceDocuments,
+  allianceArchives = {},
   academyEnrollments,
   serviceColors,
   blobConfigured,
@@ -124,6 +127,8 @@ export function DocumentsCabinet({
   referrals: ReferralFolder[];
   alliances: AllianceRow[];
   allianceDocuments: AllianceDocRow[];
+  // "My files" per alliance (Documents, Photos & images, Marketing).
+  allianceArchives?: Record<string, ArchiveItem[]>;
   academyEnrollments: AcademyEnrollmentRow[];
   serviceColors: Record<string, string>;
   blobConfigured: boolean;
@@ -332,7 +337,8 @@ export function DocumentsCabinet({
   }
 
   if (view.level === "alliances") {
-    const countFor = (allianceId: string) => allianceDocuments.filter((d) => d.allianceId === allianceId).length;
+    const countFor = (allianceId: string) =>
+      allianceArchives[allianceId]?.length ?? allianceDocuments.filter((d) => d.allianceId === allianceId).length;
     const sorted = [...alliances].sort(
       (a, b) => countFor(b.id) - countFor(a.id) || a.organizationName.localeCompare(b.organizationName),
     );
@@ -406,7 +412,9 @@ export function DocumentsCabinet({
 
         {blobConfigured && alliance && <AllianceDocumentUploader allianceId={alliance.id} />}
 
-        {allianceDocs.length === 0 ? (
+        {allianceArchives[view.allianceId] ? (
+          <AllianceArchive items={allianceArchives[view.allianceId]} mode="staff" allianceId={view.allianceId} />
+        ) : allianceDocs.length === 0 ? (
           <p className="text-muted-foreground">{t("empty")}</p>
         ) : (
           <ul className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">

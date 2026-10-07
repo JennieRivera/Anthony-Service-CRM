@@ -24,6 +24,7 @@ export function PartnerUploadForm({
   withCaption = false,
   label,
   contactId,
+  folder,
 }: {
   kind: Kind;
   documentTypes?: readonly string[];
@@ -31,6 +32,8 @@ export function PartnerUploadForm({
   label: string;
   // "contact_document": which of the ally's contacts the file is for.
   contactId?: string;
+  // "document": the "My files" folder it goes to (photos = web images only).
+  folder?: "documents" | "photos";
 }) {
   const t = useTranslations("Partners.upload");
   const tDocType = useTranslations("AllianceDocumentType");
@@ -59,7 +62,7 @@ export function PartnerUploadForm({
       const start = await fetch("/api/partners/uploads/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileName: file.name, kind, contactId }),
+        body: JSON.stringify({ fileName: file.name, kind, contactId, folder }),
       });
       const started = (await start.json().catch(() => ({}))) as { pathname?: string; contentType?: string; error?: string };
       if (!start.ok || !started.pathname) throw new Error(started.error);
@@ -74,7 +77,7 @@ export function PartnerUploadForm({
       const done = await fetch("/api/partners/uploads/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pathname: blob.pathname, fileName: file.name, documentType, caption, contactId }),
+        body: JSON.stringify({ pathname: blob.pathname, fileName: file.name, documentType, caption, contactId, folder }),
       });
       if (!done.ok) {
         const data = (await done.json().catch(() => ({}))) as { error?: string };
@@ -128,11 +131,11 @@ export function PartnerUploadForm({
       <input
         ref={input}
         type="file"
-        accept={kind === "logo" || kind === "photo" ? IMAGE_ACCEPT : PORTAL_UPLOAD_ACCEPT}
+        accept={kind === "logo" || kind === "photo" || folder === "photos" ? IMAGE_ACCEPT : PORTAL_UPLOAD_ACCEPT}
         className="hidden"
         onChange={(e) => handle(e.target.files?.[0])}
       />
-      <p className="text-xs text-muted-foreground">{kind === "logo" || kind === "photo" ? t("imageRules") : t("rules")}</p>
+      <p className="text-xs text-muted-foreground">{kind === "logo" || kind === "photo" || folder === "photos" ? t("imageRules") : t("rules")}</p>
       {status.kind === "uploading" && (
         <div className="flex flex-col gap-1" aria-live="polite">
           <p className="truncate text-sm text-foreground">{t("uploading", { name: status.name })}</p>
