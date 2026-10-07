@@ -16,6 +16,7 @@ export const PARTNER_MAX_PHOTOS = 12;
 export const PARTNER_MAX_REFERRALS_PER_DAY = 20;
 export const PARTNER_MAX_PROFILE_CHANGES_PER_DAY = 10;
 export const PARTNER_MAX_SERVICES = 30;
+export const PARTNER_MAX_MEETING_REQUESTS_PER_DAY = 5;
 
 // Contractor license / insurance: alert staff this many days before.
 export const PARTNER_EXPIRY_ALERT_DAYS = 30;

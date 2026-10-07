@@ -19,6 +19,7 @@ process.env.AUTH_SECRET ??= "isolation-test-secret";
 
 const {
   allianceDocuments,
+  appointments,
   cases,
   clientCommunicationPreferences,
   clients,
@@ -391,6 +392,43 @@ async function main() {
       q.createPartnerReferral(db, { allianceId: allyA.id, input: { name: "Direct Three", phone: "(555) 555-0603", permission: true, directTo: allyC.id, requestedService: "Tile" }, ...evidence }),
       q.PartnerValidationError,
     );
+  });
+
+  // ── Phase B4: the ally's calendar ────────────────────────────────────
+  const cal = await import("./calendar");
+  await ok("calendar: A sees only meetings staff marked for A; referral visits only date+service with consent", async () => {
+    const soon = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+    const later = new Date(soon.getTime() + 60 * 60 * 1000);
+    const appt = (values: Partial<typeof appointments.$inferInsert>) =>
+      db
+        .insert(appointments)
+        .values({ clientId: clientB.id, title: "x", serviceType: "immigration", startAt: soon, endAt: later, ...values })
+        .returning()
+        .then((r) => r[0]);
+    const meetingA = await appt({ allianceId: allyA.id, partnerVisible: true, title: "Quarterly review with AMS", notes: "MEETING-NOTES" });
+    await appt({ allianceId: allyA.id, partnerVisible: false, title: "Client visit tied to A" });
+    await appt({ allianceId: allyB.id, partnerVisible: true, title: "B meeting" });
+    await appt({ clientId: clientShared.id, title: "SECRET VISIT", location: "SECRET PLACE", notes: "SECRET NOTES", serviceType: "tax_prep" });
+    await appt({ clientId: clientPrivate.id, title: "PRIVATE VISIT", serviceType: "notary" });
+
+    const a = await cal.listPartnerCalendar(db, allyA.id);
+    assert.deepEqual(a.meetings.map((m) => m.id), [meetingA.id]);
+    assert.ok(!JSON.stringify(a.meetings).includes("MEETING-NOTES"));
+    assert.deepEqual(a.referralAppointments.map((r) => r.serviceType), ["tax_prep"]);
+    assert.deepEqual(Object.keys(a.referralAppointments[0]).sort(), ["serviceType", "startAt"]);
+    assert.ok(!JSON.stringify(a).includes("SECRET") && !JSON.stringify(a).includes("PRIVATE VISIT"));
+
+    const b = await cal.listPartnerCalendar(db, allyB.id);
+    assert.ok(!b.meetings.some((m) => m.id === meetingA.id));
+    assert.ok(!b.referralAppointments.some((r) => r.serviceType === "tax_prep"));
+  });
+  await ok("calendar: 'Request a meeting' creates a task for staff, with limits", async () => {
+    await assert.rejects(cal.requestPartnerMeeting(db, { allianceId: allyB.id, input: { topic: "", preferred: "Tue" } }), q.PartnerValidationError);
+    await cal.requestPartnerMeeting(db, { allianceId: allyB.id, input: { topic: "New services", preferred: "Tuesday afternoon", mode: "video" } });
+    const [task] = await db.select().from(tasks).where(and(eq(tasks.allianceId, allyB.id), eq(tasks.type, "partner_meeting_request")));
+    assert.ok(task.title.includes("New services") && task.title.includes("video call"));
+    for (let i = 0; i < 4; i++) await cal.requestPartnerMeeting(db, { allianceId: allyB.id, input: { topic: "More", preferred: "Any" } });
+    await assert.rejects(cal.requestPartnerMeeting(db, { allianceId: allyB.id, input: { topic: "One more", preferred: "Any" } }), q.PartnerLimitError);
   });
 
   // ── tasks invariant ──────────────────────────────────────────────────

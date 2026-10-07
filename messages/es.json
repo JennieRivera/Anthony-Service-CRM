@@ -1811,7 +1811,9 @@
       "notes": "Notas",
       "save": "Guardar Cita",
       "saving": "Guardando...",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "partnerVisible": "Mostrar en el calendario del aliado",
+      "partnerVisibleHint": "Para reuniones con el aliado: la ve en su portal (fecha, hora, título, tipo y lugar; nunca el cliente ni las notas)."
     },
     "detail": {
       "clientName": "Nombre del Cliente",
@@ -2207,7 +2209,8 @@
     "partner_referral": "Referido de un Aliado",
     "partner_license_expiring": "Licencia/Seguro del Aliado por Vencer",
     "partner_referral_assign": "Asignar Referido a un Aliado",
-    "partner_network_review": "Revisar Red del Aliado"
+    "partner_network_review": "Revisar Red del Aliado",
+    "partner_meeting_request": "Solicitud de Reunión del Aliado"
   },
   "Tasks": {
     "title": "Tareas",
@@ -4792,7 +4795,8 @@
       "referrals": "Referidos",
       "more": "Más",
       "network": "Mi red",
-      "directory": "Directorio"
+      "directory": "Directorio",
+      "calendar": "Calendario"
     },
     "access": {
       "title": "Su portal de aliado",
@@ -5041,6 +5045,39 @@
       "off": "Su negocio no aparece en el directorio.",
       "saved": "Guardado.",
       "error": "No se pudo guardar. Inténtelo de nuevo."
+    },
+    "calendar": {
+      "title": "Calendario",
+      "intro": "Sus reuniones con Anthony Multiservice y las citas de sus referidos.",
+      "meetingsTitle": "Próximas reuniones con Anthony Multiservice",
+      "noMeetings": "No tiene reuniones programadas.",
+      "pastTitle": "Reuniones anteriores",
+      "referralsTitle": "Citas de sus referidos",
+      "referralsHint": "Solo la fecha y el servicio, y solo de los clientes que dieron permiso para compartir sus datos con aliados.",
+      "noReferralAppointments": "No hay citas para mostrar.",
+      "request": "Pedir reunión",
+      "fields": {
+        "topic": "¿De qué quiere hablar?",
+        "preferred": "Días y horas que le convienen",
+        "preferredPlaceholder": "Por ejemplo: martes o jueves en la tarde",
+        "mode": "¿Cómo prefiere reunirse?",
+        "note": "Nota (opcional)"
+      },
+      "modes": {
+        "in_person": "En persona",
+        "phone": "Por teléfono",
+        "video": "Por videollamada"
+      },
+      "send": "Enviar solicitud",
+      "sending": "Enviando…",
+      "cancel": "Cancelar",
+      "requested": "¡Gracias! Anthony Multiservice le confirmará la reunión.",
+      "errors": {
+        "topic": "Escriba de qué quiere hablar.",
+        "preferred": "Escriba qué días y horas le convienen.",
+        "limit_reached": "Ya pidió varias reuniones hoy. Inténtelo mañana.",
+        "generic": "No se pudo enviar. Inténtelo de nuevo."
+      }
     }
   },
   "PartnerAccess": {

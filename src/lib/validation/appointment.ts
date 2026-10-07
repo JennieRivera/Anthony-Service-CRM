@@ -47,6 +47,8 @@ export const appointmentFormSchema = z
     newClientBusinessName: optionalString,
     caseId: optionalString,
     allianceId: optionalString,
+    // Show in that ally's portal calendar (a meeting with the ally).
+    partnerVisible: z.boolean().optional(),
     title: z.string().trim().min(1, "Title is required"),
     serviceType: z.enum(serviceTypeValues),
     appointmentType: z.enum(appointmentTypeValues),

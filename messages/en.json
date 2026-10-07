@@ -1811,7 +1811,9 @@
       "notes": "Notes",
       "save": "Save Appointment",
       "saving": "Saving...",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "partnerVisible": "Show in the ally's calendar",
+      "partnerVisibleHint": "For meetings with the ally: it sees it in its portal (date, time, title, type and place; never the client or notes)."
     },
     "detail": {
       "clientName": "Client Name",
@@ -2207,7 +2209,8 @@
     "partner_referral": "Referral from a Partner",
     "partner_license_expiring": "Partner License/Insurance Expiring",
     "partner_referral_assign": "Assign Referral to an Ally",
-    "partner_network_review": "Review Ally Network"
+    "partner_network_review": "Review Ally Network",
+    "partner_meeting_request": "Ally Meeting Request"
   },
   "Tasks": {
     "title": "Tasks",
@@ -4792,7 +4795,8 @@
       "referrals": "Referrals",
       "more": "More",
       "network": "My network",
-      "directory": "Directory"
+      "directory": "Directory",
+      "calendar": "Calendar"
     },
     "access": {
       "title": "Your partner portal",
@@ -5041,6 +5045,39 @@
       "off": "Your business does not appear in the directory.",
       "saved": "Saved.",
       "error": "Couldn't save. Please try again."
+    },
+    "calendar": {
+      "title": "Calendar",
+      "intro": "Your meetings with Anthony Multiservice and your referrals' appointments.",
+      "meetingsTitle": "Upcoming meetings with Anthony Multiservice",
+      "noMeetings": "You have no meetings scheduled.",
+      "pastTitle": "Past meetings",
+      "referralsTitle": "Your referrals' appointments",
+      "referralsHint": "Only the date and the service, and only for clients who gave permission to share their details with allies.",
+      "noReferralAppointments": "No appointments to show.",
+      "request": "Request a meeting",
+      "fields": {
+        "topic": "What would you like to talk about?",
+        "preferred": "Days and times that work for you",
+        "preferredPlaceholder": "For example: Tuesday or Thursday afternoon",
+        "mode": "How would you like to meet?",
+        "note": "Note (optional)"
+      },
+      "modes": {
+        "in_person": "In person",
+        "phone": "By phone",
+        "video": "By video call"
+      },
+      "send": "Send request",
+      "sending": "Sending…",
+      "cancel": "Cancel",
+      "requested": "Thank you! Anthony Multiservice will confirm the meeting.",
+      "errors": {
+        "topic": "Write what you'd like to talk about.",
+        "preferred": "Write which days and times work for you.",
+        "limit_reached": "You already requested several meetings today. Please try again tomorrow.",
+        "generic": "Couldn't send. Please try again."
+      }
     }
   },
   "PartnerAccess": {

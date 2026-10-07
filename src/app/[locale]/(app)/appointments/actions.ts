@@ -75,6 +75,8 @@ function normalize(
     clientId,
     caseId: values.caseId || null,
     allianceId: values.allianceId || null,
+    // Only meaningful with an alliance: then it shows in that ally's portal.
+    partnerVisible: Boolean(values.allianceId) && values.partnerVisible === true,
     title: values.title,
     serviceType: values.serviceType,
     appointmentType: values.appointmentType,

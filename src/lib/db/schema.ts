@@ -1031,6 +1031,9 @@ export const taskTypeEnum = pgEnum("task_type", [
   // document to its network.
   "partner_referral_assign",
   "partner_network_review",
+  // Partner portal (Phase B4) — an ally asked for a meeting ("Request a
+  // meeting"); staff confirms it and creates the appointment.
+  "partner_meeting_request",
 ]);
 
 export const taskStatusEnum = pgEnum("task_status", [
@@ -1365,6 +1368,11 @@ export const appointments = pgTable("appointments", {
   allianceId: uuid("alliance_id").references(() => strategicAlliances.id, {
     onDelete: "set null",
   }),
+  // Partner portal (Phase B4): a meeting between AMS and the alliance above,
+  // shown in that ally's portal calendar (date, time, title, type, place —
+  // never the client or notes). Off by default: an appointment merely tied
+  // to an alliance (e.g. a referred client's visit) is never shown to it.
+  partnerVisible: boolean("partner_visible").notNull().default(false),
   title: text("title").notNull(),
   serviceType: serviceTypeEnum("service_type").notNull(),
   startAt: timestamp("start_at", { withTimezone: true }).notNull(),

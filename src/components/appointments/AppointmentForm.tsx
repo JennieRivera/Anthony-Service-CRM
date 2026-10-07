@@ -89,6 +89,7 @@ export function AppointmentForm({
       newClientBusinessName: "",
       caseId: appointment?.caseId ?? "",
       allianceId: appointment?.allianceId ?? "",
+      partnerVisible: appointment?.partnerVisible ?? false,
       title: appointment?.title ?? "",
       // No default service: staff must pick one.
       serviceType: appointment?.serviceType ?? ("" as AppointmentFormValues["serviceType"]),
@@ -107,6 +108,7 @@ export function AppointmentForm({
 
   const selectedClientId = watch("clientId");
   const paymentRequired = watch("paymentRequired");
+  const selectedAllianceId = watch("allianceId");
   const clientCases = cases.filter((c) => c.clientId === selectedClientId);
 
   async function submit(values: AppointmentFormValues) {
@@ -197,6 +199,21 @@ export function AppointmentForm({
               </Select>
             )}
           />
+          {selectedAllianceId && (
+            <div className="flex items-start gap-2 pt-1">
+              <Controller
+                control={control}
+                name="partnerVisible"
+                render={({ field }) => (
+                  <Checkbox id="partnerVisible" checked={field.value === true} onCheckedChange={(v) => field.onChange(v === true)} className="mt-0.5" />
+                )}
+              />
+              <div className="flex flex-col gap-0.5">
+                <Label htmlFor="partnerVisible">{t("partnerVisible")}</Label>
+                <p className="text-xs text-muted-foreground">{t("partnerVisibleHint")}</p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
