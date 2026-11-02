@@ -58,8 +58,10 @@ function CaseCard({ item }: { item: CaseCardData }) {
         {item.title}
       </Link>
       <span className="text-sm text-muted-foreground">{item.clientName}</span>
-      <div className="flex items-center justify-between">
-        <Badge variant="outline">{tService(item.serviceType)}</Badge>
+      <div className="flex items-center justify-between gap-2">
+        <Badge variant="outline" className="h-auto min-w-0 shrink whitespace-normal">
+          {tService(item.serviceType)}
+        </Badge>
         {item.fee && (
           <span className="text-sm font-medium text-foreground">
             ${Number(item.fee).toFixed(2)}

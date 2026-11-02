@@ -8,6 +8,7 @@ import { TriangleAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import {
   testIntegrationConnectionAction,
@@ -135,20 +136,28 @@ export function IntegrationCard({ integration }: { integration: Integration }) {
         )}
       </div>
 
-      <div className="flex justify-end gap-2">
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          disabled={isPending}
-          onClick={disconnect}
-        >
-          {t("disconnect")}
-        </Button>
-        <Button type="button" size="sm" disabled={isPending} onClick={testConnection}>
-          {t("testConnection")}
-        </Button>
-      </div>
+      {integration.managedBy ? (
+        <div className="flex justify-end">
+          <Button size="sm" variant="outline" render={<Link href="/settings/notifications" />}>
+            {t("manageInNotifications")}
+          </Button>
+        </div>
+      ) : (
+        <div className="flex justify-end gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={isPending}
+            onClick={disconnect}
+          >
+            {t("disconnect")}
+          </Button>
+          <Button type="button" size="sm" disabled={isPending} onClick={testConnection}>
+            {t("testConnection")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

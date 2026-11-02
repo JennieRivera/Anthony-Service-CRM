@@ -23,6 +23,10 @@ export type IntegrationDefinition = {
     | "calendar_sync";
   connectionType: IntegrationConnectionType;
   envVarName?: string;
+  // Live providers run by the notification engine: their real state comes
+  // from src/lib/notifications/providers.ts, and they are managed on
+  // /settings/notifications rather than with Test / Disconnect here.
+  managedBy?: "notifications";
 };
 
 export const INTEGRATION_DEFINITIONS: IntegrationDefinition[] = [
@@ -30,8 +34,8 @@ export const INTEGRATION_DEFINITIONS: IntegrationDefinition[] = [
   { key: "whatsapp", category: "communications", connectionType: "api", envVarName: "WHATSAPP_API_KEY" },
   { key: "meta_facebook", category: "communications", connectionType: "api", envVarName: "META_FACEBOOK_TOKEN" },
   { key: "meta_instagram", category: "communications", connectionType: "api", envVarName: "META_INSTAGRAM_TOKEN" },
-  { key: "email_provider", category: "communications", connectionType: "smtp", envVarName: "EMAIL_PROVIDER_API_KEY" },
-  { key: "sms_provider", category: "communications", connectionType: "api", envVarName: "SMS_PROVIDER_API_KEY" },
+  { key: "email_provider", category: "communications", connectionType: "api", managedBy: "notifications" },
+  { key: "sms_provider", category: "communications", connectionType: "api", managedBy: "notifications" },
   { key: "google_drive", category: "productivity", connectionType: "oauth", envVarName: "GOOGLE_DRIVE_CLIENT_ID" },
   { key: "quickbooks", category: "productivity", connectionType: "oauth", envVarName: "QUICKBOOKS_CLIENT_ID" },
   { key: "tax_software", category: "professional_systems", connectionType: "unknown", envVarName: "TAX_SOFTWARE_API_KEY" },

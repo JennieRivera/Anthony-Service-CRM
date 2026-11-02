@@ -1300,8 +1300,9 @@
   },
   "Integrations": {
     "title": "Integrations",
-    "description": "Every integration named in the Phase 4 plan, prepared but not yet activated. Test Connection checks only whether the server has the relevant environment variable set — it never reads or displays the value.",
+    "description": "Status of the CRM's connections to other services. Email and SMS are managed in Automatic Notices; the others are prepared but not yet activated. Test Connection checks only whether the server has the relevant environment variable set — it never reads or displays the value.",
     "backToSettings": "Back to Settings",
+    "manageInNotifications": "Manage in Automatic Notices",
     "categories": {
       "communications": "Communications",
       "calendar_sync": "Calendar Sync",
@@ -5417,5 +5418,24 @@
     "partner_service_removed": "The ally removed a service",
     "partner_directory_opt_in": "The ally agreed to appear in the network directory",
     "partner_directory_opt_out": "The ally left the network directory"
+  },
+  "CertificatePdf": {
+    "revoked": "REVOKED",
+    "heading": "Certificate of Completion",
+    "certifies": "This certifies that",
+    "completed": "has successfully completed",
+    "issueDate": "Issue Date",
+    "completionDate": "Completion Date",
+    "authorizedSignature": "Authorized Signature",
+    "certificateNumber": "Certificate No."
+  },
+  "ErrorPages": {
+    "errorTitle": "We couldn't load this page",
+    "errorDescription": "Something went wrong while opening this page. Try again; if it keeps happening, go back to the start.",
+    "errorCode": "Error code: {code}",
+    "retry": "Try again",
+    "notFoundTitle": "We couldn't find this page",
+    "notFoundDescription": "The link may be wrong, or the record no longer exists.",
+    "goHome": "Back to start"
   }
 }

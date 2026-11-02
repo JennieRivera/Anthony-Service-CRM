@@ -100,7 +100,7 @@ export default async function InvoiceDetailPage({
           </div>
           {caseTitle && (
             <div>
-              <p className="text-muted-foreground">Case</p>
+              <p className="text-muted-foreground">{t("form.case")}</p>
               <p className="text-foreground">{caseTitle}</p>
             </div>
           )}

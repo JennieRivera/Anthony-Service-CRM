@@ -137,7 +137,7 @@ export default async function ReportsPage({
       <DateRangeForm key={`${from}_${to}`} from={from} to={to} tab={tab} />
 
       <Tabs defaultValue={activeTab}>
-        <TabsList>
+        <TabsList className="max-w-full flex-wrap justify-start group-data-horizontal/tabs:h-auto">
           {visibility.full && <TabsTrigger value="overview">{t("tabOverview")}</TabsTrigger>}
           {visibility.full && <TabsTrigger value="billing">{t("tabBilling")}</TabsTrigger>}
           {visibility.full && <TabsTrigger value="payments">{t("tabPayments")}</TabsTrigger>}

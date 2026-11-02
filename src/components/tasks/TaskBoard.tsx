@@ -266,7 +266,7 @@ export function TaskBoard({
                 <TableHead>{t("columnClient")}</TableHead>
                 <TableHead>{t("columnCase")}</TableHead>
                 <TableHead>{t("columnDueDate")}</TableHead>
-                <TableHead />
+                <TableHead className="sticky right-0 bg-card" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -281,7 +281,7 @@ export function TaskBoard({
                     <TableCell>
                       <Badge variant="outline">{tType(task.type)}</Badge>
                     </TableCell>
-                    <TableCell className="max-w-md whitespace-normal">
+                    <TableCell className="max-w-md min-w-56 whitespace-normal">
                       <button
                         type="button"
                         className="cursor-pointer text-left font-medium text-primary underline-offset-2 hover:underline"
@@ -302,7 +302,7 @@ export function TaskBoard({
                         {whoName(task)}
                       </Link>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="max-w-48 whitespace-normal">
                       {task.caseId ? (
                         <Link
                           href={`/cases/${task.caseId}`}
@@ -320,7 +320,7 @@ export function TaskBoard({
                       {overdue && <span className="block text-xs">{t("overdue")}</span>}
                       {task.dueDate === today && <span className="block text-xs text-foreground">{t("dueToday")}</span>}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="sticky right-0 bg-card">
                       <div className="flex flex-wrap justify-end gap-2">
                         <DirectButton action={directAction(task)} />
                         <Button

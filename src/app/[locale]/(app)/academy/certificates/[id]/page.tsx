@@ -10,9 +10,9 @@ import { formatDate } from "@/lib/dates";
 export default async function CertificateViewPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }) {
-  const { id } = await params;
+  const { id, locale } = await params;
   const t = await getTranslations("AcademyCertificates");
 
   const certificate = await getCertificateById(id);
@@ -34,7 +34,7 @@ export default async function CertificateViewPage({
           <CertificatePrintButton label={t("print")} />
           <Button
             variant="outline"
-            render={<a href={`/api/academy/certificates/${id}/pdf`} />}
+            render={<a href={`/api/academy/certificates/${id}/pdf?locale=${locale}`} />}
           >
             <Download className="h-4 w-4" />
             {t("downloadPdf")}

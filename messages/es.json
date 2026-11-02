@@ -1300,8 +1300,9 @@
   },
   "Integrations": {
     "title": "Integraciones",
-    "description": "Cada integración nombrada en el plan de Fase 4, preparada pero aún no activada. Probar Conexión solo verifica si el servidor tiene configurada la variable de entorno correspondiente — nunca lee ni muestra su valor.",
+    "description": "Estado de las conexiones del CRM con otros servicios. El correo y el SMS se administran en Avisos automáticos; las demás están preparadas pero aún no activadas. Probar Conexión solo verifica si el servidor tiene configurada la variable de entorno correspondiente — nunca lee ni muestra su valor.",
     "backToSettings": "Volver a Configuración",
+    "manageInNotifications": "Administrar en Avisos automáticos",
     "categories": {
       "communications": "Comunicaciones",
       "calendar_sync": "Sincronización de Calendario",
@@ -5417,5 +5418,24 @@
     "partner_service_removed": "El aliado quitó un servicio",
     "partner_directory_opt_in": "El aliado aceptó aparecer en el directorio de la red",
     "partner_directory_opt_out": "El aliado salió del directorio de la red"
+  },
+  "CertificatePdf": {
+    "revoked": "REVOCADO",
+    "heading": "Certificado de Finalización",
+    "certifies": "Se certifica que",
+    "completed": "ha completado satisfactoriamente",
+    "issueDate": "Fecha de Emisión",
+    "completionDate": "Fecha de Finalización",
+    "authorizedSignature": "Firma Autorizada",
+    "certificateNumber": "Certificado No."
+  },
+  "ErrorPages": {
+    "errorTitle": "No pudimos cargar esta página",
+    "errorDescription": "Ocurrió un problema al abrir esta página. Intente de nuevo; si sigue pasando, vuelva al inicio.",
+    "errorCode": "Código del error: {code}",
+    "retry": "Intentar de nuevo",
+    "notFoundTitle": "No encontramos esta página",
+    "notFoundDescription": "El enlace puede estar equivocado, o el registro ya no existe.",
+    "goHome": "Volver al inicio"
   }
 }

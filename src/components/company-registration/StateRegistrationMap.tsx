@@ -239,7 +239,7 @@ export function StateRegistrationMap() {
                 <Button
                   size="sm"
                   variant="outline"
-                  render={<Link href={`/associations?state=${selectedState}`} />}
+                  render={<Link href={`/community?tab=associations&state=${selectedState}`} />}
                 >
                   {t("viewAssociations")}
                 </Button>

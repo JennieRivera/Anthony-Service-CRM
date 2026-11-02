@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { integrationSettings } from "@/lib/db/schema";
-import { getIntegrationDefinition } from "@/lib/integrations";
+import { getIntegrationDefinition, type IntegrationDefinition } from "@/lib/integrations";
 import { logAuditEvent } from "@/lib/audit";
 import { requireAccessArea } from "@/lib/permissions";
 
@@ -13,6 +13,10 @@ async function ensureRow(integrationKey: string) {
     .insert(integrationSettings)
     .values({ integrationKey })
     .onConflictDoNothing({ target: integrationSettings.integrationKey });
+}
+
+function assertNotManaged(definition: IntegrationDefinition) {
+  if (definition.managedBy) throw new Error("Managed in notification settings");
 }
 
 // Checks only whether the integration's env var is *set* on the server —
@@ -24,6 +28,7 @@ export async function testIntegrationConnectionAction(integrationKey: string) {
   await requireAccessArea("settings");
   const definition = getIntegrationDefinition(integrationKey);
   if (!definition) throw new Error("Unknown integration");
+  assertNotManaged(definition);
 
   await ensureRow(integrationKey);
 
@@ -75,6 +80,10 @@ export async function testIntegrationConnectionAction(integrationKey: string) {
 
 export async function disconnectIntegrationAction(integrationKey: string) {
   await requireAccessArea("settings");
+  const definition = getIntegrationDefinition(integrationKey);
+  if (!definition) throw new Error("Unknown integration");
+  assertNotManaged(definition);
+
   await ensureRow(integrationKey);
   await getDb()
     .update(integrationSettings)

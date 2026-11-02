@@ -83,7 +83,27 @@ const styles = StyleSheet.create({
   },
 });
 
-export function CertificatePdf({ certificate }: { certificate: AcademyCertificate }) {
+export type CertificatePdfLabels = Record<
+  | "revoked"
+  | "heading"
+  | "certifies"
+  | "completed"
+  | "issueDate"
+  | "completionDate"
+  | "authorizedSignature"
+  | "certificateNumber",
+  string
+>;
+
+export function CertificatePdf({
+  certificate,
+  labels,
+  locale,
+}: {
+  certificate: AcademyCertificate;
+  labels: CertificatePdfLabels;
+  locale: string;
+}) {
   const certificateNumber = formatCertificateNumber(certificate.certificateSeq, certificate.issueDate);
   const revoked = certificate.status === "revoked";
 
@@ -91,12 +111,12 @@ export function CertificatePdf({ certificate }: { certificate: AcademyCertificat
     <Document>
       <Page size="LETTER" orientation="landscape" style={styles.page}>
         <View style={styles.frame}>
-          {revoked && <Text style={styles.revokedBanner}>REVOKED</Text>}
+          {revoked && <Text style={styles.revokedBanner}>{labels.revoked}</Text>}
           <Text style={styles.issuer}>Anthony Multiservice Academy</Text>
-          <Text style={styles.heading}>Certificate of Completion</Text>
-          <Text style={styles.muted}>This certifies that</Text>
+          <Text style={styles.heading}>{labels.heading}</Text>
+          <Text style={styles.muted}>{labels.certifies}</Text>
           <Text style={styles.studentName}>{certificate.studentNameSnapshot}</Text>
-          <Text style={styles.muted}>has successfully completed</Text>
+          <Text style={styles.muted}>{labels.completed}</Text>
           <Text style={styles.courseName}>
             {certificate.courseNameSnapshot}
             {certificate.programNameSnapshot ? ` — ${certificate.programNameSnapshot}` : ""}
@@ -104,23 +124,23 @@ export function CertificatePdf({ certificate }: { certificate: AcademyCertificat
 
           <View style={styles.datesRow}>
             <View>
-              <Text style={styles.dateLabel}>Issue Date</Text>
-              <Text style={styles.dateValue}>{formatDate(certificate.issueDate)}</Text>
+              <Text style={styles.dateLabel}>{labels.issueDate}</Text>
+              <Text style={styles.dateValue}>{formatDate(certificate.issueDate, locale)}</Text>
             </View>
             <View>
-              <Text style={styles.dateLabel}>Completion Date</Text>
+              <Text style={styles.dateLabel}>{labels.completionDate}</Text>
               <Text style={styles.dateValue}>
-                {certificate.completionDate ? formatDate(certificate.completionDate) : "—"}
+                {certificate.completionDate ? formatDate(certificate.completionDate, locale) : "—"}
               </Text>
             </View>
           </View>
 
           <View style={styles.signatureBlock}>
             <Text>{certificate.issuedBy}</Text>
-            <Text style={styles.dateLabel}>Authorized Signature</Text>
+            <Text style={styles.dateLabel}>{labels.authorizedSignature}</Text>
           </View>
 
-          <Text style={styles.certNumber}>Certificate No. {certificateNumber}</Text>
+          <Text style={styles.certNumber}>{labels.certificateNumber} {certificateNumber}</Text>
         </View>
       </Page>
     </Document>
