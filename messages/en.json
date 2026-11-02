@@ -465,6 +465,15 @@
     "outstandingBalance": "Outstanding Balance",
     "notes": "Notes",
     "form": {
+            "address": "Address",
+      "bestTimeToCall": "Best time to call",
+      "bestTimeNotSet": "Not set",
+      "bestTimes": {
+        "morning": "Morning",
+        "midday": "Midday",
+        "afternoon": "Afternoon",
+        "evening": "Evening"
+      },
       "fullName": "Full Name",
       "email": "Email",
       "phone": "Phone",

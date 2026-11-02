@@ -465,6 +465,15 @@
     "outstandingBalance": "Balance Pendiente",
     "notes": "Notas",
     "form": {
+            "address": "Dirección",
+      "bestTimeToCall": "Mejor hora para llamar",
+      "bestTimeNotSet": "Sin indicar",
+      "bestTimes": {
+        "morning": "Mañana",
+        "midday": "Mediodía",
+        "afternoon": "Tarde",
+        "evening": "Noche"
+      },
       "fullName": "Nombre Completo",
       "email": "Correo Electrónico",
       "phone": "Teléfono",
