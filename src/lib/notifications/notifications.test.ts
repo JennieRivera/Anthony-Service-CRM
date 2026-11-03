@@ -55,7 +55,7 @@ async function pureTests() {
     const short = DEFAULT_LEGAL_TEXTS.not_a_law_firm_email.es;
     const { html, text } = renderEmail("Hola", "es", short, "client");
     for (const out of [html, text]) {
-      assert.ok(out.includes("Anthony Multiservice no es una firma de abogados y no ofrece asesoría legal."));
+      assert.ok(out.includes(short));
       assert.ok(out.includes("Tel. (689) 342-6309"));
       assert.ok(!out.includes(DEFAULT_LEGAL_TEXTS.not_a_law_firm.es));
     }
